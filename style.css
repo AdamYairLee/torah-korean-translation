@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
+
+.hebrew-text { 
+    font-family: 'Hadassah Friedlaender', serif; 
+    font-size: 1.5em; 
+    margin-bottom: 5px; 
+    color: #000;
+}
+.korean-text { font-size: 1em; margin-bottom: 10px; color: #333; }
+.verse-number {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-right: 10px;
+    color: #0078d7;
+}
+.rashi-container { background: #f0f0f0; padding: 10px; border-left: 4px solid #0078d7; margin-top: 10px; }
+.rashi-title { font-size: 14px !important; color: #0078d7; font-weight: bold; margin-bottom: 5px; }
+.rashi-body { font-size: 13px !important; line-height: 1.5; color: #222; }
+/* --- 슈타인잘쯔 전용 디자인 (기존 코드 맨 아래에 추가) --- */
+
+/* 슈타인잘쯔 전용 제목 (16px, Bold) */
+.steinsaltz-content .title-highlight { 
+    font-size: 16px; 
+    font-weight: bold; 
+    margin-top: 20px; 
+}
+
+/* 슈타인잘쯔 전용 본문 (10px) */
+.steinsaltz-content .korean-text { 
+    font-size: 10px; 
+    line-height: 1.6; 
+}
+
+/* 괄호 안 내용 (8px, 회색) - 슈타인잘쯔 전용 */
+.steinsaltz-content .korean-text span { 
+    font-size: 8px; 
+    color: gray; 
+}
+
+/* 히브리어 전용 */
+.steinsaltz-content .hebrew-text { 
+    font-size: 10px; 
+    color: black; 
+    font-family: 'Hadassah Friedlaender', serif; 
+}
+body { font-family: 'NanumSquare', sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
+
+/* 상단 메뉴바 */
+.header-menu { background: #fff; padding: 20px; border-bottom: 1px solid #ddd; text-align: center; }
+.menu-group { margin: 10px 0; }
+.menu-group h3 { font-size: 14px; color: #888; margin-bottom: 5px; }
+
+/* 버튼 디자인 */
+button { 
+    padding: 10px 20px; margin: 5px; cursor: pointer; 
+    background: #fff; border: 1px solid #333; border-radius: 4px; transition: 0.3s;
+}
+button:hover { background: #333; color: #fff; }
+
+/* 본문 영역 */
+#torah-container { max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.8; }
+/* 괄호 디자인 */
+.parens { font-size: 12px; color: #888; } 
+
+/* 슈타인잘쯔 제목 */
+.s-title { font-size: 20px; font-weight: bold; margin: 30px 0 15px 0; color: #333; }
+
+/* 본문 디자인 */
+.s-body { font-size: 16px; line-height: 1.8; margin-bottom: 20px; color: #222; white-space: pre-line; }
+/* 절 번호 스타일 */
+.verse-number { font-size: 10px; color: #999; margin-right: 10px; vertical-align: top; }
+
+/* 토라 구절 사이 간격 */
+.verse-item { margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #eee; }
+
+/* 기본 모드(라이트) 스타일은 유지하시고, 아래를 추가하세요 */
+.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-mode button {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.dark-mode .verse-item {
+    border-bottom: 1px solid #333;
+}
+/* 다크 모드 스타일 (전체 적용) */
+.dark-mode {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+/* 다크 모드일 때 모든 텍스트 색상 강제 지정 */
+.dark-mode *, 
+.dark-mode button {
+    color: #e0e0e0 !important;
+    border-color: #555 !important;
+    background-color: transparent;
+}
+
+/* 다크 모드일 때 버튼 배경 */
+.dark-mode button {
+    background-color: #333 !important;
+}
+
+/* 다크 모드일 때 구분선 */
+.dark-mode .verse-item {
+    border-bottom: 1px solid #333 !important;
+}
+/* style.css */
+.dark-mode #bsd {
+    color: #bbb !important; /* 다크 모드일 때 글씨를 밝게 변경 */
+}
+/* style.css 맨 아래에 추가 */
+.sub-menu {
+    margin: 5px 0 15px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.dark-mode .sub-menu {
+    border-color: #444;
+}
+/* 본문 전체 글자를 왼쪽으로 정렬 */
+body {
+    text-align: left !important;
+}
+
+/* 메뉴 그룹도 왼쪽 정렬로 강제 지정 */
+.menu-group {
+    text-align: left !important;
+}
+
+/* 슈타인잘쯔나 토라 본문 내용도 왼쪽 정렬 */
+#torah-container {
+    text-align: left !important;
+}
+/* 하단 작은 메뉴들 */
+.footer-menu {
+    text-align: right; /* 오른쪽 정렬 */
+    margin-top: 20px;
+}
+
+.small-btn {
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+    margin-left: 5px;
+}
+
+/* 페이드인 오버레이 */
+.info-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.info-content {
+    background: #fff;
+    padding: 30px;
+    max-width: 600px;
+    color: #555;
+    border-radius: 10px;
+}
+
+.dark-mode .info-content { background: #1e1e1e; color: #ccc; }
