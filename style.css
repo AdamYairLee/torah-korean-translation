@@ -173,3 +173,56 @@ body {
 }
 
 .dark-mode .info-content { background: #1e1e1e; color: #ccc; }
+/* 기존 다크모드 버튼과 בס"ד가 들어있는 상단 컨테이너(예: header 혹은 nav)에 적용 */
+.header-top {
+    display: flex;
+    justify-content: space-between; /* 양 끝으로 배치 */
+    align-items: center;
+    padding: 10px 20px;
+}
+
+/* בס"ד 텍스트 스타일 */
+.basd-text {
+    font-size: 24px; /* 글씨 크기 키우기 */
+    font-weight: bold;
+}
+/* 타이틀 위치 조정 */
+h1 {
+    margin-top: 7px; /* 숫자를 줄일수록 위로 올라감 */
+}
+
+/* 버튼들의 컨테이너 */
+.button-container {
+    display: flex;
+    gap: 5px; /* 버튼 사이 간격 */
+    justify-content: center; /* 가운데 정렬 */
+}
+/* 레이아웃 조정을 위한 추가 스타일 */
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.basd-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+h1 {
+    text-align: center;
+    margin-top: 10px;
+}
+.menu-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 20px;
+}
+.left-buttons {
+    display: flex;
+    gap: 15px;
+}
+.right-links {
+    display: flex;
+    gap: 10px;
+}
