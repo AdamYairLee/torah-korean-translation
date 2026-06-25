@@ -226,3 +226,16 @@ h1 {
     display: flex;
     gap: 10px;
 }
+/* 화면 가로폭이 768px 이하인 기기(핸드폰 등)에 적용 */
+@media (max-width: 768px) {
+    body {
+        font-size: 20px; /* 글자 크기를 조금 키움 */
+    }
+    h1 {
+        font-size: 24px; /* 타이틀 크기 조정 */
+    }
+    button {
+        padding: 12px 16px; /* 버튼 터치하기 좋게 패딩 증가 */
+        font-size: 16px;
+    }
+}
