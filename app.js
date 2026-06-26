@@ -18,7 +18,7 @@ function loadContent(filename) {
                     div.className = 'verse-item';
                     div.innerHTML = `
                         <div class="verse-header" style="cursor:pointer;">
-                            <span class="verse-number">1:${item.id}</span>
+                            <span class="verse-number">${item.chapter}:${item.verse}</span>
                             <span class="hebrew-text">${item.hebrew || ''}</span>
                         </div>
                         <div class="korean-text">${item.korean || ''}</div>
