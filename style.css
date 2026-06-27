@@ -1,241 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
 
-.hebrew-text { 
-    font-family: 'Hadassah Friedlaender', serif; 
-    font-size: 1.5em; 
-    margin-bottom: 5px; 
-    color: #000;
-}
-.korean-text { font-size: 1em; margin-bottom: 10px; color: #333; }
-.verse-number {
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-right: 10px;
-    color: #0078d7;
-}
-.rashi-container { background: #f0f0f0; padding: 10px; border-left: 4px solid #0078d7; margin-top: 10px; }
-.rashi-title { font-size: 14px !important; color: #0078d7; font-weight: bold; margin-bottom: 5px; }
-.rashi-body { font-size: 13px !important; line-height: 1.5; color: #222; }
-/* --- 슈타인잘쯔 전용 디자인 (기존 코드 맨 아래에 추가) --- */
+/* 1. 기본 설정 및 정렬 */
+body { font-family: 'NanumSquare', sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; text-align: left; min-height: 100vh; display: flex; flex-direction: column; }
+#torah-container { flex: 1; max-width: 800px; margin: 20px auto; padding: 20px; text-align: left; }
+h1 { text-align: center; margin-top: 10px; }
 
-/* 슈타인잘쯔 전용 제목 (16px, Bold) */
-.steinsaltz-content .title-highlight { 
-    font-size: 16px; 
-    font-weight: bold; 
-    margin-top: 20px; 
-}
+/* 2. 상단 헤더 */
+.header-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
+.basd-text { font-size: 24px; font-weight: bold; }
 
-/* 슈타인잘쯔 전용 본문 (10px) */
-.steinsaltz-content .korean-text { 
-    font-size: 10px; 
-    line-height: 1.6; 
-}
-
-/* 괄호 안 내용 (8px, 회색) - 슈타인잘쯔 전용 */
-.steinsaltz-content .korean-text span { 
-    font-size: 8px; 
-    color: gray; 
-}
-
-/* 히브리어 전용 */
-.steinsaltz-content .hebrew-text { 
-    font-size: 10px; 
-    color: black; 
-    font-family: 'Hadassah Friedlaender', serif; 
-}
-body { font-family: 'NanumSquare', sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
-
-/* 상단 메뉴바 */
-.header-menu { background: #fff; padding: 20px; border-bottom: 1px solid #ddd; text-align: center; }
-.menu-group { margin: 10px 0; }
-.menu-group h3 { font-size: 14px; color: #888; margin-bottom: 5px; }
-
-/* 버튼 디자인 */
-button { 
-    padding: 10px 20px; margin: 5px; cursor: pointer; 
-    background: #fff; border: 1px solid #333; border-radius: 4px; transition: 0.3s;
-}
+/* 3. 메뉴 및 버튼 배치 (가로 정렬 고정) */
+.menu-wrapper { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 20px; flex-wrap: wrap; }
+.left-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.right-links { display: flex; gap: 10px; }
+button { padding: 10px 15px; cursor: pointer; background: #fff; border: 1px solid #333; border-radius: 4px; transition: 0.3s; font-size: 14px; }
 button:hover { background: #333; color: #fff; }
 
-/* 본문 영역 */
-#torah-container { max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.8; }
-/* 괄호 디자인 */
-.parens { font-size: 12px; color: #888; } 
+/* 4. 검색 안내 */
+.search-guide { text-align: center; margin: 15px 0; font-size: 14px; color: #555; white-space: nowrap; width: 100%; }
 
-/* 슈타인잘쯔 제목 */
+/* 5. 콘텐츠 디자인 */
+.hebrew-text { font-family: 'Hadassah Friedlaender', serif; font-size: 1.5em; color: #000; }
+.korean-text { font-size: 1em; margin: 5px 0 10px 0; color: #333; }
+.verse-number { font-weight: bold; font-size: 0.8em; color: #999; margin-right: 10px; }
+.rashi-container { background: #f0f0f0; padding: 10px; border-left: 4px solid #0078d7; margin-top: 10px; }
+.rashi-title { font-size: 14px !important; color: #0078d7; font-weight: bold; }
+/* 라쉬 해설 본문 글자 크기 조정 */
+.rashi-body { 
+    font-size: 16px !important;  /* 기존보다 큰 16px로 조정 */
+    line-height: 1.6;           /* 줄 간격을 조금 더 넓혀서 읽기 편하게 함 */
+    color: #222; 
+    margin-top: 5px;
+}
+
+/* 6. 후원 영역 (항상 하단) */
+.footer-support { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background-color: #f9f9f9; }
+.support-text { margin: 5px 0 0 0; font-size: 14px; text-align: center; }
+
+/* 7. 다크 모드 */
+.dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
+.dark-mode *, .dark-mode button { color: #e0e0e0 !important; border-color: #555 !important; background-color: #333 !important; }
+.dark-mode .rashi-container { background: #222 !important; }
+
+/* 8. 슈타인잘쯔 강의 전용 디자인 (복구 완료) */
 .s-title { font-size: 20px; font-weight: bold; margin: 30px 0 15px 0; color: #333; }
+.s-body { 
+    font-size: 16px; 
+    line-height: 1.8; 
+    margin-bottom: 20px; 
+    color: #222; 
+    white-space: pre-line; /* 이 줄이 핵심! \n\n 줄바꿈을 살려줍니다 */
+}
+.parens { font-size: 12px; color: #888; margin-left: 5px; }
+.dark-mode .s-title, .dark-mode .s-body { color: #ccc !important; }
 
-/* 본문 디자인 */
-.s-body { font-size: 16px; line-height: 1.8; margin-bottom: 20px; color: #222; white-space: pre-line; }
-/* 절 번호 스타일 */
-.verse-number { font-size: 10px; color: #999; margin-right: 10px; vertical-align: top; }
-
-/* 토라 구절 사이 간격 */
-.verse-item { margin-bottom: 10px; padding: 5px; border-bottom: 1px solid #eee; }
-
-/* 기본 모드(라이트) 스타일은 유지하시고, 아래를 추가하세요 */
-.dark-mode {
-    background-color: #121212 !important;
-    color: #e0e0e0 !important;
-}
-
-.dark-mode button {
-    background-color: #333;
-    color: #fff;
-    border: 1px solid #555;
-}
-
-.dark-mode .verse-item {
-    border-bottom: 1px solid #333;
-}
-/* 다크 모드 스타일 (전체 적용) */
-.dark-mode {
-    background-color: #121212 !important;
-    color: #e0e0e0 !important;
-}
-
-/* 다크 모드일 때 모든 텍스트 색상 강제 지정 */
-.dark-mode *, 
-.dark-mode button {
-    color: #e0e0e0 !important;
-    border-color: #555 !important;
-    background-color: transparent;
-}
-
-/* 다크 모드일 때 버튼 배경 */
-.dark-mode button {
-    background-color: #333 !important;
-}
-
-/* 다크 모드일 때 구분선 */
-.dark-mode .verse-item {
-    border-bottom: 1px solid #333 !important;
-}
-/* style.css */
-.dark-mode #bsd {
-    color: #bbb !important; /* 다크 모드일 때 글씨를 밝게 변경 */
-}
-/* style.css 맨 아래에 추가 */
-.sub-menu {
-    margin: 5px 0 15px 0;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.dark-mode .sub-menu {
-    border-color: #444;
-}
-/* 본문 전체 글자를 왼쪽으로 정렬 */
-body {
-    text-align: left !important;
-}
-
-/* 메뉴 그룹도 왼쪽 정렬로 강제 지정 */
-.menu-group {
-    text-align: left !important;
-}
-
-/* 슈타인잘쯔나 토라 본문 내용도 왼쪽 정렬 */
-#torah-container {
-    text-align: left !important;
-}
-/* 하단 작은 메뉴들 */
-.footer-menu {
-    text-align: right; /* 오른쪽 정렬 */
-    margin-top: 20px;
-}
-
-.small-btn {
-    font-size: 12px !important;
-    padding: 5px 10px !important;
-    margin-left: 5px;
-}
-
-/* 페이드인 오버레이 */
-.info-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.info-content {
-    background: #fff;
-    padding: 30px;
-    max-width: 600px;
-    color: #555;
-    border-radius: 10px;
-}
-
-.dark-mode .info-content { background: #1e1e1e; color: #ccc; }
-/* 기존 다크모드 버튼과 בס"ד가 들어있는 상단 컨테이너(예: header 혹은 nav)에 적용 */
-.header-top {
-    display: flex;
-    justify-content: space-between; /* 양 끝으로 배치 */
-    align-items: center;
-    padding: 10px 20px;
-}
-
-/* בס"ד 텍스트 스타일 */
-.basd-text {
-    font-size: 24px; /* 글씨 크기 키우기 */
-    font-weight: bold;
-}
-/* 타이틀 위치 조정 */
-h1 {
-    margin-top: 7px; /* 숫자를 줄일수록 위로 올라감 */
-}
-
-/* 버튼들의 컨테이너 */
-.button-container {
-    display: flex;
-    gap: 5px; /* 버튼 사이 간격 */
-    justify-content: center; /* 가운데 정렬 */
-}
-/* 레이아웃 조정을 위한 추가 스타일 */
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-}
-.basd-text {
-    font-size: 24px;
-    font-weight: bold;
-}
-h1 {
-    text-align: center;
-    margin-top: 10px;
-}
-.menu-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 0 20px;
-}
-.left-buttons {
-    display: flex;
-    gap: 15px;
-}
-.right-links {
-    display: flex;
-    gap: 10px;
-}
-/* 화면 가로폭이 768px 이하인 기기(핸드폰)에 적용 */
+/* 9. 반응형 처리 (핸드폰) */
 @media (max-width: 768px) {
-    /* 본문 글자만 크게 */
-    body {
-        font-size: 25px !important; 
-    }
-    
-    /* 메뉴 버튼은 크기 강제 고정 (작게 유지) */
-    button {
-        font-size: 14px !important; /* 버튼 글자 크기 다시 작게 */
-        padding: 5px 10px !important; /* 버튼 안쪽 여백 줄이기 */
-    }
+    .menu-wrapper { flex-direction: column; align-items: center; gap: 10px; }
+    body { font-size: 20px; }
 }

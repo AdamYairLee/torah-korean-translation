@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6064858100865975" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
     <title>유대교 문헌 한글 번역</title>
-    <meta name="description" content="토라를 기반으로 하는 모든 유대교 문헌을 한국어로 번역하는 공간입니다. 토라 본문의 히브리어를 누르면 해설들이 나오며, 각 화면마다 ctrl+f를 눌러 원하는 단어로 필요한 본문을 찾으며 읽어볼 수 있습니다.">
-    
-    <meta name="keywords" content="유대교, 유태교, 유대인, 유태인, 토라, 베레쉬트, 바이크라, 랍비, 슈타인잘쯔, 미드라쉬, 탈무드, 게마라, 그마라, 카발라, 조하르, 성경 번역, 히브리어 번역, 히브리어 성경, 토라 번역, 구전 토라, 모세오경, 창세기, 출애굽기, 레위기, 신명기">
+    <meta name="description" content="토라를 기반으로 하는 모든 유대교 문헌을 한국어로 번역하는 공간입니다.">
 </head>
 <body>
-    <!-- 상단 헤더: 다크모드 버튼과 בס"ד 배치 -->
+
+    <!-- 상단 헤더 -->
     <div class="header-top">
         <button id="dark-mode-toggle">다크 모드 전환</button>
         <div class="basd-text">בס"ד</div>
     </div>
 
-    <!-- 타이틀 -->
     <h1>유대교 문헌 한글 번역</h1>
 
     <!-- 메인 메뉴 영역 -->
     <div class="menu-wrapper">
-        <!-- 왼쪽 버튼 그룹 -->
         <div class="left-buttons">
-            <div>
+            <!-- 토라 메뉴 -->
+            <div class="menu-item">
                 <button onclick="toggleMenu('torah-menu')">토라 번역 (열기/닫기)</button>
                 <div id="torah-menu" class="sub-menu" style="display:none;">
                     <button onclick="loadContent('data/bereshit.json')">베레쉬트 '창세기'</button>
@@ -33,7 +32,8 @@
                     <button onclick="loadContent('data/devarim.json')">드바림 '신명기'</button>
                 </div>
             </div>
-            <div>
+            <!-- 강의 메뉴 -->
+            <div class="menu-item">
                 <button onclick="toggleMenu('steinsaltz-menu')">슈타인잘쯔 강의 (열기/닫기)</button>
                 <div id="steinsaltz-menu" class="sub-menu" style="display:none;">
                     <button onclick="loadContent('data/steinsaltz_bereshit.json')">베레쉬트 '창세기'</button>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <!-- 오른쪽 메뉴 그룹 -->
+        <!-- 오른쪽 링크 -->
         <div class="right-links">
             <button class="small-btn" onclick="showInfo('about')">소개(About)</button>
             <button class="small-btn" onclick="showInfo('contact')">문의(Contact)</button>
@@ -53,15 +53,25 @@
         </div>
     </div>
 
-    <!-- 본문 영역 -->
-    <div id="torah-container">본문을 선택해주세요.</div>
-
-    <!-- 정보 오버레이 -->
-    <div id="info-overlay" class="info-overlay" style="display:none;">
-        <div id="info-content" class="info-content"></div>
+    <!-- 검색 안내 문구 -->
+    <div class="search-guide">
+        원하는 장이나 제목, 문구를 ctrl + f 버튼으로 찾아보세요.
     </div>
 
+    <!-- 본문 영역 -->
+    <main id="torah-container">
+        본문을 선택해주세요.
+    </main>
+
+    <!-- 후원 영역 (맨 아래 항상 위치) -->
+    <footer class="footer-support">
+        <a href="https://ko-fi.com/adamlee1986" target="_blank">
+            <img src="https://storage.ko-fi.com/cdn/kofi1.png" alt="Support me on Ko-fi" style="height: 45px;">
+        </a>
+        <p class="support-text">지속적인 유대 문헌 번역을 위해 후원 부탁드립니다.</p>
+        <p class="support-text">Please support my ongoing work on translation.</p>
+    </footer>
+
     <script src="app.js"></script>
-    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script><script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#72a4f2', 'M0O7223QBP');kofiwidget2.draw();</script> 
 </body>
 </html>
