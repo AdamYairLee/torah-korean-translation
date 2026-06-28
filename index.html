@@ -42,7 +42,12 @@
             </div>
             <div class="menu-item"><button onclick="toggleMenu('midrash-menu')">미드라쉬</button><div id="midrash-menu" class="sub-menu" style="display:none;"></div></div>
             <div class="menu-item"><button onclick="toggleMenu('etc-menu')">유대교 이모저모</button><div id="etc-menu" class="sub-menu" style="display:none;"></div></div>
-            <div class="menu-item"><button onclick="toggleMenu('noahide-menu')">노아하이드 강의</button><div id="noahide-menu" class="sub-menu" style="display:none;"></div></div>
+            <div class="menu-item">
+    <button onclick="toggleMenu('noahide-menu')">노아하이드 강의</button>
+    <div id="noahide-menu" class="sub-menu" style="display:none;">
+        <button onclick="loadBlog('data/noahide.json')">강의 목록 보기</button>
+    </div>
+</div>
             <div class="menu-item">
                 <button onclick="toggleMenu('travel-menu')">이스라엘 여행 정보</button>
                 <div id="travel-menu" class="sub-menu" style="display:none;">

@@ -75,3 +75,23 @@ function closeInfo() {
     overlay.style.opacity = '0';
     overlay.style.visibility = 'hidden';
 }
+function loadBlog(filename) {
+    fetch(filename)
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('torah-container');
+            container.innerHTML = '<h2 style="text-align:center;">노아하이드 강의실</h2>';
+            
+            data.content.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'blog-post';
+                div.innerHTML = `
+                    <h3 style="border-bottom:1px solid #ccc; padding-bottom:5px;">${item.title}</h3>
+                    <small style="color:#888;">${item.date}</small>
+                    <p style="margin-top:10px; line-height:1.6;">${item.body}</p>
+                    <hr style="margin:30px 0;">
+                `;
+                container.appendChild(div);
+            });
+        });
+}
