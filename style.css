@@ -86,3 +86,9 @@ button:hover { background: #333; color: #fff; }
 }
 
 .dark-mode .info-content { background: #1e1e1e !important; color: #ccc !important; }
+/* 새로운 메뉴 레이아웃 */
+.main-nav { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; padding: 10px; }
+.main-nav button { font-size: 13px; padding: 8px 10px; }
+.bottom-links { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+.tiny-btn { font-size: 11px; color: #666; background: none; border: none; cursor: pointer; text-decoration: underline; }
+.sub-menu { text-align: center; margin-top: 5px; }

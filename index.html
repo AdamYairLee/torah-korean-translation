@@ -10,21 +10,18 @@
 </head>
 <body>
 
-    <!-- 상단 헤더 -->
     <div class="header-top">
         <button id="dark-mode-toggle">다크 모드 전환</button>
         <div class="basd-text">בס"ד</div>
     </div>
-<a href="index.html" style="text-decoration: none; color: inherit;">
-    <h1>유대교 문헌 한글 번역</h1>
-</a>
+    <a href="index.html" style="text-decoration: none; color: inherit;">
+        <h1>유대교 문헌 한글 번역</h1>
+    </a>
 
-    <!-- 메인 메뉴 영역 -->
     <div class="menu-wrapper">
-        <div class="left-buttons">
-            <!-- 토라 메뉴 -->
+        <div class="main-nav">
             <div class="menu-item">
-                <button onclick="toggleMenu('torah-menu')">토라 번역 (열기/닫기)</button>
+                <button onclick="toggleMenu('torah-menu')">토라 번역</button>
                 <div id="torah-menu" class="sub-menu" style="display:none;">
                     <button onclick="loadContent('data/bereshit.json')">베레쉬트 '창세기'</button>
                     <button onclick="loadContent('data/shemot.json')">슈모트 '출애굽기/탈출기'</button>
@@ -33,9 +30,8 @@
                     <button onclick="loadContent('data/devarim.json')">드바림 '신명기'</button>
                 </div>
             </div>
-            <!-- 강의 메뉴 -->
             <div class="menu-item">
-                <button onclick="toggleMenu('steinsaltz-menu')">슈타인잘쯔 강의 (열기/닫기)</button>
+                <button onclick="toggleMenu('steinsaltz-menu')">슈타인잘쯔 강의</button>
                 <div id="steinsaltz-menu" class="sub-menu" style="display:none;">
                     <button onclick="loadContent('data/steinsaltz_bereshit.json')">베레쉬트 '창세기'</button>
                     <button onclick="loadContent('data/steinsaltz_shemot.json')">슈모트 '출애굽기/탈출기'</button>
@@ -44,28 +40,35 @@
                     <button onclick="loadContent('data/steinsaltz_devarim.json')">드바림 '신명기'</button>
                 </div>
             </div>
+            <div class="menu-item"><button onclick="toggleMenu('midrash-menu')">미드라쉬</button><div id="midrash-menu" class="sub-menu" style="display:none;"></div></div>
+            <div class="menu-item"><button onclick="toggleMenu('etc-menu')">유대교 이모저모</button><div id="etc-menu" class="sub-menu" style="display:none;"></div></div>
+            <div class="menu-item"><button onclick="toggleMenu('noahide-menu')">노아하이드 강의</button><div id="noahide-menu" class="sub-menu" style="display:none;"></div></div>
+            <div class="menu-item">
+                <button onclick="toggleMenu('travel-menu')">이스라엘 여행 정보</button>
+                <div id="travel-menu" class="sub-menu" style="display:none;">
+                    <button onclick="loadContent('data/tomb.json')">거룩한 무덤</button>
+                    <button onclick="loadContent('data/spots.json')">추천 여행지</button>
+                    <button onclick="loadContent('data/restaurants.json')">추천 식당</button>
+                </div>
+            </div>
         </div>
-
-<!-- 오른쪽 메뉴 그룹 -->
-<div class="right-links">
-    <button class="small-btn" onclick="showInfo('about')">소개(About)</button>
-    <button class="small-btn" onclick="showInfo('contact')">문의(Contact)</button>
-    <button class="small-btn" onclick="showInfo('privacy')">개인정보(Privacy)</button>
-</div>
     </div>
 
-    <!-- 검색 안내 문구 -->
     <div class="search-guide">
         원하는 장이나 제목, 문구를 ctrl + f 버튼으로 찾아보세요.<br>
         토라의 히브리어 본문을 누르면 라쉬 해설을 볼 수 있습니다.
     </div>
 
-    <!-- 본문 영역 -->
     <main id="torah-container">
         본문을 선택해주세요.
     </main>
 
-    <!-- 후원 영역 (맨 아래 항상 위치) -->
+    <div class="bottom-links">
+        <button class="tiny-btn" onclick="showInfo('about')">소개</button>
+        <button class="tiny-btn" onclick="showInfo('contact')">문의</button>
+        <button class="tiny-btn" onclick="showInfo('privacy')">개인정보</button>
+    </div>
+
     <footer class="footer-support">
         <a href="https://ko-fi.com/adamlee1986" target="_blank">
             <img src="https://storage.ko-fi.com/cdn/kofi1.png" alt="Support me on Ko-fi" style="height: 45px;">
@@ -75,9 +78,8 @@
     </footer>
 
     <script src="app.js"></script>
-    <!-- 정보 오버레이 (버튼을 누르면 나타나는 창) -->
-<div id="info-overlay" class="info-overlay">
-    <div id="info-content" class="info-content" onclick="event.stopPropagation()"></div>
-</div>
+    <div id="info-overlay" class="info-overlay">
+        <div id="info-content" class="info-content" onclick="event.stopPropagation()"></div>
+    </div>
 </body>
 </html>
