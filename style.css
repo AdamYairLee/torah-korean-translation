@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
 
 /* 1. 기본 설정 및 정렬 */
 body { font-family: 'NanumSquare', sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; text-align: left; min-height: 100vh; display: flex; flex-direction: column; }
@@ -9,15 +10,34 @@ h1 { text-align: center; margin-top: 10px; }
 .header-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
 .basd-text { font-size: 24px; font-weight: bold; }
 
-/* 3. 메뉴 및 버튼 배치 (가로 정렬 고정) */
-.menu-wrapper { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 20px; flex-wrap: wrap; }
-.left-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-.right-links { display: flex; gap: 10px; }
-button { padding: 10px 15px; cursor: pointer; background: #fff; border: 1px solid #333; border-radius: 4px; transition: 0.3s; font-size: 14px; }
-button:hover { background: #333; color: #fff; }
+/* 3. 메뉴 및 검색창 배치 (핵심 수정) */
+.menu-wrapper { padding: 0 20px; }
+.main-nav { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    padding: 10px; 
+    position: relative; 
+}
 
-/* 4. 검색 안내 */
-.search-guide { text-align: center; margin: 15px 0; font-size: 14px; color: #555; white-space: nowrap; width: 100%; }
+/* 검색창을 오른쪽 끝으로 고정 */
+.search-container { margin-left: auto; }
+#search-input { 
+    padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 180px; 
+}
+
+/* 버튼 효과 */
+button { 
+    padding: 10px 15px; cursor: pointer; background: #fff; border: 1px solid #ddd; border-radius: 4px; 
+    transition: all 0.3s ease; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+button:hover { background: #333; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transform: translateY(-2px); }
+
+/* 환영 문구 및 안내 */
+.fade-in-text { font-family: 'Noto Sans KR', sans-serif; font-size: 28px; font-weight: bold; text-align: center; margin-top: 150px; color: #333; animation: fadeIn 2s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.search-guide { text-align: center; margin: 15px 0; font-size: 14px; color: #555; }
 
 /* 5. 콘텐츠 디자인 */
 .hebrew-text { font-family: 'Hadassah Friedlaender', serif; font-size: 1.5em; color: #000; }
@@ -25,70 +45,26 @@ button:hover { background: #333; color: #fff; }
 .verse-number { font-weight: bold; font-size: 0.8em; color: #999; margin-right: 10px; }
 .rashi-container { background: #f0f0f0; padding: 10px; border-left: 4px solid #0078d7; margin-top: 10px; }
 .rashi-title { font-size: 14px !important; color: #0078d7; font-weight: bold; }
-/* 라쉬 해설 본문 글자 크기 조정 */
-.rashi-body { 
-    font-size: 16px !important;  /* 기존보다 큰 16px로 조정 */
-    line-height: 1.6;           /* 줄 간격을 조금 더 넓혀서 읽기 편하게 함 */
-    color: #222; 
-    margin-top: 5px;
-}
+.rashi-body { font-size: 16px !important; line-height: 1.6; color: #222; margin-top: 5px; }
 
-/* 6. 후원 영역 (항상 하단) */
+/* 6. 후원 및 다크모드 */
 .footer-support { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; background-color: #f9f9f9; }
-.support-text { margin: 5px 0 0 0; font-size: 14px; text-align: center; }
-
-/* 7. 다크 모드 */
 .dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
 .dark-mode *, .dark-mode button { color: #e0e0e0 !important; border-color: #555 !important; background-color: #333 !important; }
-.dark-mode .rashi-container { background: #222 !important; }
 
-/* 8. 슈타인잘쯔 강의 전용 디자인 (복구 완료) */
+/* 8. 슈타인잘쯔 강의 디자인 */
 .s-title { font-size: 20px; font-weight: bold; margin: 30px 0 15px 0; color: #333; }
-.s-body { 
-    font-size: 16px; 
-    line-height: 1.8; 
-    margin-bottom: 20px; 
-    color: #222; 
-    white-space: pre-line; /* 이 줄이 핵심! \n\n 줄바꿈을 살려줍니다 */
-}
-.parens { font-size: 12px; color: #888; margin-left: 5px; }
-.dark-mode .s-title, .dark-mode .s-body { color: #ccc !important; }
+.s-body { font-size: 16px; line-height: 1.8; margin-bottom: 20px; color: #222; white-space: pre-line; }
 
 /* 9. 반응형 처리 (핸드폰) */
 @media (max-width: 768px) {
-    .menu-wrapper { flex-direction: column; align-items: center; gap: 10px; }
-    body { font-size: 20px; }
-}
-/* 정보 오버레이 스타일 (가장 위에, 정중앙 고정) */
-.info-overlay {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: rgba(0,0,0,0.8) !important;
-    display: none !important; /* 기본값: 안 보임 */
-    justify-content: center !important;
-    align-items: center !important;
-    z-index: 9999 !important;
+    .main-nav { flex-direction: column; align-items: stretch; }
+    .search-container { margin-left: 0; margin-top: 10px; }
+    #search-input { width: 100%; box-sizing: border-box; }
 }
 
-.info-content {
-    background: #fff !important;
-    padding: 30px !important;
-    max-width: 600px !important;
-    width: 90% !important;
-    color: #555 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    max-height: 80vh; /* 화면 밖으로 안 나가게 설정 */
-    overflow-y: auto; /* 내용 길면 스크롤 */
-}
-
+/* 정보 오버레이 */
+.info-overlay { position: fixed !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; background: rgba(0,0,0,0.8) !important; display: none !important; justify-content: center !important; align-items: center !important; z-index: 9999 !important; }
+.info-content { background: #fff !important; padding: 30px !important; max-width: 600px !important; width: 90% !important; color: #555 !important; border-radius: 10px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto; }
 .dark-mode .info-content { background: #1e1e1e !important; color: #ccc !important; }
-/* 새로운 메뉴 레이아웃 */
-.main-nav { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; padding: 10px; }
-.main-nav button { font-size: 13px; padding: 8px 10px; }
-.bottom-links { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-.tiny-btn { font-size: 11px; color: #666; background: none; border: none; cursor: pointer; text-decoration: underline; }
-.sub-menu { text-align: center; margin-top: 5px; }
+.highlight { background-color: yellow !important; }

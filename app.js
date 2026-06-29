@@ -1,5 +1,12 @@
+// 환영 문구 숨기기 함수
+function hideWelcome() {
+    const welcome = document.getElementById('welcome-message');
+    if (welcome) welcome.style.display = 'none';
+}
+
 // 1. 콘텐츠 불러오기 함수
 function loadContent(filename) {
+    hideWelcome(); 
     fetch(filename)
         .then(response => response.json())
         .then(data => {
@@ -60,31 +67,24 @@ function showInfo(type) {
     if (data[type]) {
         content.innerHTML = data[type] + '<br><br><button onclick="closeInfo()">닫기</button>';
         overlay.style.setProperty('display', 'flex', 'important');
-        overlay.style.opacity = '1';
-        overlay.style.visibility = 'visible';
     }
 }
 
 function closeInfo() {
     const overlay = document.getElementById('info-overlay');
     overlay.style.setProperty('display', 'none', 'important');
-    overlay.style.opacity = '0';
-    overlay.style.visibility = 'hidden';
 }
 
-// 4. 노아하이드 강의 블로그 (목차 클릭 시 즉시 본문 교체)
+// 4. 노아하이드 강의 블로그
 function loadBlog(filename, index = 0) {
-    // 1. 데이터 가져오기
+    hideWelcome();
     fetch(filename)
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('torah-container');
             const allItems = data.content;
-            
-            // 처음 한 번만 전체 구조(목차+본문)를 그리기 위해 초기화
             container.innerHTML = ''; 
 
-            // 1. [상단 목차 영역] - 항상 표시
             const toc = document.createElement('div');
             toc.style.cssText = "margin-bottom:30px; padding:15px; background-color:#f9f9f9; border:1px solid #ddd;";
             toc.innerHTML = '<h4 style="margin:0 0 10px 0;">강의 목차</h4>';
@@ -93,31 +93,62 @@ function loadBlog(filename, index = 0) {
                 const link = document.createElement('span');
                 link.innerText = `${i + 1}. ${item.title}`;
                 link.style.cssText = "display:block; cursor:pointer; color:#007bff; margin-bottom:5px; font-size:14px; text-decoration:underline;";
-                
-                // 목차 클릭 시 상세 본문 영역(postArea)만 다시 그리기
                 link.onclick = () => {
                     const postArea = document.getElementById('post-area');
-                    postArea.innerHTML = `
-                        <h2>${item.title}</h2>
-                        <small style="color:#888;">${item.date}</small>
-                        <p style="margin-top:20px; line-height:1.6; white-space: pre-line;">${item.body}</p>
-                    `;
+                    postArea.innerHTML = `<h2>${item.title}</h2><small style="color:#888;">${item.date}</small><p style="margin-top:20px; line-height:1.6; white-space: pre-line;">${item.body}</p>`;
                 };
                 toc.appendChild(link);
             });
             container.appendChild(toc);
 
-            // 2. [본문 영역] - 여기가 목차 클릭 시 계속 바뀜
             const postArea = document.createElement('div');
-            postArea.id = 'post-area'; // 본문 영역을 식별할 ID
-            
-            // 초기 화면은 0번째 글 표시
+            postArea.id = 'post-area';
             const initialItem = allItems[index];
-            postArea.innerHTML = `
-                <h2>${initialItem.title}</h2>
-                <small style="color:#888;">${initialItem.date}</small>
-                <p style="margin-top:20px; line-height:1.6; white-space: pre-line;">${initialItem.body}</p>
-            `;
+            postArea.innerHTML = `<h2>${initialItem.title}</h2><small style="color:#888;">${initialItem.date}</small><p style="margin-top:20px; line-height:1.6; white-space: pre-line;">${initialItem.body}</p>`;
             container.appendChild(postArea);
         });
+}
+
+// 검색 실행 함수 (이 블록 전체를 app.js 맨 아래에 붙여넣으세요)
+function performSearch() {
+    const query = document.getElementById('search-input').value.trim();
+    if (!query) return;
+
+    hideWelcome(); 
+    
+    // 1. 기존 강조 효과 모두 제거
+    const highlighted = document.querySelectorAll('.highlight');
+    highlighted.forEach(el => {
+        el.outerHTML = el.innerText;
+    });
+
+    // 2. 검색어 강조 및 스크롤
+    const container = document.getElementById('torah-container');
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    let found = false;
+    const textNodes = [];
+
+    while (node = walker.nextNode()) {
+        if (node.nodeValue.includes(query)) textNodes.push(node);
+    }
+
+    textNodes.forEach(node => {
+        const parent = node.parentNode;
+        const text = node.nodeValue;
+        const regex = new RegExp(`(${query})`, 'gi');
+        const newHTML = text.replace(regex, '<span class="highlight" style="background-color: yellow;">$1</span>');
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newHTML;
+        while (tempDiv.firstChild) parent.insertBefore(tempDiv.firstChild, node);
+        parent.removeChild(node);
+        found = true;
+    });
+
+    if (!found) alert("검색 결과가 없습니다.");
+    else {
+        const firstHighlight = document.querySelector('.highlight');
+        if (firstHighlight) firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 }
