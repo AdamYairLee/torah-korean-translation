@@ -10,27 +10,58 @@ h1 { text-align: center; margin-top: 10px; }
 .header-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
 .basd-text { font-size: 24px; font-weight: bold; }
 
-/* 3. 메뉴 및 검색창 배치 (핵심 수정) */
-.menu-wrapper { padding: 0 20px; }
+/* 3. 메뉴 및 검색창 배치 수정 */
 .main-nav { 
     display: flex; 
-    align-items: center; 
-    gap: 10px; 
     flex-wrap: wrap; 
+    align-items: flex-start; 
+    gap: 10px; /* 항목 간 간격 */
     padding: 10px; 
+    justify-content: flex-start;
+}
+
+.menu-item { 
+    display: flex; 
+    flex-direction: column; 
     position: relative; 
+    /* 핵심: 가로 너비를 콘텐츠 크기에 맞게 자동 조정 */
+    width: auto; 
+    flex: 0 0 auto; 
+}
+/* 서브 메뉴를 버튼 바로 아래로 자연스럽게 배치 */
+.sub-menu { 
+    max-height: 0; 
+    overflow: hidden; 
+    opacity: 0; 
+    transition: max-height 0.3s ease; /* 부드러운 애니메이션 */
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px; /* 살짝 오른쪽으로 들어가게 하여 하위 메뉴임을 표시 */
+    background: #fff;
 }
 
-/* 검색창을 오른쪽 끝으로 고정 */
-.search-container { margin-left: auto; }
+.sub-menu.active { 
+    max-height: 1000px; /* 충분히 크게 설정 */
+    opacity: 1; 
+    padding: 5px 0;
+}
+/* 검색창 배치 */
+.search-container { 
+    margin-left: auto; 
+    display: flex;
+    align-items: center;
+    height: 40px;
+}
 #search-input { 
-    padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 180px; 
+    padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 180px; height: 40px; box-sizing: border-box;
 }
 
-/* 버튼 효과 */
+/* 버튼 규격 통일 */
 button { 
     padding: 10px 15px; cursor: pointer; background: #fff; border: 1px solid #ddd; border-radius: 4px; 
     transition: all 0.3s ease; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    height: 40px; /* 버튼 높이 고정 */
+    white-space: nowrap;
 }
 button:hover { background: #333; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transform: translateY(-2px); }
 
@@ -59,8 +90,9 @@ button:hover { background: #333; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0
 /* 9. 반응형 처리 (핸드폰) */
 @media (max-width: 768px) {
     .main-nav { flex-direction: column; align-items: stretch; }
-    .search-container { margin-left: 0; margin-top: 10px; }
-    #search-input { width: 100%; box-sizing: border-box; }
+    .search-container { margin-left: 0; width: 100%; } 
+    #search-input { width: 100%; }
+    .main-nav button { width: 100%; text-align: left; }
 }
 
 /* 정보 오버레이 */

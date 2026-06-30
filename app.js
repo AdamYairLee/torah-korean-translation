@@ -45,14 +45,22 @@ function loadContent(filename) {
         });
 }
 
-// 2. 다크 모드 & 메뉴
+// 2. 다크 모드 & 스마트 메뉴 제어
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     document.body.classList.toggle('dark-mode');
 });
 
 function toggleMenu(menuId) {
-    const menu = document.getElementById(menuId);
-    menu.style.display = (menu.style.display === "none") ? "block" : "none";
+    const targetMenu = document.getElementById(menuId);
+    
+    // 토글 (active 클래스를 넣었다 뺐다 함)
+    targetMenu.classList.toggle('active');
+    
+    // 부모 메뉴가 있다면 부모도 강제로 펼쳐주기 (이 부분이 핵심!)
+    let parent = targetMenu.parentElement;
+    if (parent && parent.classList.contains('sub-menu')) {
+        parent.classList.add('active');
+    }
 }
 
 // 3. 정보창 관리 함수
@@ -109,20 +117,18 @@ function loadBlog(filename, index = 0) {
         });
 }
 
-// 검색 실행 함수 (이 블록 전체를 app.js 맨 아래에 붙여넣으세요)
+// 검색 실행 함수
 function performSearch() {
     const query = document.getElementById('search-input').value.trim();
     if (!query) return;
 
     hideWelcome(); 
     
-    // 1. 기존 강조 효과 모두 제거
     const highlighted = document.querySelectorAll('.highlight');
     highlighted.forEach(el => {
         el.outerHTML = el.innerText;
     });
 
-    // 2. 검색어 강조 및 스크롤
     const container = document.getElementById('torah-container');
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
     let node;

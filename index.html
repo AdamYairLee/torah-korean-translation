@@ -23,7 +23,7 @@
         <div class="main-nav">
             <div class="menu-item">
                 <button onclick="toggleMenu('torah-menu')">기록 토라</button>
-                <div id="torah-menu" class="sub-menu" style="display:none;">
+                <div id="torah-menu" class="sub-menu">
                     <button onclick="loadContent('data/bereshit.json')">베레쉬트 '창세기'</button>
                     <button onclick="loadContent('data/shemot.json')">슈모트 '출애굽기/탈출기'</button>
                     <button onclick="loadContent('data/vayikra.json')">바이크라 '레위기'</button>
@@ -38,21 +38,24 @@
 
             <div class="menu-item">
                 <button onclick="toggleMenu('lecture-menu')">토라 강의</button>
-                <div id="lecture-menu" class="sub-menu" style="display:none;">
-                    <button onclick="loadContent('data/steinsaltz_bereshit.json')">베레쉬트 '창세기'</button>
-                    <button onclick="loadContent('data/steinsaltz_shemot.json')">슈모트 '출애굽기/탈출기'</button>
-                    <button onclick="loadContent('data/steinsaltz_vayikra.json')">바이크라 '레위기'</button>
-                    <button onclick="loadContent('data/steinsaltz_bamidbar.json')">바미드바르 '민수기'</button>
-                    <button onclick="loadContent('data/steinsaltz_devarim.json')">드바림 '신명기'</button>
+                <div id="lecture-menu" class="sub-menu">
+                    <button onclick="toggleMenu('steinsaltz-menu')">슈타인잘쯔 강의</button>
+                    <div id="steinsaltz-menu" class="sub-menu">
+                        <button onclick="loadContent('data/steinsaltz_bereshit.json')">베레쉬트 '창세기'</button>
+                        <button onclick="loadContent('data/steinsaltz_shemot.json')">슈모트 '출애굽기/탈출기'</button>
+                        <button onclick="loadContent('data/steinsaltz_vayikra.json')">바이크라 '레위기'</button>
+                        <button onclick="loadContent('data/steinsaltz_bamidbar.json')">바미드바르 '민수기'</button>
+                        <button onclick="loadContent('data/steinsaltz_devarim.json')">드바림 '신명기'</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="menu-item"><button onclick="toggleMenu('etc-menu')">유대교 이모저모</button><div id="etc-menu" class="sub-menu" style="display:none;"></div></div>
+            <div class="menu-item"><button onclick="toggleMenu('etc-menu')">유대교 이모저모</button><div id="etc-menu" class="sub-menu"></div></div>
             <div class="menu-item"><button onclick="loadBlog('data/noahide.json')">노아하이드 강의</button></div>
             
             <div class="menu-item">
                 <button onclick="toggleMenu('travel-menu')">이스라엘 여행 정보</button>
-                <div id="travel-menu" class="sub-menu" style="display:none;">
+                <div id="travel-menu" class="sub-menu">
                     <button onclick="loadContent('data/tomb.json')">거룩한 무덤</button>
                     <button onclick="loadContent('data/spots.json')">추천 여행지</button>
                     <button onclick="loadContent('data/restaurants.json')">추천 식당</button>
