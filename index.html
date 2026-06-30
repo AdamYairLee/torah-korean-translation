@@ -13,10 +13,16 @@
 </head>
 <body>
 
-    <div class="header-top">
-        <button id="dark-mode-toggle">다크 모드 전환</button>
-        <div class="basd-text">בס"ד</div>
-    </div>
+    <header class="header-top">
+        <div class="header-left">
+            <button id="dark-mode-toggle">다크 모드 전환</button>
+        </div>
+        <div class="header-right">
+            <div class="basd-text">בס"ד</div>
+            <div id="shabbat-info"></div>
+        </div>
+    </header>
+
     <a href="index.html" style="text-decoration: none; color: inherit;">
         <h1>유대교 문헌 한글 번역</h1>
     </a>
@@ -83,15 +89,14 @@
         본문을 선택해주세요.
     </main>
 
-    <div class="bottom-links">
-        <button class="tiny-btn" onclick="showInfo('about')">소개</button>
-        <button class="tiny-btn" onclick="showInfo('contact')">문의</button>
-        <button class="tiny-btn" onclick="showInfo('privacy')">개인정보</button>
-    </div>
-
     <footer class="footer-support">
+        <div class="bottom-links">
+            <button class="tiny-btn" onclick="showInfo('about')">소개</button>
+            <button class="tiny-btn" onclick="showInfo('contact')">문의</button>
+            <button class="tiny-btn" onclick="showInfo('privacy')">개인정보</button>
+        </div>
         <a href="https://ko-fi.com/adamlee1986" target="_blank">
-            <img src="https://storage.ko-fi.com/cdn/kofi1.png" alt="Support me on Ko-fi" style="height: 45px;">
+            <img src="https://storage.ko-fi.com/cdn/kofi1.png" alt="Support me on Ko-fi" style="height: 45px; margin-top: 20px;">
         </a>
         <p class="support-text">지속적인 유대 문헌 번역을 위해 후원 부탁드립니다.</p>
         <p class="support-text">Please support my ongoing work on translation.</p>

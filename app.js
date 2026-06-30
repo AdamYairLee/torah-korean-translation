@@ -1,10 +1,33 @@
-// 환영 문구 숨기기 함수
+// 페이지 로드 시 실행되는 통합 함수
+window.onload = function() {
+    fetchShabbatInfo();
+};
+
+// 1. 샤밧 정보 가져오기 (예루살렘 고정)
+async function fetchShabbatInfo() {
+    const infoDiv = document.getElementById('shabbat-info');
+    if (!infoDiv) return;
+    const url = `https://www.hebcal.com/shabbat?cfg=json&geonameid=281184&m=50`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const parashat = data.items.find(item => item.category === 'parashat')?.title || "";
+        const candleLighting = data.items.find(item => item.category === 'candles')?.title || "";
+        const havdalah = data.items.find(item => item.category === 'havdalah')?.title || "";
+        infoDiv.innerHTML = `${parashat}<br>${candleLighting} | ${havdalah}`;
+    } catch (error) {
+        console.error("샤밧 정보를 불러올 수 없습니다.", error);
+        infoDiv.innerText = "Shabbat info unavailable.";
+    }
+}
+
+// 2. 환영 문구 숨기기
 function hideWelcome() {
     const welcome = document.getElementById('welcome-message');
     if (welcome) welcome.style.display = 'none';
 }
 
-// 1. 콘텐츠 불러오기 함수
+// 3. 콘텐츠 불러오기 (토라 본문)
 function loadContent(filename) {
     hideWelcome(); 
     fetch(filename)
@@ -45,25 +68,21 @@ function loadContent(filename) {
         });
 }
 
-// 2. 다크 모드 & 스마트 메뉴 제어
+// 4. 다크 모드 & 메뉴 제어
 document.getElementById('dark-mode-toggle').addEventListener('click', function() {
     document.body.classList.toggle('dark-mode');
 });
 
 function toggleMenu(menuId) {
     const targetMenu = document.getElementById(menuId);
-    
-    // 토글 (active 클래스를 넣었다 뺐다 함)
     targetMenu.classList.toggle('active');
-    
-    // 부모 메뉴가 있다면 부모도 강제로 펼쳐주기 (이 부분이 핵심!)
     let parent = targetMenu.parentElement;
     if (parent && parent.classList.contains('sub-menu')) {
         parent.classList.add('active');
     }
 }
 
-// 3. 정보창 관리 함수
+// 5. 정보창 관리
 function showInfo(type) {
     const overlay = document.getElementById('info-overlay');
     const content = document.getElementById('info-content');
@@ -79,11 +98,10 @@ function showInfo(type) {
 }
 
 function closeInfo() {
-    const overlay = document.getElementById('info-overlay');
-    overlay.style.setProperty('display', 'none', 'important');
+    document.getElementById('info-overlay').style.setProperty('display', 'none', 'important');
 }
 
-// 4. 노아하이드 강의 블로그
+// 6. 노아하이드 강의 & 검색 로직 (아담님 원본 함수)
 function loadBlog(filename, index = 0) {
     hideWelcome();
     fetch(filename)
@@ -92,11 +110,9 @@ function loadBlog(filename, index = 0) {
             const container = document.getElementById('torah-container');
             const allItems = data.content;
             container.innerHTML = ''; 
-
             const toc = document.createElement('div');
             toc.style.cssText = "margin-bottom:30px; padding:15px; background-color:#f9f9f9; border:1px solid #ddd;";
             toc.innerHTML = '<h4 style="margin:0 0 10px 0;">강의 목차</h4>';
-            
             allItems.forEach((item, i) => {
                 const link = document.createElement('span');
                 link.innerText = `${i + 1}. ${item.title}`;
@@ -108,7 +124,6 @@ function loadBlog(filename, index = 0) {
                 toc.appendChild(link);
             });
             container.appendChild(toc);
-
             const postArea = document.createElement('div');
             postArea.id = 'post-area';
             const initialItem = allItems[index];
@@ -117,44 +132,24 @@ function loadBlog(filename, index = 0) {
         });
 }
 
-// 검색 실행 함수
 function performSearch() {
     const query = document.getElementById('search-input').value.trim();
     if (!query) return;
-
     hideWelcome(); 
-    
     const highlighted = document.querySelectorAll('.highlight');
-    highlighted.forEach(el => {
-        el.outerHTML = el.innerText;
-    });
-
+    highlighted.forEach(el => { el.outerHTML = el.innerText; });
     const container = document.getElementById('torah-container');
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
-    let node;
-    let found = false;
-    const textNodes = [];
-
-    while (node = walker.nextNode()) {
-        if (node.nodeValue.includes(query)) textNodes.push(node);
-    }
-
+    let node, textNodes = [];
+    while (node = walker.nextNode()) { if (node.nodeValue.includes(query)) textNodes.push(node); }
     textNodes.forEach(node => {
         const parent = node.parentNode;
-        const text = node.nodeValue;
-        const regex = new RegExp(`(${query})`, 'gi');
-        const newHTML = text.replace(regex, '<span class="highlight" style="background-color: yellow;">$1</span>');
-        
+        const newHTML = node.nodeValue.replace(new RegExp(`(${query})`, 'gi'), '<span class="highlight" style="background-color: yellow;">$1</span>');
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = newHTML;
         while (tempDiv.firstChild) parent.insertBefore(tempDiv.firstChild, node);
         parent.removeChild(node);
-        found = true;
     });
-
-    if (!found) alert("검색 결과가 없습니다.");
-    else {
-        const firstHighlight = document.querySelector('.highlight');
-        if (firstHighlight) firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    if (document.querySelector('.highlight')) document.querySelector('.highlight').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    else alert("검색 결과가 없습니다.");
 }
