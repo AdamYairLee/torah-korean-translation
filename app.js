@@ -28,13 +28,24 @@ function hideWelcome() {
 }
 
 // 3. 콘텐츠 불러오기 (토라 본문)
-function loadContent(filename) {
+function loadContent(filename, element) {
+    // 1. 메뉴 선택 표시 로직 (정상 작동)
+    if (element) {
+        document.querySelectorAll('.main-nav button').forEach(btn => btn.classList.remove('menu-active'));
+        element.classList.add('menu-active');
+    }
+
     hideWelcome(); 
     fetch(filename)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('파일 없음');
+            return response.json();
+        })
         .then(data => {
             const container = document.getElementById('torah-container');
             container.innerHTML = '';
+            
+            // [복구 완료] 여기서부터 본문 출력 로직이 다시 살아납니다!
             data.content.forEach(item => {
                 const div = document.createElement('div');
                 if (item.type) {
@@ -65,7 +76,23 @@ function loadContent(filename) {
                 }
                 container.appendChild(div);
             });
+            // 본문 출력 로직 끝
+        })
+        .catch(err => {
+            // "제목 없음.png"에 나온 안내문구 수정은 아래에서!
+            showWorkingMessage();
         });
+}
+
+// 작업 중 메시지 함수
+function showWorkingMessage() {
+    const container = document.getElementById('torah-container');
+    container.innerHTML = `
+        <div class="working-msg-box">
+            <h2>현재 작업 중입니다.</h2>
+            <p>번역 중인 문헌입니다.</p>
+        </div>
+    `;
 }
 
 // 4. 다크 모드 & 메뉴 제어

@@ -32,16 +32,16 @@
             <div class="menu-item">
                 <button onclick="toggleMenu('torah-menu')">기록 토라</button>
                 <div id="torah-menu" class="sub-menu">
-                    <button onclick="loadContent('data/bereshit.json')">베레쉬트 '창세기'</button>
-                    <button onclick="loadContent('data/shemot.json')">슈모트 '출애굽기/탈출기'</button>
-                    <button onclick="loadContent('data/vayikra.json')">바이크라 '레위기'</button>
-                    <button onclick="loadContent('data/bamidbar.json')">바미드바르 '민수기'</button>
-                    <button onclick="loadContent('data/devarim.json')">드바림 '신명기'</button>
+                    <button onclick="loadContent('data/bereshit.json', this)">베레쉬트 '창세기'</button>
+                    <button onclick="loadContent('data/shemot.json', this)">슈모트 '출애굽기/탈출기'</button>
+                    <button onclick="loadContent('data/vayikra.json', this)">바이크라 '레위기'</button>
+                    <button onclick="loadContent('data/bamidbar.json', this)">바미드바르 '민수기'</button>
+                    <button onclick="loadContent('data/devarim.json', this)">드바림 '신명기'</button>
                 </div>
             </div>
             
             <div class="menu-item">
-                <button onclick="loadContent('data/midrash.json')">구전 토라</button>
+                <button onclick="loadContent('data/midrash.json', this)">구전 토라</button>
             </div>
 
             <div class="menu-item">
@@ -49,11 +49,11 @@
                 <div id="lecture-menu" class="sub-menu">
                     <button onclick="toggleMenu('steinsaltz-menu')">슈타인잘쯔 강의</button>
                     <div id="steinsaltz-menu" class="sub-menu">
-                        <button onclick="loadContent('data/steinsaltz_bereshit.json')">베레쉬트 '창세기'</button>
-                        <button onclick="loadContent('data/steinsaltz_shemot.json')">슈모트 '출애굽기/탈출기'</button>
-                        <button onclick="loadContent('data/steinsaltz_vayikra.json')">바이크라 '레위기'</button>
-                        <button onclick="loadContent('data/steinsaltz_bamidbar.json')">바미드바르 '민수기'</button>
-                        <button onclick="loadContent('data/steinsaltz_devarim.json')">드바림 '신명기'</button>
+                        <button onclick="loadContent('data/steinsaltz_bereshit.json', this)">베레쉬트 '창세기'</button>
+                        <button onclick="loadContent('data/steinsaltz_shemot.json', this)">슈모트 '출애굽기/탈출기'</button>
+                        <button onclick="loadContent('data/steinsaltz_vayikra.json', this)">바이크라 '레위기'</button>
+                        <button onclick="loadContent('data/steinsaltz_bamidbar.json', this)">바미드바르 '민수기'</button>
+                        <button onclick="loadContent('data/steinsaltz_devarim.json', this)">드바림 '신명기'</button>
                     </div>
                 </div>
             </div>
@@ -64,9 +64,9 @@
             <div class="menu-item">
                 <button onclick="toggleMenu('travel-menu')">이스라엘 여행 정보</button>
                 <div id="travel-menu" class="sub-menu">
-                    <button onclick="loadContent('data/tomb.json')">거룩한 무덤</button>
-                    <button onclick="loadContent('data/spots.json')">추천 여행지</button>
-                    <button onclick="loadContent('data/restaurants.json')">추천 식당</button>
+                    <button onclick="loadContent('data/tomb.json', this)">거룩한 무덤</button>
+                    <button onclick="loadContent('data/spots.json', this)">추천 여행지</button>
+                    <button onclick="loadContent('data/restaurants.json', this)">추천 식당</button>
                 </div>
             </div>
 

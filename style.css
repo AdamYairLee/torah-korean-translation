@@ -113,3 +113,21 @@ h1 {
     line-height: 1.8 !important;
     color: #222 !important;
 }
+/* 선택된 메뉴의 세련된 디자인 */
+.menu-active {
+    background-color: #f0f0f0 !important;
+    border-left: 4px solid #0078d7 !important; /* 왼쪽 블루 바 */
+    font-weight: bold !important;
+    padding-left: 10px !important;
+    color: #0078d7 !important;
+}
+
+/* 작업 중 메시지 박스 스타일 */
+.working-msg-box {
+    text-align: center; 
+    padding: 50px; 
+    border: 2px dashed #ccc; 
+    border-radius: 10px; 
+    margin-top: 20px;
+    color: #555;
+}
