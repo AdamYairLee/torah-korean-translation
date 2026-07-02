@@ -86,3 +86,7 @@ button {
     margin-top: 15px;
     border-radius: 15px;
 }
+/* 한글 폰트 강제 적용 (가장 강력한 우선순위) */
+body, button, .card, .korean-text, .korean-sub {
+    font-family: 'Jua', sans-serif !important;
+}
