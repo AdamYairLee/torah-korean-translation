@@ -1,0 +1,25 @@
+{
+  "curriculum": {
+    "reading": [
+      {"step": 1, "name": "자음", "items": ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ"]},
+      {"step": 2, "name": "모음", "items": ["ㅏ", "ㅑ", "ㅓ", "ㅕ", "ㅗ"]},
+      {"step": 3, "name": "기본 받침", "items": ["각", "난", "닫", "랄", "맘"]},
+      {"step": 4, "name": "복잡한 받침", "items": ["닭", "삶", "앉", "많", "없"]}
+    ],
+    "pronunciation": [
+      {"step": 1, "name": "단어 기초", "items": [1, 2]},
+      {"step": 2, "name": "단어 심화", "items": [3, 4]},
+      {"step": 3, "name": "문장 기초", "items": [5]},
+      {"step": 4, "name": "문장 중급", "items": []},
+      {"step": 5, "name": "문장 고급", "items": []},
+      {"step": 6, "name": "음성/로마자 제어", "items": []}
+    ]
+  },
+  "word_list": [
+    { "id": 1, "step": 1, "korean": "사과", "hebrew": "תפוח", "meaning": "Apple", "romanization": "Sagwa" },
+    { "id": 2, "step": 1, "korean": "학교", "hebrew": "בית ספר", "meaning": "School", "romanization": "Hakgyo" },
+    { "id": 3, "step": 2, "korean": "행복", "hebrew": "אושר", "meaning": "Happiness", "romanization": "Haengbok" },
+    { "id": 4, "step": 2, "korean": "친구", "hebrew": "חבר", "meaning": "Friend", "romanization": "Chingu" },
+    { "id": 5, "step": 3, "korean": "나는 학생입니다", "hebrew": "אני סטודנט", "meaning": "I am a student", "romanization": "Naneun haksaeng-imnida" }
+  ]
+}

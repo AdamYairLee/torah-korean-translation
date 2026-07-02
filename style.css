@@ -131,3 +131,28 @@ h1 {
     margin-top: 20px;
     color: #555;
 }
+/* 기존 폰트 설정을 유지하면서 버튼만 강조하는 스타일 */
+.korean-nav-btn {
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: #b3e5fc; /* 파스텔 하늘색 (배경색) */
+    color: #333;              /* 가독성을 위한 짙은 색 텍스트 */
+    text-decoration: none;
+    border-radius: 12px;      /* 약간 둥근 모서리 */
+    font-weight: bold;
+    border: 2px solid #81d4fa; /* 조금 더 진한 하늘색 (테두리) */
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.korean-nav-btn:hover {
+    background-color: #81d4fa; /* 마우스 올렸을 때 더 진한 하늘색 */
+    color: white;
+}
+
+.hebrew-sub {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    opacity: 0.8;             /* 약간 흐린 느낌으로 보조 텍스트 강조 */
+}
