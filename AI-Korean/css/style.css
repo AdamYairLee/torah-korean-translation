@@ -1,97 +1,88 @@
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
 
-/* 기본 설정 초기화 */
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    height: 100vh;
+    min-height: 100vh; /* 화면보다 작을 땐 꽉 채우고, 크면 늘어남 */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* 블러 때문에 생기는 테두리 흰색 방지 */
-    position: relative;
-
-    /* 폰트 정보를 body에 다시 명확하게 지정 */
     font-family: 'Jua', sans-serif;
     color: white;
+    background: #000; /* 블러 배경 아래의 기본 색 */
 }
 
+/* 배경 블러 효과 */
 body::before {
     content: "";
-    position: absolute;
+    position: fixed; /* 화면 고정 */
     top: 0; left: 0; width: 100%; height: 100%;
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
                 url('../images/bg-korean.jpg');
     background-size: cover;
     background-position: center;
-    filter: blur(3px); /* 이 숫자를 바꾸어 블러 강도를 조절하세요 */
-    z-index: -1; /* 글자 뒤로 배치 */
-}
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    filter: blur(3px);
+    z-index: -1;
 }
 
-/* 앱 컨테이너 */
 #app {
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     padding: 20px;
     text-align: center;
-}
-
-/* 텍스트 스타일 (메인 문구) */
-.main-title {
-    font-size: 3em; /* 더 크고 웅장하게 */
-    color: white;
-    margin-bottom: 40px;
-    text-shadow: 0 4px 10px rgba(0,0,0,0.7); /* 깊이감 있는 그림자 */
-    line-height: 1.2;
-    font-weight: normal;
-}
-
-/* 버튼 그룹 */
-.btn-group {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 버튼 간격 확대 */
+    align-items: center;
 }
 
-/* 버튼 스타일 */
+/* 상단 우측 홈버튼 */
+.home-btn {
+    position: absolute; /* fixed 대신 absolute로 변경하여 컨텐츠 흐름에 맞춤 */
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 10px;
+    font-family: 'Jua', sans-serif;
+    text-decoration: none;
+    z-index: 1000;
+}
+
+/* 버튼 그리드 (가장 중요한 부분) */
+.btn-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 무조건 2열 */
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+}
+
 button {
-    font-family: 'Hadassah Friedlaender', serif; /* 버튼 안은 히브리어 우선 */
-    font-size: 1.4em;
-    padding: 20px 30px;
-    border-radius: 15px; /* 약간 둥근 사각형 */
-    border: none;
+    font-family: 'Hadassah Friedlaender', serif;
+    font-size: 1em;
+    padding: 20px 10px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
     cursor: pointer;
-    transition: all 0.3s ease;
-    
-    /* 프로페셔널한 반투명 글래스 효과 */
     background: rgba(255, 255, 255, 0.15);
     color: white;
     backdrop-filter: blur(5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.2);
 }
 
-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-3px); /* 살짝 떠오르는 효과 */
+/* 모바일 전용 버튼 크기 최적화 */
+@media (max-width: 600px) {
+    button { padding: 15px 5px; font-size: 0.9em; }
+    .main-title { font-size: 1.8em; }
 }
 
-/* 작은 폰트 (병기용) */
-.korean-sub {
-    font-family: 'Jua', sans-serif;
-    font-size: 0.7em;
-    display: block;
-    opacity: 0.8;
-    margin-top: 5px;
+.list-container { width: 100%; }
+.card {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    margin-top: 15px;
+    border-radius: 15px;
 }
-
-/* 페이드인 애니메이션 (유지) */
-.fade-in { animation: fadeIn 1.5s ease-in; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
