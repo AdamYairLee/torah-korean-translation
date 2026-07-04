@@ -1,21 +1,2633 @@
-{
-  "curriculum": {
-    "reading": [
-      { "id": 1, "name": "자음", "items": ["ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"] },
-      { "id": 2, "name": "모음", "items": ["ㅏ", "ㅑ", "ㅓ", "ㅕ", "ㅗ", "ㅛ", "ㅜ", "ㅠ", "ㅡ", "ㅣ"] },
-      { "id": 3, "name": "받침 없는 기본", "items": ["아빠", "나비", "모자", "오이"] },
-      { "id": 4, "name": "받침 있는 기본", "items": ["가방", "자전거", "학교", "공부"] },
-      { "id": 5, "name": "받침 있는 중등", "items": ["식품", "햇살", "운동", "선생"] },
-      { "id": 6, "name": "받침 있는 고등", "items": ["닭", "꽹과리", "읽기", "앉아"] }
-    ],
-    "pronunciation": {
-      "sentences": [
-        "만나서 반가워요! (נָעִים לְהַכִּיר!)",
-        "오늘 뭐 했어? (מָה עָשִׂיתָ הַיּוֹם?)",
-        "진짜 대박이다! (אֲנִי לֹא מַאֲמִין, זֶה מְטֹרָף!)",
-        "조금 있다가 봐. (נִתְרָאֶה בְּקָרוֹב.)",
-        "고생했어, 내일 봐! (הָיָה יוֹם אָרֹךְ, נִתְרָאֶה מָחָר!)"
-      ]
-    }
+[
+  {
+    "category": "consonants",
+    "ko": "ㄱ",
+    "roman": "giyeok",
+    "he_sound": "ג / ק",
+    "speak": "ㄱ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㄴ",
+    "roman": "nieun",
+    "he_sound": "נ",
+    "speak": "ㄴ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㄷ",
+    "roman": "digeut",
+    "he_sound": "ד / ט",
+    "speak": "ㄷ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㄹ",
+    "roman": "rieul",
+    "he_sound": "ר / ל",
+    "speak": "ㄹ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅁ",
+    "roman": "mieum",
+    "he_sound": "מ",
+    "speak": "ㅁ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅂ",
+    "roman": "bieup",
+    "he_sound": "בּ / פּ",
+    "speak": "ㅂ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅅ",
+    "roman": "siot",
+    "he_sound": "ס / שׁ",
+    "speak": "ㅅ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅇ",
+    "roman": "ieung",
+    "he_sound": "א / נג",
+    "speak": "ㅇ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅈ",
+    "roman": "jieut",
+    "he_sound": "ג׳",
+    "speak": "ㅈ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅊ",
+    "roman": "chieut",
+    "he_sound": "צ׳",
+    "speak": "ㅊ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅋ",
+    "roman": "kieuk",
+    "he_sound": "ק",
+    "speak": "ㅋ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅌ",
+    "roman": "tieut",
+    "he_sound": "ט",
+    "speak": "ㅌ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅍ",
+    "roman": "pieup",
+    "he_sound": "פּ",
+    "speak": "ㅍ"
+  },
+  {
+    "category": "consonants",
+    "ko": "ㅎ",
+    "roman": "hieut",
+    "he_sound": "ה",
+    "speak": "ㅎ"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅏ",
+    "roman": "a",
+    "he_sound": "אָ",
+    "speak": "아"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅑ",
+    "roman": "ya",
+    "he_sound": "יָה",
+    "speak": "야"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅓ",
+    "roman": "eo",
+    "he_sound": "אוֹ פתוח",
+    "speak": "어"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅕ",
+    "roman": "yeo",
+    "he_sound": "יוֹ פתוח",
+    "speak": "여"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅗ",
+    "roman": "o",
+    "he_sound": "אוֹ",
+    "speak": "오"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅛ",
+    "roman": "yo",
+    "he_sound": "יוֹ",
+    "speak": "요"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅜ",
+    "roman": "u",
+    "he_sound": "אוּ",
+    "speak": "우"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅠ",
+    "roman": "yu",
+    "he_sound": "יוּ",
+    "speak": "유"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅡ",
+    "roman": "eu",
+    "he_sound": "אְ / צליל קוריאני",
+    "speak": "으"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅣ",
+    "roman": "i",
+    "he_sound": "אִי",
+    "speak": "이"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅐ",
+    "roman": "ae",
+    "he_sound": "אֶה",
+    "speak": "애"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅔ",
+    "roman": "e",
+    "he_sound": "אֵה",
+    "speak": "에"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅘ",
+    "roman": "wa",
+    "he_sound": "וָה",
+    "speak": "와"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅙ",
+    "roman": "wae",
+    "he_sound": "וֶה",
+    "speak": "왜"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅚ",
+    "roman": "oe",
+    "he_sound": "וֵה",
+    "speak": "외"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅝ",
+    "roman": "wo",
+    "he_sound": "ווֹ",
+    "speak": "워"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅞ",
+    "roman": "we",
+    "he_sound": "ווֶ",
+    "speak": "웨"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅟ",
+    "roman": "wi",
+    "he_sound": "וִי",
+    "speak": "위"
+  },
+  {
+    "category": "vowels",
+    "ko": "ㅢ",
+    "roman": "ui",
+    "he_sound": "אְי / אִי",
+    "speak": "의"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "아기",
+    "roman": "agi",
+    "he": "תינוק"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "오이",
+    "roman": "oi",
+    "he": "מלפפון"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "아이",
+    "roman": "ai",
+    "he": "ילד"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "우유",
+    "roman": "uyu",
+    "he": "חלב"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "나비",
+    "roman": "nabi",
+    "he": "פרפר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "모자",
+    "roman": "moja",
+    "he": "כובע"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "바다",
+    "roman": "bada",
+    "he": "ים"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "고기",
+    "roman": "gogi",
+    "he": "בשר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "가게",
+    "roman": "gage",
+    "he": "חנות"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "도로",
+    "roman": "doro",
+    "he": "כביש"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "지도",
+    "roman": "jido",
+    "he": "מפה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "기차",
+    "roman": "gicha",
+    "he": "רכבת"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "사과",
+    "roman": "sagwa",
+    "he": "תפוח"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "소리",
+    "roman": "sori",
+    "he": "קול"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "머리",
+    "roman": "meori",
+    "he": "ראש"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "다리",
+    "roman": "dari",
+    "he": "רגל / גשר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "나라",
+    "roman": "nara",
+    "he": "מדינה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "노래",
+    "roman": "norae",
+    "he": "שיר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "누나",
+    "roman": "nuna",
+    "he": "אחות גדולה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "아빠",
+    "roman": "appa",
+    "he": "אבא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "엄마",
+    "roman": "eomma",
+    "he": "אמא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "오빠",
+    "roman": "oppa",
+    "he": "אח גדול"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "이모",
+    "roman": "imo",
+    "he": "דודה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "고모",
+    "roman": "gomo",
+    "he": "דודה מצד האב"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "비누",
+    "roman": "binu",
+    "he": "סבון"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "휴지",
+    "roman": "hyuji",
+    "he": "נייר טואלט"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "의자",
+    "roman": "uija",
+    "he": "כיסא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "시계",
+    "roman": "sigye",
+    "he": "שעון"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "라디오",
+    "roman": "radio",
+    "he": "רדיו"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "카메라",
+    "roman": "kamera",
+    "he": "מצלמה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "버스",
+    "roman": "beoseu",
+    "he": "אוטובוס"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "택시",
+    "roman": "taeksi",
+    "he": "מונית"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "비자",
+    "roman": "bija",
+    "he": "ויזה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "메뉴",
+    "roman": "menyu",
+    "he": "תפריט"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "커피",
+    "roman": "keopi",
+    "he": "קפה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "피자",
+    "roman": "pija",
+    "he": "פיצה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "주스",
+    "roman": "juseu",
+    "he": "מיץ"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "바나나",
+    "roman": "banana",
+    "he": "בננה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "토마토",
+    "roman": "tomato",
+    "he": "עגבנייה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "고구마",
+    "roman": "goguma",
+    "he": "בטטה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "기러기",
+    "roman": "gireogi",
+    "he": "אווז בר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "개미",
+    "roman": "gaemi",
+    "he": "נמלה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "여우",
+    "roman": "yeou",
+    "he": "שועל"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "가위",
+    "roman": "gawi",
+    "he": "מספריים"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "나무",
+    "roman": "namu",
+    "he": "עץ"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "구두",
+    "roman": "gudu",
+    "he": "נעליים"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "고래",
+    "roman": "gorae",
+    "he": "לווייתן"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "도시",
+    "roman": "dosi",
+    "he": "עיר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "거리",
+    "roman": "geori",
+    "he": "רחוב"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "미소",
+    "roman": "miso",
+    "he": "חיוך"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "하루",
+    "roman": "haru",
+    "he": "יום אחד"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "어제",
+    "roman": "eoje",
+    "he": "אתמול"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "오늘",
+    "roman": "oneul",
+    "he": "היום"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "내일",
+    "roman": "naeil",
+    "he": "מחר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "여기",
+    "roman": "yeogi",
+    "he": "כאן"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "저기",
+    "roman": "jeogi",
+    "he": "שם"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "거기",
+    "roman": "geogi",
+    "he": "שם לידך"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "아니요",
+    "roman": "aniyo",
+    "he": "לא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "네",
+    "roman": "ne",
+    "he": "כן"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "우리",
+    "roman": "uri",
+    "he": "אנחנו"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "나이",
+    "roman": "nai",
+    "he": "גיל"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "이야기",
+    "roman": "iyagi",
+    "he": "סיפור"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "재미",
+    "roman": "jaemi",
+    "he": "כיף"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "기회",
+    "roman": "gihoe",
+    "he": "הזדמנות"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "회의",
+    "roman": "hoeui",
+    "he": "ישיבה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "자료",
+    "roman": "jaryo",
+    "he": "חומר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "도구",
+    "roman": "dogu",
+    "he": "כלי"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "후보",
+    "roman": "hubo",
+    "he": "מועמד"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "가수",
+    "roman": "gasu",
+    "he": "זמר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "배우",
+    "roman": "baeu",
+    "he": "שחקן"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "의사",
+    "roman": "uisa",
+    "he": "רופא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "교사",
+    "roman": "gyosa",
+    "he": "מורה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "기자",
+    "roman": "gija",
+    "he": "עיתונאי"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "가이드",
+    "roman": "gaideu",
+    "he": "מדריך"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "요리",
+    "roman": "yori",
+    "he": "בישול"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "고마워",
+    "roman": "gomawo",
+    "he": "תודה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "미안해",
+    "roman": "mianhae",
+    "he": "סליחה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "좋아요",
+    "roman": "johayo",
+    "he": "טוב"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "싫어요",
+    "roman": "silheoyo",
+    "he": "לא טוב לי"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "쉬어요",
+    "roman": "swieoyo",
+    "he": "לנוח"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "가요",
+    "roman": "gayo",
+    "he": "הולך"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "와요",
+    "roman": "wayo",
+    "he": "בא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "봐요",
+    "roman": "bwayo",
+    "he": "רואה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "줘요",
+    "roman": "jwoyo",
+    "he": "תן לי"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "사요",
+    "roman": "sayo",
+    "he": "קונה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "타요",
+    "roman": "tayo",
+    "he": "נוסע"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "자요",
+    "roman": "jayo",
+    "he": "ישן"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "마셔요",
+    "roman": "masyeoyo",
+    "he": "שותה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "먹어요",
+    "roman": "meokeoyo",
+    "he": "אוכל"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "배워요",
+    "roman": "baewoyo",
+    "he": "לומד"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "읽어요",
+    "roman": "ilkeoyo",
+    "he": "קורא"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "써요",
+    "roman": "sseoyo",
+    "he": "כותב"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "해요",
+    "roman": "haeyo",
+    "he": "עושה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "돼요",
+    "roman": "dwaeyo",
+    "he": "אפשר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "되어요",
+    "roman": "doeeoyo",
+    "he": "נהיה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "보여요",
+    "roman": "boyeoyo",
+    "he": "נראה"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "들어요",
+    "roman": "deuleoyo",
+    "he": "שומע"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "열어요",
+    "roman": "yeoleoyo",
+    "he": "פותח"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "닫아요",
+    "roman": "datayo",
+    "he": "סוגר"
+  },
+  {
+    "category": "basic_no_patchim",
+    "ko": "기다려요",
+    "roman": "gidaryeoyo",
+    "he": "מחכה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "가방",
+    "roman": "gabang",
+    "he": "תיק"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "학교",
+    "roman": "hakgyo",
+    "he": "בית ספר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "공부",
+    "roman": "gongbu",
+    "he": "לימודים"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "한국",
+    "roman": "hanguk",
+    "he": "קוריאה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "사람",
+    "roman": "saram",
+    "he": "אדם"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "이름",
+    "roman": "ireum",
+    "he": "שם"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "마음",
+    "roman": "maeum",
+    "he": "לב"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "사랑",
+    "roman": "sarang",
+    "he": "אהבה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "시간",
+    "roman": "sigan",
+    "he": "זמן"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "사진",
+    "roman": "sajin",
+    "he": "תמונה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "시장",
+    "roman": "sijang",
+    "he": "שוק"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "식당",
+    "roman": "sikdang",
+    "he": "מסעדה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "방문",
+    "roman": "bangmun",
+    "he": "ביקור"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "공항",
+    "roman": "gonghang",
+    "he": "שדה תעופה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "병원",
+    "roman": "byeongwon",
+    "he": "בית חולים"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "은행",
+    "roman": "eunhaeng",
+    "he": "בנק"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "전화",
+    "roman": "jeonhwa",
+    "he": "טלפון"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "문장",
+    "roman": "munjang",
+    "he": "משפט"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "발음",
+    "roman": "baleum",
+    "he": "הגייה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "받침",
+    "roman": "batchim",
+    "he": "עיצור סופי"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "한글",
+    "roman": "hangeul",
+    "he": "האנגול"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "연습",
+    "roman": "yeonseup",
+    "he": "תרגול"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "질문",
+    "roman": "jilmun",
+    "he": "שאלה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "대답",
+    "roman": "daedap",
+    "he": "תשובה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "친구",
+    "roman": "chingu",
+    "he": "חבר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "가족",
+    "roman": "gajok",
+    "he": "משפחה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "아침",
+    "roman": "achim",
+    "he": "בוקר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "점심",
+    "roman": "jeomsim",
+    "he": "צהריים"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "저녁",
+    "roman": "jeonyeok",
+    "he": "ערב"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "음식",
+    "roman": "eumsik",
+    "he": "אוכל"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "김치",
+    "roman": "gimchi",
+    "he": "קימצ׳י"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "빵집",
+    "roman": "ppangjip",
+    "he": "מאפייה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "물건",
+    "roman": "mulgeon",
+    "he": "חפץ"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "가격",
+    "roman": "gagyeok",
+    "he": "מחיר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "생활",
+    "roman": "saenghwal",
+    "he": "חיים"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "약속",
+    "roman": "yaksok",
+    "he": "פגישה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "생각",
+    "roman": "saenggak",
+    "he": "מחשבה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "기분",
+    "roman": "gibun",
+    "he": "מצב רוח"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "문제",
+    "roman": "munje",
+    "he": "בעיה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "방법",
+    "roman": "bangbeop",
+    "he": "דרך"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "작업",
+    "roman": "jakeop",
+    "he": "עבודה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "직업",
+    "roman": "jikeop",
+    "he": "מקצוע"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "운전",
+    "roman": "unjeon",
+    "he": "נהיגה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "버전",
+    "roman": "beojeon",
+    "he": "גרסה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "계정",
+    "roman": "gyejeong",
+    "he": "חשבון"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "광고",
+    "roman": "gwanggo",
+    "he": "פרסומת"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "수익",
+    "roman": "suik",
+    "he": "רווח"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "사이트",
+    "roman": "saiteu",
+    "he": "אתר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "버튼",
+    "roman": "beoteun",
+    "he": "כפתור"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "화면",
+    "roman": "hwamyeon",
+    "he": "מסך"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "파일",
+    "roman": "pail",
+    "he": "קובץ"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "저장",
+    "roman": "jeojang",
+    "he": "שמירה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "수정",
+    "roman": "sujeong",
+    "he": "תיקון"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "완성",
+    "roman": "wanseong",
+    "he": "השלמה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "연결",
+    "roman": "yeongyeol",
+    "he": "חיבור"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "위치",
+    "roman": "wichi",
+    "he": "מיקום"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "색상",
+    "roman": "saeksang",
+    "he": "צבע"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "음성",
+    "roman": "eumseong",
+    "he": "קול"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "남성",
+    "roman": "namseong",
+    "he": "גבר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "여성",
+    "roman": "yeoseong",
+    "he": "אישה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "한국어",
+    "roman": "hangukeo",
+    "he": "קוריאנית"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "히브리어",
+    "roman": "hibeurieo",
+    "he": "עברית"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "영어",
+    "roman": "yeongeo",
+    "he": "אנגלית"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "이스라엘",
+    "roman": "iseurael",
+    "he": "ישראל"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "마을",
+    "roman": "maeul",
+    "he": "כפר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "도움",
+    "roman": "doum",
+    "he": "עזרה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "가능",
+    "roman": "ganeung",
+    "he": "אפשרי"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "확인",
+    "roman": "hwakin",
+    "he": "בדיקה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "내용",
+    "roman": "naeyong",
+    "he": "תוכן"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "순서",
+    "roman": "sunseo",
+    "he": "סדר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "기본",
+    "roman": "gibon",
+    "he": "בסיס"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "중급",
+    "roman": "junggeup",
+    "he": "בינוני"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "고급",
+    "roman": "gogeup",
+    "he": "מתקדם"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "단어",
+    "roman": "daneo",
+    "he": "מילה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "표현",
+    "roman": "pyohyeon",
+    "he": "ביטוי"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "숙어",
+    "roman": "sukeo",
+    "he": "צירוף"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "의미",
+    "roman": "uimi",
+    "he": "משמעות"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "읽기",
+    "roman": "ilkgi",
+    "he": "קריאה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "쓰기",
+    "roman": "sseugi",
+    "he": "כתיבה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "듣기",
+    "roman": "deutgi",
+    "he": "שמיעה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "말하기",
+    "roman": "malhagi",
+    "he": "דיבור"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "시작",
+    "roman": "sijak",
+    "he": "התחלה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "종료",
+    "roman": "jongryo",
+    "he": "סיום"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "선택",
+    "roman": "seontaek",
+    "he": "בחירה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "다음",
+    "roman": "daeum",
+    "he": "הבא"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "이전",
+    "roman": "ijeon",
+    "he": "קודם"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "정답",
+    "roman": "jeongdap",
+    "he": "תשובה נכונה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "테스트",
+    "roman": "teseuteu",
+    "he": "מבחן"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "메뉴",
+    "roman": "menyu",
+    "he": "תפריט"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "카드",
+    "roman": "kadeu",
+    "he": "כרטיס"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "목록",
+    "roman": "mokrok",
+    "he": "רשימה"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "과정",
+    "roman": "gwajeong",
+    "he": "קורס"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "수업",
+    "roman": "sueop",
+    "he": "שיעור"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "자료실",
+    "roman": "jaryosil",
+    "he": "מאגר"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "비즈니스",
+    "roman": "bijeuniseu",
+    "he": "עסקים"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "회의실",
+    "roman": "hoeuisil",
+    "he": "חדר ישיבות"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "문서",
+    "roman": "munseo",
+    "he": "מסמך"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "계획",
+    "roman": "gyehoek",
+    "he": "תוכנית"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "식품",
+    "roman": "sikpum",
+    "he": "מזון"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "햇살",
+    "roman": "haetsal",
+    "he": "קרן שמש"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "운동",
+    "roman": "undong",
+    "he": "ספורט"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "선생",
+    "roman": "seonsaeng",
+    "he": "מורה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "학생",
+    "roman": "haksaeng",
+    "he": "תלמיד"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "언덕",
+    "roman": "eondeok",
+    "he": "גבעה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "창문",
+    "roman": "changmun",
+    "he": "חלון"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "냉장고",
+    "roman": "naengjanggo",
+    "he": "מקרר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "컴퓨터",
+    "roman": "keompyuteo",
+    "he": "מחשב"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "인터넷",
+    "roman": "inteonet",
+    "he": "אינטרנט"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "휴대폰",
+    "roman": "hyudaepon",
+    "he": "טלפון נייד"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "관심",
+    "roman": "gwansim",
+    "he": "עניין"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "중심",
+    "roman": "jungsim",
+    "he": "מרכז"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "발전",
+    "roman": "baljeon",
+    "he": "התפתחות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "환경",
+    "roman": "hwangyeong",
+    "he": "סביבה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "경험",
+    "roman": "gyeongheom",
+    "he": "ניסיון"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "문화",
+    "roman": "munhwa",
+    "he": "תרבות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "역사",
+    "roman": "yeoksa",
+    "he": "היסטוריה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "경제",
+    "roman": "gyeongje",
+    "he": "כלכלה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "정치",
+    "roman": "jeongchi",
+    "he": "פוליטיקה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "사회",
+    "roman": "sahoe",
+    "he": "חברה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "연락",
+    "roman": "yeonrak",
+    "he": "קשר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "신청",
+    "roman": "sincheong",
+    "he": "בקשה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "준비",
+    "roman": "junbi",
+    "he": "הכנה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "출발",
+    "roman": "chulbal",
+    "he": "יציאה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "도착",
+    "roman": "dochak",
+    "he": "הגעה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "입구",
+    "roman": "ipgu",
+    "he": "כניסה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "출구",
+    "roman": "chulgu",
+    "he": "יציאה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "안전",
+    "roman": "anjeon",
+    "he": "בטיחות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "규칙",
+    "roman": "gyuchik",
+    "he": "כלל"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "결정",
+    "roman": "gyeoljeong",
+    "he": "החלטה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "변경",
+    "roman": "byeongyeong",
+    "he": "שינוי"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "설명",
+    "roman": "seolmyeong",
+    "he": "הסבר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "소개",
+    "roman": "sogae",
+    "he": "הצגה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "예약",
+    "roman": "yeyak",
+    "he": "הזמנה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "취소",
+    "roman": "chwiso",
+    "he": "ביטול"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "확정",
+    "roman": "hwakjeong",
+    "he": "אישור סופי"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "결과",
+    "roman": "gyeolgwa",
+    "he": "תוצאה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "목표",
+    "roman": "mokpyo",
+    "he": "מטרה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "성공",
+    "roman": "seonggong",
+    "he": "הצלחה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "실패",
+    "roman": "silpae",
+    "he": "כישלון"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "노력",
+    "roman": "noryeok",
+    "he": "מאמץ"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "연구",
+    "roman": "yeongu",
+    "he": "מחקר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "개발",
+    "roman": "gaebal",
+    "he": "פיתוח"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "디자인",
+    "roman": "dijain",
+    "he": "עיצוב"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "서비스",
+    "roman": "seobiseu",
+    "he": "שירות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "고객",
+    "roman": "gogaek",
+    "he": "לקוח"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "직원",
+    "roman": "jikwon",
+    "he": "עובד"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "사장",
+    "roman": "sajang",
+    "he": "מנהל"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "회사",
+    "roman": "hoesa",
+    "he": "חברה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "월급",
+    "roman": "wolgeup",
+    "he": "משכורת"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "계약",
+    "roman": "gyeyak",
+    "he": "חוזה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "조건",
+    "roman": "jogeon",
+    "he": "תנאי"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "권리",
+    "roman": "gwonri",
+    "he": "זכות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "책임",
+    "roman": "chaekim",
+    "he": "אחריות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "법원",
+    "roman": "beopwon",
+    "he": "בית משפט"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "서류",
+    "roman": "seoryu",
+    "he": "מסמכים"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "증거",
+    "roman": "jeunggeo",
+    "he": "ראיה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "은행원",
+    "roman": "eunhaengwon",
+    "he": "פקיד בנק"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "기술",
+    "roman": "gisul",
+    "he": "טכנולוגיה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "프로그램",
+    "roman": "peurogeuraem",
+    "he": "תוכנית"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "데이터",
+    "roman": "deiteo",
+    "he": "נתונים"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "오류",
+    "roman": "oryu",
+    "he": "שגיאה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "기능",
+    "roman": "gineung",
+    "he": "פונקציה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "속도",
+    "roman": "sokdo",
+    "he": "מהירות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "방식",
+    "roman": "bangsik",
+    "he": "שיטה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "경로",
+    "roman": "gyeongro",
+    "he": "נתיב"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "폴더",
+    "roman": "poldeo",
+    "he": "תיקייה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "배경",
+    "roman": "baegyeong",
+    "he": "רקע"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "글씨",
+    "roman": "geulssi",
+    "he": "אותיות"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "크기",
+    "roman": "keugi",
+    "he": "גודל"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "세로",
+    "roman": "sero",
+    "he": "אנכי"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "가로",
+    "roman": "garo",
+    "he": "אופקי"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "스크롤",
+    "roman": "seukeurol",
+    "he": "גלילה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "드래그",
+    "roman": "deuraegeu",
+    "he": "גרירה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "마우스",
+    "roman": "mauseu",
+    "he": "עכבר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "사용자",
+    "roman": "sayongja",
+    "he": "משתמש"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "방문자",
+    "roman": "bangmunja",
+    "he": "מבקר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "학습자",
+    "roman": "hakseupja",
+    "he": "לומד"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "초보자",
+    "roman": "choboja",
+    "he": "מתחיל"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "전문가",
+    "roman": "jeonmunga",
+    "he": "מומחה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "관리자",
+    "roman": "gwanrija",
+    "he": "מנהל מערכת"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "번역",
+    "roman": "beonyeok",
+    "he": "תרגום"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "발표",
+    "roman": "balpyo",
+    "he": "הצגה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "자료",
+    "roman": "jaryo",
+    "he": "חומר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "분석",
+    "roman": "bunseok",
+    "he": "ניתוח"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "추천",
+    "roman": "chucheon",
+    "he": "המלצה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "검색",
+    "roman": "geomsaek",
+    "he": "חיפוש"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "추가",
+    "roman": "chuga",
+    "he": "הוספה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "삭제",
+    "roman": "sakje",
+    "he": "מחיקה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "복구",
+    "roman": "bokgu",
+    "he": "שחזור"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "업로드",
+    "roman": "eoprodeu",
+    "he": "העלאה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "다운로드",
+    "roman": "daunrodeu",
+    "he": "הורדה"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "저장소",
+    "roman": "jeojangso",
+    "he": "מאגר"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "링크",
+    "roman": "ringkeu",
+    "he": "קישור"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "주소",
+    "roman": "juso",
+    "he": "כתובת"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "홈페이지",
+    "roman": "hompeiji",
+    "he": "דף בית"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "웹사이트",
+    "roman": "wepsaiteu",
+    "he": "אתר אינטרנט"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "브라우저",
+    "roman": "beuraujeo",
+    "he": "דפדפן"
+  },
+  {
+    "category": "medium_patchim",
+    "ko": "서버",
+    "roman": "seobeo",
+    "he": "שרת"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "닭",
+    "roman": "dalk",
+    "he": "תרנגול"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "값",
+    "roman": "gaps",
+    "he": "מחיר / ערך"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "삶",
+    "roman": "salm",
+    "he": "חיים"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "몫",
+    "roman": "moks",
+    "he": "חלק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "앉아",
+    "roman": "anja",
+    "he": "שב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "읽기",
+    "roman": "ilkgi",
+    "he": "קריאה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "읽다",
+    "roman": "ilkda",
+    "he": "לקרוא"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "많다",
+    "roman": "manhda",
+    "he": "הרבה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "않다",
+    "roman": "anhda",
+    "he": "לא לעשות"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "괜찮다",
+    "roman": "gwaenchanhda",
+    "he": "בסדר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "짧다",
+    "roman": "jjalbda",
+    "he": "קצר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "넓다",
+    "roman": "neolbda",
+    "he": "רחב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "밟다",
+    "roman": "balbda",
+    "he": "לדרוך"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "젊다",
+    "roman": "jeolmda",
+    "he": "צעיר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "늙다",
+    "roman": "neulkda",
+    "he": "זקן"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "맑다",
+    "roman": "malkda",
+    "he": "צלול"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "밝다",
+    "roman": "balkda",
+    "he": "בהיר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "얇다",
+    "roman": "yalbda",
+    "he": "דק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "굵다",
+    "roman": "gulkda",
+    "he": "עבה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "닮다",
+    "roman": "dalmda",
+    "he": "דומה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "뚫다",
+    "roman": "ttulhda",
+    "he": "לנקב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "끓다",
+    "roman": "kkeulhda",
+    "he": "לרתוח"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "싫다",
+    "roman": "silhda",
+    "he": "לא לאהוב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "잃다",
+    "roman": "ilhda",
+    "he": "לאבד"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "옳다",
+    "roman": "olhda",
+    "he": "נכון"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "쌓다",
+    "roman": "ssahda",
+    "he": "לערום"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "낳다",
+    "roman": "nahda",
+    "he": "ללדת"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "놓다",
+    "roman": "nohda",
+    "he": "להניח"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "좋다",
+    "roman": "johda",
+    "he": "טוב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "꽃",
+    "roman": "kkot",
+    "he": "פרח"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "밖",
+    "roman": "bak",
+    "he": "בחוץ"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "끝",
+    "roman": "kkeut",
+    "he": "סוף"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "빛",
+    "roman": "bit",
+    "he": "אור"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "낮",
+    "roman": "nat",
+    "he": "יום"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "옷",
+    "roman": "ot",
+    "he": "בגד"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "젖",
+    "roman": "jeot",
+    "he": "חלב אם"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "팥",
+    "roman": "pat",
+    "he": "שעועית אדומה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "부엌",
+    "roman": "bueok",
+    "he": "מטבח"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "무릎",
+    "roman": "mureup",
+    "he": "ברך"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "앞",
+    "roman": "ap",
+    "he": "לפני"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "옆",
+    "roman": "yeop",
+    "he": "ליד"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "숲",
+    "roman": "sup",
+    "he": "יער"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "집",
+    "roman": "jip",
+    "he": "בית"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "밥",
+    "roman": "bap",
+    "he": "אורז / ארוחה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "입",
+    "roman": "ip",
+    "he": "פה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "법",
+    "roman": "beop",
+    "he": "חוק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "십",
+    "roman": "sip",
+    "he": "עשר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "국",
+    "roman": "guk",
+    "he": "מרק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "떡",
+    "roman": "tteok",
+    "he": "עוגת אורז"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "책",
+    "roman": "chaek",
+    "he": "ספר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "색",
+    "roman": "saek",
+    "he": "צבע"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "벽",
+    "roman": "byeok",
+    "he": "קיר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "목",
+    "roman": "mok",
+    "he": "צוואר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "약",
+    "roman": "yak",
+    "he": "תרופה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "역",
+    "roman": "yeok",
+    "he": "תחנה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "복",
+    "roman": "bok",
+    "he": "מזל"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "속",
+    "roman": "sok",
+    "he": "פנים"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "독",
+    "roman": "dok",
+    "he": "רעל"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "흙",
+    "roman": "heulk",
+    "he": "אדמה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "몽골",
+    "roman": "monggol",
+    "he": "מונגוליה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "촬영",
+    "roman": "chwalyeong",
+    "he": "צילום"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "영향",
+    "roman": "yeonghyang",
+    "he": "השפעה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "상황",
+    "roman": "sanghwang",
+    "he": "מצב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "방향",
+    "roman": "banghyang",
+    "he": "כיוון"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "경력",
+    "roman": "gyeongryeok",
+    "he": "ותק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "능력",
+    "roman": "neungryeok",
+    "he": "יכולת"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "협력",
+    "roman": "hyeopryeok",
+    "he": "שיתוף פעולה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "압력",
+    "roman": "apryeok",
+    "he": "לחץ"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "입력",
+    "roman": "ipryeok",
+    "he": "קלט"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "출력",
+    "roman": "chulryeok",
+    "he": "פלט"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "등록",
+    "roman": "deungrok",
+    "he": "רישום"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "목록",
+    "roman": "mokrok",
+    "he": "רשימה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "연속",
+    "roman": "yeonsok",
+    "he": "רצף"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "접속",
+    "roman": "jeopsok",
+    "he": "חיבור"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "학습",
+    "roman": "hakseup",
+    "he": "למידה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "습관",
+    "roman": "seupgwan",
+    "he": "הרגל"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "확률",
+    "roman": "hwakryul",
+    "he": "סיכוי"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "품질",
+    "roman": "pumjil",
+    "he": "איכות"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "핵심",
+    "roman": "haeksim",
+    "he": "עיקר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "복잡",
+    "roman": "bokjap",
+    "he": "מורכב"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "정확",
+    "roman": "jeonghwak",
+    "he": "מדויק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "직접",
+    "roman": "jikjeop",
+    "he": "ישיר"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "간접",
+    "roman": "ganjeop",
+    "he": "עקיף"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "면접",
+    "roman": "myeonjeop",
+    "he": "ראיון"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "합격",
+    "roman": "hapgyeok",
+    "he": "קבלה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "불합격",
+    "roman": "bulhapgyeok",
+    "he": "דחייה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "공급",
+    "roman": "gonggeup",
+    "he": "אספקה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "수입",
+    "roman": "suip",
+    "he": "יבוא"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "지급",
+    "roman": "jigeup",
+    "he": "תשלום"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "확인",
+    "roman": "hwakin",
+    "he": "אישור"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "법적",
+    "roman": "beopjeok",
+    "he": "משפטי"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "감정",
+    "roman": "gamjeong",
+    "he": "רגש"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "걱정",
+    "roman": "geokjeong",
+    "he": "דאגה"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "약간",
+    "roman": "yakgan",
+    "he": "קצת"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "충분",
+    "roman": "chungbun",
+    "he": "מספיק"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "특별",
+    "roman": "teukbyeol",
+    "he": "מיוחד"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "필요",
+    "roman": "pilyo",
+    "he": "צורך"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "실제",
+    "roman": "silje",
+    "he": "אמיתי"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "전체",
+    "roman": "jeonche",
+    "he": "כולל"
+  },
+  {
+    "category": "advanced_patchim",
+    "ko": "현재",
+    "roman": "hyeonjae",
+    "he": "נוכחי"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "계획표",
+    "roman": "gyehoekpyo",
+    "he": "לוח תוכנית"
+  },
+  {
+    "category": "basic_patchim",
+    "ko": "수업료",
+    "roman": "sueopryo",
+    "he": "שכר לימוד"
   }
-}
+]

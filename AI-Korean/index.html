@@ -1,33 +1,42 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>AI Korean Master</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Korean Master</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-    <a href="https://jewishkorean.com" class="home-btn">
-        דַף הַבַּיִת (홈으로 돌아가기)
-    </a>
+  <a href="https://jewishkorean.com" class="home-btn">דַף הַבַּיִת <span>(홈으로 돌아가기)</span></a>
 
-    <div id="app" class="fade-in">
-        <h1 class="main-title">Don't study,<br>Just read first!</h1>
-
-        <div class="btn-group">
-            <button onclick="showCurriculumMenu()">
-                קַורְס מַאסְטֶר לִאָלְפָבֵּית
-                <span class="korean-sub">(자·모음 마스터 코스)</span>
-            </button>
-            <button onclick="loadLearning('pronunciation')">
-                מַצַב אִמּוּן הֲגִיָה
-                <span class="korean-sub">(발음 훈련 모드)</span>
-            </button>
-            <button onclick="loadLearning('daily')">
-                אֹוסֵף מִילִים יוֹמִי
-                <span class="korean-sub">(일상 필수 단어 훈련)</span>
-            </button>
-        </div>
+  <main id="app" class="fade-in">
+    <h1 class="main-title">Don't study,<br />Just read first!</h1>
+    <section class="today-card">
+      <div class="today-label">🇰🇷 Today's Korean <span class="korean-sub">(오늘의 표현)</span></div>
+      <div class="today-ko">안녕하세요</div>
+      <div class="today-he" dir="rtl">שלום</div>
+    </section>
+    <div class="btn-group main-menu">
+      <button type="button" onclick="showCurriculumMenu()">
+        קוּרְס מַאסְטֶר לְאוֹתִיּוֹת וּתְנוּעוֹת
+        <span class="korean-sub">(자·모음 마스터 코스)</span>
+      </button>
+      <button type="button" onclick="loadPhraseMode('pronunciation')">
+        קְרִיאַת שִׂיחוֹת אֲמִתִּיּוֹת
+        <span class="korean-sub">(실전 회화 읽기)</span>
+      </button>
+      <button type="button" onclick="loadWordMode('daily')">
+        בִּטּוּיִים שִׁמּוּשִׁיִּים לְיוֹם־יוֹם
+        <span class="korean-sub">(일상 필수 표현)</span>
+      </button>
+      <button type="button" onclick="loadWordMode('business')">
+        בִּטּוּיִים חִיּוּנִיִּים לַעֲסָקִים
+        <span class="korean-sub">(비즈니스 필수 표현)</span>
+      </button>
     </div>
-    <script src="js/app.js"></script>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

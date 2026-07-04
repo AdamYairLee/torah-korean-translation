@@ -3,107 +3,425 @@
 
 * { box-sizing: border-box; }
 
-body {
-    margin: 0;
-    min-height: 100vh; /* 화면보다 작을 땐 꽉 채우고, 크면 늘어남 */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Jua', sans-serif;
-    color: white;
-    background: #000; /* 블러 배경 아래의 기본 색 */
+:root {
+  --glass: rgba(255,255,255,0.16);
+  --glass-strong: rgba(255,255,255,0.24);
+  --line: rgba(255,255,255,0.28);
+  --text: #ffffff;
+  --soft: rgba(255,255,255,0.78);
+  --accent: #7dd3fc;
+  --accent-strong: #38bdf8;
 }
 
-/* 배경 블러 효과 */
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Jua', sans-serif;
+  color: var(--text);
+  background: #000;
+  overflow-x: hidden;
+}
+
 body::before {
-    content: "";
-    position: fixed; /* 화면 고정 */
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                url('../images/bg-korean.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: blur(3px);
-    z-index: -1;
+  content: "";
+  position: fixed;
+  inset: -14px;
+  background: linear-gradient(rgba(0,0,0,0.42), rgba(0,0,0,0.58)), url('../images/bg-korean.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px);
+  transform: scale(1.04);
+  z-index: -2;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.08), rgba(0,0,0,0.18));
+  z-index: -1;
+  pointer-events: none;
 }
 
 #app {
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: min(94vw, 760px);
+  max-height: calc(100vh - 88px);
+  padding: 22px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
 }
 
-/* 상단 우측 홈버튼 */
+.fade-in { animation: fadeIn 0.65s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.main-title {
+  font-family: 'Jua', sans-serif;
+  font-size: clamp(2.8rem, 8vw, 5rem);
+  line-height: 1.04;
+  margin: 0 0 30px;
+  text-shadow: 0 5px 16px rgba(0,0,0,0.65);
+  letter-spacing: 0.01em;
+}
+
 .home-btn {
-    position: absolute; /* fixed 대신 absolute로 변경하여 컨텐츠 흐름에 맞춤 */
-    top: 20px;
-    right: 20px;
-    padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border-radius: 10px;
-    font-family: 'Jua', sans-serif;
-    text-decoration: none;
-    z-index: 1000;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 2000;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.42);
+  border: 1px solid var(--line);
+  color: white !important;
+  text-decoration: none !important;
+  font-family: 'Hadassah Friedlaender', serif;
+  font-size: 1rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+  backdrop-filter: blur(6px);
+}
+.home-btn span { font-family: 'Jua', sans-serif; font-size: 0.9rem; opacity: 0.9; }
+
+.btn-row {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 14px;
 }
 
-/* 버튼 그리드 (가장 중요한 부분) */
 .btn-group {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 무조건 2열 */
-    gap: 15px;
-    width: 100%;
-    margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+  margin-top: 12px;
 }
 
-button {
-    font-family: 'Hadassah Friedlaender', serif;
-    font-size: 1em;
-    padding: 20px 10px;
-    border-radius: 15px;
-    border: 1px solid rgba(255,255,255,0.2);
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    backdrop-filter: blur(5px);
+button, .small-btn {
+  font-family: 'Hadassah Friedlaender', 'Jua', serif;
+  font-size: clamp(1rem, 2.4vw, 1.35rem);
+  padding: 18px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  background: var(--glass);
+  color: white;
+  backdrop-filter: blur(7px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  transition: transform .16s ease, background .16s ease;
+}
+button:hover, .small-btn:hover { background: var(--glass-strong); transform: translateY(-2px); }
+
+.nav-btn {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
 }
 
-/* 모바일 전용 버튼 크기 최적화 */
-@media (max-width: 600px) {
-    .hebrew-text { font-size: 2.5rem !important; }
-    .korean-text { font-size: 2.0rem !important; }
-    button { padding: 16px 5px; font-size: 0.9em; }
-    .main-title { font-size: 1.8em; }
+.primary-btn { background: rgba(56,189,248,0.36); border-color: rgba(125,211,252,0.65); }
+
+.korean-sub {
+  display: block;
+  margin-top: 6px;
+  font-family: 'Jua', sans-serif;
+  font-size: 0.72em;
+  opacity: 0.88;
 }
 
-.list-container { width: 100%; }
+.section-title {
+  margin: 6px 0 10px;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  text-shadow: 0 4px 12px rgba(0,0,0,.45);
+}
+.section-desc { margin: 0 0 10px; color: var(--soft); font-size: 1.05rem; }
+
+.list-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  padding-bottom: 90px;
+}
+
 .card {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    margin-top: 15px;
-    border-radius: 15px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid var(--line);
+  padding: 18px 12px;
+  border-radius: 22px;
+  cursor: pointer;
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  backdrop-filter: blur(6px);
 }
-/* 한글 폰트 강제 적용 (가장 강력한 우선순위) */
-body, button, .card, .korean-text, .korean-sub {
-    font-family: 'Jua', sans-serif !important;
+.card:hover { background: rgba(255,255,255,0.25); }
+
+.ko-big {
+  font-family: 'Jua', sans-serif;
+  font-size: clamp(3.8rem, 11vw, 6rem);
+  line-height: 1;
+  margin: 0;
 }
-/* 글자 크기 일괄 조절 (이 숫자들을 높이면 전체가 커집니다) */
-.hebrew-text { 
-    font-size: 3.5rem !important; 
-    margin: 10px 0;
+.ko-word { font-size: clamp(2.4rem, 7vw, 4.5rem); }
+.roman { font-size: clamp(1.1rem, 3.2vw, 1.45rem); color: rgba(255,255,255,.9); }
+.he-sound { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: clamp(1.4rem, 4vw, 2rem); color: white; }
+.meaning { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: 1.35rem; color: white; }
+
+.random-test-btn {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1500;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(56,189,248,0.92);
+  color: #062033;
+  border: none;
+  font-family: 'Jua', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
 }
 
-.korean-text { 
-    font-size: 2.5rem !important; 
-    margin: 10px 0;
+.test-shell { width: min(94vw, 620px); display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.test-card {
+  width: 100%;
+  min-height: 340px;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+}
+.test-front { font-size: clamp(6rem, 28vw, 11rem); line-height: 1; }
+.test-back .roman { font-size: clamp(2rem, 6vw, 3rem); }
+.test-back .he-sound { font-size: clamp(2.3rem, 7vw, 4rem); }
+.test-back .ko-mini { font-size: clamp(2.2rem, 6vw, 3.4rem); margin-bottom: 14px; }
+.progress { color: var(--soft); font-size: 1.1rem; }
+
+.phrase-card, .word-card {
+  width: 100%;
+  min-height: auto;
+  text-align: center;
+}
+.phrase-ko { font-size: clamp(1.9rem, 5vw, 3.2rem); margin-bottom: 10px; }
+.phrase-he { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: clamp(1.35rem, 4vw, 2rem); }
+
+@media (max-width: 640px) {
+  #app { width: 96vw; max-height: calc(100vh - 76px); padding: 16px 10px; }
+  .btn-group { grid-template-columns: 1fr; gap: 10px; }
+  .curriculum-grid { grid-template-columns: 1fr 1fr; }
+  button { padding: 15px 10px; }
+  .home-btn { top: 10px; left: 10px; font-size: .9rem; padding: 8px 10px; }
+  .random-test-btn { right: 10px; bottom: 14px; top: auto; transform: none; padding: 12px 14px; }
+  .card { min-height: 165px; }
 }
 
-/* body 전체 기본 크기 조절 */
-body {
-    font-size: 1.2rem; /* 전체적인 글자 베이스를 키웁니다 */
+
+/* 가로 읽기 모드: 실전 회화 / 일상 표현 / 비즈니스 표현 */
+.horizontal-list {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  padding: 8px 12px 90px;
+  -webkit-overflow-scrolling: touch;
+}
+.horizontal-card {
+  flex: 0 0 min(82vw, 560px);
+  min-height: 260px;
+  scroll-snap-align: center;
+}
+.horizontal-card .phrase-ko {
+  white-space: nowrap;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.25;
+}
+.horizontal-card .roman,
+.horizontal-card .meaning,
+.horizontal-card .phrase-he {
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .horizontal-card { flex-basis: 86vw; }
+  .horizontal-card .phrase-ko { font-size: clamp(1.65rem, 8vw, 2.5rem); }
+}
+
+/* v1.0 Jarvis additions */
+.kofi-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  width: min(100%, 560px);
+  margin-top: 18px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(0,0,0,0.28);
+  color: white !important;
+  text-decoration: none !important;
+  font-size: clamp(0.86rem, 2.4vw, 1rem);
+  line-height: 1.35;
+  backdrop-filter: blur(7px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+}
+.kofi-banner:hover { background: rgba(0,0,0,0.38); transform: translateY(-1px); }
+.kofi-heart { font-size: 1.35rem; line-height: 1; }
+
+.intro-panel {
+  width: min(100%, 680px);
+  padding: clamp(20px, 5vw, 34px);
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.34);
+  backdrop-filter: blur(9px);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.28);
+}
+.intro-panel h2 { margin: 0 0 18px; font-size: clamp(1.7rem, 5vw, 2.6rem); }
+.intro-ko {
+  font-family: 'Jua', sans-serif;
+  font-size: clamp(1.15rem, 3.5vw, 1.55rem);
+  line-height: 1.7;
+  margin: 0 0 18px;
+}
+.intro-he {
+  font-family: 'Hadassah Friedlaender', serif;
+  font-size: clamp(1.15rem, 3.5vw, 1.55rem);
+  line-height: 1.75;
+  margin: 0 0 24px;
+  color: rgba(255,255,255,0.92);
+}
+.start-btn { min-width: 180px; }
+
+.single-card-shell {
+  width: min(96vw, 720px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+.single-practice-card {
+  width: 100%;
+  min-height: clamp(300px, 52vh, 430px);
+  padding: clamp(22px, 5vw, 40px);
+  border-radius: 30px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(9px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.24);
+}
+.single-practice-card .phrase-ko {
+  width: 100%;
+  font-size: clamp(2rem, 7vw, 4.6rem);
+  line-height: 1.22;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.single-practice-card .roman { font-size: clamp(1.15rem, 3.2vw, 1.7rem); }
+.single-practice-card .phrase-he {
+  font-family: 'Hadassah Friedlaender', serif;
+  font-size: clamp(1.35rem, 4.3vw, 2.35rem);
+  line-height: 1.35;
+}
+.hint-text { color: rgba(255,255,255,0.72); font-size: 1.05rem; }
+.single-controls button { min-width: 150px; }
+
+@media (max-width: 640px) {
+  .kofi-banner { margin-top: 14px; padding: 10px 12px; }
+  .intro-panel { border-radius: 22px; }
+  .single-practice-card { min-height: 48vh; border-radius: 24px; }
+  .single-controls { gap: 8px; }
+  .single-controls button { width: 100%; min-width: 0; }
+}
+
+/* v1.1 Beta: today's expression and launch note */
+.today-card {
+  position: relative;
+  width: min(100%, 560px);
+  margin: -6px auto 18px;
+  padding: 14px 18px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.24);
+  background: rgba(0,0,0,0.22);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+  text-align: center;
+}
+.today-label {
+  font-size: clamp(0.92rem, 2.6vw, 1.08rem);
+  color: rgba(255,255,255,0.82);
+  margin-bottom: 6px;
+}
+.today-ko {
+  font-family: 'Jua', sans-serif;
+  font-size: clamp(2rem, 6.5vw, 3.8rem);
+  line-height: 1.15;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.36);
+  word-break: keep-all;
+}
+.today-he {
+  font-family: 'Hadassah Friedlaender', serif;
+  font-size: clamp(1.15rem, 3.4vw, 1.75rem);
+  margin-top: 4px;
+  color: rgba(255,255,255,0.92);
+}
+.today-sound {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+}
+.today-start {
+  margin-top: 12px;
+  padding: 9px 14px;
+  font-size: 0.95rem;
+  border-radius: 14px;
+}
+.beta-note {
+  width: min(100%, 560px);
+  margin: 10px auto 0;
+  color: rgba(255,255,255,0.72);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+@media (max-width: 640px) {
+  .today-card { margin-top: -2px; padding: 12px 14px 14px; border-radius: 18px; }
+  .today-sound { width: 36px; height: 36px; min-width: 36px; right: 9px; top: 9px; }
+  .today-start { width: 100%; }
+  .beta-note { font-size: 0.8rem; }
 }
