@@ -75,7 +75,9 @@ button {
 
 /* 모바일 전용 버튼 크기 최적화 */
 @media (max-width: 600px) {
-    button { padding: 15px 5px; font-size: 0.9em; }
+    .hebrew-text { font-size: 2.5rem !important; }
+    .korean-text { font-size: 2.0rem !important; }
+    button { padding: 16px 5px; font-size: 0.9em; }
     .main-title { font-size: 1.8em; }
 }
 
@@ -89,4 +91,19 @@ button {
 /* 한글 폰트 강제 적용 (가장 강력한 우선순위) */
 body, button, .card, .korean-text, .korean-sub {
     font-family: 'Jua', sans-serif !important;
+}
+/* 글자 크기 일괄 조절 (이 숫자들을 높이면 전체가 커집니다) */
+.hebrew-text { 
+    font-size: 3.5rem !important; 
+    margin: 10px 0;
+}
+
+.korean-text { 
+    font-size: 2.5rem !important; 
+    margin: 10px 0;
+}
+
+/* body 전체 기본 크기 조절 */
+body {
+    font-size: 1.2rem; /* 전체적인 글자 베이스를 키웁니다 */
 }

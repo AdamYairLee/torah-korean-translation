@@ -1,8 +1,15 @@
 [
-  { "id": 1, "ko": "자음", "he": "עיצורים (ㄱ, ㄴ, ㄷ...)" },
-  { "id": 2, "ko": "모음", "he": "תנועות (ㅏ, ㅑ, ㅓ...)" },
-  { "id": 3, "ko": "받침 없는 기본 조합", "he": "צירופים בסיסיים (아빠, 나비)" },
-  { "id": 4, "ko": "받침 있는 기본 조합", "he": "עיצור בסוף הברה (가방, 학교)" },
-  { "id": 5, "ko": "받침 있는 중등 조합", "he": "צירופים בינוניים (식품, 운동)" },
-  { "id": 6, "ko": "받침 있는 고등 조합", "he": "צירופים מתקדמים (닭, 꽹과리)" }
+  { "category": "consonants", "he": "Giyeok", "ko": "ㄱ" },
+  { "category": "consonants", "he": "Nieun", "ko": "ㄴ" },
+  { "category": "consonants", "he": "Digeut", "ko": "ㄷ" },
+  { "category": "vowels", "he": "Ah", "ko": "ㅏ" },
+  { "category": "vowels", "he": "Ya", "ko": "ㅑ" },
+  { "category": "basic_no_patchim", "he": "אַבָּא", "ko": "아빠" },
+  { "category": "basic_no_patchim", "he": "נָבִּי", "ko": "나비" },
+  { "category": "basic_patchim", "he": "תִּיק", "ko": "가방" },
+  { "category": "basic_patchim", "he": "בֵּית סֵפֶר", "ko": "학교" },
+  { "category": "medium_patchim", "he": "מוּצָר", "ko": "식품" },
+  { "category": "medium_patchim", "he": "אִמּוּן", "ko": "운동" },
+  { "category": "advanced_patchim", "he": "תַּרְנְגוֹל", "ko": "닭" },
+  { "category": "advanced_patchim", "he": "גּוֹנְג", "ko": "꽽과리" }
 ]
