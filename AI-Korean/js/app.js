@@ -1,5 +1,5 @@
 const app = document.getElementById('app');
-const CONFIG_FALLBACK = { KOFI_URL: 'https://ko-fi.com/YOUR_KOFI_ID', SITE_NAME: 'AI Korean Master', VERSION: '1.1 Beta' };
+const CONFIG_FALLBACK = { KOFI_URL: 'https://ko-fi.com/YOUR_KOFI_ID', SITE_NAME: 'AI Korean Master', VERSION: '1.3 Beta' };
 const SITE_CONFIG = (typeof CONFIG !== 'undefined') ? { ...CONFIG_FALLBACK, ...CONFIG } : CONFIG_FALLBACK;
 let currentVoice = null;
 let currentCategory = null;
@@ -9,32 +9,32 @@ let currentTestFlipped = false;
 
 const curriculumMeta = {
   consonants: {
-    titleHe: 'עִיצוּרִים',
+    titleHe: 'עיצורים',
     titleKo: '자음',
     desc: '한글을 크게 보고, 클릭하면 소리를 들을 수 있습니다.'
   },
   vowels: {
-    titleHe: 'תְּנוּעוֹת',
+    titleHe: 'תנועות',
     titleKo: '모음',
     desc: '모음은 자모 단독 음성이 부정확할 수 있어 실제 음절(아, 어, 으 등)로 읽게 했습니다.'
   },
   basic_no_patchim: {
-    titleHe: 'צֵרוּפִים בְּסִיסִיִּים בְּלִי פַּצ׳ִים',
+    titleHe: 'צירופים בסיסיים בלי פצ׳ים',
     titleKo: '받침 없는 기본 조합',
     desc: '받침 없이 읽는 쉬운 조합입니다.'
   },
   basic_patchim: {
-    titleHe: 'צֵרוּפִים בְּסִיסִיִּים עִם פַּצ׳ִים',
+    titleHe: 'צירופים בסיסיים עם פצ׳ים',
     titleKo: '받침 있는 기본 조합',
     desc: '기본 받침을 포함한 단어입니다.'
   },
   medium_patchim: {
-    titleHe: 'צֵרוּפִים בֵּינוֹנִיִּים',
+    titleHe: 'צירופים בינוניים',
     titleKo: '받침 있는 중등 조합',
     desc: '조금 더 복잡한 받침과 실제 읽기 예시입니다.'
   },
   advanced_patchim: {
-    titleHe: 'צֵרוּפִים מִתְקַדְּמִים',
+    titleHe: 'צירופים מתקדמים',
     titleKo: '받침 있는 고등 조합',
     desc: '겹받침과 실제 발음이 달라지는 예시입니다.'
   }
@@ -45,19 +45,19 @@ const curriculumMeta = {
 const learningIntros = {
   basic_no_patchim: {
     ko: `받침 없이 자음과 모음만 만나면 한 글자가 됩니다.<br>예를 들어 ㄴ + ㅏ = 나, ㅁ + ㅗ = 모처럼 읽습니다.<br>먼저 받침 없는 글자부터 익히면 한글의 기본 리듬을 쉽게 잡을 수 있습니다.<br><br>자, 그럼 시작해 볼까요?`,
-    he: `כאשר עיצור ותנועה מתחברים בלי עיצור סופי, נוצרת הברה אחת.<br>לדוגמה: ㄴ + ㅏ = 나, ו־ㅁ + ㅗ = 모.<br>אם מתחילים מהברות בלי עיצור סופי, קל יותר להבין את הקצב הבסיסי של הקוריאנית.<br><br>אז נתחיל?`
+    he: `כאשר עיצור ותנועה מתחברים בלי עיצור סופי, נוצרת הברה אחת.<br>לדוגמה: ㄴ + ㅏ = 나, וㅁ + ㅗ = 모.<br>אם מתחילים מהברות בלי עיצור סופי, קל יותר להבין את הקצב הבסיסי של הקוריאנית.<br><br>אז נתחיל?`
   },
   basic_patchim: {
     ko: `한글에서는 글자 아래에 오는 마지막 자음을 받침이라고 합니다.<br>예를 들어 방, 밥, 손처럼 글자의 끝소리를 만들어 줍니다.<br>받침을 익히면 더 많은 한국어 단어를 읽을 수 있습니다.<br><br>자, 그럼 시작해 볼까요?`,
-    he: `בקוריאנית, העיצור שמופיע בתחתית ההברה נקרא פַּצִ׳ים.<br>לדוגמה, במילים 방, 밥, 손 הוא יוצר את הצליל הסופי של ההברה.<br>כשלומדים פַּצִ׳ים, אפשר לקרוא הרבה יותר מילים בקוריאנית.<br><br>אז נתחיל?`
+    he: `בקוריאנית, העיצור שמופיע בתחתית ההברה נקרא פצ׳ים.<br>לדוגמה, במילים 방, 밥, 손 הוא יוצר את הצליל הסופי של ההברה.<br>כשלומדים פצ׳ים, אפשר לקרוא הרבה יותר מילים בקוריאנית.<br><br>אז נתחיל?`
   },
   medium_patchim: {
     ko: `이 단계에서는 받침이 들어간 단어를 조금 더 자연스럽게 읽는 연습을 합니다.<br>글자 하나씩 끊어 읽기보다, 단어 전체의 흐름을 보면서 읽어 보세요.<br>받침 소리가 익숙해지면 한국어 읽기가 훨씬 부드러워집니다.<br><br>자, 그럼 시작해 볼까요?`,
-    he: `בשלב הזה מתרגלים קריאה טבעית יותר של מילים עם פַּצִ׳ים.<br>במקום לקרוא כל הברה בנפרד, נסו לראות את הזרימה של כל המילה.<br>כשהצליל הסופי נעשה מוכר, הקריאה בקוריאנית הופכת להרבה יותר חלקה.<br><br>אז נתחיל?`
+    he: `בשלב הזה מתרגלים קריאה טבעית יותר של מילים עם פצ׳ים.<br>במקום לקרוא כל הברה בנפרד, נסו לראות את הזרימה של כל המילה.<br>כשהצליל הסופי נעשה מוכר, הקריאה בקוריאנית הופכת להרבה יותר חלקה.<br><br>אז נתחיל?`
   },
   advanced_patchim: {
     ko: `이 단계에서는 읽기 어려운 받침과 복잡한 조합을 연습합니다.<br>어떤 단어는 글자 모양과 실제 소리가 조금 다르게 느껴질 수 있습니다.<br>천천히 보고, 듣고, 다시 읽으면 어려운 단어도 익숙해집니다.<br><br>자, 그럼 시작해 볼까요?`,
-    he: `בשלב הזה מתרגלים פַּצִ׳ים קשים וצירופים מורכבים יותר.<br>בחלק מהמילים, הצורה הכתובה והצליל בפועל עשויים להרגיש מעט שונים.<br>אם מסתכלים לאט, מקשיבים וקוראים שוב, גם מילים קשות נעשות מוכרות.<br><br>אז נתחיל?`
+    he: `בשלב הזה מתרגלים פצ׳ים קשים וצירופים מורכבים יותר.<br>בחלק מהמילים, הצורה הכתובה והצליל בפועל עשויים להרגיש מעט שונים.<br>אם מסתכלים לאט, מקשיבים וקוראים שוב, גם מילים קשות נעשות מוכרות.<br><br>אז נתחיל?`
   }
 };
 
@@ -128,26 +128,26 @@ function renderMain() {
     ${renderTodayExpressionPlaceholder()}
     <div class="btn-group main-menu">
       <button type="button" onclick="showCurriculumMenu()">
-        קוּרְס מַאסְטֶר לְאוֹתִיּוֹת וּתְנוּעוֹת
+        קורס מאסטר לאותיות ותנועות
         <span class="korean-sub">(자·모음 마스터 코스)</span>
       </button>
       <button type="button" onclick="loadPhraseMode('pronunciation')">
-        קְרִיאַת שִׂיחוֹת אֲמִתִּיּוֹת
+        קריאת שיחות אמיתיות
         <span class="korean-sub">(실전 회화 읽기)</span>
       </button>
       <button type="button" onclick="loadWordMode('daily')">
-        בִּטּוּיִים שִׁמּוּשִׁיִּים לְיוֹם־יוֹם
+        ביטויים שימושיים ליום-יום
         <span class="korean-sub">(일상 필수 표현)</span>
       </button>
       <button type="button" onclick="loadWordMode('business')">
-        בִּטּוּיִים חִיּוּנִיִּים לַעֲסָקִים
+        ביטויים חיוניים לעסקים
         <span class="korean-sub">(비즈니스 필수 표현)</span>
       </button>
     </div>
     <a href="${SITE_CONFIG.KOFI_URL}" target="_blank" rel="noopener" class="kofi-banner">
       <span class="kofi-heart">☕</span>
       <span>이 프로젝트가 도움이 되셨다면, 다음 레슨과 새로운 콘텐츠 제작을 응원해 주세요.</span>
-      <span dir="rtl">אם הפרויקט עזר לכם, תוכלו לתמוך בפיתוח שיעורים ותכנים חדשים.</span>
+      <span class="hebrew" dir="rtl">אם הפרויקט עזר לכם, תוכלו לתמוך בפיתוח שיעורים ותכנים חדשים.</span>
     </a>
     <p class="beta-note">Beta Version 1.1 · 히브리어 사용자를 위한 한국어 읽기 중심 학습 프로젝트입니다.</p>
   `;
@@ -192,7 +192,7 @@ function showError(message) {
   removeRandomButton();
   app.innerHTML = `
     <div class="btn-row"><button class="nav-btn" onclick="renderMain()">דף ראשי <span class="korean-sub">(메인으로)</span></button></div>
-    <h2 class="section-title">שְׁגִיאָה <span class="korean-sub">(오류)</span></h2>
+    <h2 class="section-title">שגיאה <span class="korean-sub">(오류)</span></h2>
     <p class="section-desc">${message}</p>
   `;
 }
@@ -204,15 +204,15 @@ function showCurriculumMenu() {
     <div class="btn-row">
       <button class="nav-btn" onclick="renderMain()">דף ראשי <span class="korean-sub">(메인으로)</span></button>
     </div>
-    <h2 class="section-title">קוּרְס קְרִיאָה</h2>
+    <h2 class="section-title">קורס קריאה</h2>
     <p class="section-desc">히브리어 먼저, 한글은 괄호로 표시합니다. 학습 본문은 한글을 가장 크게 보여줍니다.</p>
     <div class="btn-group curriculum-grid">
-      <button onclick="loadLearning('consonants')">עִיצוּרִים <span class="korean-sub">(자음)</span></button>
-      <button onclick="loadLearning('vowels')">תְּנוּעוֹת <span class="korean-sub">(모음)</span></button>
-      <button onclick="showLearningIntro('basic_no_patchim')">צֵרוּפִים בְּלִי פַּצ׳ִים <span class="korean-sub">(받침 없는 기본 조합)</span></button>
-      <button onclick="showLearningIntro('basic_patchim')">צֵרוּפִים עִם פַּצ׳ִים <span class="korean-sub">(받침 있는 기본 조합)</span></button>
-      <button onclick="showLearningIntro('medium_patchim')">צֵרוּפִים בֵּינוֹנִיִּים <span class="korean-sub">(받침 있는 중등 조합)</span></button>
-      <button onclick="showLearningIntro('advanced_patchim')">צֵרוּפִים מִתְקַדְּמִים <span class="korean-sub">(받침 있는 고등 조합)</span></button>
+      <button onclick="loadLearning('consonants')">עיצורים <span class="korean-sub">(자음)</span></button>
+      <button onclick="loadLearning('vowels')">תנועות <span class="korean-sub">(모음)</span></button>
+      <button onclick="showLearningIntro('basic_no_patchim')">צירופים בלי פצ׳ים <span class="korean-sub">(받침 없는 기본 조합)</span></button>
+      <button onclick="showLearningIntro('basic_patchim')">צירופים עם פצ׳ים <span class="korean-sub">(받침 있는 기본 조합)</span></button>
+      <button onclick="showLearningIntro('medium_patchim')">צירופים בינוניים <span class="korean-sub">(받침 있는 중등 조합)</span></button>
+      <button onclick="showLearningIntro('advanced_patchim')">צירופים מתקדמים <span class="korean-sub">(받침 있는 고등 조합)</span></button>
     </div>
   `;
 }
@@ -287,7 +287,7 @@ function addRandomTestButton(category) {
   const btn = document.createElement('button');
   btn.className = 'random-test-btn';
   btn.type = 'button';
-  btn.innerHTML = 'מִבְחָן אַקְרָאִי<br><span class="korean-sub">(랜덤 테스트)</span>';
+  btn.innerHTML = 'מבחן אקראי<br><span class="korean-sub">(랜덤 테스트)</span>';
   btn.onclick = () => startTestMode(category);
   document.body.appendChild(btn);
 }
@@ -322,7 +322,7 @@ function renderTestCard() {
         <button class="nav-btn" onclick="showCurriculumMenu()">חזרה לתפריט הקודם <span class="korean-sub">(이전 메뉴로)</span></button>
         <button class="nav-btn" onclick="loadLearning(currentCategory)">חזרה ללימוד <span class="korean-sub">(학습으로)</span></button>
       </div>
-      <h2 class="section-title">סִיַּמְתָּ! <span class="korean-sub">(완료!)</span></h2>
+      <h2 class="section-title">סימת! <span class="korean-sub">(완료!)</span></h2>
     `;
     return;
   }
@@ -373,7 +373,7 @@ async function loadWordMode(kind) {
   try {
     removeRandomButton();
     const file = kind === 'business' ? 'business' : 'daily';
-    const titleHe = kind === 'business' ? 'בִּטּוּיִים חִיּוּנִיִּים לַעֲסָקִים' : 'בִּטּוּיִים שִׁמּוּשִׁיִּים לְיוֹם־יוֹם';
+    const titleHe = kind === 'business' ? 'ביטויים חיוניים לעסקים' : 'בטויים שמושיים ליוםיום';
     const titleKo = kind === 'business' ? '비즈니스 필수 표현' : '일상 필수 표현';
     singleModeData = await loadJson(`data/${file}.json`);
     singleModeKind = kind;
@@ -391,7 +391,7 @@ async function loadPhraseMode() {
     removeRandomButton();
     singleModeData = await loadJson('data/pronunciation.json');
     singleModeKind = 'pronunciation';
-    singleModeTitle = { he: 'קְרִיאַת שִׂיחוֹת אֲמִתִּיּוֹת', ko: '실전 회화 읽기' };
+    singleModeTitle = { he: 'קריאת שיחות אמיתיות', ko: '실전 회화 읽기' };
     singleModeIndex = pickRandomIndex(singleModeData.length);
     singleModeFlipped = false;
     renderSingleModeCard();

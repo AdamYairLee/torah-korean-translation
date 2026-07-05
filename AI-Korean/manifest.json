@@ -1,15 +1,25 @@
 {
   "name": "AI Korean Master",
   "short_name": "KoreanMaster",
-  "start_url": "index.html",
+  "description": "Korean reading-first learning app for Hebrew speakers.",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

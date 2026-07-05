@@ -4,10 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Korean Master</title>
-  <link rel="stylesheet" href="css/style.css" />
+    <meta name="description" content="AI Korean Master is a Korean reading-first learning project for Hebrew speakers. Learn Hangul, daily expressions, real conversation reading, and business Korean." />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="application-name" content="AI Korean Master" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="KoreanMaster" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta property="og:title" content="AI Korean Master" />
+  <meta property="og:description" content="Don't study. Just read first. Korean reading practice for Hebrew speakers." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="images/bg-korean.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <a href="https://jewishkorean.com" class="home-btn">דַף הַבַּיִת <span>(홈으로 돌아가기)</span></a>
+  <a href="https://jewishkorean.com" class="home-btn">דף הבית <span>(홈으로 돌아가기)</span></a>
 
   <main id="app" class="fade-in">
     <h1 class="main-title">Don't study,<br />Just read first!</h1>
@@ -18,19 +32,19 @@
     </section>
     <div class="btn-group main-menu">
       <button type="button" onclick="showCurriculumMenu()">
-        קוּרְס מַאסְטֶר לְאוֹתִיּוֹת וּתְנוּעוֹת
+        קורס מאסטר לאותיות ותנועות ותנועות
         <span class="korean-sub">(자·모음 마스터 코스)</span>
       </button>
       <button type="button" onclick="loadPhraseMode('pronunciation')">
-        קְרִיאַת שִׂיחוֹת אֲמִתִּיּוֹת
+        קריאת שיחות אמיתיות
         <span class="korean-sub">(실전 회화 읽기)</span>
       </button>
       <button type="button" onclick="loadWordMode('daily')">
-        בִּטּוּיִים שִׁמּוּשִׁיִּים לְיוֹם־יוֹם
+        בטויים שמושיים ליוםיום
         <span class="korean-sub">(일상 필수 표현)</span>
       </button>
       <button type="button" onclick="loadWordMode('business')">
-        בִּטּוּיִים חִיּוּנִיִּים לַעֲסָקִים
+        ביטויים חיוניים לעסקים
         <span class="korean-sub">(비즈니스 필수 표현)</span>
       </button>
     </div>
@@ -38,5 +52,12 @@
 
   <script src="js/config.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

@@ -38,14 +38,14 @@
     "category": "consonants",
     "ko": "ㅂ",
     "roman": "bieup",
-    "he_sound": "בּ / פּ",
+    "he_sound": "ב / פ",
     "speak": "ㅂ"
   },
   {
     "category": "consonants",
     "ko": "ㅅ",
     "roman": "siot",
-    "he_sound": "ס / שׁ",
+    "he_sound": "ס / ש",
     "speak": "ㅅ"
   },
   {
@@ -87,7 +87,7 @@
     "category": "consonants",
     "ko": "ㅍ",
     "roman": "pieup",
-    "he_sound": "פּ",
+    "he_sound": "פ",
     "speak": "ㅍ"
   },
   {
@@ -101,133 +101,133 @@
     "category": "vowels",
     "ko": "ㅏ",
     "roman": "a",
-    "he_sound": "אָ",
+    "he_sound": "א",
     "speak": "아"
   },
   {
     "category": "vowels",
     "ko": "ㅑ",
     "roman": "ya",
-    "he_sound": "יָה",
+    "he_sound": "יה",
     "speak": "야"
   },
   {
     "category": "vowels",
     "ko": "ㅓ",
     "roman": "eo",
-    "he_sound": "אוֹ פתוח",
+    "he_sound": "או פתוח",
     "speak": "어"
   },
   {
     "category": "vowels",
     "ko": "ㅕ",
     "roman": "yeo",
-    "he_sound": "יוֹ פתוח",
+    "he_sound": "יו פתוח",
     "speak": "여"
   },
   {
     "category": "vowels",
     "ko": "ㅗ",
     "roman": "o",
-    "he_sound": "אוֹ",
+    "he_sound": "או",
     "speak": "오"
   },
   {
     "category": "vowels",
     "ko": "ㅛ",
     "roman": "yo",
-    "he_sound": "יוֹ",
+    "he_sound": "יו",
     "speak": "요"
   },
   {
     "category": "vowels",
     "ko": "ㅜ",
     "roman": "u",
-    "he_sound": "אוּ",
+    "he_sound": "או",
     "speak": "우"
   },
   {
     "category": "vowels",
     "ko": "ㅠ",
     "roman": "yu",
-    "he_sound": "יוּ",
+    "he_sound": "יו",
     "speak": "유"
   },
   {
     "category": "vowels",
     "ko": "ㅡ",
     "roman": "eu",
-    "he_sound": "אְ / צליל קוריאני",
+    "he_sound": "א / צליל קוריאני",
     "speak": "으"
   },
   {
     "category": "vowels",
     "ko": "ㅣ",
     "roman": "i",
-    "he_sound": "אִי",
+    "he_sound": "אי",
     "speak": "이"
   },
   {
     "category": "vowels",
     "ko": "ㅐ",
     "roman": "ae",
-    "he_sound": "אֶה",
+    "he_sound": "אה",
     "speak": "애"
   },
   {
     "category": "vowels",
     "ko": "ㅔ",
     "roman": "e",
-    "he_sound": "אֵה",
+    "he_sound": "אה",
     "speak": "에"
   },
   {
     "category": "vowels",
     "ko": "ㅘ",
     "roman": "wa",
-    "he_sound": "וָה",
+    "he_sound": "וה",
     "speak": "와"
   },
   {
     "category": "vowels",
     "ko": "ㅙ",
     "roman": "wae",
-    "he_sound": "וֶה",
+    "he_sound": "וה",
     "speak": "왜"
   },
   {
     "category": "vowels",
     "ko": "ㅚ",
     "roman": "oe",
-    "he_sound": "וֵה",
+    "he_sound": "וה",
     "speak": "외"
   },
   {
     "category": "vowels",
     "ko": "ㅝ",
     "roman": "wo",
-    "he_sound": "ווֹ",
+    "he_sound": "וו",
     "speak": "워"
   },
   {
     "category": "vowels",
     "ko": "ㅞ",
     "roman": "we",
-    "he_sound": "ווֶ",
+    "he_sound": "וו",
     "speak": "웨"
   },
   {
     "category": "vowels",
     "ko": "ㅟ",
     "roman": "wi",
-    "he_sound": "וִי",
+    "he_sound": "וי",
     "speak": "위"
   },
   {
     "category": "vowels",
     "ko": "ㅢ",
     "roman": "ui",
-    "he_sound": "אְי / אִי",
+    "he_sound": "אי / אי",
     "speak": "의"
   },
   {

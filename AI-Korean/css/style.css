@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600;700&display=swap');
 
 * { box-sizing: border-box; }
 
 :root {
+  --font-ko: 'Jua', system-ui, sans-serif;
+  --font-he: 'Noto Sans Hebrew', Arial, 'Helvetica Neue', sans-serif;
   --glass: rgba(255,255,255,0.16);
   --glass-strong: rgba(255,255,255,0.24);
   --line: rgba(255,255,255,0.28);
@@ -22,7 +24,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   color: var(--text);
   background: #000;
   overflow-x: hidden;
@@ -64,7 +66,7 @@ body::after {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 .main-title {
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-size: clamp(2.8rem, 8vw, 5rem);
   line-height: 1.04;
   margin: 0 0 30px;
@@ -86,12 +88,12 @@ body::after {
   border: 1px solid var(--line);
   color: white !important;
   text-decoration: none !important;
-  font-family: 'Hadassah Friedlaender', serif;
+  font-family: var(--font-he);
   font-size: 1rem;
   box-shadow: 0 4px 14px rgba(0,0,0,0.28);
   backdrop-filter: blur(6px);
 }
-.home-btn span { font-family: 'Jua', sans-serif; font-size: 0.9rem; opacity: 0.9; }
+.home-btn span { font-family: var(--font-ko); font-size: 0.9rem; opacity: 0.9; }
 
 .btn-row {
   width: 100%;
@@ -111,7 +113,7 @@ body::after {
 }
 
 button, .small-btn {
-  font-family: 'Hadassah Friedlaender', 'Jua', serif;
+  font-family: var(--font-he);
   font-size: clamp(1rem, 2.4vw, 1.35rem);
   padding: 18px 14px;
   border-radius: 18px;
@@ -137,7 +139,7 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
 .korean-sub {
   display: block;
   margin-top: 6px;
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-size: 0.72em;
   opacity: 0.88;
 }
@@ -174,15 +176,15 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
 .card:hover { background: rgba(255,255,255,0.25); }
 
 .ko-big {
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-size: clamp(3.8rem, 11vw, 6rem);
   line-height: 1;
   margin: 0;
 }
 .ko-word { font-size: clamp(2.4rem, 7vw, 4.5rem); }
 .roman { font-size: clamp(1.1rem, 3.2vw, 1.45rem); color: rgba(255,255,255,.9); }
-.he-sound { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: clamp(1.4rem, 4vw, 2rem); color: white; }
-.meaning { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: 1.35rem; color: white; }
+.he-sound { font-family: var(--font-he); direction: rtl; font-size: clamp(1.4rem, 4vw, 2rem); color: white; }
+.meaning { font-family: var(--font-he); direction: rtl; font-size: 1.35rem; color: white; }
 
 .random-test-btn {
   position: fixed;
@@ -195,7 +197,7 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
   background: rgba(56,189,248,0.92);
   color: #062033;
   border: none;
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-weight: bold;
   box-shadow: 0 10px 28px rgba(0,0,0,.35);
 }
@@ -227,7 +229,7 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
   text-align: center;
 }
 .phrase-ko { font-size: clamp(1.9rem, 5vw, 3.2rem); margin-bottom: 10px; }
-.phrase-he { font-family: 'Hadassah Friedlaender', serif; direction: rtl; font-size: clamp(1.35rem, 4vw, 2rem); }
+.phrase-he { font-family: var(--font-he); direction: rtl; font-size: clamp(1.35rem, 4vw, 2rem); }
 
 @media (max-width: 640px) {
   #app { width: 96vw; max-height: calc(100vh - 76px); padding: 16px 10px; }
@@ -304,13 +306,13 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
 }
 .intro-panel h2 { margin: 0 0 18px; font-size: clamp(1.7rem, 5vw, 2.6rem); }
 .intro-ko {
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-size: clamp(1.15rem, 3.5vw, 1.55rem);
   line-height: 1.7;
   margin: 0 0 18px;
 }
 .intro-he {
-  font-family: 'Hadassah Friedlaender', serif;
+  font-family: var(--font-he);
   font-size: clamp(1.15rem, 3.5vw, 1.55rem);
   line-height: 1.75;
   margin: 0 0 24px;
@@ -350,7 +352,7 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
 }
 .single-practice-card .roman { font-size: clamp(1.15rem, 3.2vw, 1.7rem); }
 .single-practice-card .phrase-he {
-  font-family: 'Hadassah Friedlaender', serif;
+  font-family: var(--font-he);
   font-size: clamp(1.35rem, 4.3vw, 2.35rem);
   line-height: 1.35;
 }
@@ -384,14 +386,14 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
   margin-bottom: 6px;
 }
 .today-ko {
-  font-family: 'Jua', sans-serif;
+  font-family: var(--font-ko);
   font-size: clamp(2rem, 6.5vw, 3.8rem);
   line-height: 1.15;
   text-shadow: 0 4px 12px rgba(0,0,0,0.36);
   word-break: keep-all;
 }
 .today-he {
-  font-family: 'Hadassah Friedlaender', serif;
+  font-family: var(--font-he);
   font-size: clamp(1.15rem, 3.4vw, 1.75rem);
   margin-top: 4px;
   color: rgba(255,255,255,0.92);
@@ -424,4 +426,118 @@ button:hover, .small-btn:hover { background: var(--glass-strong); transform: tra
   .today-sound { width: 36px; height: 36px; min-width: 36px; right: 9px; top: 9px; }
   .today-start { width: 100%; }
   .beta-note { font-size: 0.8rem; }
+}
+/* Hebrew text fix */
+.hebrew,
+[dir="rtl"] {
+    font-family: Arial, "Noto Sans Hebrew", "David", sans-serif !important;
+    direction: rtl;
+    unicode-bidi: isolate;
+    letter-spacing: 0;
+}
+
+/* Korean text keeps cute font */
+.korean,
+.korean-sub,
+.main-title {
+    font-family: var(--font-ko) !important;
+}
+
+/* Avoid forcing Jua on everything */
+button {
+    font-family: Arial, "Noto Sans Hebrew", "Jua", sans-serif;
+}
+/* Hebrew rendering fix */
+button,
+.nav-btn,
+.section-title,
+.section-desc,
+.intro-he,
+.phrase-he,
+.today-he,
+.meaning,
+.he-sound,
+[dir="rtl"] {
+  font-family: Arial, "Noto Sans Hebrew", "David", sans-serif !important;
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: 0;
+}
+
+.korean-sub,
+.main-title,
+.ko-big,
+.ko-word,
+.phrase-ko,
+.today-ko,
+.intro-ko,
+.roman {
+  font-family: var(--font-ko) !important;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+button .korean-sub,
+.nav-btn .korean-sub {
+  display: block;
+}
+
+/* v1.3 iPhone/Safari Hebrew stability */
+.hebrew,
+[dir="rtl"],
+button,
+.nav-btn,
+.section-title,
+.today-he,
+.phrase-he,
+.intro-he,
+.he-sound,
+.meaning {
+  font-family: var(--font-he) !important;
+  direction: rtl;
+  unicode-bidi: isolate;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.korean-sub,
+.main-title,
+.ko-big,
+.ko-word,
+.phrase-ko,
+.today-ko,
+.intro-ko,
+.roman {
+  font-family: var(--font-ko) !important;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+button .korean-sub,
+.nav-btn .korean-sub {
+  display: block;
+  direction: ltr;
+}
+
+/* Make long Hebrew buttons wrap naturally on small iPhones */
+button {
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+/* Print/share fallback */
+@supports (-webkit-touch-callout: none) {
+  .hebrew,
+  [dir="rtl"],
+  button,
+  .nav-btn,
+  .section-title,
+  .today-he,
+  .phrase-he,
+  .intro-he,
+  .he-sound,
+  .meaning {
+    font-family: Arial, "Noto Sans Hebrew", sans-serif !important;
+  }
 }
