@@ -1,0 +1,514 @@
+{
+  "terms": [
+    {
+      "source": "תנ״ך",
+      "preferred": "타낙흐",
+      "note": "구약으로만 부르지 말고 유대 문헌 맥락에서는 타낙흐"
+    },
+    {
+      "source": "תורה",
+      "preferred": "토라",
+      "note": "가르침; 기록 토라와 구전 토라를 모두 포함 가능"
+    },
+    {
+      "source": "בראשית",
+      "preferred": "베레쉬트",
+      "note": "창세기"
+    },
+    {
+      "source": "שמות",
+      "preferred": "슈모트",
+      "note": "출애굽기/탈출기"
+    },
+    {
+      "source": "ויקרא",
+      "preferred": "바이크라",
+      "note": "레위기"
+    },
+    {
+      "source": "במדבר",
+      "preferred": "바미드바르",
+      "note": "민수기"
+    },
+    {
+      "source": "דברים",
+      "preferred": "드바림",
+      "note": "신명기"
+    },
+    {
+      "source": "נביאים",
+      "preferred": "네비임",
+      "note": "예언서들"
+    },
+    {
+      "source": "כתובים",
+      "preferred": "크투빔",
+      "note": "기록서들"
+    },
+    {
+      "source": "יהושע",
+      "preferred": "예호슈아",
+      "note": "여호수아"
+    },
+    {
+      "source": "שופטים",
+      "preferred": "쇼프팀",
+      "note": "사사기/판관기"
+    },
+    {
+      "source": "שמואל",
+      "preferred": "슈무엘",
+      "note": "사무엘"
+    },
+    {
+      "source": "מלכים",
+      "preferred": "멜락힘",
+      "note": "열왕기"
+    },
+    {
+      "source": "ישעיהו",
+      "preferred": "예샤야후",
+      "note": "이사야"
+    },
+    {
+      "source": "ירמיהו",
+      "preferred": "이르메야후",
+      "note": "예레미야"
+    },
+    {
+      "source": "יחזקאל",
+      "preferred": "옉헤즈켈",
+      "note": "에스겔/에제키엘"
+    },
+    {
+      "source": "הושע",
+      "preferred": "호셰아",
+      "note": "호세아"
+    },
+    {
+      "source": "יואל",
+      "preferred": "요엘",
+      "note": "요엘"
+    },
+    {
+      "source": "עמוס",
+      "preferred": "아모쓰",
+      "note": "아모스"
+    },
+    {
+      "source": "עובדיה",
+      "preferred": "오바드야",
+      "note": "오바댜"
+    },
+    {
+      "source": "יונה",
+      "preferred": "요나",
+      "note": "요나"
+    },
+    {
+      "source": "מיכה",
+      "preferred": "미하",
+      "note": "미가"
+    },
+    {
+      "source": "נחום",
+      "preferred": "나훔",
+      "note": "나훔"
+    },
+    {
+      "source": "חבקוק",
+      "preferred": "하박쿡",
+      "note": "하박국"
+    },
+    {
+      "source": "צפניה",
+      "preferred": "쯔판야",
+      "note": "스바냐"
+    },
+    {
+      "source": "חגי",
+      "preferred": "하가이",
+      "note": "학개"
+    },
+    {
+      "source": "זכריה",
+      "preferred": "즈하르야",
+      "note": "스가랴"
+    },
+    {
+      "source": "מלאכי",
+      "preferred": "말아히",
+      "note": "말라기"
+    },
+    {
+      "source": "תהילים",
+      "preferred": "트힐림",
+      "note": "시편"
+    },
+    {
+      "source": "משלי",
+      "preferred": "미슐레이",
+      "note": "잠언"
+    },
+    {
+      "source": "איוב",
+      "preferred": "이요브",
+      "note": "욥"
+    },
+    {
+      "source": "שיר השירים",
+      "preferred": "쉬르 하쉬림",
+      "note": "아가서"
+    },
+    {
+      "source": "רות",
+      "preferred": "루트",
+      "note": "룻기"
+    },
+    {
+      "source": "איכה",
+      "preferred": "엑하",
+      "note": "예레미야 애가"
+    },
+    {
+      "source": "קהלת",
+      "preferred": "코헬레트",
+      "note": "전도서/코헬렛"
+    },
+    {
+      "source": "אסתר",
+      "preferred": "에스테르",
+      "note": "에스더"
+    },
+    {
+      "source": "דניאל",
+      "preferred": "다니옐",
+      "note": "다니엘"
+    },
+    {
+      "source": "עזרא",
+      "preferred": "에즈라",
+      "note": "에스라"
+    },
+    {
+      "source": "נחמיה",
+      "preferred": "느헤미야",
+      "note": "느헤미야"
+    },
+    {
+      "source": "דברי הימים",
+      "preferred": "디브레이 하야밈",
+      "note": "역대상/하"
+    },
+    {
+      "source": "גמרא",
+      "preferred": "그마라",
+      "note": "게마라라고도 하나 사용자 선호는 그마라"
+    },
+    {
+      "source": "תלמוד",
+      "preferred": "탈무드",
+      "note": "유대 문헌"
+    },
+    {
+      "source": "משנה",
+      "preferred": "미슈나",
+      "note": "반복으로 번역하지 말 것"
+    },
+    {
+      "source": "משנה תורה",
+      "preferred": "미슈네 토라",
+      "note": "람밤의 법전"
+    },
+    {
+      "source": "הלכה",
+      "preferred": "할라하",
+      "note": "유대인의 특정 법/전체 규정"
+    },
+    {
+      "source": "מדרש",
+      "preferred": "미드라쉬",
+      "note": "성서 해설 문헌"
+    },
+    {
+      "source": "רב",
+      "preferred": "라브",
+      "note": "랍비의 히브리어 발음"
+    },
+    {
+      "source": "רבי",
+      "preferred": "라비",
+      "note": "탈무드 인명 호칭"
+    },
+    {
+      "source": "רש״י",
+      "preferred": "라쉬",
+      "note": "라브 슐로모 이쯔학크"
+    },
+    {
+      "source": "רמב״ם",
+      "preferred": "람밤",
+      "note": "라브 모셰 벤 마이몬"
+    },
+    {
+      "source": "משה",
+      "preferred": "모셰",
+      "note": "모세"
+    },
+    {
+      "source": "אהרן",
+      "preferred": "아하론",
+      "note": "아론"
+    },
+    {
+      "source": "לוי",
+      "preferred": "레비",
+      "note": "레위"
+    },
+    {
+      "source": "כהן",
+      "preferred": "코헨",
+      "note": "제사장"
+    },
+    {
+      "source": "כהנים",
+      "preferred": "코하님",
+      "note": "제사장들"
+    },
+    {
+      "source": "נביא",
+      "preferred": "나비",
+      "note": "예언자/선지자"
+    },
+    {
+      "source": "יהודי",
+      "preferred": "예후디",
+      "note": "남자 유대인"
+    },
+    {
+      "source": "יהודיה",
+      "preferred": "예후디야",
+      "note": "여자 유대인"
+    },
+    {
+      "source": "יהודים",
+      "preferred": "예후딤",
+      "note": "유대인들"
+    },
+    {
+      "source": "יהדות",
+      "preferred": "야하두트",
+      "note": "유대교/쥬다이즘"
+    },
+    {
+      "source": "השם",
+      "preferred": "하쉠",
+      "note": "극존칭. 하쉠께서/하쉠의 뜻처럼 번역"
+    },
+    {
+      "source": "הקב״ה",
+      "preferred": "카도쉬 바룩 후",
+      "note": "반드시 “거룩하고 복되신 분”으로 번역"
+    },
+    {
+      "source": "הקדוש ברוך הוא",
+      "preferred": "카도쉬 바룩 후",
+      "note": "반드시 “거룩하고 복되신 분”으로 번역"
+    },
+    {
+      "source": "אלוהים",
+      "preferred": "엘로힘",
+      "note": "하나님/하느님, 신들, 재판관 맥락 구분"
+    },
+    {
+      "source": "אלקים",
+      "preferred": "엘로킴",
+      "note": "엘로힘을 함부로 부르지 않는 표기"
+    },
+    {
+      "source": "מצווה",
+      "preferred": "미쯔바",
+      "note": "계명"
+    },
+    {
+      "source": "מצוות",
+      "preferred": "미쯔보트",
+      "note": "계명들"
+    },
+    {
+      "source": "שבת",
+      "preferred": "샤바트",
+      "note": "안식일"
+    },
+    {
+      "source": "יום כיפור",
+      "preferred": "욤 키푸르",
+      "note": "대속죄일"
+    },
+    {
+      "source": "פסח",
+      "preferred": "페싹흐",
+      "note": "유월절/파스카"
+    },
+    {
+      "source": "כשר",
+      "preferred": "카셰르",
+      "note": "코셔"
+    },
+    {
+      "source": "כיפה",
+      "preferred": "키파",
+      "note": "둥근 캡"
+    },
+    {
+      "source": "ציצית",
+      "preferred": "찌찌트",
+      "note": "옷술"
+    },
+    {
+      "source": "קרבן",
+      "preferred": "코르반",
+      "note": "제사/제물"
+    },
+    {
+      "source": "סנהדרין",
+      "preferred": "싼헤드린",
+      "note": "유대 법정 최고 권위"
+    },
+    {
+      "source": "בית המקדש",
+      "preferred": "베이트 하미크다쉬",
+      "note": "성전"
+    },
+    {
+      "source": "הר הבית",
+      "preferred": "하르 하바이트",
+      "note": "성전산"
+    },
+    {
+      "source": "כותל",
+      "preferred": "코텔",
+      "note": "서쪽 벽"
+    },
+    {
+      "source": "לשון הרע",
+      "preferred": "라숀 하라",
+      "note": "험담/악담"
+    },
+    {
+      "source": "עבודה",
+      "preferred": "아보다",
+      "note": "섬김/예배"
+    },
+    {
+      "source": "עבודה זרה",
+      "preferred": "아보다 자라",
+      "note": "우상 숭배가 아닌 더 넓은 이질적 섬김"
+    },
+    {
+      "source": "אמונה",
+      "preferred": "에무나",
+      "note": "믿음"
+    },
+    {
+      "source": "תשובה",
+      "preferred": "츄바",
+      "note": "회개/돌아감/응답"
+    },
+    {
+      "source": "קבלה",
+      "preferred": "카발라",
+      "note": "토라 내면 차원의 해석"
+    },
+    {
+      "source": "קדוש",
+      "preferred": "카도쉬",
+      "note": "거룩"
+    },
+    {
+      "source": "משיח",
+      "preferred": "마쉬악흐",
+      "note": "메시아"
+    },
+    {
+      "source": "מנורה",
+      "preferred": "메노라",
+      "note": "일곱 가지 촛대"
+    },
+    {
+      "source": "מזוזה",
+      "preferred": "메주자",
+      "note": "문설주 부착 성구함"
+    },
+    {
+      "source": "מקווה",
+      "preferred": "미크베",
+      "note": "정결 침례용 물"
+    },
+    {
+      "source": "משכן",
+      "preferred": "미슈칸",
+      "note": "성막"
+    },
+    {
+      "source": "סוכה",
+      "preferred": "쑤카",
+      "note": "초막"
+    },
+    {
+      "source": "סוכות",
+      "preferred": "쑤코트",
+      "note": "초막절"
+    },
+    {
+      "source": "סדום",
+      "preferred": "쓰돔",
+      "note": "소돔"
+    },
+    {
+      "source": "עמורה",
+      "preferred": "아모라",
+      "note": "고모라"
+    },
+    {
+      "source": "קֹרח",
+      "preferred": "코라흐",
+      "note": "고라"
+    },
+    {
+      "source": "פינחס",
+      "preferred": "핀하스",
+      "note": "비느하스"
+    }
+  ],
+  "replacements": {
+    "율법": "토라",
+    "구약성경": "타낙흐",
+    "구약": "타낙흐",
+    "반복": "미슈나",
+    "랍비": "라브",
+    "게마라": "그마라",
+    "코셔": "카셰르",
+    "통곡의 벽": "코텔",
+    "제사장": "코헨",
+    "시온": "찌욘",
+    "성전 산": "하르 하바이트",
+    "성전산": "하르 하바이트",
+    "여호와": "하쉠",
+    "야훼": "하쉠",
+    "주님": "하쉠",
+    "하나님께서": "하쉠께서",
+    "하나님의": "하쉠의",
+    "하나님이": "하쉠께서",
+    "거룩하신 분, 복되신 그분": "거룩하고 복되신 분",
+    "거룩하신 이, 찬미받으실 분": "거룩하고 복되신 분",
+    "거룩하신 분": "거룩하고 복되신 분",
+    "The Holy One, blessed be He": "거룩하고 복되신 분",
+    "Holy One blessed be He": "거룩하고 복되신 분"
+  },
+  "reverenceRules": [
+    "하쉠을 지칭하는 표현은 가능한 한 극존칭으로 처리합니다. 예: 하쉠께서, 하쉠께, 하쉠의 뜻.",
+    "הקב״ה / הקדוש ברוך הוא 는 항상 “거룩하고 복되신 분”으로 번역합니다.",
+    "인명과 타낙흐 책 이름은 한국 개신교식 표기보다 등록된 히브리어 원 발음 표기를 우선합니다."
+  ]
+}
