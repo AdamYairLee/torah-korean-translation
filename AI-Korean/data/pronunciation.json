@@ -2,501 +2,601 @@
   {
     "ko": "안녕하세요, 만나서 반가워요",
     "he": "שלום, נעים להכיר",
-    "roman": "annyeonghaseyo, mannaseo bangawoyo"
+    "roman": "annyeonghaseyo, mannaseo bangawoyo",
+    "en": "Hello, nice to meet you"
   },
   {
     "ko": "요즘 어떻게 지내요?",
     "he": "איך הולך בזמן האחרון?",
-    "roman": "yojeum eotteohge jinaeyo?"
+    "roman": "yojeum eotteohge jinaeyo?",
+    "en": "How have you been lately?"
   },
   {
     "ko": "저는 한국어를 배우고 있어요",
     "he": "אני לומד קוריאנית",
-    "roman": "jeoneun hangukeoreul baeugo iteoyo"
+    "roman": "jeoneun hangukeoreul baeugo iteoyo",
+    "en": "I am learning Korean"
   },
   {
     "ko": "아직 천천히 읽어야 해요",
     "he": "אני עדיין צריך לקרוא לאט",
-    "roman": "ajik cheoncheonhi ilkeoya haeyo"
+    "roman": "ajik cheoncheonhi ilkeoya haeyo",
+    "en": "I still need to read slowly"
   },
   {
     "ko": "이 문장은 조금 어려워요",
     "he": "המשפט הזה קצת קשה",
-    "roman": "i munjangeun jogeum eoryeowoyo"
+    "roman": "i munjangeun jogeum eoryeowoyo",
+    "en": "This sentence is a little difficult"
   },
   {
     "ko": "다시 한번 읽어 볼게요",
     "he": "אקרא שוב פעם",
-    "roman": "dasi hanbeon ilkeo bolgeyo"
+    "roman": "dasi hanbeon ilkeo bolgeyo",
+    "en": "I'll try reading it once more"
   },
   {
     "ko": "발음을 천천히 들어 보세요",
     "he": "תקשיב להגייה לאט",
-    "roman": "baleumeul cheoncheonhi deuleo boseyo"
+    "roman": "baleumeul cheoncheonhi deuleo boseyo",
+    "en": "Listen to the pronunciation slowly"
   },
   {
     "ko": "띄어쓰기를 잘 봐야 해요",
     "he": "צריך לשים לב לרווחים",
-    "roman": "ttuieosseugireul jal bwaya haeyo"
+    "roman": "ttuieosseugireul jal bwaya haeyo",
+    "en": "You need to pay attention to the spacing"
   },
   {
     "ko": "글자를 먼저 보고 소리를 들어요",
     "he": "קודם רואים את האותיות ואז שומעים",
-    "roman": "geuljareul meonjeo bogo sorireul deuleoyo"
+    "roman": "geuljareul meonjeo bogo sorireul deuleoyo",
+    "en": "Look at the letters first, then listen to the sound"
   },
   {
     "ko": "급하게 외우지 않아도 돼요",
     "he": "לא חייבים לשנן מהר",
-    "roman": "geuphage oeuji anhado dwaeyo"
+    "roman": "geuphage oeuji anhado dwaeyo",
+    "en": "You don't have to memorize it quickly"
   },
   {
     "ko": "오늘은 여기까지 연습해요",
     "he": "נתרגל עד כאן היום",
-    "roman": "oneuleun yeogikkaji yeonseuphaeyo"
+    "roman": "oneuleun yeogikkaji yeonseuphaeyo",
+    "en": "Let's practice up to here today"
   },
   {
     "ko": "내일은 조금 더 길게 읽어 봐요",
     "he": "מחר נקרא קצת יותר ארוך",
-    "roman": "naeileun jogeum deo gilge ilkeo bwayo"
+    "roman": "naeileun jogeum deo gilge ilkeo bwayo",
+    "en": "Tomorrow, let's read something a little longer"
   },
   {
     "ko": "저는 커피를 마시고 싶어요",
     "he": "אני רוצה לשתות קפה",
-    "roman": "jeoneun keopireul masigo sipeoyo"
+    "roman": "jeoneun keopireul masigo sipeoyo",
+    "en": "I want to drink coffee"
   },
   {
     "ko": "지금 집에 가는 중이에요",
     "he": "אני בדרך הביתה עכשיו",
-    "roman": "jigeum jipe ganeun jungieyo"
+    "roman": "jigeum jipe ganeun jungieyo",
+    "en": "I'm on my way home now"
   },
   {
     "ko": "버스가 조금 늦게 와요",
     "he": "האוטובוס מגיע קצת מאוחר",
-    "roman": "beoseuga jogeum neutge wayo"
+    "roman": "beoseuga jogeum neutge wayo",
+    "en": "The bus is coming a little late"
   },
   {
     "ko": "오늘 날씨가 정말 좋아요",
     "he": "מזג האוויר היום ממש טוב",
-    "roman": "oneul nalssiga jeongmal johayo"
+    "roman": "oneul nalssiga jeongmal johayo",
+    "en": "The weather is really nice today"
   },
   {
     "ko": "비가 와서 길이 막혀요",
     "he": "יורד גשם ויש פקקים",
-    "roman": "biga waseo gili makhyeoyo"
+    "roman": "biga waseo gili makhyeoyo",
+    "en": "It's raining, so the road is congested"
   },
   {
     "ko": "주말에 뭐 할 거예요?",
     "he": "מה תעשה בסוף שבוע?",
-    "roman": "jumale mwo hal geoyeyo?"
+    "roman": "jumale mwo hal geoyeyo?",
+    "en": "What are you going to do this weekend?"
   },
   {
     "ko": "친구를 만나러 갈 거예요",
     "he": "אני הולך לפגוש חבר",
-    "roman": "chingureul mannareo gal geoyeyo"
+    "roman": "chingureul mannareo gal geoyeyo",
+    "en": "I'm going to meet a friend"
   },
   {
     "ko": "저녁에 같이 먹을까요?",
     "he": "נאכל יחד בערב?",
-    "roman": "jeonyeoke gati meokeulkkayo?"
+    "roman": "jeonyeoke gati meokeulkkayo?",
+    "en": "Shall we eat together in the evening?"
   },
   {
     "ko": "저는 매운 음식을 좋아해요",
     "he": "אני אוהב אוכל חריף",
-    "roman": "jeoneun maeun eumsikeul johahaeyo"
+    "roman": "jeoneun maeun eumsikeul johahaeyo",
+    "en": "I like spicy food"
   },
   {
     "ko": "이건 생각보다 맛있어요",
     "he": "זה טעים יותר ממה שחשבתי",
-    "roman": "igeon saenggakboda matiteoyo"
+    "roman": "igeon saenggakboda matiteoyo",
+    "en": "This is tastier than I expected"
   },
   {
     "ko": "조금만 더 주세요",
     "he": "תן לי עוד קצת בבקשה",
-    "roman": "jogeumman deo juseyo"
+    "roman": "jogeumman deo juseyo",
+    "en": "Please give me a little more"
   },
   {
     "ko": "포장해서 가져갈게요",
     "he": "אקח את זה ארוז",
-    "roman": "pojanghaeseo gajyeogalgeyo"
+    "roman": "pojanghaeseo gajyeogalgeyo",
+    "en": "I'll take it to go"
   },
   {
     "ko": "계산은 제가 할게요",
     "he": "אני אשלם",
-    "roman": "gyesaneun jega halgeyo"
+    "roman": "gyesaneun jega halgeyo",
+    "en": "I'll pay"
   },
   {
     "ko": "오늘 정말 고마웠어요",
     "he": "תודה רבה על היום",
-    "roman": "oneul jeongmal gomawoteoyo"
+    "roman": "oneul jeongmal gomawoteoyo",
+    "en": "Thank you so much for today"
   },
   {
     "ko": "조심해서 들어가요",
     "he": "תחזור בזהירות",
-    "roman": "josimhaeseo deuleogayo"
+    "roman": "josimhaeseo deuleogayo",
+    "en": "Get home safely"
   },
   {
     "ko": "도착하면 연락해요",
     "he": "תודיע כשתגיע",
-    "roman": "dochakhamyeon yeonrakhaeyo"
+    "roman": "dochakhamyeon yeonrakhaeyo",
+    "en": "Contact me when you arrive"
   },
   {
     "ko": "문제가 있으면 바로 말해 주세요",
     "he": "אם יש בעיה תגיד מיד",
-    "roman": "munjega iteumyeon baro malhae juseyo"
+    "roman": "munjega iteumyeon baro malhae juseyo",
+    "en": "If there is a problem, please tell me right away"
   },
   {
     "ko": "저도 도와드릴게요",
     "he": "גם אני אעזור",
-    "roman": "jeodo dowadeurilgeyo"
+    "roman": "jeodo dowadeurilgeyo",
+    "en": "I will help too"
   },
   {
     "ko": "이 부분은 다시 설명해 주세요",
     "he": "תסביר שוב את החלק הזה",
-    "roman": "i bubuneun dasi seolmyeonghae juseyo"
+    "roman": "i bubuneun dasi seolmyeonghae juseyo",
+    "en": "Please explain this part again"
   },
   {
     "ko": "제가 제대로 이해했는지 확인할게요",
     "he": "אבדוק אם הבנתי נכון",
-    "roman": "jega jedaero ihaehaetneunji hwakinhalgeyo"
+    "roman": "jega jedaero ihaehaetneunji hwakinhalgeyo",
+    "en": "I'll check whether I understood correctly"
   },
   {
     "ko": "말씀하신 뜻은 이해했어요",
     "he": "הבנתי למה התכוונת",
-    "roman": "malsseumhasin tteuteun ihaehaeteoyo"
+    "roman": "malsseumhasin tteuteun ihaehaeteoyo",
+    "en": "I understood what you meant"
   },
   {
     "ko": "그런데 조금 다르게 생각해요",
     "he": "אבל אני חושב קצת אחרת",
-    "roman": "geureonde jogeum dareuge saenggakhaeyo"
+    "roman": "geureonde jogeum dareuge saenggakhaeyo",
+    "en": "But I think a little differently"
   },
   {
     "ko": "제 생각에는 이 방법이 좋아요",
     "he": "לדעתי הדרך הזאת טובה",
-    "roman": "je saenggakeneun i bangbeopi johayo"
+    "roman": "je saenggakeneun i bangbeopi johayo",
+    "en": "In my opinion, this method is good"
   },
   {
     "ko": "너무 복잡하게 가지 말아요",
     "he": "בוא לא נעשה את זה מסובך מדי",
-    "roman": "neomu bokjaphage gaji malayo"
+    "roman": "neomu bokjaphage gaji malayo",
+    "en": "Let's not make it too complicated"
   },
   {
     "ko": "간단한 방법부터 해 봅시다",
     "he": "נתחיל מהדרך הפשוטה",
-    "roman": "gandanhan bangbeopbuteo hae bopsida"
+    "roman": "gandanhan bangbeopbuteo hae bopsida",
+    "en": "Let's start with the simple method"
   },
   {
     "ko": "한 번에 하나씩 고쳐요",
     "he": "נתקן דבר אחד בכל פעם",
-    "roman": "han beone hanassik gochyeoyo"
+    "roman": "han beone hanassik gochyeoyo",
+    "en": "Let's fix one thing at a time"
   },
   {
     "ko": "이 파일만 수정하면 돼요",
     "he": "צריך לתקן רק את הקובץ הזה",
-    "roman": "i pailman sujeonghamyeon dwaeyo"
+    "roman": "i pailman sujeonghamyeon dwaeyo",
+    "en": "Only this file needs to be modified"
   },
   {
     "ko": "전체를 다시 만들 필요는 없어요",
     "he": "לא צריך לבנות הכול מחדש",
-    "roman": "jeonchereul dasi mandeul pilyoneun eopseoyo"
+    "roman": "jeonchereul dasi mandeul pilyoneun eopseoyo",
+    "en": "There is no need to rebuild everything"
   },
   {
     "ko": "버튼 위치가 조금 이상해요",
     "he": "מיקום הכפתור קצת מוזר",
-    "roman": "beoteun wichiga jogeum isanghaeyo"
+    "roman": "beoteun wichiga jogeum isanghaeyo",
+    "en": "The button position is a little strange"
   },
   {
     "ko": "글씨가 너무 작게 보여요",
     "he": "הטקסט נראה קטן מדי",
-    "roman": "geulssiga neomu jakge boyeoyo"
+    "roman": "geulssiga neomu jakge boyeoyo",
+    "en": "The text looks too small"
   },
   {
     "ko": "이 화면은 훨씬 좋아졌어요",
     "he": "המסך הזה השתפר מאוד",
-    "roman": "i hwamyeoneun hwolssin johajyeoteoyo"
+    "roman": "i hwamyeoneun hwolssin johajyeoteoyo",
+    "en": "This screen has improved a lot"
   },
   {
     "ko": "이제 거의 완성된 것 같아요",
     "he": "נראה שזה כמעט מוכן",
-    "roman": "ije geoui wanseongdoen geot gatayo"
+    "roman": "ije geoui wanseongdoen geot gatayo",
+    "en": "Now it seems almost complete"
   },
   {
     "ko": "데이터만 계속 추가하면 돼요",
     "he": "צריך רק להמשיך להוסיף נתונים",
-    "roman": "deiteoman gyesok chugahamyeon dwaeyo"
+    "roman": "deiteoman gyesok chugahamyeon dwaeyo",
+    "en": "We just need to keep adding data"
   },
   {
     "ko": "사용자가 읽기 편해야 해요",
     "he": "צריך שיהיה נוח למשתמש לקרוא",
-    "roman": "sayongjaga ilkgi pyeonhaeya haeyo"
+    "roman": "sayongjaga ilkgi pyeonhaeya haeyo",
+    "en": "It should be easy for users to read"
   },
   {
     "ko": "문장이 끊어져 보이면 헷갈려요",
     "he": "אם המשפט נשבר זה מבלבל",
-    "roman": "munjangi kkeunheojyeo boimyeon hetgalryeoyo"
+    "roman": "munjangi kkeunheojyeo boimyeon hetgalryeoyo",
+    "en": "If the sentence looks broken, it becomes confusing"
   },
   {
     "ko": "가로로 읽으면 더 자연스러워요",
     "he": "קריאה אופקית מרגישה טבעית יותר",
-    "roman": "garoro ilkeumyeon deo jayeonseureowoyo"
+    "roman": "garoro ilkeumyeon deo jayeonseureowoyo",
+    "en": "Reading horizontally feels more natural"
   },
   {
     "ko": "마우스로 옆으로 넘길 수 있어요",
     "he": "אפשר לגלול הצידה עם העכבר",
-    "roman": "mauseuro yeopeuro neomgil su iteoyo"
+    "roman": "mauseuro yeopeuro neomgil su iteoyo",
+    "en": "You can scroll sideways with the mouse"
   },
   {
     "ko": "카드를 누르면 소리가 나와요",
     "he": "כשלוחצים על כרטיס יוצא קול",
-    "roman": "kadeureul nureumyeon soriga nawayo"
+    "roman": "kadeureul nureumyeon soriga nawayo",
+    "en": "When you click a card, the sound plays"
   },
   {
     "ko": "정답을 보기 전에 먼저 읽어 보세요",
     "he": "קרא קודם לפני שאתה רואה תשובה",
-    "roman": "jeongdapeul bogi jeone meonjeo ilkeo boseyo"
+    "roman": "jeongdapeul bogi jeone meonjeo ilkeo boseyo",
+    "en": "Try reading first before seeing the answer"
   },
   {
     "ko": "틀려도 괜찮아요",
     "he": "זה בסדר גם אם טעית",
-    "roman": "teulryeodo gwaenchanhayo"
+    "roman": "teulryeodo gwaenchanhayo",
+    "en": "It's okay even if you get it wrong"
   },
   {
     "ko": "중요한 건 계속 읽는 거예요",
     "he": "העיקר להמשיך לקרוא",
-    "roman": "jungyohan geon gyesok ilkneun geoyeyo"
+    "roman": "jungyohan geon gyesok ilkneun geoyeyo",
+    "en": "The important thing is to keep reading"
   },
   {
     "ko": "소리를 듣고 다시 따라 해 보세요",
     "he": "תקשיב ותחזור שוב",
-    "roman": "sorireul deutgo dasi ttara hae boseyo"
+    "roman": "sorireul deutgo dasi ttara hae boseyo",
+    "en": "Listen to the sound and repeat it again"
   },
   {
     "ko": "오늘보다 내일 더 쉬워질 거예요",
     "he": "מחר זה יהיה קל יותר מהיום",
-    "roman": "oneulboda naeil deo swiwojil geoyeyo"
+    "roman": "oneulboda naeil deo swiwojil geoyeyo",
+    "en": "Tomorrow it will be easier than today"
   },
   {
     "ko": "한국어는 처음에 낯설 수 있어요",
     "he": "קוריאנית יכולה להיות זרה בהתחלה",
-    "roman": "hangukeoneun cheoeume natseol su iteoyo"
+    "roman": "hangukeoneun cheoeume natseol su iteoyo",
+    "en": "Korean can feel unfamiliar at first"
   },
   {
     "ko": "하지만 글자 원리는 아주 논리적이에요",
     "he": "אבל עקרון הכתב מאוד הגיוני",
-    "roman": "hajiman geulja wonrineun aju nonrijeokieyo"
+    "roman": "hajiman geulja wonrineun aju nonrijeokieyo",
+    "en": "But the writing system is very logical"
   },
   {
     "ko": "자음과 모음을 합치면 소리가 돼요",
     "he": "כשמחברים עיצור ותנועה נוצר צליל",
-    "roman": "jaeumgwa moeumeul hapchimyeon soriga dwaeyo"
+    "roman": "jaeumgwa moeumeul hapchimyeon soriga dwaeyo",
+    "en": "When you combine consonants and vowels, they become sounds"
   },
   {
     "ko": "받침은 마지막 소리를 만들어 줘요",
     "he": "פצ׳ים יוצר את הצליל הסופי",
-    "roman": "batchimeun majimak sorireul mandeuleo jwoyo"
+    "roman": "batchimeun majimak sorireul mandeuleo jwoyo",
+    "en": "Patchim creates the final sound"
   },
   {
     "ko": "처음에는 받침이 조금 어려워요",
     "he": "בהתחלה פצ׳ים קצת קשה",
-    "roman": "cheoeumeneun batchimi jogeum eoryeowoyo"
+    "roman": "cheoeumeneun batchimi jogeum eoryeowoyo",
+    "en": "At first, patchim is a little difficult"
   },
   {
     "ko": "그래도 천천히 보면 읽을 수 있어요",
     "he": "אבל אם מסתכלים לאט אפשר לקרוא",
-    "roman": "geuraedo cheoncheonhi bomyeon ilkeul su iteoyo"
+    "roman": "geuraedo cheoncheonhi bomyeon ilkeul su iteoyo",
+    "en": "But if you look slowly, you can read it"
   },
   {
     "ko": "읽을 수 있으면 배우는 속도가 빨라져요",
     "he": "אם יודעים לקרוא, הלמידה נהיית מהירה יותר",
-    "roman": "ilkeul su iteumyeon baeuneun sokdoga ppalrajyeoyo"
+    "roman": "ilkeul su iteumyeon baeuneun sokdoga ppalrajyeoyo",
+    "en": "If you can read, learning becomes faster"
   },
   {
     "ko": "단어 뜻은 나중에 붙이면 돼요",
     "he": "את משמעות המילים אפשר להוסיף אחר כך",
-    "roman": "daneo tteuteun najunge butimyeon dwaeyo"
+    "roman": "daneo tteuteun najunge butimyeon dwaeyo",
+    "en": "You can add the meanings of words later"
   },
   {
     "ko": "먼저 눈으로 글자를 익혀요",
     "he": "קודם מתרגלים את האותיות בעיניים",
-    "roman": "meonjeo nuneuro geuljareul ikhyeoyo"
+    "roman": "meonjeo nuneuro geuljareul ikhyeoyo",
+    "en": "First, get used to the letters with your eyes"
   },
   {
     "ko": "그다음 귀로 소리를 확인해요",
     "he": "אחר כך מאמתים את הצליל באוזניים",
-    "roman": "geudaeum gwiro sorireul hwakinhaeyo"
+    "roman": "geudaeum gwiro sorireul hwakinhaeyo",
+    "en": "Then check the sounds with your ears"
   },
   {
     "ko": "마지막으로 입으로 따라 해요",
     "he": "בסוף חוזרים עם הפה",
-    "roman": "majimakeuro ipeuro ttara haeyo"
+    "roman": "majimakeuro ipeuro ttara haeyo",
+    "en": "Finally, repeat with your mouth"
   },
   {
     "ko": "이 순서가 가장 안정적이에요",
     "he": "הסדר הזה הכי יציב",
-    "roman": "i sunseoga gajang anjeongjeokieyo"
+    "roman": "i sunseoga gajang anjeongjeokieyo",
+    "en": "This order is the most stable"
   },
   {
     "ko": "저는 오늘 새로운 단어를 배웠어요",
     "he": "למדתי היום מילה חדשה",
-    "roman": "jeoneun oneul saeroun daneoreul baewoteoyo"
+    "roman": "jeoneun oneul saeroun daneoreul baewoteoyo",
+    "en": "I learned a new word today"
   },
   {
     "ko": "그 단어를 문장 안에서 읽어 봤어요",
     "he": "קראתי את המילה בתוך משפט",
-    "roman": "geu daneoreul munjang aneseo ilkeo bwateoyo"
+    "roman": "geu daneoreul munjang aneseo ilkeo bwateoyo",
+    "en": "I read that word inside a sentence"
   },
   {
     "ko": "혼자 읽을 때보다 훨씬 쉬웠어요",
     "he": "זה היה הרבה יותר קל מלקרוא לבד",
-    "roman": "honja ilkeul ttaeboda hwolssin swiwoteoyo"
+    "roman": "honja ilkeul ttaeboda hwolssin swiwoteoyo",
+    "en": "It was much easier than reading alone"
   },
   {
     "ko": "예문이 있으면 기억하기 좋아요",
     "he": "עם משפט דוגמה קל לזכור",
-    "roman": "yemuni iteumyeon gieokhagi johayo"
+    "roman": "yemuni iteumyeon gieokhagi johayo",
+    "en": "Example sentences make it easier to remember"
   },
   {
     "ko": "실제 대화처럼 들리면 더 좋아요",
     "he": "אם זה נשמע כמו שיחה אמיתית זה טוב יותר",
-    "roman": "silje daehwacheoreom deulrimyeon deo johayo"
+    "roman": "silje daehwacheoreom deulrimyeon deo johayo",
+    "en": "It's even better when it sounds like real conversation"
   },
   {
     "ko": "교과서 말투는 가끔 어색해요",
     "he": "שפה של ספר לימוד לפעמים מוזרה",
-    "roman": "gyogwaseo maltuneun gakkeum eosaekhaeyo"
+    "roman": "gyogwaseo maltuneun gakkeum eosaekhaeyo",
+    "en": "Textbook language sometimes feels awkward"
   },
   {
     "ko": "사람들이 실제로 쓰는 표현이 필요해요",
     "he": "צריך ביטויים שאנשים באמת משתמשים בהם",
-    "roman": "saramdeuli siljero sseuneun pyohyeoni pilyohaeyo"
+    "roman": "saramdeuli siljero sseuneun pyohyeoni pilyohaeyo",
+    "en": "We need expressions that people actually use"
   },
   {
     "ko": "그래서 짧고 자연스러운 문장이 좋아요",
     "he": "לכן משפטים קצרים וטבעיים טובים",
-    "roman": "geuraeseo jjalbgo jayeonseureoun munjangi johayo"
+    "roman": "geuraeseo jjalbgo jayeonseureoun munjangi johayo",
+    "en": "That's why short and natural sentences are good"
   },
   {
     "ko": "오늘 수업은 정말 도움이 됐어요",
     "he": "השיעור היום ממש עזר",
-    "roman": "oneul sueopeun jeongmal doumi dwaeteoyo"
+    "roman": "oneul sueopeun jeongmal doumi dwaeteoyo",
+    "en": "Today's lesson was really helpful"
   },
   {
     "ko": "다음에는 더 긴 문장도 읽어 볼게요",
     "he": "בפעם הבאה אקרא גם משפטים ארוכים יותר",
-    "roman": "daeumeneun deo gin munjangdo ilkeo bolgeyo"
+    "roman": "daeumeneun deo gin munjangdo ilkeo bolgeyo",
+    "en": "Next time, I will try reading longer sentences too"
   },
   {
     "ko": "이제 한글이 조금 보이기 시작해요",
     "he": "עכשיו האנגול מתחיל להיראות לי",
-    "roman": "ije hangeuli jogeum boigi sijakhaeyo"
+    "roman": "ije hangeuli jogeum boigi sijakhaeyo",
+    "en": "Now Hangul is starting to become visible to me"
   },
   {
     "ko": "처음보다 덜 무서워요",
     "he": "זה פחות מפחיד מההתחלה",
-    "roman": "cheoeumboda deol museowoyo"
+    "roman": "cheoeumboda deol museowoyo",
+    "en": "It feels less scary than at the beginning"
   },
   {
     "ko": "읽는 재미가 생겼어요",
     "he": "התחיל להיות כיף לקרוא",
-    "roman": "ilkneun jaemiga saenggyeoteoyo"
+    "roman": "ilkneun jaemiga saenggyeoteoyo",
+    "en": "Reading has started to become fun"
   },
   {
     "ko": "발음이 완벽하지 않아도 괜찮아요",
     "he": "זה בסדר אם ההגייה לא מושלמת",
-    "roman": "baleumi wanbyeokhaji anhado gwaenchanhayo"
+    "roman": "baleumi wanbyeokhaji anhado gwaenchanhayo",
+    "en": "It's okay if your pronunciation is not perfect"
   },
   {
     "ko": "계속 듣고 읽으면 좋아져요",
     "he": "אם ממשיכים לשמוע ולקרוא זה משתפר",
-    "roman": "gyesok deutgo ilkeumyeon johajyeoyo"
+    "roman": "gyesok deutgo ilkeumyeon johajyeoyo",
+    "en": "If you keep listening and reading, it gets better"
   },
   {
     "ko": "오늘 배운 문장을 다시 읽어 봐요",
     "he": "בוא נקרא שוב את המשפט שלמדנו היום",
-    "roman": "oneul baeun munjangeul dasi ilkeo bwayo"
+    "roman": "oneul baeun munjangeul dasi ilkeo bwayo",
+    "en": "Let's read again the sentence we learned today"
   },
   {
     "ko": "천천히, 그리고 정확하게 읽어요",
     "he": "לאט ובמדויק",
-    "roman": "cheoncheonhi, geurigo jeonghwakhage ilkeoyo"
+    "roman": "cheoncheonhi, geurigo jeonghwakhage ilkeoyo",
+    "en": "Slowly and accurately"
   },
   {
     "ko": "너무 빨리 읽으려고 하지 마세요",
     "he": "אל תנסה לקרוא מהר מדי",
-    "roman": "neomu ppalri ilkeuryeogo haji maseyo"
+    "roman": "neomu ppalri ilkeuryeogo haji maseyo",
+    "en": "Don't try to read too fast"
   },
   {
     "ko": "리듬을 느끼면서 읽어 보세요",
     "he": "נסה לקרוא עם תחושת קצב",
-    "roman": "rideumeul neukkimyeonseo ilkeo boseyo"
+    "roman": "rideumeul neukkimyeonseo ilkeo boseyo",
+    "en": "Try reading while feeling the rhythm"
   },
   {
     "ko": "한국어는 리듬이 중요해요",
     "he": "בקוריאנית הקצב חשוב",
-    "roman": "hangukeoneun rideumi jungyohaeyo"
+    "roman": "hangukeoneun rideumi jungyohaeyo",
+    "en": "Rhythm is important in Korean"
   },
   {
     "ko": "띄어쓰기마다 살짝 쉬어 주세요",
     "he": "תעצור קצת בכל רווח",
-    "roman": "ttuieosseugimada saljjak swieo juseyo"
+    "roman": "ttuieosseugimada saljjak swieo juseyo",
+    "en": "Pause slightly at each space"
   },
   {
     "ko": "문장이 길면 나눠서 읽어요",
     "he": "אם המשפט ארוך, קוראים בחלקים",
-    "roman": "munjangi gilmyeon nanwoseo ilkeoyo"
+    "roman": "munjangi gilmyeon nanwoseo ilkeoyo",
+    "en": "If the sentence is long, read it in parts"
   },
   {
     "ko": "모르는 단어가 있어도 멈추지 마세요",
     "he": "גם אם יש מילה לא מוכרת, אל תעצור",
-    "roman": "moreuneun daneoga iteodo meomchuji maseyo"
+    "roman": "moreuneun daneoga iteodo meomchuji maseyo",
+    "en": "Even if there is a word you don't know, don't stop"
   },
   {
     "ko": "끝까지 한번 읽어 보는 게 중요해요",
     "he": "חשוב לקרוא פעם אחת עד הסוף",
-    "roman": "kkeutkkaji hanbeon ilkeo boneun ge jungyohaeyo"
+    "roman": "kkeutkkaji hanbeon ilkeo boneun ge jungyohaeyo",
+    "en": "It is important to read once until the end"
   },
   {
     "ko": "그다음 뜻을 확인하면 돼요",
     "he": "אחר כך בודקים את המשמעות",
-    "roman": "geudaeum tteuteul hwakinhamyeon dwaeyo"
+    "roman": "geudaeum tteuteul hwakinhamyeon dwaeyo",
+    "en": "Then you can check the meaning"
   },
   {
     "ko": "잘했어요, 다음 문장으로 가요",
     "he": "כל הכבוד, נעבור למשפט הבא",
-    "roman": "jalhaeteoyo, daeum munjangeuro gayo"
+    "roman": "jalhaeteoyo, daeum munjangeuro gayo",
+    "en": "Well done, let's move to the next sentence"
   },
   {
     "ko": "이제 진짜 읽기 연습이 시작돼요",
     "he": "עכשיו מתחיל תרגול קריאה אמיתי",
-    "roman": "ije jinjja ilkgi yeonseupi sijakdwaeyo"
+    "roman": "ije jinjja ilkgi yeonseupi sijakdwaeyo",
+    "en": "Now real reading practice begins"
   },
   {
     "ko": "오늘 읽은 문장을 저장해 둘게요",
     "he": "אשמור את המשפט שקראנו היום",
-    "roman": "oneul ilkeun munjangeul jeojanghae dulgeyo"
+    "roman": "oneul ilkeun munjangeul jeojanghae dulgeyo",
+    "en": "I will save the sentence we read today"
   },
   {
     "ko": "내일 다시 이어서 읽어 봐요",
     "he": "מחר נמשיך לקרוא מאותה נקודה",
-    "roman": "naeil dasi ieoseo ilkeo bwayo"
+    "roman": "naeil dasi ieoseo ilkeo bwayo",
+    "en": "Tomorrow, let's continue reading from the same point"
   },
   {
     "ko": "모르는 글자는 크게 보고 읽어요",
     "he": "אות שלא מכירים קוראים אחרי שמסתכלים בגדול",
-    "roman": "moreuneun geuljaneun keuge bogo ilkeoyo"
+    "roman": "moreuneun geuljaneun keuge bogo ilkeoyo",
+    "en": "If you don't know a letter, look at it large and read it"
   },
   {
     "ko": "소리가 이상하면 다시 들어 보세요",
     "he": "אם הצליל מוזר תקשיב שוב",
-    "roman": "soriga isanghamyeon dasi deuleo boseyo"
+    "roman": "soriga isanghamyeon dasi deuleo boseyo",
+    "en": "If the sound feels strange, listen again"
   },
   {
     "ko": "짧은 문장부터 길게 늘려 가요",
     "he": "מתחילים ממשפט קצר ומאריכים בהדרגה",
-    "roman": "jjalbeun munjangbuteo gilge neulryeo gayo"
+    "roman": "jjalbeun munjangbuteo gilge neulryeo gayo",
+    "en": "Start with short sentences and gradually make them longer"
   },
   {
     "ko": "이제 다음 단계로 넘어가요",
     "he": "עכשיו נעבור לשלב הבא",
-    "roman": "ije daeum dangyero neomeogayo"
+    "roman": "ije daeum dangyero neomeogayo",
+    "en": "Now let's move to the next step"
   }
 ]

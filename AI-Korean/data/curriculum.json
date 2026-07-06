@@ -4,363 +4,418 @@
     "ko": "ㄱ",
     "roman": "giyeok",
     "he_sound": "ג / ק",
-    "speak": "ㄱ"
+    "speak": "ㄱ",
+    "en_sound": "g / k"
   },
   {
     "category": "consonants",
     "ko": "ㄴ",
     "roman": "nieun",
     "he_sound": "נ",
-    "speak": "ㄴ"
+    "speak": "ㄴ",
+    "en_sound": "n"
   },
   {
     "category": "consonants",
     "ko": "ㄷ",
     "roman": "digeut",
     "he_sound": "ד / ט",
-    "speak": "ㄷ"
+    "speak": "ㄷ",
+    "en_sound": "d / t"
   },
   {
     "category": "consonants",
     "ko": "ㄹ",
     "roman": "rieul",
     "he_sound": "ר / ל",
-    "speak": "ㄹ"
+    "speak": "ㄹ",
+    "en_sound": "r / l"
   },
   {
     "category": "consonants",
     "ko": "ㅁ",
     "roman": "mieum",
     "he_sound": "מ",
-    "speak": "ㅁ"
+    "speak": "ㅁ",
+    "en_sound": "m"
   },
   {
     "category": "consonants",
     "ko": "ㅂ",
     "roman": "bieup",
     "he_sound": "ב / פ",
-    "speak": "ㅂ"
+    "speak": "ㅂ",
+    "en_sound": "b / p"
   },
   {
     "category": "consonants",
     "ko": "ㅅ",
     "roman": "siot",
     "he_sound": "ס / ש",
-    "speak": "ㅅ"
+    "speak": "ㅅ",
+    "en_sound": "s / sh"
   },
   {
     "category": "consonants",
     "ko": "ㅇ",
     "roman": "ieung",
     "he_sound": "א / נג",
-    "speak": "ㅇ"
+    "speak": "ㅇ",
+    "en_sound": "silent / ng"
   },
   {
     "category": "consonants",
     "ko": "ㅈ",
     "roman": "jieut",
     "he_sound": "ג׳",
-    "speak": "ㅈ"
+    "speak": "ㅈ",
+    "en_sound": "j"
   },
   {
     "category": "consonants",
     "ko": "ㅊ",
     "roman": "chieut",
     "he_sound": "צ׳",
-    "speak": "ㅊ"
+    "speak": "ㅊ",
+    "en_sound": "ch"
   },
   {
     "category": "consonants",
     "ko": "ㅋ",
     "roman": "kieuk",
     "he_sound": "ק",
-    "speak": "ㅋ"
+    "speak": "ㅋ",
+    "en_sound": "k"
   },
   {
     "category": "consonants",
     "ko": "ㅌ",
     "roman": "tieut",
     "he_sound": "ט",
-    "speak": "ㅌ"
+    "speak": "ㅌ",
+    "en_sound": "t"
   },
   {
     "category": "consonants",
     "ko": "ㅍ",
     "roman": "pieup",
     "he_sound": "פ",
-    "speak": "ㅍ"
+    "speak": "ㅍ",
+    "en_sound": "p"
   },
   {
     "category": "consonants",
     "ko": "ㅎ",
     "roman": "hieut",
     "he_sound": "ה",
-    "speak": "ㅎ"
+    "speak": "ㅎ",
+    "en_sound": "h"
   },
   {
     "category": "vowels",
     "ko": "ㅏ",
     "roman": "a",
     "he_sound": "א",
-    "speak": "아"
+    "speak": "아",
+    "en_sound": "a"
   },
   {
     "category": "vowels",
     "ko": "ㅑ",
     "roman": "ya",
     "he_sound": "יה",
-    "speak": "야"
+    "speak": "야",
+    "en_sound": "ya"
   },
   {
     "category": "vowels",
     "ko": "ㅓ",
     "roman": "eo",
     "he_sound": "או פתוח",
-    "speak": "어"
+    "speak": "어",
+    "en_sound": "eo / uh"
   },
   {
     "category": "vowels",
     "ko": "ㅕ",
     "roman": "yeo",
     "he_sound": "יו פתוח",
-    "speak": "여"
+    "speak": "여",
+    "en_sound": "yeo / yuh"
   },
   {
     "category": "vowels",
     "ko": "ㅗ",
     "roman": "o",
     "he_sound": "או",
-    "speak": "오"
+    "speak": "오",
+    "en_sound": "o"
   },
   {
     "category": "vowels",
     "ko": "ㅛ",
     "roman": "yo",
     "he_sound": "יו",
-    "speak": "요"
+    "speak": "요",
+    "en_sound": "yo"
   },
   {
     "category": "vowels",
     "ko": "ㅜ",
     "roman": "u",
     "he_sound": "או",
-    "speak": "우"
+    "speak": "우",
+    "en_sound": "u / oo"
   },
   {
     "category": "vowels",
     "ko": "ㅠ",
     "roman": "yu",
     "he_sound": "יו",
-    "speak": "유"
+    "speak": "유",
+    "en_sound": "yu"
   },
   {
     "category": "vowels",
     "ko": "ㅡ",
     "roman": "eu",
     "he_sound": "א / צליל קוריאני",
-    "speak": "으"
+    "speak": "으",
+    "en_sound": "eu"
   },
   {
     "category": "vowels",
     "ko": "ㅣ",
     "roman": "i",
     "he_sound": "אי",
-    "speak": "이"
+    "speak": "이",
+    "en_sound": "i / ee"
   },
   {
     "category": "vowels",
     "ko": "ㅐ",
     "roman": "ae",
     "he_sound": "אה",
-    "speak": "애"
+    "speak": "애",
+    "en_sound": "ae"
   },
   {
     "category": "vowels",
     "ko": "ㅔ",
     "roman": "e",
     "he_sound": "אה",
-    "speak": "에"
+    "speak": "에",
+    "en_sound": "e"
   },
   {
     "category": "vowels",
     "ko": "ㅘ",
     "roman": "wa",
     "he_sound": "וה",
-    "speak": "와"
+    "speak": "와",
+    "en_sound": "wa"
   },
   {
     "category": "vowels",
     "ko": "ㅙ",
     "roman": "wae",
     "he_sound": "וה",
-    "speak": "왜"
+    "speak": "왜",
+    "en_sound": "wae"
   },
   {
     "category": "vowels",
     "ko": "ㅚ",
     "roman": "oe",
     "he_sound": "וה",
-    "speak": "외"
+    "speak": "외",
+    "en_sound": "oe / we"
   },
   {
     "category": "vowels",
     "ko": "ㅝ",
     "roman": "wo",
     "he_sound": "וו",
-    "speak": "워"
+    "speak": "워",
+    "en_sound": "wo"
   },
   {
     "category": "vowels",
     "ko": "ㅞ",
     "roman": "we",
     "he_sound": "וו",
-    "speak": "웨"
+    "speak": "웨",
+    "en_sound": "we"
   },
   {
     "category": "vowels",
     "ko": "ㅟ",
     "roman": "wi",
     "he_sound": "וי",
-    "speak": "위"
+    "speak": "위",
+    "en_sound": "wi"
   },
   {
     "category": "vowels",
     "ko": "ㅢ",
     "roman": "ui",
     "he_sound": "אי / אי",
-    "speak": "의"
+    "speak": "의",
+    "en_sound": "ui"
   },
   {
     "category": "basic_no_patchim",
     "ko": "아기",
     "roman": "agi",
-    "he": "תינוק"
+    "he": "תינוק",
+    "en": "baby"
   },
   {
     "category": "basic_no_patchim",
     "ko": "오이",
     "roman": "oi",
-    "he": "מלפפון"
+    "he": "מלפפון",
+    "en": "cucumber"
   },
   {
     "category": "basic_no_patchim",
     "ko": "아이",
     "roman": "ai",
-    "he": "ילד"
+    "he": "ילד",
+    "en": "child"
   },
   {
     "category": "basic_no_patchim",
     "ko": "우유",
     "roman": "uyu",
-    "he": "חלב"
+    "he": "חלב",
+    "en": "milk"
   },
   {
     "category": "basic_no_patchim",
     "ko": "나비",
     "roman": "nabi",
-    "he": "פרפר"
+    "he": "פרפר",
+    "en": "butterfly"
   },
   {
     "category": "basic_no_patchim",
     "ko": "모자",
     "roman": "moja",
-    "he": "כובע"
+    "he": "כובע",
+    "en": "hat"
   },
   {
     "category": "basic_no_patchim",
     "ko": "바다",
     "roman": "bada",
-    "he": "ים"
+    "he": "ים",
+    "en": "sea"
   },
   {
     "category": "basic_no_patchim",
     "ko": "고기",
     "roman": "gogi",
-    "he": "בשר"
+    "he": "בשר",
+    "en": "meat"
   },
   {
     "category": "basic_no_patchim",
     "ko": "가게",
     "roman": "gage",
-    "he": "חנות"
+    "he": "חנות",
+    "en": "store"
   },
   {
     "category": "basic_no_patchim",
     "ko": "도로",
     "roman": "doro",
-    "he": "כביש"
+    "he": "כביש",
+    "en": "road"
   },
   {
     "category": "basic_no_patchim",
     "ko": "지도",
     "roman": "jido",
-    "he": "מפה"
+    "he": "מפה",
+    "en": "map"
   },
   {
     "category": "basic_no_patchim",
     "ko": "기차",
     "roman": "gicha",
-    "he": "רכבת"
+    "he": "רכבת",
+    "en": "train"
   },
   {
     "category": "basic_no_patchim",
     "ko": "사과",
     "roman": "sagwa",
-    "he": "תפוח"
+    "he": "תפוח",
+    "en": "apple"
   },
   {
     "category": "basic_no_patchim",
     "ko": "소리",
     "roman": "sori",
-    "he": "קול"
+    "he": "קול",
+    "en": "sound"
   },
   {
     "category": "basic_no_patchim",
     "ko": "머리",
     "roman": "meori",
-    "he": "ראש"
+    "he": "ראש",
+    "en": "head / hair"
   },
   {
     "category": "basic_no_patchim",
     "ko": "다리",
     "roman": "dari",
-    "he": "רגל / גשר"
+    "he": "רגל / גשר",
+    "en": "leg / bridge"
   },
   {
     "category": "basic_no_patchim",
     "ko": "나라",
     "roman": "nara",
-    "he": "מדינה"
+    "he": "מדינה",
+    "en": "country"
   },
   {
     "category": "basic_no_patchim",
     "ko": "노래",
     "roman": "norae",
-    "he": "שיר"
+    "he": "שיר",
+    "en": "song"
   },
   {
     "category": "basic_no_patchim",
     "ko": "누나",
     "roman": "nuna",
-    "he": "אחות גדולה"
+    "he": "אחות גדולה",
+    "en": "older sister"
   },
   {
     "category": "basic_no_patchim",
     "ko": "아빠",
     "roman": "appa",
-    "he": "אבא"
+    "he": "אבא",
+    "en": "dad"
   },
   {
     "category": "basic_no_patchim",
     "ko": "엄마",
     "roman": "eomma",
-    "he": "אמא"
+    "he": "אמא",
+    "en": "mom"
   },
   {
     "category": "basic_no_patchim",
     "ko": "오빠",
     "roman": "oppa",
-    "he": "אח גדול"
+    "he": "אח גדול",
+    "en": "older brother"
   },
   {
     "category": "basic_no_patchim",
@@ -378,7 +433,8 @@
     "category": "basic_no_patchim",
     "ko": "비누",
     "roman": "binu",
-    "he": "סבון"
+    "he": "סבון",
+    "en": "soap"
   },
   {
     "category": "basic_no_patchim",
@@ -402,19 +458,22 @@
     "category": "basic_no_patchim",
     "ko": "라디오",
     "roman": "radio",
-    "he": "רדיו"
+    "he": "רדיו",
+    "en": "radio"
   },
   {
     "category": "basic_no_patchim",
     "ko": "카메라",
     "roman": "kamera",
-    "he": "מצלמה"
+    "he": "מצלמה",
+    "en": "camera"
   },
   {
     "category": "basic_no_patchim",
     "ko": "버스",
     "roman": "beoseu",
-    "he": "אוטובוס"
+    "he": "אוטובוס",
+    "en": "bus"
   },
   {
     "category": "basic_no_patchim",
@@ -438,7 +497,8 @@
     "category": "basic_no_patchim",
     "ko": "커피",
     "roman": "keopi",
-    "he": "קפה"
+    "he": "קפה",
+    "en": "coffee"
   },
   {
     "category": "basic_no_patchim",
@@ -456,13 +516,15 @@
     "category": "basic_no_patchim",
     "ko": "바나나",
     "roman": "banana",
-    "he": "בננה"
+    "he": "בננה",
+    "en": "banana"
   },
   {
     "category": "basic_no_patchim",
     "ko": "토마토",
     "roman": "tomato",
-    "he": "עגבנייה"
+    "he": "עגבנייה",
+    "en": "tomato"
   },
   {
     "category": "basic_no_patchim",
@@ -540,43 +602,50 @@
     "category": "basic_no_patchim",
     "ko": "어제",
     "roman": "eoje",
-    "he": "אתמול"
+    "he": "אתמול",
+    "en": "yesterday"
   },
   {
     "category": "basic_no_patchim",
     "ko": "오늘",
     "roman": "oneul",
-    "he": "היום"
+    "he": "היום",
+    "en": "today"
   },
   {
     "category": "basic_no_patchim",
     "ko": "내일",
     "roman": "naeil",
-    "he": "מחר"
+    "he": "מחר",
+    "en": "tomorrow"
   },
   {
     "category": "basic_no_patchim",
     "ko": "여기",
     "roman": "yeogi",
-    "he": "כאן"
+    "he": "כאן",
+    "en": "here"
   },
   {
     "category": "basic_no_patchim",
     "ko": "저기",
     "roman": "jeogi",
-    "he": "שם"
+    "he": "שם",
+    "en": "there"
   },
   {
     "category": "basic_no_patchim",
     "ko": "거기",
     "roman": "geogi",
-    "he": "שם לידך"
+    "he": "שם לידך",
+    "en": "there"
   },
   {
     "category": "basic_no_patchim",
     "ko": "아니요",
     "roman": "aniyo",
-    "he": "לא"
+    "he": "לא",
+    "en": "no"
   },
   {
     "category": "basic_no_patchim",
@@ -588,7 +657,8 @@
     "category": "basic_no_patchim",
     "ko": "우리",
     "roman": "uri",
-    "he": "אנחנו"
+    "he": "אנחנו",
+    "en": "we / us"
   },
   {
     "category": "basic_no_patchim",
@@ -600,7 +670,8 @@
     "category": "basic_no_patchim",
     "ko": "이야기",
     "roman": "iyagi",
-    "he": "סיפור"
+    "he": "סיפור",
+    "en": "story / talk"
   },
   {
     "category": "basic_no_patchim",
@@ -678,31 +749,36 @@
     "category": "basic_no_patchim",
     "ko": "요리",
     "roman": "yori",
-    "he": "בישול"
+    "he": "בישול",
+    "en": "cooking"
   },
   {
     "category": "basic_no_patchim",
     "ko": "고마워",
     "roman": "gomawo",
-    "he": "תודה"
+    "he": "תודה",
+    "en": "thank you"
   },
   {
     "category": "basic_no_patchim",
     "ko": "미안해",
     "roman": "mianhae",
-    "he": "סליחה"
+    "he": "סליחה",
+    "en": "sorry"
   },
   {
     "category": "basic_no_patchim",
     "ko": "좋아요",
     "roman": "johayo",
-    "he": "טוב"
+    "he": "טוב",
+    "en": "good / I like it"
   },
   {
     "category": "basic_no_patchim",
     "ko": "싫어요",
     "roman": "silheoyo",
-    "he": "לא טוב לי"
+    "he": "לא טוב לי",
+    "en": "I don’t like it"
   },
   {
     "category": "basic_no_patchim",
@@ -714,19 +790,22 @@
     "category": "basic_no_patchim",
     "ko": "가요",
     "roman": "gayo",
-    "he": "הולך"
+    "he": "הולך",
+    "en": "go"
   },
   {
     "category": "basic_no_patchim",
     "ko": "와요",
     "roman": "wayo",
-    "he": "בא"
+    "he": "בא",
+    "en": "come"
   },
   {
     "category": "basic_no_patchim",
     "ko": "봐요",
     "roman": "bwayo",
-    "he": "רואה"
+    "he": "רואה",
+    "en": "see / watch"
   },
   {
     "category": "basic_no_patchim",
@@ -786,13 +865,15 @@
     "category": "basic_no_patchim",
     "ko": "해요",
     "roman": "haeyo",
-    "he": "עושה"
+    "he": "עושה",
+    "en": "do"
   },
   {
     "category": "basic_no_patchim",
     "ko": "돼요",
     "roman": "dwaeyo",
-    "he": "אפשר"
+    "he": "אפשר",
+    "en": "it works / okay"
   },
   {
     "category": "basic_no_patchim",
@@ -834,121 +915,141 @@
     "category": "basic_patchim",
     "ko": "가방",
     "roman": "gabang",
-    "he": "תיק"
+    "he": "תיק",
+    "en": "bag"
   },
   {
     "category": "basic_patchim",
     "ko": "학교",
     "roman": "hakgyo",
-    "he": "בית ספר"
+    "he": "בית ספר",
+    "en": "school"
   },
   {
     "category": "basic_patchim",
     "ko": "공부",
     "roman": "gongbu",
-    "he": "לימודים"
+    "he": "לימודים",
+    "en": "study"
   },
   {
     "category": "basic_patchim",
     "ko": "한국",
     "roman": "hanguk",
-    "he": "קוריאה"
+    "he": "קוריאה",
+    "en": "Korea"
   },
   {
     "category": "basic_patchim",
     "ko": "사람",
     "roman": "saram",
-    "he": "אדם"
+    "he": "אדם",
+    "en": "person"
   },
   {
     "category": "basic_patchim",
     "ko": "이름",
     "roman": "ireum",
-    "he": "שם"
+    "he": "שם",
+    "en": "name"
   },
   {
     "category": "basic_patchim",
     "ko": "마음",
     "roman": "maeum",
-    "he": "לב"
+    "he": "לב",
+    "en": "heart / mind"
   },
   {
     "category": "basic_patchim",
     "ko": "사랑",
     "roman": "sarang",
-    "he": "אהבה"
+    "he": "אהבה",
+    "en": "love"
   },
   {
     "category": "basic_patchim",
     "ko": "시간",
     "roman": "sigan",
-    "he": "זמן"
+    "he": "זמן",
+    "en": "time"
   },
   {
     "category": "basic_patchim",
     "ko": "사진",
     "roman": "sajin",
-    "he": "תמונה"
+    "he": "תמונה",
+    "en": "photo"
   },
   {
     "category": "basic_patchim",
     "ko": "시장",
     "roman": "sijang",
-    "he": "שוק"
+    "he": "שוק",
+    "en": "market"
   },
   {
     "category": "basic_patchim",
     "ko": "식당",
     "roman": "sikdang",
-    "he": "מסעדה"
+    "he": "מסעדה",
+    "en": "restaurant"
   },
   {
     "category": "basic_patchim",
     "ko": "방문",
     "roman": "bangmun",
-    "he": "ביקור"
+    "he": "ביקור",
+    "en": "visit"
   },
   {
     "category": "basic_patchim",
     "ko": "공항",
     "roman": "gonghang",
-    "he": "שדה תעופה"
+    "he": "שדה תעופה",
+    "en": "airport"
   },
   {
     "category": "basic_patchim",
     "ko": "병원",
     "roman": "byeongwon",
-    "he": "בית חולים"
+    "he": "בית חולים",
+    "en": "hospital"
   },
   {
     "category": "basic_patchim",
     "ko": "은행",
     "roman": "eunhaeng",
-    "he": "בנק"
+    "he": "בנק",
+    "en": "bank"
   },
   {
     "category": "basic_patchim",
     "ko": "전화",
     "roman": "jeonhwa",
-    "he": "טלפון"
+    "he": "טלפון",
+    "en": "phone"
   },
   {
     "category": "basic_patchim",
     "ko": "문장",
     "roman": "munjang",
-    "he": "משפט"
+    "he": "משפט",
+    "en": "sentence"
   },
   {
     "category": "basic_patchim",
     "ko": "발음",
     "roman": "baleum",
-    "he": "הגייה"
+    "he": "הגייה",
+    "en": "pronunciation"
   },
   {
     "category": "basic_patchim",
     "ko": "받침",
     "roman": "batchim",
-    "he": "עיצור סופי"
+    "he": "עיצור סופי",
+    "en": "final consonant"
   },
   {
     "category": "basic_patchim",
@@ -966,25 +1067,29 @@
     "category": "basic_patchim",
     "ko": "질문",
     "roman": "jilmun",
-    "he": "שאלה"
+    "he": "שאלה",
+    "en": "question"
   },
   {
     "category": "basic_patchim",
     "ko": "대답",
     "roman": "daedap",
-    "he": "תשובה"
+    "he": "תשובה",
+    "en": "answer"
   },
   {
     "category": "basic_patchim",
     "ko": "친구",
     "roman": "chingu",
-    "he": "חבר"
+    "he": "חבר",
+    "en": "friend"
   },
   {
     "category": "basic_patchim",
     "ko": "가족",
     "roman": "gajok",
-    "he": "משפחה"
+    "he": "משפחה",
+    "en": "family"
   },
   {
     "category": "basic_patchim",
@@ -1050,7 +1155,8 @@
     "category": "basic_patchim",
     "ko": "생각",
     "roman": "saenggak",
-    "he": "מחשבה"
+    "he": "מחשבה",
+    "en": "thought / idea"
   },
   {
     "category": "basic_patchim",
@@ -1062,13 +1168,15 @@
     "category": "basic_patchim",
     "ko": "문제",
     "roman": "munje",
-    "he": "בעיה"
+    "he": "בעיה",
+    "en": "problem"
   },
   {
     "category": "basic_patchim",
     "ko": "방법",
     "roman": "bangbeop",
-    "he": "דרך"
+    "he": "דרך",
+    "en": "method"
   },
   {
     "category": "basic_patchim",
@@ -1194,7 +1302,8 @@
     "category": "basic_patchim",
     "ko": "한국어",
     "roman": "hangukeo",
-    "he": "קוריאנית"
+    "he": "קוריאנית",
+    "en": "Korean language"
   },
   {
     "category": "basic_patchim",
@@ -1212,7 +1321,8 @@
     "category": "basic_patchim",
     "ko": "이스라엘",
     "roman": "iseurael",
-    "he": "ישראל"
+    "he": "ישראל",
+    "en": "Israel"
   },
   {
     "category": "basic_patchim",
@@ -1296,7 +1406,8 @@
     "category": "basic_patchim",
     "ko": "읽기",
     "roman": "ilkgi",
-    "he": "קריאה"
+    "he": "קריאה",
+    "en": "reading"
   },
   {
     "category": "basic_patchim",
@@ -1422,19 +1533,22 @@
     "category": "medium_patchim",
     "ko": "식품",
     "roman": "sikpum",
-    "he": "מזון"
+    "he": "מזון",
+    "en": "food product"
   },
   {
     "category": "medium_patchim",
     "ko": "햇살",
     "roman": "haetsal",
-    "he": "קרן שמש"
+    "he": "קרן שמש",
+    "en": "sunlight"
   },
   {
     "category": "medium_patchim",
     "ko": "운동",
     "roman": "undong",
-    "he": "ספורט"
+    "he": "ספורט",
+    "en": "exercise / sport"
   },
   {
     "category": "medium_patchim",
@@ -1446,97 +1560,113 @@
     "category": "medium_patchim",
     "ko": "학생",
     "roman": "haksaeng",
-    "he": "תלמיד"
+    "he": "תלמיד",
+    "en": "student"
   },
   {
     "category": "medium_patchim",
     "ko": "언덕",
     "roman": "eondeok",
-    "he": "גבעה"
+    "he": "גבעה",
+    "en": "hill"
   },
   {
     "category": "medium_patchim",
     "ko": "창문",
     "roman": "changmun",
-    "he": "חלון"
+    "he": "חלון",
+    "en": "window"
   },
   {
     "category": "medium_patchim",
     "ko": "냉장고",
     "roman": "naengjanggo",
-    "he": "מקרר"
+    "he": "מקרר",
+    "en": "refrigerator"
   },
   {
     "category": "medium_patchim",
     "ko": "컴퓨터",
     "roman": "keompyuteo",
-    "he": "מחשב"
+    "he": "מחשב",
+    "en": "computer"
   },
   {
     "category": "medium_patchim",
     "ko": "인터넷",
     "roman": "inteonet",
-    "he": "אינטרנט"
+    "he": "אינטרנט",
+    "en": "internet"
   },
   {
     "category": "medium_patchim",
     "ko": "휴대폰",
     "roman": "hyudaepon",
-    "he": "טלפון נייד"
+    "he": "טלפון נייד",
+    "en": "mobile phone"
   },
   {
     "category": "medium_patchim",
     "ko": "관심",
     "roman": "gwansim",
-    "he": "עניין"
+    "he": "עניין",
+    "en": "interest"
   },
   {
     "category": "medium_patchim",
     "ko": "중심",
     "roman": "jungsim",
-    "he": "מרכז"
+    "he": "מרכז",
+    "en": "center"
   },
   {
     "category": "medium_patchim",
     "ko": "발전",
     "roman": "baljeon",
-    "he": "התפתחות"
+    "he": "התפתחות",
+    "en": "development"
   },
   {
     "category": "medium_patchim",
     "ko": "환경",
     "roman": "hwangyeong",
-    "he": "סביבה"
+    "he": "סביבה",
+    "en": "environment"
   },
   {
     "category": "medium_patchim",
     "ko": "경험",
     "roman": "gyeongheom",
-    "he": "ניסיון"
+    "he": "ניסיון",
+    "en": "experience"
   },
   {
     "category": "medium_patchim",
     "ko": "문화",
     "roman": "munhwa",
-    "he": "תרבות"
+    "he": "תרבות",
+    "en": "culture"
   },
   {
     "category": "medium_patchim",
     "ko": "역사",
     "roman": "yeoksa",
-    "he": "היסטוריה"
+    "he": "היסטוריה",
+    "en": "history"
   },
   {
     "category": "medium_patchim",
     "ko": "경제",
     "roman": "gyeongje",
-    "he": "כלכלה"
+    "he": "כלכלה",
+    "en": "economy"
   },
   {
     "category": "medium_patchim",
     "ko": "정치",
     "roman": "jeongchi",
-    "he": "פוליטיקה"
+    "he": "פוליטיקה",
+    "en": "politics"
   },
   {
     "category": "medium_patchim",
@@ -2022,121 +2152,141 @@
     "category": "advanced_patchim",
     "ko": "닭",
     "roman": "dalk",
-    "he": "תרנגול"
+    "he": "תרנגול",
+    "en": "chicken"
   },
   {
     "category": "advanced_patchim",
     "ko": "값",
     "roman": "gaps",
-    "he": "מחיר / ערך"
+    "he": "מחיר / ערך",
+    "en": "price / value"
   },
   {
     "category": "advanced_patchim",
     "ko": "삶",
     "roman": "salm",
-    "he": "חיים"
+    "he": "חיים",
+    "en": "life"
   },
   {
     "category": "advanced_patchim",
     "ko": "몫",
     "roman": "moks",
-    "he": "חלק"
+    "he": "חלק",
+    "en": "share"
   },
   {
     "category": "advanced_patchim",
     "ko": "앉아",
     "roman": "anja",
-    "he": "שב"
+    "he": "שב",
+    "en": "sit"
   },
   {
     "category": "advanced_patchim",
     "ko": "읽기",
     "roman": "ilkgi",
-    "he": "קריאה"
+    "he": "קריאה",
+    "en": "reading"
   },
   {
     "category": "advanced_patchim",
     "ko": "읽다",
     "roman": "ilkda",
-    "he": "לקרוא"
+    "he": "לקרוא",
+    "en": "to read"
   },
   {
     "category": "advanced_patchim",
     "ko": "많다",
     "roman": "manhda",
-    "he": "הרבה"
+    "he": "הרבה",
+    "en": "many / much"
   },
   {
     "category": "advanced_patchim",
     "ko": "않다",
     "roman": "anhda",
-    "he": "לא לעשות"
+    "he": "לא לעשות",
+    "en": "not to do"
   },
   {
     "category": "advanced_patchim",
     "ko": "괜찮다",
     "roman": "gwaenchanhda",
-    "he": "בסדר"
+    "he": "בסדר",
+    "en": "to be okay"
   },
   {
     "category": "advanced_patchim",
     "ko": "짧다",
     "roman": "jjalbda",
-    "he": "קצר"
+    "he": "קצר",
+    "en": "short"
   },
   {
     "category": "advanced_patchim",
     "ko": "넓다",
     "roman": "neolbda",
-    "he": "רחב"
+    "he": "רחב",
+    "en": "wide"
   },
   {
     "category": "advanced_patchim",
     "ko": "밟다",
     "roman": "balbda",
-    "he": "לדרוך"
+    "he": "לדרוך",
+    "en": "to step on"
   },
   {
     "category": "advanced_patchim",
     "ko": "젊다",
     "roman": "jeolmda",
-    "he": "צעיר"
+    "he": "צעיר",
+    "en": "young"
   },
   {
     "category": "advanced_patchim",
     "ko": "늙다",
     "roman": "neulkda",
-    "he": "זקן"
+    "he": "זקן",
+    "en": "old"
   },
   {
     "category": "advanced_patchim",
     "ko": "맑다",
     "roman": "malkda",
-    "he": "צלול"
+    "he": "צלול",
+    "en": "clear"
   },
   {
     "category": "advanced_patchim",
     "ko": "밝다",
     "roman": "balkda",
-    "he": "בהיר"
+    "he": "בהיר",
+    "en": "bright"
   },
   {
     "category": "advanced_patchim",
     "ko": "얇다",
     "roman": "yalbda",
-    "he": "דק"
+    "he": "דק",
+    "en": "thin"
   },
   {
     "category": "advanced_patchim",
     "ko": "굵다",
     "roman": "gulkda",
-    "he": "עבה"
+    "he": "עבה",
+    "en": "thick"
   },
   {
     "category": "advanced_patchim",
     "ko": "닮다",
     "roman": "dalmda",
-    "he": "דומה"
+    "he": "דומה",
+    "en": "to resemble"
   },
   {
     "category": "advanced_patchim",
@@ -2196,7 +2346,8 @@
     "category": "advanced_patchim",
     "ko": "꽃",
     "roman": "kkot",
-    "he": "פרח"
+    "he": "פרח",
+    "en": "flower"
   },
   {
     "category": "advanced_patchim",
@@ -2274,19 +2425,22 @@
     "category": "advanced_patchim",
     "ko": "집",
     "roman": "jip",
-    "he": "בית"
+    "he": "בית",
+    "en": "house"
   },
   {
     "category": "advanced_patchim",
     "ko": "밥",
     "roman": "bap",
-    "he": "אורז / ארוחה"
+    "he": "אורז / ארוחה",
+    "en": "rice / meal"
   },
   {
     "category": "advanced_patchim",
     "ko": "입",
     "roman": "ip",
-    "he": "פה"
+    "he": "פה",
+    "en": "mouth"
   },
   {
     "category": "advanced_patchim",
@@ -2316,7 +2470,8 @@
     "category": "advanced_patchim",
     "ko": "책",
     "roman": "chaek",
-    "he": "ספר"
+    "he": "ספר",
+    "en": "book"
   },
   {
     "category": "advanced_patchim",

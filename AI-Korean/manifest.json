@@ -1,7 +1,7 @@
 {
   "name": "AI Korean Master",
   "short_name": "KoreanMaster",
-  "description": "Korean reading-first learning app for Hebrew speakers.",
+  "description": "Korean reading-first learning app for Hebrew and English speakers.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -21,5 +21,7 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "lang": "he",
+  "version": "1.4"
 }

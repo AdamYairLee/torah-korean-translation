@@ -2,501 +2,601 @@
   {
     "ko": "안녕하세요",
     "he": "שלום",
-    "roman": "annyeonghaseyo"
+    "roman": "annyeonghaseyo",
+    "en": "Hello"
   },
   {
     "ko": "만나서 반가워요",
     "he": "נעים להכיר",
-    "roman": "mannaseo bangawoyo"
+    "roman": "mannaseo bangawoyo",
+    "en": "Nice to meet you"
   },
   {
     "ko": "잘 지냈어요?",
     "he": "מה שלומך?",
-    "roman": "jal jinaeteoyo?"
+    "roman": "jal jinaeteoyo?",
+    "en": "How have you been?"
   },
   {
     "ko": "오늘 뭐 했어요?",
     "he": "מה עשית היום?",
-    "roman": "oneul mwo haeteoyo?"
+    "roman": "oneul mwo haeteoyo?",
+    "en": "What did you do today?"
   },
   {
     "ko": "밥 먹었어요?",
     "he": "אכלת?",
-    "roman": "bap meokeoteoyo?"
+    "roman": "bap meokeoteoyo?",
+    "en": "Did you eat?"
   },
   {
     "ko": "잠깐만요",
     "he": "רגע אחד",
-    "roman": "jamkkanmanyo"
+    "roman": "jamkkanmanyo",
+    "en": "Just a moment"
   },
   {
     "ko": "잠시만 기다려 주세요",
     "he": "חכה רגע בבקשה",
-    "roman": "jamsiman gidaryeo juseyo"
+    "roman": "jamsiman gidaryeo juseyo",
+    "en": "Please wait a moment"
   },
   {
     "ko": "괜찮아요",
     "he": "זה בסדר",
-    "roman": "gwaenchanhayo"
+    "roman": "gwaenchanhayo",
+    "en": "It's okay"
   },
   {
     "ko": "정말요?",
     "he": "באמת?",
-    "roman": "jeongmalyo?"
+    "roman": "jeongmalyo?",
+    "en": "Really?"
   },
   {
     "ko": "진짜요?",
     "he": "באמת?",
-    "roman": "jinjjayo?"
+    "roman": "jinjjayo?",
+    "en": "For real?"
   },
   {
     "ko": "대박이네요",
     "he": "וואו, מטורף",
-    "roman": "daebakineyo"
+    "roman": "daebakineyo",
+    "en": "That's amazing"
   },
   {
     "ko": "말도 안 돼요",
     "he": "לא יכול להיות",
-    "roman": "maldo an dwaeyo"
+    "roman": "maldo an dwaeyo",
+    "en": "No way"
   },
   {
     "ko": "좋은 생각이에요",
     "he": "רעיון טוב",
-    "roman": "joheun saenggakieyo"
+    "roman": "joheun saenggakieyo",
+    "en": "That's a good idea"
   },
   {
     "ko": "저도 그렇게 생각해요",
     "he": "גם אני חושב כך",
-    "roman": "jeodo geureohge saenggakhaeyo"
+    "roman": "jeodo geureohge saenggakhaeyo",
+    "en": "I think so too"
   },
   {
     "ko": "그건 잘 모르겠어요",
     "he": "אני לא ממש יודע",
-    "roman": "geugeon jal moreugeteoyo"
+    "roman": "geugeon jal moreugeteoyo",
+    "en": "I'm not sure about that"
   },
   {
     "ko": "다시 말해 주세요",
     "he": "תגיד שוב בבקשה",
-    "roman": "dasi malhae juseyo"
+    "roman": "dasi malhae juseyo",
+    "en": "Please say it again"
   },
   {
     "ko": "천천히 말해 주세요",
     "he": "דבר לאט בבקשה",
-    "roman": "cheoncheonhi malhae juseyo"
+    "roman": "cheoncheonhi malhae juseyo",
+    "en": "Please speak slowly"
   },
   {
     "ko": "한국어로 뭐라고 해요?",
     "he": "איך אומרים את זה בקוריאנית?",
-    "roman": "hangukeoro mworago haeyo?"
+    "roman": "hangukeoro mworago haeyo?",
+    "en": "How do you say this in Korean?"
   },
   {
     "ko": "이거 무슨 뜻이에요?",
     "he": "מה זה אומר?",
-    "roman": "igeo museun tteutieyo?"
+    "roman": "igeo museun tteutieyo?",
+    "en": "What does this mean?"
   },
   {
     "ko": "어떻게 읽어요?",
     "he": "איך קוראים את זה?",
-    "roman": "eotteohge ilkeoyo?"
+    "roman": "eotteohge ilkeoyo?",
+    "en": "How do you read it?"
   },
   {
     "ko": "도와줄 수 있어요?",
     "he": "אתה יכול לעזור?",
-    "roman": "dowajul su iteoyo?"
+    "roman": "dowajul su iteoyo?",
+    "en": "Can you help me?"
   },
   {
     "ko": "문제가 생겼어요",
     "he": "יש בעיה",
-    "roman": "munjega saenggyeoteoyo"
+    "roman": "munjega saenggyeoteoyo",
+    "en": "There is a problem"
   },
   {
     "ko": "괜찮으면 같이 갈까요?",
     "he": "אם זה בסדר, נלך ביחד?",
-    "roman": "gwaenchanheumyeon gati galkkayo?"
+    "roman": "gwaenchanheumyeon gati galkkayo?",
+    "en": "If it's okay, shall we go together?"
   },
   {
     "ko": "저는 먼저 갈게요",
     "he": "אני אלך קודם",
-    "roman": "jeoneun meonjeo galgeyo"
+    "roman": "jeoneun meonjeo galgeyo",
+    "en": "I'll go first"
   },
   {
     "ko": "조금 있다가 봐요",
     "he": "נתראה עוד מעט",
-    "roman": "jogeum itdaga bwayo"
+    "roman": "jogeum itdaga bwayo",
+    "en": "See you in a little while"
   },
   {
     "ko": "내일 봐요",
     "he": "נתראה מחר",
-    "roman": "naeil bwayo"
+    "roman": "naeil bwayo",
+    "en": "See you tomorrow"
   },
   {
     "ko": "나중에 연락할게요",
     "he": "אצור קשר אחר כך",
-    "roman": "najunge yeonrakhalgeyo"
+    "roman": "najunge yeonrakhalgeyo",
+    "en": "I'll contact you later"
   },
   {
     "ko": "전화해 주세요",
     "he": "תתקשר בבקשה",
-    "roman": "jeonhwahae juseyo"
+    "roman": "jeonhwahae juseyo",
+    "en": "Please call me"
   },
   {
     "ko": "메시지 보내 주세요",
     "he": "שלח הודעה בבקשה",
-    "roman": "mesiji bonae juseyo"
+    "roman": "mesiji bonae juseyo",
+    "en": "Please send me a message"
   },
   {
     "ko": "주소 보내 주세요",
     "he": "שלח כתובת בבקשה",
-    "roman": "juso bonae juseyo"
+    "roman": "juso bonae juseyo",
+    "en": "Please send me the address"
   },
   {
     "ko": "여기 어디예요?",
     "he": "איפה זה כאן?",
-    "roman": "yeogi eodiyeyo?"
+    "roman": "yeogi eodiyeyo?",
+    "en": "Where is this place?"
   },
   {
     "ko": "화장실 어디예요?",
     "he": "איפה השירותים?",
-    "roman": "hwajangsil eodiyeyo?"
+    "roman": "hwajangsil eodiyeyo?",
+    "en": "Where is the bathroom?"
   },
   {
     "ko": "얼마예요?",
     "he": "כמה זה עולה?",
-    "roman": "eolmayeyo?"
+    "roman": "eolmayeyo?",
+    "en": "How much is it?"
   },
   {
     "ko": "카드 돼요?",
     "he": "אפשר לשלם בכרטיס?",
-    "roman": "kadeu dwaeyo?"
+    "roman": "kadeu dwaeyo?",
+    "en": "Can I pay by card?"
   },
   {
     "ko": "현금만 돼요?",
     "he": "רק מזומן?",
-    "roman": "hyeongeumman dwaeyo?"
+    "roman": "hyeongeumman dwaeyo?",
+    "en": "Is it cash only?"
   },
   {
     "ko": "영수증 주세요",
     "he": "קבלה בבקשה",
-    "roman": "yeongsujeung juseyo"
+    "roman": "yeongsujeung juseyo",
+    "en": "Please give me a receipt"
   },
   {
     "ko": "포장해 주세요",
     "he": "לארוז בבקשה",
-    "roman": "pojanghae juseyo"
+    "roman": "pojanghae juseyo",
+    "en": "Please pack it to go"
   },
   {
     "ko": "여기서 먹을게요",
     "he": "אני אוכל כאן",
-    "roman": "yeogiseo meokeulgeyo"
+    "roman": "yeogiseo meokeulgeyo",
+    "en": "I'll eat here"
   },
   {
     "ko": "물이 필요해요",
     "he": "אני צריך מים",
-    "roman": "muli pilyohaeyo"
+    "roman": "muli pilyohaeyo",
+    "en": "I need water"
   },
   {
     "ko": "너무 매워요",
     "he": "זה חריף מדי",
-    "roman": "neomu maewoyo"
+    "roman": "neomu maewoyo",
+    "en": "It's too spicy"
   },
   {
     "ko": "맛있어요",
     "he": "טעים",
-    "roman": "matiteoyo"
+    "roman": "matiteoyo",
+    "en": "It's delicious"
   },
   {
     "ko": "배고파요",
     "he": "אני רעב",
-    "roman": "baegopayo"
+    "roman": "baegopayo",
+    "en": "I'm hungry"
   },
   {
     "ko": "배불러요",
     "he": "אני שבע",
-    "roman": "baebulreoyo"
+    "roman": "baebulreoyo",
+    "en": "I'm full"
   },
   {
     "ko": "피곤해요",
     "he": "אני עייף",
-    "roman": "pigonhaeyo"
+    "roman": "pigonhaeyo",
+    "en": "I'm tired"
   },
   {
     "ko": "좀 쉬고 싶어요",
     "he": "אני רוצה לנוח קצת",
-    "roman": "jom swigo sipeoyo"
+    "roman": "jom swigo sipeoyo",
+    "en": "I want to rest a little"
   },
   {
     "ko": "오늘 시간이 없어요",
     "he": "אין לי זמן היום",
-    "roman": "oneul sigani eopseoyo"
+    "roman": "oneul sigani eopseoyo",
+    "en": "I don't have time today"
   },
   {
     "ko": "시간 괜찮아요?",
     "he": "הזמן מתאים?",
-    "roman": "sigan gwaenchanhayo?"
+    "roman": "sigan gwaenchanhayo?",
+    "en": "Is the time okay?"
   },
   {
     "ko": "몇 시에 만날까요?",
     "he": "באיזו שעה ניפגש?",
-    "roman": "myeot sie mannalkkayo?"
+    "roman": "myeot sie mannalkkayo?",
+    "en": "What time should we meet?"
   },
   {
     "ko": "어디서 만날까요?",
     "he": "איפה ניפגש?",
-    "roman": "eodiseo mannalkkayo?"
+    "roman": "eodiseo mannalkkayo?",
+    "en": "Where should we meet?"
   },
   {
     "ko": "제가 늦을 것 같아요",
     "he": "נראה לי שאאחר",
-    "roman": "jega neuteul geot gatayo"
+    "roman": "jega neuteul geot gatayo",
+    "en": "I think I'll be late"
   },
   {
     "ko": "금방 갈게요",
     "he": "אני בא מיד",
-    "roman": "geumbang galgeyo"
+    "roman": "geumbang galgeyo",
+    "en": "I'll be there soon"
   },
   {
     "ko": "이미 도착했어요",
     "he": "כבר הגעתי",
-    "roman": "imi dochakhaeteoyo"
+    "roman": "imi dochakhaeteoyo",
+    "en": "I've already arrived"
   },
   {
     "ko": "길을 잃었어요",
     "he": "הלכתי לאיבוד",
-    "roman": "gileul ilheoteoyo"
+    "roman": "gileul ilheoteoyo",
+    "en": "I'm lost"
   },
   {
     "ko": "버스가 언제 와요?",
     "he": "מתי מגיע האוטובוס?",
-    "roman": "beoseuga eonje wayo?"
+    "roman": "beoseuga eonje wayo?",
+    "en": "When does the bus come?"
   },
   {
     "ko": "택시를 불러 주세요",
     "he": "תזמין מונית בבקשה",
-    "roman": "taeksireul bulreo juseyo"
+    "roman": "taeksireul bulreo juseyo",
+    "en": "Please call a taxi"
   },
   {
     "ko": "이 길이 맞아요?",
     "he": "זו הדרך הנכונה?",
-    "roman": "i gili matayo?"
+    "roman": "i gili matayo?",
+    "en": "Is this the right way?"
   },
   {
     "ko": "사진 찍어도 돼요?",
     "he": "אפשר לצלם?",
-    "roman": "sajin jjikeodo dwaeyo?"
+    "roman": "sajin jjikeodo dwaeyo?",
+    "en": "Can I take a picture?"
   },
   {
     "ko": "여기 앉아도 돼요?",
     "he": "אפשר לשבת כאן?",
-    "roman": "yeogi anjado dwaeyo?"
+    "roman": "yeogi anjado dwaeyo?",
+    "en": "Can I sit here?"
   },
   {
     "ko": "괜찮으면 물어봐도 돼요?",
     "he": "אפשר לשאול משהו?",
-    "roman": "gwaenchanheumyeon muleobwado dwaeyo?"
+    "roman": "gwaenchanheumyeon muleobwado dwaeyo?",
+    "en": "If it's okay, may I ask something?"
   },
   {
     "ko": "미안해요",
     "he": "סליחה",
-    "roman": "mianhaeyo"
+    "roman": "mianhaeyo",
+    "en": "I'm sorry"
   },
   {
     "ko": "정말 감사합니다",
     "he": "תודה רבה",
-    "roman": "jeongmal gamsahapnida"
+    "roman": "jeongmal gamsahapnida",
+    "en": "Thank you very much"
   },
   {
     "ko": "천만에요",
     "he": "בכיף",
-    "roman": "cheonmaneyo"
+    "roman": "cheonmaneyo",
+    "en": "You're welcome"
   },
   {
     "ko": "축하해요",
     "he": "מזל טוב",
-    "roman": "chukhahaeyo"
+    "roman": "chukhahaeyo",
+    "en": "Congratulations"
   },
   {
     "ko": "조심하세요",
     "he": "תיזהר",
-    "roman": "josimhaseyo"
+    "roman": "josimhaseyo",
+    "en": "Be careful"
   },
   {
     "ko": "좋은 하루 보내세요",
     "he": "שיהיה יום טוב",
-    "roman": "joheun haru bonaeseyo"
+    "roman": "joheun haru bonaeseyo",
+    "en": "Have a good day"
   },
   {
     "ko": "주말 잘 보내세요",
     "he": "שיהיה סוף שבוע טוב",
-    "roman": "jumal jal bonaeseyo"
+    "roman": "jumal jal bonaeseyo",
+    "en": "Have a good weekend"
   },
   {
     "ko": "오늘 너무 바빴어요",
     "he": "הייתי מאוד עסוק היום",
-    "roman": "oneul neomu bappateoyo"
+    "roman": "oneul neomu bappateoyo",
+    "en": "I was very busy today"
   },
   {
     "ko": "요즘 어떻게 지내요?",
     "he": "איך הולך בזמן האחרון?",
-    "roman": "yojeum eotteohge jinaeyo?"
+    "roman": "yojeum eotteohge jinaeyo?",
+    "en": "How have you been lately?"
   },
   {
     "ko": "별일 없어요",
     "he": "אין משהו מיוחד",
-    "roman": "byeolil eopseoyo"
+    "roman": "byeolil eopseoyo",
+    "en": "Nothing special"
   },
   {
     "ko": "잘 되고 있어요",
     "he": "זה הולך טוב",
-    "roman": "jal doego iteoyo"
+    "roman": "jal doego iteoyo",
+    "en": "It's going well"
   },
   {
     "ko": "아직 준비 중이에요",
     "he": "אני עדיין מתכונן",
-    "roman": "ajik junbi jungieyo"
+    "roman": "ajik junbi jungieyo",
+    "en": "I'm still preparing"
   },
   {
     "ko": "거의 다 됐어요",
     "he": "זה כמעט מוכן",
-    "roman": "geoui da dwaeteoyo"
+    "roman": "geoui da dwaeteoyo",
+    "en": "It's almost done"
   },
   {
     "ko": "다시 확인해 볼게요",
     "he": "אבדוק שוב",
-    "roman": "dasi hwakinhae bolgeyo"
+    "roman": "dasi hwakinhae bolgeyo",
+    "en": "I'll check again"
   },
   {
     "ko": "제가 해 볼게요",
     "he": "אני אנסה",
-    "roman": "jega hae bolgeyo"
+    "roman": "jega hae bolgeyo",
+    "en": "I'll try it"
   },
   {
     "ko": "그렇게 하면 될 것 같아요",
     "he": "נראה לי שזה יעבוד",
-    "roman": "geureohge hamyeon doel geot gatayo"
+    "roman": "geureohge hamyeon doel geot gatayo",
+    "en": "I think that will work"
   },
   {
     "ko": "이건 아닌 것 같아요",
     "he": "נראה לי שזה לא זה",
-    "roman": "igeon anin geot gatayo"
+    "roman": "igeon anin geot gatayo",
+    "en": "I don't think this is it"
   },
   {
     "ko": "다른 방법이 있을까요?",
     "he": "יש דרך אחרת?",
-    "roman": "dareun bangbeopi iteulkkayo?"
+    "roman": "dareun bangbeopi iteulkkayo?",
+    "en": "Is there another way?"
   },
   {
     "ko": "좋아요, 그렇게 해요",
     "he": "טוב, נעשה כך",
-    "roman": "johayo, geureohge haeyo"
+    "roman": "johayo, geureohge haeyo",
+    "en": "Okay, let's do that"
   },
   {
     "ko": "잠깐 생각해 볼게요",
     "he": "אחשוב על זה רגע",
-    "roman": "jamkkan saenggakhae bolgeyo"
+    "roman": "jamkkan saenggakhae bolgeyo",
+    "en": "I'll think about it for a moment"
   },
   {
     "ko": "무슨 말인지 이해했어요",
     "he": "הבנתי למה אתה מתכוון",
-    "roman": "museun malinji ihaehaeteoyo"
+    "roman": "museun malinji ihaehaeteoyo",
+    "en": "I understand what you mean"
   },
   {
     "ko": "아직 잘 이해가 안 돼요",
     "he": "עדיין לא ממש הבנתי",
-    "roman": "ajik jal ihaega an dwaeyo"
+    "roman": "ajik jal ihaega an dwaeyo",
+    "en": "I still don't quite understand"
   },
   {
     "ko": "예를 들어 주세요",
     "he": "תן דוגמה בבקשה",
-    "roman": "yereul deuleo juseyo"
+    "roman": "yereul deuleo juseyo",
+    "en": "Please give me an example"
   },
   {
     "ko": "더 쉽게 설명해 주세요",
     "he": "תסביר יותר פשוט בבקשה",
-    "roman": "deo swipge seolmyeonghae juseyo"
+    "roman": "deo swipge seolmyeonghae juseyo",
+    "en": "Please explain it more simply"
   },
   {
     "ko": "그 부분만 바꿔 주세요",
     "he": "תשנה רק את החלק הזה",
-    "roman": "geu bubunman bakkwo juseyo"
+    "roman": "geu bubunman bakkwo juseyo",
+    "en": "Please change only that part"
   },
   {
     "ko": "전체를 바꾸지 마세요",
     "he": "אל תשנה את הכול",
-    "roman": "jeonchereul bakkuji maseyo"
+    "roman": "jeonchereul bakkuji maseyo",
+    "en": "Please don't change everything"
   },
   {
     "ko": "저장했어요",
     "he": "שמרתי",
-    "roman": "jeojanghaeteoyo"
+    "roman": "jeojanghaeteoyo",
+    "en": "I saved it"
   },
   {
     "ko": "다시 해 볼게요",
     "he": "אנסה שוב",
-    "roman": "dasi hae bolgeyo"
+    "roman": "dasi hae bolgeyo",
+    "en": "I'll try again"
   },
   {
     "ko": "잘 작동해요",
     "he": "זה עובד טוב",
-    "roman": "jal jakdonghaeyo"
+    "roman": "jal jakdonghaeyo",
+    "en": "It works well"
   },
   {
     "ko": "아직 안 돼요",
     "he": "זה עדיין לא עובד",
-    "roman": "ajik an dwaeyo"
+    "roman": "ajik an dwaeyo",
+    "en": "It still doesn't work"
   },
   {
     "ko": "오류가 나요",
     "he": "יש שגיאה",
-    "roman": "oryuga nayo"
+    "roman": "oryuga nayo",
+    "en": "There is an error"
   },
   {
     "ko": "화면이 이상해요",
     "he": "המסך נראה מוזר",
-    "roman": "hwamyeoni isanghaeyo"
+    "roman": "hwamyeoni isanghaeyo",
+    "en": "The screen looks strange"
   },
   {
     "ko": "버튼이 안 눌려요",
     "he": "הכפתור לא נלחץ",
-    "roman": "beoteuni an nulryeoyo"
+    "roman": "beoteuni an nulryeoyo",
+    "en": "The button doesn't work"
   },
   {
     "ko": "소리가 안 나요",
     "he": "אין קול",
-    "roman": "soriga an nayo"
+    "roman": "soriga an nayo",
+    "en": "There is no sound"
   },
   {
     "ko": "글씨가 안 보여요",
     "he": "הטקסט לא נראה",
-    "roman": "geulssiga an boyeoyo"
+    "roman": "geulssiga an boyeoyo",
+    "en": "The text is not visible"
   },
   {
     "ko": "이제 괜찮아요",
     "he": "עכשיו זה בסדר",
-    "roman": "ije gwaenchanhayo"
+    "roman": "ije gwaenchanhayo",
+    "en": "Now it's okay"
   },
   {
     "ko": "완전 좋아요",
     "he": "זה ממש טוב",
-    "roman": "wanjeon johayo"
+    "roman": "wanjeon johayo",
+    "en": "It's really good"
   },
   {
     "ko": "마음에 들어요",
     "he": "אני אוהב את זה",
-    "roman": "maeume deuleoyo"
+    "roman": "maeume deuleoyo",
+    "en": "I like it"
   },
   {
     "ko": "이대로 가요",
     "he": "נמשיך ככה",
-    "roman": "idaero gayo"
+    "roman": "idaero gayo",
+    "en": "Let's continue like this"
   },
   {
     "ko": "그건 정말 도움이 됐어요",
     "he": "זה באמת עזר",
-    "roman": "geugeon jeongmal doumi dwaeteoyo"
+    "roman": "geugeon jeongmal doumi dwaeteoyo",
+    "en": "That was really helpful"
   },
   {
     "ko": "다음에도 부탁드릴게요",
     "he": "אבקש גם בפעם הבאה",
-    "roman": "daeumedo butakdeurilgeyo"
+    "roman": "daeumedo butakdeurilgeyo",
+    "en": "Please help me again next time"
   }
 ]

@@ -2,501 +2,601 @@
   {
     "ko": "회의 시간 확인 부탁드립니다",
     "he": "נא לאשר את שעת הישיבה",
-    "roman": "hoeui sigan hwakin butakdeuripnida"
+    "roman": "hoeui sigan hwakin butakdeuripnida",
+    "en": "Please confirm the meeting time"
   },
   {
     "ko": "오늘 회의 가능하신가요?",
     "he": "האם אפשר לקיים פגישה היום?",
-    "roman": "oneul hoeui ganeunghasingayo?"
+    "roman": "oneul hoeui ganeunghasingayo?",
+    "en": "Are you available for a meeting today?"
   },
   {
     "ko": "일정을 다시 조정해야 합니다",
     "he": "צריך לתאם מחדש את הלו״ז",
-    "roman": "iljeongeul dasi jojeonghaeya hapnida"
+    "roman": "iljeongeul dasi jojeonghaeya hapnida",
+    "en": "We need to reschedule"
   },
   {
     "ko": "자료를 보내 드리겠습니다",
     "he": "אשלח את החומר",
-    "roman": "jaryoreul bonae deurigetseupnida"
+    "roman": "jaryoreul bonae deurigetseupnida",
+    "en": "I will send you the materials"
   },
   {
     "ko": "첨부 파일을 확인해 주세요",
     "he": "נא לבדוק את הקובץ המצורף",
-    "roman": "cheombu paileul hwakinhae juseyo"
+    "roman": "cheombu paileul hwakinhae juseyo",
+    "en": "Please check the attached file"
   },
   {
     "ko": "검토 후 답변드리겠습니다",
     "he": "אענה אחרי בדיקה",
-    "roman": "geomto hu dapbyeondeurigetseupnida"
+    "roman": "geomto hu dapbyeondeurigetseupnida",
+    "en": "I will reply after reviewing it"
   },
   {
     "ko": "가능한 시간 알려 주세요",
     "he": "נא לעדכן זמן אפשרי",
-    "roman": "ganeunghan sigan alryeo juseyo"
+    "roman": "ganeunghan sigan alryeo juseyo",
+    "en": "Please let me know your available time"
   },
   {
     "ko": "이번 주 안에 가능할까요?",
     "he": "האם זה אפשרי השבוע?",
-    "roman": "ibeon ju ane ganeunghalkkayo?"
+    "roman": "ibeon ju ane ganeunghalkkayo?",
+    "en": "Would it be possible within this week?"
   },
   {
     "ko": "마감일이 언제인가요?",
     "he": "מתי הדדליין?",
-    "roman": "magamili eonjeingayo?"
+    "roman": "magamili eonjeingayo?",
+    "en": "When is the deadline?"
   },
   {
     "ko": "진행 상황을 공유해 주세요",
     "he": "נא לשתף סטטוס התקדמות",
-    "roman": "jinhaeng sanghwangeul gongyuhae juseyo"
+    "roman": "jinhaeng sanghwangeul gongyuhae juseyo",
+    "en": "Please share the progress status"
   },
   {
     "ko": "현재 작업 중입니다",
     "he": "זה כרגע בטיפול",
-    "roman": "hyeonjae jakeop jungipnida"
+    "roman": "hyeonjae jakeop jungipnida",
+    "en": "It is currently in progress"
   },
   {
     "ko": "거의 완료되었습니다",
     "he": "זה כמעט הסתיים",
-    "roman": "geoui wanryodoeeotseupnida"
+    "roman": "geoui wanryodoeeotseupnida",
+    "en": "It is almost completed"
   },
   {
     "ko": "추가 확인이 필요합니다",
     "he": "נדרשת בדיקה נוספת",
-    "roman": "chuga hwakini pilyohapnida"
+    "roman": "chuga hwakini pilyohapnida",
+    "en": "Additional confirmation is needed"
   },
   {
     "ko": "수정본을 다시 보내 주세요",
     "he": "נא לשלוח גרסה מתוקנת",
-    "roman": "sujeongboneul dasi bonae juseyo"
+    "roman": "sujeongboneul dasi bonae juseyo",
+    "en": "Please send the revised version again"
   },
   {
     "ko": "최종본으로 진행하겠습니다",
     "he": "נתקדם עם הגרסה הסופית",
-    "roman": "choejongboneuro jinhaenghagetseupnida"
+    "roman": "choejongboneuro jinhaenghagetseupnida",
+    "en": "We will proceed with the final version"
   },
   {
     "ko": "가격 제안을 보내 주세요",
     "he": "נא לשלוח הצעת מחיר",
-    "roman": "gagyeok jeaneul bonae juseyo"
+    "roman": "gagyeok jeaneul bonae juseyo",
+    "en": "Please send a price proposal"
   },
   {
     "ko": "견적서를 확인했습니다",
     "he": "בדקתי את הצעת המחיר",
-    "roman": "gyeonjeokseoreul hwakinhaetseupnida"
+    "roman": "gyeonjeokseoreul hwakinhaetseupnida",
+    "en": "I checked the quotation"
   },
   {
     "ko": "조건을 다시 논의하고 싶습니다",
     "he": "אני רוצה לדון שוב בתנאים",
-    "roman": "jogeoneul dasi nonuihago sipseupnida"
+    "roman": "jogeoneul dasi nonuihago sipseupnida",
+    "en": "I would like to discuss the terms again"
   },
   {
     "ko": "계약서를 보내 주세요",
     "he": "נא לשלוח את החוזה",
-    "roman": "gyeyakseoreul bonae juseyo"
+    "roman": "gyeyakseoreul bonae juseyo",
+    "en": "Please send the contract"
   },
   {
     "ko": "서명 후 회신드리겠습니다",
     "he": "אחזיר אחרי חתימה",
-    "roman": "seomyeong hu hoesindeurigetseupnida"
+    "roman": "seomyeong hu hoesindeurigetseupnida",
+    "en": "I will reply after signing"
   },
   {
     "ko": "결제는 언제 진행되나요?",
     "he": "מתי מתבצע התשלום?",
-    "roman": "gyeoljeneun eonje jinhaengdoenayo?"
+    "roman": "gyeoljeneun eonje jinhaengdoenayo?",
+    "en": "When will the payment be processed?"
   },
   {
     "ko": "입금 확인 부탁드립니다",
     "he": "נא לאשר קבלת תשלום",
-    "roman": "ipgeum hwakin butakdeuripnida"
+    "roman": "ipgeum hwakin butakdeuripnida",
+    "en": "Please confirm receipt of the payment"
   },
   {
     "ko": "영수증 발행 부탁드립니다",
     "he": "נא להוציא קבלה",
-    "roman": "yeongsujeung balhaeng butakdeuripnida"
+    "roman": "yeongsujeung balhaeng butakdeuripnida",
+    "en": "Please issue a receipt"
   },
   {
     "ko": "세금계산서가 필요합니다",
     "he": "צריך חשבונית מס",
-    "roman": "segeumgyesanseoga pilyohapnida"
+    "roman": "segeumgyesanseoga pilyohapnida",
+    "en": "I need a tax invoice"
   },
   {
     "ko": "배송 일정 알려 주세요",
     "he": "נא לעדכן מועד משלוח",
-    "roman": "baesong iljeong alryeo juseyo"
+    "roman": "baesong iljeong alryeo juseyo",
+    "en": "Please let me know the delivery schedule"
   },
   {
     "ko": "재고가 있나요?",
     "he": "האם יש מלאי?",
-    "roman": "jaegoga itnayo?"
+    "roman": "jaegoga itnayo?",
+    "en": "Is it in stock?"
   },
   {
     "ko": "샘플을 받아볼 수 있을까요?",
     "he": "אפשר לקבל דוגמה?",
-    "roman": "saempeuleul batabol su iteulkkayo?"
+    "roman": "saempeuleul batabol su iteulkkayo?",
+    "en": "Can I receive a sample?"
   },
   {
     "ko": "품질 확인이 필요합니다",
     "he": "נדרשת בדיקת איכות",
-    "roman": "pumjil hwakini pilyohapnida"
+    "roman": "pumjil hwakini pilyohapnida",
+    "en": "Quality inspection is needed"
   },
   {
     "ko": "고객 요청이 변경되었습니다",
     "he": "בקשת הלקוח השתנתה",
-    "roman": "gogaek yocheongi byeongyeongdoeeotseupnida"
+    "roman": "gogaek yocheongi byeongyeongdoeeotseupnida",
+    "en": "The customer's request has changed"
   },
   {
     "ko": "우선순위를 바꿔야 합니다",
     "he": "צריך לשנות סדר עדיפויות",
-    "roman": "useonsunwireul bakkwoya hapnida"
+    "roman": "useonsunwireul bakkwoya hapnida",
+    "en": "We need to change the priority"
   },
   {
     "ko": "이 부분은 급합니다",
     "he": "החלק הזה דחוף",
-    "roman": "i bubuneun geuphapnida"
+    "roman": "i bubuneun geuphapnida",
+    "en": "This part is urgent"
   },
   {
     "ko": "오늘 안에 처리 가능할까요?",
     "he": "האם אפשר לטפל בזה היום?",
-    "roman": "oneul ane cheori ganeunghalkkayo?"
+    "roman": "oneul ane cheori ganeunghalkkayo?",
+    "en": "Can this be handled today?"
   },
   {
     "ko": "내일까지 부탁드립니다",
     "he": "בבקשה עד מחר",
-    "roman": "naeilkkaji butakdeuripnida"
+    "roman": "naeilkkaji butakdeuripnida",
+    "en": "Please complete it by tomorrow"
   },
   {
     "ko": "다음 주로 미뤄도 될까요?",
     "he": "אפשר לדחות לשבוע הבא?",
-    "roman": "daeum juro mirwodo doelkkayo?"
+    "roman": "daeum juro mirwodo doelkkayo?",
+    "en": "Can we postpone it to next week?"
   },
   {
     "ko": "담당자가 누구인가요?",
     "he": "מי האחראי?",
-    "roman": "damdangjaga nuguingayo?"
+    "roman": "damdangjaga nuguingayo?",
+    "en": "Who is the person in charge?"
   },
   {
     "ko": "담당자에게 전달해 주세요",
     "he": "נא להעביר לאחראי",
-    "roman": "damdangjaege jeondalhae juseyo"
+    "roman": "damdangjaege jeondalhae juseyo",
+    "en": "Please forward this to the person in charge"
   },
   {
     "ko": "제가 담당하겠습니다",
     "he": "אני אטפל בזה",
-    "roman": "jega damdanghagetseupnida"
+    "roman": "jega damdanghagetseupnida",
+    "en": "I will be in charge of this"
   },
   {
     "ko": "팀과 확인해 보겠습니다",
     "he": "אבדוק עם הצוות",
-    "roman": "timgwa hwakinhae bogetseupnida"
+    "roman": "timgwa hwakinhae bogetseupnida",
+    "en": "I will check with the team"
   },
   {
     "ko": "내부 검토 중입니다",
     "he": "זה בבדיקה פנימית",
-    "roman": "naebu geomto jungipnida"
+    "roman": "naebu geomto jungipnida",
+    "en": "It is under internal review"
   },
   {
     "ko": "승인이 필요합니다",
     "he": "נדרש אישור",
-    "roman": "seungini pilyohapnida"
+    "roman": "seungini pilyohapnida",
+    "en": "Approval is required"
   },
   {
     "ko": "승인되었습니다",
     "he": "זה אושר",
-    "roman": "seungindoeeotseupnida"
+    "roman": "seungindoeeotseupnida",
+    "en": "It has been approved"
   },
   {
     "ko": "아직 승인 전입니다",
     "he": "זה עדיין לא אושר",
-    "roman": "ajik seungin jeonipnida"
+    "roman": "ajik seungin jeonipnida",
+    "en": "It has not been approved yet"
   },
   {
     "ko": "문제가 발생했습니다",
     "he": "נוצרה בעיה",
-    "roman": "munjega balsaenghaetseupnida"
+    "roman": "munjega balsaenghaetseupnida",
+    "en": "A problem has occurred"
   },
   {
     "ko": "해결 방법을 찾고 있습니다",
     "he": "אנחנו מחפשים פתרון",
-    "roman": "haegyeol bangbeopeul chatgo itseupnida"
+    "roman": "haegyeol bangbeopeul chatgo itseupnida",
+    "en": "We are looking for a solution"
   },
   {
     "ko": "원인을 확인 중입니다",
     "he": "בודקים את הסיבה",
-    "roman": "wonineul hwakin jungipnida"
+    "roman": "wonineul hwakin jungipnida",
+    "en": "We are checking the cause"
   },
   {
     "ko": "다시 테스트하겠습니다",
     "he": "נבדוק שוב",
-    "roman": "dasi teseuteuhagetseupnida"
+    "roman": "dasi teseuteuhagetseupnida",
+    "en": "We will test it again"
   },
   {
     "ko": "업데이트가 필요합니다",
     "he": "צריך עדכון",
-    "roman": "eopdeiteuga pilyohapnida"
+    "roman": "eopdeiteuga pilyohapnida",
+    "en": "An update is needed"
   },
   {
     "ko": "새 버전을 공유하겠습니다",
     "he": "אשתף גרסה חדשה",
-    "roman": "sae beojeoneul gongyuhagetseupnida"
+    "roman": "sae beojeoneul gongyuhagetseupnida",
+    "en": "I will share the new version"
   },
   {
     "ko": "파일명이 잘못되었습니다",
     "he": "שם הקובץ שגוי",
-    "roman": "pailmyeongi jalmotdoeeotseupnida"
+    "roman": "pailmyeongi jalmotdoeeotseupnida",
+    "en": "The file name is incorrect"
   },
   {
     "ko": "링크가 열리지 않습니다",
     "he": "הקישור לא נפתח",
-    "roman": "ringkeuga yeolriji anhseupnida"
+    "roman": "ringkeuga yeolriji anhseupnida",
+    "en": "The link does not open"
   },
   {
     "ko": "접근 권한이 없습니다",
     "he": "אין הרשאת גישה",
-    "roman": "jeopgeun gwonhani eopsseupnida"
+    "roman": "jeopgeun gwonhani eopsseupnida",
+    "en": "I do not have access permission"
   },
   {
     "ko": "권한을 열어 주세요",
     "he": "נא לפתוח הרשאה",
-    "roman": "gwonhaneul yeoleo juseyo"
+    "roman": "gwonhaneul yeoleo juseyo",
+    "en": "Please open the permission"
   },
   {
     "ko": "회의 링크를 보내 주세요",
     "he": "נא לשלוח קישור לפגישה",
-    "roman": "hoeui ringkeureul bonae juseyo"
+    "roman": "hoeui ringkeureul bonae juseyo",
+    "en": "Please send the meeting link"
   },
   {
     "ko": "줌으로 진행할까요?",
     "he": "נקיים בזום?",
-    "roman": "jumeuro jinhaenghalkkayo?"
+    "roman": "jumeuro jinhaenghalkkayo?",
+    "en": "Shall we do it on Zoom?"
   },
   {
     "ko": "전화로 설명드리겠습니다",
     "he": "אסביר בטלפון",
-    "roman": "jeonhwaro seolmyeongdeurigetseupnida"
+    "roman": "jeonhwaro seolmyeongdeurigetseupnida",
+    "en": "I will explain by phone"
   },
   {
     "ko": "이메일로 정리해서 보내겠습니다",
     "he": "אסכם במייל",
-    "roman": "imeilro jeongrihaeseo bonaegetseupnida"
+    "roman": "imeilro jeongrihaeseo bonaegetseupnida",
+    "en": "I will summarize it by email"
   },
   {
     "ko": "짧게 요약해 주세요",
     "he": "נא לסכם בקצרה",
-    "roman": "jjalbge yoyakhae juseyo"
+    "roman": "jjalbge yoyakhae juseyo",
+    "en": "Please summarize it briefly"
   },
   {
     "ko": "상세 설명이 필요합니다",
     "he": "צריך הסבר מפורט",
-    "roman": "sangse seolmyeongi pilyohapnida"
+    "roman": "sangse seolmyeongi pilyohapnida",
+    "en": "A detailed explanation is needed"
   },
   {
     "ko": "목표를 다시 정리합시다",
     "he": "נסכם שוב את המטרה",
-    "roman": "mokpyoreul dasi jeongrihapsida"
+    "roman": "mokpyoreul dasi jeongrihapsida",
+    "en": "Let's summarize the goal again"
   },
   {
     "ko": "범위를 정해야 합니다",
     "he": "צריך להגדיר היקף",
-    "roman": "beomwireul jeonghaeya hapnida"
+    "roman": "beomwireul jeonghaeya hapnida",
+    "en": "We need to define the scope"
   },
   {
     "ko": "예산이 제한되어 있습니다",
     "he": "התקציב מוגבל",
-    "roman": "yesani jehandoeeo itseupnida"
+    "roman": "yesani jehandoeeo itseupnida",
+    "en": "The budget is limited"
   },
   {
     "ko": "비용이 예상보다 높습니다",
     "he": "העלות גבוהה מהצפוי",
-    "roman": "biyongi yesangboda nopseupnida"
+    "roman": "biyongi yesangboda nopseupnida",
+    "en": "The cost is higher than expected"
   },
   {
     "ko": "대안을 제안해 주세요",
     "he": "נא להציע חלופה",
-    "roman": "daeaneul jeanhae juseyo"
+    "roman": "daeaneul jeanhae juseyo",
+    "en": "Please suggest an alternative"
   },
   {
     "ko": "우선 작은 버전으로 시작합시다",
     "he": "נתחיל בגרסה קטנה",
-    "roman": "useon jakeun beojeoneuro sijakhapsida"
+    "roman": "useon jakeun beojeoneuro sijakhapsida",
+    "en": "Let's start with a smaller version first"
   },
   {
     "ko": "나중에 확장할 수 있습니다",
     "he": "אפשר להרחיב אחר כך",
-    "roman": "najunge hwakjanghal su itseupnida"
+    "roman": "najunge hwakjanghal su itseupnida",
+    "en": "We can expand it later"
   },
   {
     "ko": "고객 반응이 좋습니다",
     "he": "תגובת הלקוח טובה",
-    "roman": "gogaek baneungi johseupnida"
+    "roman": "gogaek baneungi johseupnida",
+    "en": "The customer's response is positive"
   },
   {
     "ko": "피드백을 반영하겠습니다",
     "he": "נטמיע את הפידבק",
-    "roman": "pideubaekeul banyeonghagetseupnida"
+    "roman": "pideubaekeul banyeonghagetseupnida",
+    "en": "I will reflect the feedback"
   },
   {
     "ko": "수정 요청이 있습니다",
     "he": "יש בקשת תיקון",
-    "roman": "sujeong yocheongi itseupnida"
+    "roman": "sujeong yocheongi itseupnida",
+    "en": "There is a revision request"
   },
   {
     "ko": "이 부분은 유지해 주세요",
     "he": "נא להשאיר את החלק הזה",
-    "roman": "i bubuneun yujihae juseyo"
+    "roman": "i bubuneun yujihae juseyo",
+    "en": "Please keep this part"
   },
   {
     "ko": "전체 구조는 유지해 주세요",
     "he": "נא לשמור על המבנה הכללי",
-    "roman": "jeonche gujoneun yujihae juseyo"
+    "roman": "jeonche gujoneun yujihae juseyo",
+    "en": "Please keep the overall structure"
   },
   {
     "ko": "필요한 부분만 바꿔 주세요",
     "he": "נא לשנות רק מה שצריך",
-    "roman": "pilyohan bubunman bakkwo juseyo"
+    "roman": "pilyohan bubunman bakkwo juseyo",
+    "en": "Please change only the necessary parts"
   },
   {
     "ko": "테스트 결과를 공유해 주세요",
     "he": "נא לשתף תוצאות בדיקה",
-    "roman": "teseuteu gyeolgwareul gongyuhae juseyo"
+    "roman": "teseuteu gyeolgwareul gongyuhae juseyo",
+    "en": "Please share the test results"
   },
   {
     "ko": "배포 전에 확인합시다",
     "he": "נבדוק לפני העלאה",
-    "roman": "baepo jeone hwakinhapsida"
+    "roman": "baepo jeone hwakinhapsida",
+    "en": "Let's check before deployment"
   },
   {
     "ko": "배포가 완료되었습니다",
     "he": "ההעלאה הסתיימה",
-    "roman": "baepoga wanryodoeeotseupnida"
+    "roman": "baepoga wanryodoeeotseupnida",
+    "en": "The deployment has been completed"
   },
   {
     "ko": "사이트가 정상 작동합니다",
     "he": "האתר עובד תקין",
-    "roman": "saiteuga jeongsang jakdonghapnida"
+    "roman": "saiteuga jeongsang jakdonghapnida",
+    "en": "The website is working properly"
   },
   {
     "ko": "사용자 경험이 중요합니다",
     "he": "חוויית משתמש חשובה",
-    "roman": "sayongja gyeongheomi jungyohapnida"
+    "roman": "sayongja gyeongheomi jungyohapnida",
+    "en": "User experience is important"
   },
   {
     "ko": "디자인을 조금 더 다듬읍시다",
     "he": "נלטש קצת את העיצוב",
-    "roman": "dijaineul jogeum deo dadeumeupsida"
+    "roman": "dijaineul jogeum deo dadeumeupsida",
+    "en": "Let's refine the design a little more"
   },
   {
     "ko": "모바일 화면도 확인해 주세요",
     "he": "נא לבדוק גם מובייל",
-    "roman": "mobail hwamyeondo hwakinhae juseyo"
+    "roman": "mobail hwamyeondo hwakinhae juseyo",
+    "en": "Please check the mobile screen as well"
   },
   {
     "ko": "속도가 조금 느립니다",
     "he": "המהירות קצת איטית",
-    "roman": "sokdoga jogeum neuripnida"
+    "roman": "sokdoga jogeum neuripnida",
+    "en": "The speed is a little slow"
   },
   {
     "ko": "성능 개선이 필요합니다",
     "he": "צריך שיפור ביצועים",
-    "roman": "seongneung gaeseoni pilyohapnida"
+    "roman": "seongneung gaeseoni pilyohapnida",
+    "en": "Performance improvement is needed"
   },
   {
     "ko": "보안 확인이 필요합니다",
     "he": "נדרשת בדיקת אבטחה",
-    "roman": "boan hwakini pilyohapnida"
+    "roman": "boan hwakini pilyohapnida",
+    "en": "A security check is needed"
   },
   {
     "ko": "개인정보를 조심해야 합니다",
     "he": "צריך להיזהר עם פרטיות",
-    "roman": "gaeinjeongboreul josimhaeya hapnida"
+    "roman": "gaeinjeongboreul josimhaeya hapnida",
+    "en": "We need to be careful with privacy"
   },
   {
     "ko": "일단 이 방향으로 가겠습니다",
     "he": "נתקדם בינתיים בכיוון הזה",
-    "roman": "ildan i banghyangeuro gagetseupnida"
+    "roman": "ildan i banghyangeuro gagetseupnida",
+    "en": "For now, we will proceed in this direction"
   },
   {
     "ko": "결정 전에 다시 상의합시다",
     "he": "נתייעץ שוב לפני החלטה",
-    "roman": "gyeoljeong jeone dasi sanguihapsida"
+    "roman": "gyeoljeong jeone dasi sanguihapsida",
+    "en": "Let's discuss again before making a decision"
   },
   {
     "ko": "좋은 제안 감사합니다",
     "he": "תודה על ההצעה הטובה",
-    "roman": "joheun jean gamsahapnida"
+    "roman": "joheun jean gamsahapnida",
+    "en": "Thank you for the good suggestion"
   },
   {
     "ko": "빠른 답변 감사합니다",
     "he": "תודה על המענה המהיר",
-    "roman": "ppareun dapbyeon gamsahapnida"
+    "roman": "ppareun dapbyeon gamsahapnida",
+    "en": "Thank you for the quick reply"
   },
   {
     "ko": "협조해 주셔서 감사합니다",
     "he": "תודה על שיתוף הפעולה",
-    "roman": "hyeopjohae jusyeoseo gamsahapnida"
+    "roman": "hyeopjohae jusyeoseo gamsahapnida",
+    "en": "Thank you for your cooperation"
   },
   {
     "ko": "이번 건은 보류하겠습니다",
     "he": "נשים את זה בהמתנה",
-    "roman": "ibeon geoneun boryuhagetseupnida"
+    "roman": "ibeon geoneun boryuhagetseupnida",
+    "en": "We will put this on hold"
   },
   {
     "ko": "우선순위를 낮추겠습니다",
     "he": "נוריד עדיפות",
-    "roman": "useonsunwireul natchugetseupnida"
+    "roman": "useonsunwireul natchugetseupnida",
+    "en": "We will lower the priority"
   },
   {
     "ko": "다음 단계로 넘어가겠습니다",
     "he": "נעבור לשלב הבא",
-    "roman": "daeum dangyero neomeogagetseupnida"
+    "roman": "daeum dangyero neomeogagetseupnida",
+    "en": "We will move on to the next step"
   },
   {
     "ko": "회의록을 보내 드리겠습니다",
     "he": "אשלח סיכום פגישה",
-    "roman": "hoeuirokeul bonae deurigetseupnida"
+    "roman": "hoeuirokeul bonae deurigetseupnida",
+    "en": "I will send the meeting notes"
   },
   {
     "ko": "결론만 말씀드리면",
     "he": "בשורה התחתונה",
-    "roman": "gyeolronman malsseumdeurimyeon"
+    "roman": "gyeolronman malsseumdeurimyeon",
+    "en": "The bottom line is"
   },
   {
     "ko": "제안서를 업데이트했습니다",
     "he": "עדכנתי את ההצעה",
-    "roman": "jeanseoreul eopdeiteuhaetseupnida"
+    "roman": "jeanseoreul eopdeiteuhaetseupnida",
+    "en": "I updated the proposal"
   },
   {
     "ko": "확인 후 연락드리겠습니다",
     "he": "אצור קשר אחרי בדיקה",
-    "roman": "hwakin hu yeonrakdeurigetseupnida"
+    "roman": "hwakin hu yeonrakdeurigetseupnida",
+    "en": "I will contact you after checking"
   },
   {
     "ko": "오늘은 여기까지 하겠습니다",
     "he": "נסיים כאן להיום",
-    "roman": "oneuleun yeogikkaji hagetseupnida"
+    "roman": "oneuleun yeogikkaji hagetseupnida",
+    "en": "Let's stop here for today"
   },
   {
     "ko": "좋습니다, 진행하겠습니다",
     "he": "מצוין, נתקדם",
-    "roman": "johseupnida, jinhaenghagetseupnida"
+    "roman": "johseupnida, jinhaenghagetseupnida",
+    "en": "Great, we will proceed"
   },
   {
     "ko": "일정표를 업데이트했습니다",
     "he": "עדכנתי את לוח הזמנים",
-    "roman": "iljeongpyoreul eopdeiteuhaetseupnida"
+    "roman": "iljeongpyoreul eopdeiteuhaetseupnida",
+    "en": "I updated the schedule"
   },
   {
     "ko": "담당 부서와 확인하겠습니다",
     "he": "אבדוק עם המחלקה האחראית",
-    "roman": "damdang buseowa hwakinhagetseupnida"
+    "roman": "damdang buseowa hwakinhagetseupnida",
+    "en": "I will check with the department in charge"
   },
   {
     "ko": "자료 형식을 맞춰 주세요",
     "he": "נא להתאים את פורמט החומר",
-    "roman": "jaryo hyeongsikeul matchwo juseyo"
+    "roman": "jaryo hyeongsikeul matchwo juseyo",
+    "en": "Please match the format of the materials"
   },
   {
     "ko": "결과를 간단히 공유하겠습니다",
     "he": "אשתף את התוצאה בקצרה",
-    "roman": "gyeolgwareul gandanhi gongyuhagetseupnida"
+    "roman": "gyeolgwareul gandanhi gongyuhagetseupnida",
+    "en": "I will briefly share the result"
   }
 ]
