@@ -380,3 +380,21 @@ button:hover {
     .verse-header { flex-direction: column; }
     .verse-number { min-width: auto; }
 }
+/* Hebrew font reset - Torah site only */
+body:not(.ai-korean-page) .hebrew,
+body:not(.ai-korean-page) .hebrew-text,
+body:not(.ai-korean-page) .verse-hebrew,
+body:not(.ai-korean-page) .torah-hebrew,
+body:not(.ai-korean-page) .verse-card .hebrew,
+body:not(.ai-korean-page) [lang="he"],
+body:not(.ai-korean-page) [dir="rtl"] {
+  font-family: "Frank Ruhl Libre", "Noto Serif Hebrew", "Times New Roman", serif !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  line-height: 1.9;
+  letter-spacing: 0;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  direction: rtl;
+  unicode-bidi: plaintext;
+}
