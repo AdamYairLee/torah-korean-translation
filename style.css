@@ -156,3 +156,227 @@ h1 {
     font-size: 0.9em;
     opacity: 0.8;             /* 약간 흐린 느낌으로 보조 텍스트 강조 */
 }
+
+/* ==== JewishKorean v2 UI upgrade ==== */
+:root {
+    --stone-bg: #efe2ca;
+    --stone-ink: #2f261b;
+    --glass-bg: rgba(255,255,255,0.58);
+    --glass-border: rgba(120,92,52,0.22);
+    --accent: #9b7a3d;
+    --accent-dark: #604820;
+    --shadow-soft: 0 14px 35px rgba(78,56,29,0.16);
+}
+body {
+    font-family: 'Noto Sans KR', 'NanumSquare', sans-serif;
+    color: var(--stone-ink);
+    background:
+        linear-gradient(135deg, rgba(255,250,238,.90), rgba(231,213,177,.82)),
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.72), transparent 32%),
+        radial-gradient(circle at 85% 20%, rgba(176,139,82,.18), transparent 35%),
+        linear-gradient(90deg, rgba(130,101,58,.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(130,101,58,.06) 1px, transparent 1px);
+    background-size: auto, auto, auto, 52px 52px, 52px 52px;
+    background-attachment: fixed;
+}
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.40), transparent 38%), rgba(255,255,255,.12);
+    backdrop-filter: blur(0.6px);
+    z-index: -1;
+}
+.header-top {
+    align-items: center !important;
+    padding-top: 12px !important;
+}
+#dark-mode-toggle {
+    height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+    border-radius: 999px !important;
+}
+.basd-text {
+    font-size: 15px !important;
+    line-height: 1 !important;
+    opacity: .88;
+}
+#shabbat-info { font-size: 10px !important; }
+h1 {
+    margin: 18px 0 8px;
+    font-size: clamp(28px, 6vw, 46px);
+    letter-spacing: -0.04em;
+    text-align: center;
+}
+.menu-wrapper, #torah-container, .search-guide, .footer-support, .korean-nav-btn {
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--shadow-soft) !important;
+}
+.menu-wrapper {
+    width: min(920px, calc(100% - 28px));
+    border-radius: 24px;
+    margin-top: 18px;
+    overflow: visible;
+}
+.main-nav { gap: 8px !important; padding: 14px !important; }
+button, #search-input {
+    border-radius: 999px !important;
+    border: 1px solid rgba(123,94,50,.22) !important;
+    background: rgba(255,255,255,.48) !important;
+    color: var(--stone-ink) !important;
+    box-shadow: 0 7px 18px rgba(69,46,15,.08) !important;
+}
+button:hover {
+    background: rgba(63,45,21,.88) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+}
+.menu-active, .chapter-btn.active {
+    background: linear-gradient(135deg, rgba(155,122,61,.95), rgba(96,72,32,.95)) !important;
+    color: #fff !important;
+    border-left: none !important;
+    box-shadow: 0 10px 25px rgba(96,72,32,.25) !important;
+}
+.sub-menu {
+    margin-left: 0 !important;
+    margin-top: 8px;
+    padding-left: 10px;
+    background: transparent !important;
+    border-left: 1px solid rgba(123,94,50,.20);
+    transition: max-height .35s ease, opacity .25s ease, transform .35s ease !important;
+    transform: translateY(-4px);
+}
+.sub-menu.active { transform: translateY(0); }
+#search-input {
+    min-width: 220px;
+    outline: none;
+}
+.search-btn { width: auto !important; }
+.search-guide, #torah-container, .footer-support {
+    border-radius: 22px;
+    width: min(840px, calc(100% - 28px));
+    box-sizing: border-box;
+}
+.search-guide {
+    margin-top: 16px;
+    padding: 14px 18px;
+    line-height: 1.55;
+    text-align: center;
+    color: rgba(47,38,27,.78);
+}
+#torah-container { padding: clamp(16px, 4vw, 28px) !important; }
+.reader-toolbar, .chapter-nav, .search-results-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 18px;
+}
+.reader-title {
+    text-align: center;
+    margin: 8px 0 18px;
+    font-size: 24px;
+    font-weight: 800;
+}
+.chapter-btn {
+    min-width: 44px;
+    height: 36px !important;
+    padding: 6px 12px !important;
+}
+.verse-item, .search-result-item, .toc-card {
+    background: rgba(255,255,255,.54);
+    border: 1px solid rgba(123,94,50,.18);
+    border-radius: 18px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 10px 26px rgba(77,55,24,.08);
+}
+.verse-header {
+    gap: 12px;
+    align-items: flex-start !important;
+}
+.verse-number {
+    flex: 0 0 auto;
+    min-width: 52px;
+    text-align: center;
+    background: rgba(155,122,61,.16);
+    color: var(--accent-dark) !important;
+    border-radius: 999px;
+    padding: 5px 8px;
+    font-size: 12px !important;
+    font-weight: 800;
+}
+.hebrew-text {
+    direction: rtl;
+    text-align: right;
+    flex: 1;
+    font-size: clamp(22px, 4.8vw, 32px) !important;
+    line-height: 1.65;
+}
+.korean-text {
+    margin-top: 12px;
+    line-height: 1.85;
+    font-size: 16px;
+}
+.rashi-container {
+    border-radius: 14px;
+    border-left: 4px solid var(--accent) !important;
+    background: rgba(245,238,222,.72) !important;
+    margin-top: 10px;
+    padding: 12px;
+}
+.rashi-title { color: var(--accent-dark) !important; }
+.korean-nav-btn {
+    margin: 10px 0 4px;
+    background: rgba(255,255,255,.42) !important;
+}
+.fade-in-text { margin-top: 42px !important; }
+.search-result-meta { font-size: 12px; color: #7a643f; font-weight: 800; margin-bottom: 6px; }
+.search-result-item { cursor: pointer; }
+.search-result-item:hover { transform: translateY(-2px); }
+.highlight { background: rgba(255,221,87,.75); border-radius: 4px; padding: 0 2px; }
+.toc-link {
+    display:block;
+    cursor:pointer;
+    color:#7a5b25;
+    margin-bottom:5px;
+    font-size:14px;
+    text-decoration:underline;
+}
+#post-area p { margin-top:20px; line-height:1.8; white-space: pre-line; }
+.dark-mode {
+    background: #11100e !important;
+    color: #eee7d8 !important;
+}
+.dark-mode .menu-wrapper, .dark-mode #torah-container, .dark-mode .search-guide, .dark-mode .footer-support, .dark-mode .korean-nav-btn,
+.dark-mode .verse-item, .dark-mode .search-result-item, .dark-mode .toc-card {
+    background: rgba(28,25,21,.70) !important;
+    border-color: rgba(238,221,190,.14) !important;
+    color: #eee7d8 !important;
+}
+.dark-mode button, .dark-mode #search-input {
+    background: rgba(44,40,34,.78) !important;
+    color: #eee7d8 !important;
+    border-color: rgba(238,221,190,.20) !important;
+}
+.dark-mode .menu-active, .dark-mode .chapter-btn.active {
+    background: linear-gradient(135deg, rgba(188,153,82,.95), rgba(126,94,42,.95)) !important;
+}
+.dark-mode .rashi-container { background: rgba(40,36,31,.86) !important; }
+.dark-mode .s-title, .dark-mode .s-body, .dark-mode .search-guide, .dark-mode .toc-link { color: #eee7d8 !important; }
+@media (max-width: 768px) {
+    .header-top { padding-left: 14px !important; padding-right: 14px !important; }
+    .main-nav { align-items: stretch !important; }
+    .menu-item, .search-container, #search-input { width: 100% !important; margin-left: 0 !important; }
+    button { width: 100%; }
+    .search-container { display:flex; gap:8px; }
+    .search-btn { width: 74px !important; flex: 0 0 74px; }
+    .verse-header { flex-direction: column; }
+    .verse-number { min-width: auto; }
+}

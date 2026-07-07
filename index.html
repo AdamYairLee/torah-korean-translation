@@ -6,13 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <title>유대교 문헌 한글 번역</title>
     <meta name="description" content="토라를 기반으로 하는 모든 유대교 문헌을 한국어로 번역하는 공간입니다.">
-    <a href="AI-Korean/index.html" class="korean-nav-btn">
-    한국어 수업 시작하기
-    <span class="hebrew-sub">להתחיל ללמוד קוריאנית</span>
-</a>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3131953656688982"
      crossorigin="anonymous"></script>
 </head>
@@ -30,6 +26,10 @@
 
     <a href="index.html" style="text-decoration: none; color: inherit;">
         <h1>유대교 문헌 한글 번역</h1>
+    </a>
+    <a href="AI-Korean/index.html" class="korean-nav-btn">
+        한국어 수업 시작하기
+        <span class="hebrew-sub">להתחיל ללמוד קוריאנית</span>
     </a>
 
     <div class="menu-wrapper">
@@ -77,6 +77,7 @@
 
             <div class="search-container">
                 <input type="text" id="search-input" placeholder="검색어 입력..." onkeydown="if(event.keyCode==13) performSearch()">
+                <button class="search-btn" onclick="performSearch()">검색</button>
             </div>
         </div>
     </div>
@@ -86,8 +87,8 @@
     </div>
 
     <div class="search-guide">
-        원하는 장이나 제목, 문구를 ctrl + f 버튼으로 찾아보세요.<br>
-        토라의 히브리어 본문을 누르면 라쉬 해설을 볼 수 있습니다.
+        검색창에서 토라 본문, 강의 제목, 키워드를 검색할 수 있습니다.<br>
+        토라 본문에서는 장 버튼으로 이동하고, 히브리어 본문을 누르면 라쉬 해설을 볼 수 있습니다.
     </div>
 
     <main id="torah-container">
