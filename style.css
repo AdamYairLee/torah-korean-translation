@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Hadassah+Friedlaender&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Hebrew:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
 
 /* 1. 기본 설정 */
@@ -46,7 +46,7 @@ button:hover { background: #333; color: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* 5. 콘텐츠 디자인 */
-.hebrew-text { font-family: 'Hadassah Friedlaender', serif; font-size: 1.5em; }
+.hebrew-text { font-family: 'Noto Serif Hebrew', serif; font-size: 1.5em; }
 .rashi-container { background: #f0f0f0; padding: 10px; border-left: 4px solid #0078d7; margin-top: 10px; }
 .rashi-title { font-size: 14px !important; color: #0078d7; font-weight: bold; }
 
@@ -94,9 +94,9 @@ h1 {
 
 /* 히브리어 본문과의 간격 및 굵기 제어 */
 .verse-header {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
+  display: block !important;
+  text-align: left !important;
+  margin-bottom: 8px;
 }
 /* 슈타인잘쯔 강의 제목 굵고 크게 복구 */
 .s-title {
@@ -302,15 +302,16 @@ button:hover {
     align-items: flex-start !important;
 }
 .verse-number {
-    flex: 0 0 auto;
-    min-width: 52px;
-    text-align: center;
-    background: rgba(155,122,61,.16);
-    color: var(--accent-dark) !important;
-    border-radius: 999px;
-    padding: 5px 8px;
-    font-size: 12px !important;
-    font-weight: 800;
+  display: inline-block;
+  background: none !important;
+  border: none !important;
+  color: #8b7b5e;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  padding: 0;
+  text-align: left;
+  direction: ltr;
 }
 .hebrew-text {
     direction: rtl;
