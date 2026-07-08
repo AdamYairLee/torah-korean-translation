@@ -4,6 +4,7 @@ const CONFIG_FALLBACK = {
   SITE_NAME: 'AI Korean Master',
   VERSION: '1.4.1 International Beta',
   WHATSAPP_URL: 'https://wa.me/972502188989?text=Hello!%20I%20am%20interested%20in%20your%20Korean%20learning%20platform.%20I%20would%20like%20to%20discuss%20a%20business%20partnership.',
+  EMAIL: 'contact@jewishkorean.com',
   OLIVE_YOUNG_URL: 'https://global.oliveyoung.com/if/rd?su=KL121NV3',
   TRAVEL_URL: '#'
 };
@@ -68,8 +69,9 @@ const UI = {
     explore: 'פתח',
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'לשיתופי פעולה, חסויות, תיירות, מוצרים קוריאניים או חינוך קוריאני.',
-    whatsapp: '💬 WhatsApp Business'
-  },
+    whatsapp: '💬 WhatsApp Business',
+    email: '📧 Email'
+    },
   en: {
     chooseLanguage: 'Choose language',
     mainCourse: 'Hangul Master Course',
@@ -116,7 +118,8 @@ const UI = {
     explore: 'Explore',
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'For partnerships, sponsorships, Korean travel, Korean products, or Korean education collaboration.',
-    whatsapp: '💬 WhatsApp Business'
+    whatsapp: '💬 WhatsApp Business',
+    email: '📧 Email'
   }
 };
 
@@ -226,6 +229,11 @@ function renderBusinessInquiry() {
     <p ${isHebrewMode() ? 'dir="rtl" class="hebrew"' : 'dir="ltr"'}>${t('businessInquiryText')}</p>
     <div class="business-contact-buttons">
       <button type="button" class="business-btn" onclick="outbound(SITE_CONFIG.WHATSAPP_URL, 'click_whatsapp_business')">${t('whatsapp')}</button>
+       <button type="button"
+        class="business-btn"
+        onclick="window.location.href='mailto:'+SITE_CONFIG.EMAIL+'?subject=Business%20Inquiry'">
+        ${t('email')}
+    </button>
     </div>
   </section>`;
 }

@@ -277,7 +277,7 @@ function showInfo(type) {
     const content = document.getElementById('info-content');
     const data = {
         about: `<h2>소개(About)</h2><p>'생명의 근원을 맞이하는 공간'</p><p>이 사이트는 토라 원문을 바탕으로 그 기본적인 의미를 우리말로 풀어내는 연구의 공간입니다.</p>`,
-        contact: `<h2>문의(Contact)</h2><p>유튜브: 유대교 TV<br><br>이메일: koreanjewish@email.com</p>`,
+        contact: `<h2>문의(Contact)</h2><p>유튜브: 유대교 TV<br><br>이메일: contact@jewishkorean.com</p>`,
         privacy: `<h2>개인정보(Privacy)</h2><p>본 사이트는 사용자에게 어떠한 개인정보도 수집하지 않습니다.</p>`
     };
     if (data[type]) {
