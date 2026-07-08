@@ -2,11 +2,11 @@ const app = document.getElementById('app');
 const CONFIG_FALLBACK = {
   KOFI_URL: 'https://ko-fi.com/YOUR_KOFI_ID',
   SITE_NAME: 'AI Korean Master',
-  VERSION: '1.4.1 International Beta',
+  VERSION: '1.5 Oral Torah & K-Drama Update',
   WHATSAPP_URL: 'https://wa.me/972502188989?text=Hello!%20I%20am%20interested%20in%20your%20Korean%20learning%20platform.%20I%20would%20like%20to%20discuss%20a%20business%20partnership.',
-  EMAIL: 'contact@jewishkorean.com',
-  OLIVE_YOUNG_URL: 'https://global.oliveyoung.com/if/rd?su=KL121NV3',
-  TRAVEL_URL: '#'
+  OLIVE_YOUNG_URL: 'https://global.oliveyoung.com/if/rd?su=MXJKYTY1',
+  TRAVEL_URL: '#',
+  EMAIL: 'contact@jewishkorean.com'
 };
 const SITE_CONFIG = (typeof CONFIG !== 'undefined') ? { ...CONFIG_FALLBACK, ...CONFIG } : CONFIG_FALLBACK;
 
@@ -21,6 +21,7 @@ let singleModeIndex = -1;
 let singleModeKind = '';
 let singleModeFlipped = false;
 let singleModeTitle = { he: '', en: '', ko: '' };
+let singleModeViewCount = 0;
 
 const UI = {
   he: {
@@ -29,6 +30,7 @@ const UI = {
     realConversation: 'קריאת שיחות אמיתיות',
     daily: 'ביטויים שימושיים ליום-יום',
     business: 'ביטויים חיוניים לעסקים',
+    kdrama: 'ביטויים מדרמות קוריאניות',
     todayLabel: '🇰🇷 Today\'s Korean',
     todayStart: 'התחל מהביטוי היומי',
     home: 'דף ראשי',
@@ -57,7 +59,7 @@ const UI = {
     wordDesc: 'קוראים ביטויים ככרטיסים אקראיים. נסו לקרוא לפני שמציגים את התרגום.',
     kofiKo: '이 프로젝트가 도움이 되셨다면, 다음 레슨과 새로운 콘텐츠 제작을 응원해 주세요.',
     kofi: 'אם הפרויקט עזר לכם, תוכלו לתמוך בפיתוח שיעורים ותכנים חדשים.',
-    beta: 'Beta Version 1.4.1 · פרויקט ללימוד קריאה בקוריאנית לדוברי עברית ואנגלית.',
+    beta: 'Beta Version 1.5 · פרויקט ללימוד קריאה בקוריאנית לדוברי עברית ואנגלית.',
     journeyTitle: '🇰🇷 Continue Your Korean Journey',
     journeySub: 'המשיכו לגלות את קוריאה מעבר ללימוד האותיות.',
     beautyTitle: '🧴 Korean Beauty',
@@ -70,14 +72,20 @@ const UI = {
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'לשיתופי פעולה, חסויות, תיירות, מוצרים קוריאניים או חינוך קוריאני.',
     whatsapp: '💬 WhatsApp Business',
-    email: '📧 Email'
-    },
+    email: '📧 Email',
+    kdramaDesc: 'קראו ביטויים נפוצים בסגנון דרמות קוריאניות, כרטיס אקראי אחד בכל פעם.',
+    kofiPopupTitle: 'נהנים מהלימוד?',
+    kofiPopupText: 'אם האתר עוזר לכם ללמוד לקרוא קוריאנית, אפשר לתמוך בהמשך הפיתוח וביצירת שיעורים חדשים.',
+    supportOnKofi: 'תמיכה ב-Ko-fi',
+    maybeLater: 'אולי אחר כך'
+  },
   en: {
     chooseLanguage: 'Choose language',
     mainCourse: 'Hangul Master Course',
     realConversation: 'Real Conversation Reading',
     daily: 'Daily Essential Expressions',
     business: 'Business Essential Expressions',
+    kdrama: 'K-Drama Expressions',
     todayLabel: '🇰🇷 Today\'s Korean',
     todayStart: 'Start with today\'s expression',
     home: 'Home',
@@ -106,7 +114,7 @@ const UI = {
     wordDesc: 'Read expressions one random card at a time. Try reading before showing the translation.',
     kofiKo: '이 프로젝트가 도움이 되셨다면, 다음 레슨과 새로운 콘텐츠 제작을 응원해 주세요.',
     kofi: 'If this project helped you, you can support the creation of new Korean lessons and content.',
-    beta: 'Beta Version 1.4.1 · Korean reading-first learning project for Hebrew and English speakers.',
+    beta: 'Beta Version 1.5 · Korean reading-first learning project for Hebrew and English speakers.',
     journeyTitle: '🇰🇷 Continue Your Korean Journey',
     journeySub: 'Discover more of Korea beyond learning Hangul.',
     beautyTitle: '🧴 Korean Beauty',
@@ -119,7 +127,12 @@ const UI = {
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'For partnerships, sponsorships, Korean travel, Korean products, or Korean education collaboration.',
     whatsapp: '💬 WhatsApp Business',
-    email: '📧 Email'
+    email: '📧 Email',
+    kdramaDesc: 'Read common K-drama-style expressions, one random card at a time.',
+    kofiPopupTitle: 'Enjoying the lesson?',
+    kofiPopupText: 'If this site helps you learn to read Korean, you can support the next lessons and new content.',
+    supportOnKofi: 'Support on Ko-fi',
+    maybeLater: 'Maybe later'
   }
 };
 
@@ -229,11 +242,7 @@ function renderBusinessInquiry() {
     <p ${isHebrewMode() ? 'dir="rtl" class="hebrew"' : 'dir="ltr"'}>${t('businessInquiryText')}</p>
     <div class="business-contact-buttons">
       <button type="button" class="business-btn" onclick="outbound(SITE_CONFIG.WHATSAPP_URL, 'click_whatsapp_business')">${t('whatsapp')}</button>
-       <button type="button"
-        class="business-btn"
-        onclick="window.location.href='mailto:'+SITE_CONFIG.EMAIL+'?subject=Business%20Inquiry'">
-        ${t('email')}
-    </button>
+      <button type="button" class="business-btn" onclick="window.location.href='mailto:'+SITE_CONFIG.EMAIL+'?subject=Business%20Inquiry'; trackEvent('click_email_business')">${t('email')}</button>
     </div>
   </section>`;
 }
@@ -250,6 +259,7 @@ function renderMain() {
       <button type="button" onclick="loadPhraseMode('pronunciation'); trackEvent('open_real_conversation')">${t('realConversation')}<span class="korean-sub">(실전 회화 읽기)</span></button>
       <button type="button" onclick="loadWordMode('daily'); trackEvent('open_daily')">${t('daily')}<span class="korean-sub">(일상 필수 표현)</span></button>
       <button type="button" onclick="loadWordMode('business'); trackEvent('open_business')">${t('business')}<span class="korean-sub">(비즈니스 필수 표현)</span></button>
+      <button type="button" onclick="loadWordMode('kdrama'); trackEvent('open_kdrama')">🎬 ${t('kdrama')}<span class="korean-sub">(한국 드라마 회화 표현)</span></button>
     </div>
     <a href="${SITE_CONFIG.KOFI_URL}" target="_blank" rel="noopener" class="kofi-banner" onclick="trackEvent('click_kofi_main')">
       <span class="kofi-heart">☕</span>
@@ -325,20 +335,63 @@ function renderTestCard() {
 function flipCurrentCard() { const item = currentTestData[currentTestIndex]; if (!item) return; currentTestFlipped = !currentTestFlipped; speak(item.speak || item.ko); renderTestCard(); }
 function nextTestCard() { currentTestIndex += 1; currentTestFlipped = false; renderTestCard(); }
 
+
+function shouldShowLearningSupportPrompt() {
+  return !localStorage.getItem('kofiLearningPromptShown') && singleModeViewCount >= 15;
+}
+
+function maybeShowLearningSupportPrompt() {
+  if (!shouldShowLearningSupportPrompt()) return;
+  localStorage.setItem('kofiLearningPromptShown', '1');
+  trackEvent('show_kofi_learning_prompt', { mode: singleModeKind });
+  const overlay = document.createElement('div');
+  overlay.className = 'support-modal-overlay';
+  overlay.innerHTML = `
+    <div class="support-modal">
+      <h2>${t('kofiPopupTitle')}</h2>
+      <p ${isHebrewMode() ? 'dir="rtl" class="hebrew"' : 'dir="ltr"'}>${t('kofiPopupText')}</p>
+      <div class="support-modal-actions">
+        <button type="button" class="primary-btn" onclick="outbound(SITE_CONFIG.KOFI_URL, 'click_kofi_learning_prompt'); this.closest('.support-modal-overlay').remove();">${t('supportOnKofi')}</button>
+        <button type="button" onclick="trackEvent('dismiss_kofi_learning_prompt'); this.closest('.support-modal-overlay').remove();">${t('maybeLater')}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function registerSingleModeCardView() {
+  singleModeViewCount += 1;
+  setTimeout(maybeShowLearningSupportPrompt, 150);
+}
+
 async function loadWordMode(kind) {
-  try { removeRandomButton(); const file = kind === 'business' ? 'business' : 'daily'; singleModeData = await loadJson(`data/${file}.json`); singleModeKind = kind; singleModeTitle = kind === 'business' ? { he: UI.he.business, en: UI.en.business, ko: '비즈니스 필수 표현' } : { he: UI.he.daily, en: UI.en.daily, ko: '일상 필수 표현' }; singleModeIndex = pickRandomIndex(singleModeData.length); singleModeFlipped = false; renderSingleModeCard(); }
+  try {
+    removeRandomButton();
+    let file = 'daily';
+    let title = { he: UI.he.daily, en: UI.en.daily, ko: '일상 필수 표현' };
+    if (kind === 'business') { file = 'business'; title = { he: UI.he.business, en: UI.en.business, ko: '비즈니스 필수 표현' }; }
+    if (kind === 'kdrama') { file = 'kdrama'; title = { he: UI.he.kdrama, en: UI.en.kdrama, ko: '한국 드라마 회화 표현' }; }
+    singleModeData = await loadJson(`data/${file}.json`);
+    singleModeKind = kind;
+    singleModeTitle = title;
+    singleModeViewCount = 0;
+    singleModeIndex = pickRandomIndex(singleModeData.length);
+    singleModeFlipped = false;
+    registerSingleModeCardView();
+    renderSingleModeCard();
+  }
   catch (err) { showError(err.message); }
 }
-async function loadPhraseMode() { try { removeRandomButton(); singleModeData = await loadJson('data/pronunciation.json'); singleModeKind = 'pronunciation'; singleModeTitle = { he: UI.he.realConversation, en: UI.en.realConversation, ko: '실전 회화 읽기' }; singleModeIndex = pickRandomIndex(singleModeData.length); singleModeFlipped = false; renderSingleModeCard(); } catch (err) { showError(err.message); } }
+async function loadPhraseMode() { try { removeRandomButton(); singleModeData = await loadJson('data/pronunciation.json'); singleModeKind = 'pronunciation'; singleModeTitle = { he: UI.he.realConversation, en: UI.en.realConversation, ko: '실전 회화 읽기' }; singleModeViewCount = 0; singleModeIndex = pickRandomIndex(singleModeData.length); singleModeFlipped = false; registerSingleModeCardView(); renderSingleModeCard(); } catch (err) { showError(err.message); } }
 
 function renderSingleModeCard() {
   const item = singleModeData[singleModeIndex]; if (!item) { showError(t('noData')); return; }
-  const isPhrase = singleModeKind === 'pronunciation'; const description = isPhrase ? t('phraseDesc') : t('wordDesc');
+  const isPhrase = singleModeKind === 'pronunciation'; const description = singleModeKind === 'kdrama' ? t('kdramaDesc') : (isPhrase ? t('phraseDesc') : t('wordDesc'));
   const translated = itemTranslation(item);
   app.className = 'fade-in';
   app.innerHTML = `${renderLangSwitch()}<div class="btn-row"><button class="nav-btn" onclick="renderMain()">${t('home')} <span class="korean-sub">(메인으로)</span></button></div><h2 class="section-title">${singleModeTitle[UI_LANG] || singleModeTitle.he} <span class="korean-sub">(${singleModeTitle.ko})</span></h2><p class="section-desc" ${isHebrewMode() ? 'dir="rtl"' : 'dir="ltr"'}>${description}</p><section class="single-card-shell"><div class="progress">${singleModeIndex + 1} / ${singleModeData.length}</div><article class="single-practice-card ${singleModeFlipped ? 'is-flipped' : ''}" onclick="flipSingleModeCard()"><div class="phrase-ko">${item.ko}</div>${singleModeFlipped ? `<div class="roman">${item.roman || ''}</div><div class="phrase-he" ${isHebrewMode() ? 'dir="rtl"' : 'dir="ltr"'}>${translated}</div>` : `<div class="hint-text">${t('readFirst')}</div>`}</article><div class="btn-row single-controls"><button class="primary-btn" onclick="flipSingleModeCard()">${t('showTranslation')} <span class="korean-sub">(정답/번역 보기)</span></button><button onclick="speak(singleModeData[singleModeIndex].speak || singleModeData[singleModeIndex].ko, ${isPhrase ? '0.78' : '0.82'}); trackEvent('listen_single_card', { mode: singleModeKind })">${t('listen')}</button><button onclick="nextSingleRandomCard()">${t('nextRandom')} <span class="korean-sub">(다음 랜덤 카드)</span></button></div></section>`;
 }
 function flipSingleModeCard() { singleModeFlipped = !singleModeFlipped; renderSingleModeCard(); }
-function nextSingleRandomCard() { singleModeIndex = pickRandomIndex(singleModeData.length, singleModeIndex); singleModeFlipped = false; renderSingleModeCard(); }
+function nextSingleRandomCard() { singleModeIndex = pickRandomIndex(singleModeData.length, singleModeIndex); singleModeFlipped = false; registerSingleModeCardView(); renderSingleModeCard(); }
 
 renderMain();

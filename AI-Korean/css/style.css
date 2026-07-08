@@ -645,3 +645,31 @@ button {
   .business-btn { width: 100%; }
   .lang-switch { border-radius: 18px; }
 }
+
+
+/* v1.5 support modal */
+.support-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0,0,0,.46);
+  backdrop-filter: blur(8px);
+}
+.support-modal {
+  width: min(92vw, 440px);
+  border-radius: 26px;
+  padding: 26px 22px;
+  text-align: center;
+  background: rgba(255,255,255,.95);
+  color: #2b1f14;
+  box-shadow: 0 22px 70px rgba(0,0,0,.26);
+  animation: supportModalIn .24s ease-out both;
+}
+@keyframes supportModalIn { from { opacity:0; transform: translateY(12px) scale(.98); } to { opacity:1; transform: translateY(0) scale(1); } }
+.support-modal p { line-height: 1.55; margin: 12px 0 18px; }
+.support-modal-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.support-modal-actions button { min-width: 130px; }

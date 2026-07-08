@@ -380,19 +380,76 @@ button:hover {
     .verse-header { flex-direction: column; }
     .verse-number { min-width: auto; }
 }
-/* Torah Hebrew font - stable nikud rendering */
-.hebrew,
-.hebrew-text,
-.verse-hebrew,
-.torah-hebrew,
-[lang="he"],
-[dir="rtl"] {
-  font-family: "Noto Serif Hebrew", "Times New Roman", serif !important;
-  font-weight: 500 !important;
-  font-style: normal !important;
-  line-height: 1.9;
-  letter-spacing: 0;
-  font-synthesis: none;
-  direction: rtl;
-  unicode-bidi: plaintext;
+
+
+/* v1.5 Mishna center menus */
+.mishna-overlay-box {
+    width: min(92%, 720px);
+    margin: 40px auto;
+    padding: 28px 24px;
+    border-radius: 26px;
+    background: rgba(255,255,255,.82);
+    border: 1px solid rgba(155,122,61,.22);
+    box-shadow: 0 18px 55px rgba(63,42,18,.18);
+    text-align: center;
+    position: relative;
 }
+.fade-in-center { animation: fadeInCenter .28s ease-out both; }
+@keyframes fadeInCenter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-close-mini {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 34px !important;
+    height: 34px;
+    border-radius: 50%;
+    padding: 0 !important;
+}
+.mishna-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+}
+.mishna-choice-btn {
+    min-height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 20px !important;
+    font-size: 18px !important;
+    font-weight: 800;
+}
+.mishna-choice-btn span {
+    display: block;
+    font-size: 13px;
+    opacity: .75;
+    font-weight: 600;
+}
+.torah-support-note {
+    margin: 42px auto 12px;
+    padding: 18px 16px;
+    max-width: 680px;
+    border-radius: 20px;
+    background: rgba(245,238,222,.72);
+    border: 1px solid rgba(155,122,61,.18);
+    text-align: center;
+    color: #6b542e;
+}
+.support-mini-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(155,122,61,.16);
+    color: #6b542e;
+    text-decoration: none;
+    font-weight: 800;
+}
+.dark-mode .mishna-overlay-box, .dark-mode .torah-support-note {
+    background: rgba(28,25,21,.86) !important;
+    color: #eee7d8 !important;
+}
+.dark-mode .support-mini-btn { color: #eee7d8 !important; }

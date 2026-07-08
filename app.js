@@ -12,7 +12,8 @@ const SEARCH_FILES = [
     { file: 'data/steinsaltz_vayikra.json', label: '슈타인잘쯔 바이크라' },
     { file: 'data/steinsaltz_bamidbar.json', label: '슈타인잘쯔 바미드바르' },
     { file: 'data/steinsaltz_devarim.json', label: '슈타인잘쯔 드바림' },
-    { file: 'data/noahide.json', label: '노아하이드 강의' }
+    { file: 'data/noahide.json', label: '노아하이드 강의' },
+    { file: 'data/mishna/berakhot.json', label: '미슈나 베락호트' }
 ];
 
 window.onload = function() {
@@ -76,6 +77,7 @@ function getTitleFromFilename(filename) {
     if (filename.includes('vayikra')) return '바이크라 / 레위기';
     if (filename.includes('bamidbar')) return '바미드바르 / 민수기';
     if (filename.includes('devarim')) return '드바림 / 신명기';
+    if (filename.includes('mishna/berakhot')) return '미슈나 베락호트';
     return '본문';
 }
 
@@ -128,6 +130,71 @@ function renderChapters(container, data) {
     container.appendChild(nav);
 }
 
+
+function appendTorahSupportNote(container) {
+    const note = document.createElement('div');
+    note.className = 'torah-support-note';
+    note.innerHTML = `
+        <p>이 번역 프로젝트가 도움이 되셨다면 Ko-fi를 통해 후원하실 수 있습니다.</p>
+        <a href="https://ko-fi.com/adamlee1986" target="_blank" rel="noopener" class="support-mini-btn">후원하기 / Support / לתמיכה</a>
+    `;
+    container.appendChild(note);
+}
+
+function showCenterChoice(title, items) {
+    hideWelcome();
+    document.querySelectorAll('.sub-menu').forEach(menu => menu.classList.remove('active'));
+    const container = document.getElementById('torah-container');
+    container.innerHTML = `
+        <div class="mishna-overlay-box fade-in-center">
+            <button class="modal-close-mini" onclick="showMainHome()">×</button>
+            <h2>${title}</h2>
+            <div class="mishna-choice-grid"></div>
+        </div>
+    `;
+    const grid = container.querySelector('.mishna-choice-grid');
+    items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'mishna-choice-btn';
+        btn.innerHTML = item.subtitle ? `${item.label}<span>${item.subtitle}</span>` : item.label;
+        btn.onclick = item.action;
+        grid.appendChild(btn);
+    });
+}
+
+function showOralTorahMenu() {
+    showCenterChoice('구전 토라', [
+        { label: '미슈나', subtitle: 'Mishna', action: showMishnaOrders }
+    ]);
+}
+
+function showMishnaOrders() {
+    showCenterChoice('미슈나 · 여섯 질서', [
+        { label: '제라임', subtitle: 'Zeraim', action: () => showMishnaTractates('zeraim') },
+        { label: '모에드', subtitle: 'Moed', action: () => showWorkingMishnaOrder('모에드') },
+        { label: '나쉼', subtitle: 'Nashim', action: () => showWorkingMishnaOrder('나쉼') },
+        { label: '네지킨', subtitle: 'Nezikin', action: () => showWorkingMishnaOrder('네지킨') },
+        { label: '코다쉼', subtitle: 'Kodashim', action: () => showWorkingMishnaOrder('코다쉼') },
+        { label: '타하로트', subtitle: 'Taharot', action: () => showWorkingMishnaOrder('타하로트') }
+    ]);
+}
+
+function showMishnaTractates(order) {
+    if (order === 'zeraim') {
+        showCenterChoice('미슈나 · 제라임', [
+            { label: '베락호트', subtitle: 'Berakhot', action: () => loadContent('data/mishna/berakhot.json', null) }
+        ]);
+        return;
+    }
+    showWorkingMishnaOrder(order);
+}
+
+function showWorkingMishnaOrder(name) {
+    showCenterChoice(`미슈나 · ${name}`, [
+        { label: '현재 번역 준비 중입니다', subtitle: '새 문헌이 준비되면 이곳에 추가됩니다.', action: () => {} }
+    ]);
+}
+
 function renderContent(scrollKey = null) {
     if (!currentData) return;
     const container = document.getElementById('torah-container');
@@ -167,6 +234,7 @@ function renderContent(scrollKey = null) {
         }
         container.appendChild(div);
     });
+    appendTorahSupportNote(container);
     if (scrollKey) {
         const target = document.getElementById(`verse-${scrollKey}`);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });

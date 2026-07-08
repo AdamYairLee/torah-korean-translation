@@ -1,0 +1,19 @@
+AI-Korean / JewishKorean v1.5 Update
+
+반영 내용:
+1. 한글앱: K-Drama Expressions 메뉴 및 100개 표현 추가
+2. 한글앱: Business Inquiry에 Email(contact@jewishkorean.com) 버튼 추가
+3. 한글앱: 한 메뉴에서 15개 카드를 본 뒤 Ko-fi 후원 팝업 1회 표시
+4. 토라웹: 구전 토라 → 미슈나 → 6개 질서 → 제라임 → 베락호트 구조 추가
+5. 토라웹: Mishna Brachot 전체 한국어 번역 데이터 추가
+6. 토라웹: 본문 하단 조용한 Ko-fi 후원 안내 추가
+7. Olive Young, Ko-fi, WhatsApp, Email 설정 유지/정리
+
+적용 방법:
+- 기존 사이트 폴더 전체를 백업합니다.
+- 이 ZIP의 내용을 기존 프로젝트 루트에 전체 덮어쓰기 합니다.
+- VS Code Live Server로 확인합니다.
+- Git 변경 사항을 커밋/푸시합니다.
+
+추천 커밋 메시지:
+Add v1.5 Oral Torah Mishna Berakhot and K-Drama expressions
