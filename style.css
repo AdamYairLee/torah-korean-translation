@@ -549,3 +549,25 @@ button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(0,0,0,0.25);
 }
+.mishna-nav {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 10px 0 28px;
+}
+
+.mishna-nav button {
+  border: 1px solid rgba(90, 65, 35, 0.18);
+  background: rgba(255, 250, 240, 0.85);
+  color: #3a2a1d;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.mishna-nav button:hover {
+  transform: translateY(-2px);
+}

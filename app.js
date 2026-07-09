@@ -183,7 +183,7 @@ function showMishnaTractates(order) {
     if (order === 'zeraim') {
         showCenterChoice('미슈나 · 제라임', [
             { label: '베락호트', subtitle: 'Berakhot', action: () => loadContent('data/mishna/berakhot.json', null) },
-            { label: '페아', subtitle: 'Peah', action: () => loadContent('data/mishna/mishnah_peah_ko.json') }
+            { label: '페아', subtitle: 'Peah', action: () => loadContent('data/mishna/peah.json') },
         ]);
         return;
     }
@@ -200,6 +200,16 @@ function renderContent(scrollKey = null) {
     if (!currentData) return;
     const container = document.getElementById('torah-container');
     container.innerHTML = '';
+    const nav = document.createElement('div');
+nav.className = 'mishna-nav';
+
+nav.innerHTML = `
+  <button onclick="showMishnaTractates('zeraim')">← 제라임으로</button>
+  <button onclick="showMishnaOrders()">미슈나 목차</button>
+  <button onclick="showHome()">홈</button>
+`;
+
+container.appendChild(nav);
     renderToolbar(container, getTitleFromFilename(currentFilename));
     renderChapters(container, currentData);
     (currentData.content || []).forEach(item => {
@@ -257,9 +267,15 @@ function loadContent(filename, element, options = {}) {
             return response.json();
         })
         .then(data => {
-            currentData = data;
-            renderContent(options.scrollKey || null);
-        })
+    currentData = data;
+
+    if (currentData.chapters && currentData.chapters[0]?.mishnayot) {
+        renderMishnahContent(currentData);
+        return;
+    }
+
+    renderContent(options.scrollKey || null);
+})
         .catch(() => showWorkingMessage());
 }
 
@@ -388,4 +404,32 @@ function loadBlog(filename, index = 0) {
             postArea.innerHTML = `<h2>${initialItem.title}</h2><small>${initialItem.date}</small><p>${initialItem.body}</p>`;
             container.appendChild(postArea);
         });
+}
+function renderMishnahContent(book) {
+    const container = document.getElementById('torah-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const title = document.createElement('h1');
+    title.textContent = book.titleKo || book.title || '미슈나';
+    container.appendChild(title);
+
+    book.chapters.forEach(chapter => {
+        const chapterTitle = document.createElement('h2');
+        chapterTitle.textContent = chapter.titleKo || `제 ${chapter.chapter}장`;
+        container.appendChild(chapterTitle);
+
+        chapter.mishnayot.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'content-card';
+
+            div.innerHTML = `
+                <h3>${m.ref || ''} ${m.title || ''}</h3>
+                <p>${m.body || ''}</p>
+            `;
+
+            container.appendChild(div);
+        });
+    });
 }
