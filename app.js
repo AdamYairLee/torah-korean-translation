@@ -182,7 +182,8 @@ function showMishnaOrders() {
 function showMishnaTractates(order) {
     if (order === 'zeraim') {
         showCenterChoice('미슈나 · 제라임', [
-            { label: '베락호트', subtitle: 'Berakhot', action: () => loadContent('data/mishna/berakhot.json', null) }
+            { label: '베락호트', subtitle: 'Berakhot', action: () => loadContent('data/mishna/berakhot.json', null) },
+            { label: '페아', subtitle: 'Peah', action: () => loadContent('data/mishna/mishnah_peah_ko.json') }
         ]);
         return;
     }
