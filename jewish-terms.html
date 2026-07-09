@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>유대교 용어 검색어 | Jewish Korean</title>
+  <meta name="description" content="한국에서 자주 쓰이는 유대교 명칭과 이 사이트에서 사용하는 명칭을 연결해 보여주는 유대교 용어 검색 메뉴입니다.">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="terms-page">
+
+    <h1>유대교 용어 검색어</h1>
+
+    <p class="terms-guide">
+      이 메뉴는 '한국에서 자주 쓰이는 명칭'으로 이 사이트에서 사용하는 유대교 용어를 쉽게 찾을 수 있도록 도와줍니다.
+    </p>
+
+    <input
+      type="text"
+      id="termSearch"
+      class="term-search"
+      placeholder="예: 미쉬나, 안식일, 창세기, 하나님"
+    >
+
+    <div id="termList" class="term-list"></div>
+
+  </main>
+
+  <script>
+    const terms = [
+      { koreanName: "미쉬나", siteName: "미슈나" },
+      { koreanName: "게마라", siteName: "그마라" },
+      { koreanName: "미드라시", siteName: "미드라쉬" },
+      { koreanName: "미츠바", siteName: "미쯔바" },
+      { koreanName: "할라카", siteName: "할락하" },
+      { koreanName: "타낙/타나크", siteName: "타낙흐" },
+      { koreanName: "하와/이브", siteName: "하바" },
+      { koreanName: "한나", siteName: "하나" },
+      { koreanName: "이삭/이사악", siteName: "이쯔학크" },
+      { koreanName: "야곱/야고보", siteName: "야아코브" },
+      { koreanName: "노아", siteName: "노악흐" },
+      { koreanName: "아론", siteName: "아하론" },
+      { koreanName: "모세", siteName: "모셰" },
+      { koreanName: "이스라엘", siteName: "이쓰라엘" },
+      { koreanName: "안식일/샤밧", siteName: "샤바트" },
+      { koreanName: "창세기", siteName: "베레쉬트" },
+      { koreanName: "출애굽기/탈출기", siteName: "슈모트" },
+      { koreanName: "레위기", siteName: "바이크라" },
+      { koreanName: "민수기", siteName: "바미드바르" },
+      { koreanName: "신명기", siteName: "드바림" },
+      { koreanName: "하나님", siteName: "엘로킴" },
+      { koreanName: "랍비", siteName: "라브" },
+      { koreanName: "라시", siteName: "라쉬" }
+    ];
+
+    const termList = document.getElementById("termList");
+    const termSearch = document.getElementById("termSearch");
+
+    function normalize(text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .replace(/\s+/g, "");
+    }
+
+    function renderTerms(searchValue = "") {
+      const keyword = normalize(searchValue);
+
+      const koreanSorter = new Intl.Collator("ko-KR", {
+  sensitivity: "base",
+  numeric: true
+});
+
+const sortedTerms = [...terms].sort((a, b) =>
+  koreanSorter.compare(a.koreanName, b.koreanName)
+);
+
+      const filteredTerms = sortedTerms.filter(item => {
+        const combinedText = `${item.koreanName} ${item.siteName}`;
+        return normalize(combinedText).includes(keyword);
+      });
+
+      termList.innerHTML = "";
+
+      if (filteredTerms.length === 0) {
+        termList.innerHTML = `<p class="no-result">검색 결과가 없습니다.</p>`;
+        return;
+      }
+
+      filteredTerms.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "term-row";
+
+        row.innerHTML = `
+          <div class="term-korean">${item.koreanName}</div>
+          <div class="term-arrow">→</div>
+          <div class="term-site">${item.siteName}</div>
+        `;
+
+        termList.appendChild(row);
+      });
+    }
+
+    termSearch.addEventListener("input", function () {
+      renderTerms(this.value);
+    });
+
+    renderTerms();
+  </script>
+
+</body>
+</html>
