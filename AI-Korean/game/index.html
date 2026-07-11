@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#050505">
+
+  <title>Korean Letter Game</title>
+
+  <!--
+    중요:
+    현재 한글앱 index.html의 폰트 <link> 태그가 있다면
+    아래 game.css보다 위에 그대로 복사해 넣으세요.
+  -->
+
+  <link rel="stylesheet" href="./game.css">
+</head>
+
+<body>
+  <main class="game-app">
+
+    <header class="game-header">
+      <button id="homeButton" class="icon-button" type="button" aria-label="Back">
+        ←
+      </button>
+
+      <div class="daily-status">
+        <span id="dailyProgressLabel"></span>
+        <strong id="dailyProgress">0 / 5</strong>
+      </div>
+
+      <div class="timer-box" aria-live="polite">
+        <span aria-hidden="true">◷</span>
+        <strong id="timer">01:00</strong>
+      </div>
+    </header>
+
+    <section id="startScreen" class="screen active">
+      <div class="panel">
+        <p class="eyebrow">AI Korean Master</p>
+        <h1 id="gameTitle"></h1>
+        <p id="gameDescription" class="description"></p>
+
+        <fieldset class="difficulty-box">
+          <legend id="difficultyTitle"></legend>
+
+          <label class="difficulty-option">
+            <input type="radio" name="difficulty" value="easy" checked>
+            <span>
+              <strong id="easyTitle"></strong>
+              <small id="easyDescription"></small>
+            </span>
+          </label>
+
+          <label class="difficulty-option">
+            <input type="radio" name="difficulty" value="hard">
+            <span>
+              <strong id="hardTitle"></strong>
+              <small id="hardDescription"></small>
+            </span>
+          </label>
+        </fieldset>
+
+        <button id="startButton" class="primary-button" type="button"></button>
+      </div>
+    </section>
+
+    <section id="playScreen" class="screen">
+      <div class="play-heading">
+        <p id="instructionText" class="instruction"></p>
+
+        <button id="listenButton" class="listen-button" type="button">
+          <span aria-hidden="true">🔊</span>
+          <span id="listenText"></span>
+        </button>
+
+        <h2 id="targetWord" class="target-word"></h2>
+
+        <div class="mistake-status">
+          <span id="mistakeLabel"></span>
+          <strong id="mistakeCount">0 / 3</strong>
+        </div>
+      </div>
+
+      <div id="selectedLetters" class="selected-letters" aria-live="polite"></div>
+
+      <div
+        id="letterGrid"
+        class="letter-grid"
+        role="grid"
+        aria-label="Korean letter grid"
+      ></div>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="panel result-panel">
+        <h2 id="resultTitle"></h2>
+        <div id="resultWord" class="result-word"></div>
+        <div id="resultMeaning" class="result-meaning"></div>
+
+        <div id="successActions" class="button-row">
+          <button id="nextButton" class="primary-button" type="button"></button>
+        </div>
+
+        <div id="failureActions" class="button-row">
+          <button id="retryButton" class="primary-button" type="button"></button>
+          <button id="skipButton" class="secondary-button" type="button"></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="completeScreen" class="screen">
+      <div class="panel">
+        <h2 id="completeTitle"></h2>
+        <p id="completeMessage" class="description"></p>
+
+        <h3 id="learnedWordsTitle"></h3>
+        <div id="learnedWords" class="learned-words"></div>
+
+        <button id="completeHomeButton" class="primary-button" type="button"></button>
+      </div>
+    </section>
+
+    <section id="lockedScreen" class="screen">
+      <div class="panel">
+        <h2 id="lockedTitle"></h2>
+        <p id="lockedMessage" class="description"></p>
+        <button id="lockedHomeButton" class="primary-button" type="button"></button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="./game-i18n.js"></script>
+  <script src="./game-data.js"></script>
+  <script src="./game.js"></script>
+</body>
+</html>

@@ -66,8 +66,8 @@ const UI = {
     beautyText: 'גלו מוצרי K-Beauty דרך OLIVE YOUNG Global.',
     travelTitle: '✈ Visit Korea',
     travelText: 'מקום עתידי לשיתופי פעולה עם טיולים וחוויות בקוריאה.',
-    supportTitle: '❤️ Support This Project',
-    supportText: 'עזרו לנו ליצור עוד שיעורי קוריאנית חינמיים.',
+    supportTitle: '🎮 משחק הרכבת מילים בקוריאנית',
+    supportText: 'האזינו למילה בקוריאנית והרכיבו אותה מאותיות האנגול.',
     explore: 'פתח',
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'לשיתופי פעולה, חסויות, תיירות, מוצרים קוריאניים או חינוך קוריאני.',
@@ -121,8 +121,8 @@ const UI = {
     beautyText: 'Explore K-Beauty products through OLIVE YOUNG Global.',
     travelTitle: '✈ Visit Korea',
     travelText: 'A future space for travel partners, tours, and Korea experiences.',
-    supportTitle: '❤️ Support This Project',
-    supportText: 'Help create more free Korean lessons.',
+    supportTitle: '🎮 Korean Letter Game',
+    supportText: 'Listen to a Korean word and build it with Hangul letters.',
     explore: 'Explore',
     businessInquiryTitle: '🤝 Business Inquiry',
     businessInquiryText: 'For partnerships, sponsorships, Korean travel, Korean products, or Korean education collaboration.',
@@ -395,3 +395,361 @@ function flipSingleModeCard() { singleModeFlipped = !singleModeFlipped; renderSi
 function nextSingleRandomCard() { singleModeIndex = pickRandomIndex(singleModeData.length, singleModeIndex); singleModeFlipped = false; registerSingleModeCardView(); renderSingleModeCard(); }
 
 renderMain();
+
+
+/* ==================================================
+   Continue Your Korean Journey:
+   두 번째 Ko-fi 버튼을 한글 게임 버튼으로 교체
+================================================== */
+
+(function setupKoreanGameEntry() {
+  const GAME_URL = "./game/index.html";
+
+  function getMainAppLanguage() {
+    const possibleKeys = [
+      "language",
+      "selectedLanguage",
+      "appLanguage",
+      "currentLang",
+      "aiKoreanLanguage"
+    ];
+
+    for (const key of possibleKeys) {
+      const savedValue = localStorage.getItem(key);
+
+      if (savedValue === "en") {
+        return "en";
+      }
+
+      if (savedValue === "he") {
+        return "he";
+      }
+    }
+
+    const htmlLanguage =
+      document.documentElement.lang?.toLowerCase();
+
+    if (htmlLanguage?.startsWith("en")) {
+      return "en";
+    }
+
+    return "he";
+  }
+
+  function getGameButtonText() {
+    return getMainAppLanguage() === "en"
+      ? "Korean Letter Game"
+      : "משחק אותיות בקוריאנית";
+  }
+
+  function convertSecondKofiButton() {
+    /*
+      현재 화면에 생성된 모든 Ko-fi 링크를 찾습니다.
+      위쪽 후원 링크가 첫 번째,
+      Continue Your Korean Journey 안의 중복 링크가 두 번째입니다.
+    */
+    const kofiLinks = Array.from(
+      document.querySelectorAll(
+        'a[href*="ko-fi.com"], a[href*="ko-fi"]'
+      )
+    );
+
+    if (kofiLinks.length < 2) {
+      return false;
+    }
+
+    /*
+      마지막 Ko-fi 링크를 사용합니다.
+      두 개가 있다면 두 번째 링크가 선택됩니다.
+    */
+    const duplicateKofiButton =
+      kofiLinks[kofiLinks.length - 1];
+
+    if (
+      duplicateKofiButton.dataset.gameConverted === "true"
+    ) {
+      updateGameButtonLanguage(duplicateKofiButton);
+      return true;
+    }
+
+    duplicateKofiButton.href = GAME_URL;
+    duplicateKofiButton.removeAttribute("target");
+    duplicateKofiButton.removeAttribute("rel");
+
+    duplicateKofiButton.id = "koreanGameEntryButton";
+
+    duplicateKofiButton.classList.add(
+      "korean-game-entry-button"
+    );
+
+    duplicateKofiButton.dataset.gameConverted = "true";
+
+    duplicateKofiButton.innerHTML = `
+      <span
+        class="korean-game-entry-icon"
+        aria-hidden="true"
+      >
+        🎮
+      </span>
+
+      <span class="korean-game-entry-label">
+        ${getGameButtonText()}
+      </span>
+    `;
+
+    duplicateKofiButton.setAttribute(
+      "aria-label",
+      getGameButtonText()
+    );
+
+    return true;
+  }
+
+  function updateGameButtonLanguage(button) {
+    const gameButton =
+      button ||
+      document.getElementById("koreanGameEntryButton");
+
+    if (!gameButton) {
+      return;
+    }
+
+    const label = gameButton.querySelector(
+      ".korean-game-entry-label"
+    );
+
+    const translatedText = getGameButtonText();
+
+    if (label) {
+      label.textContent = translatedText;
+    }
+
+    gameButton.setAttribute(
+      "aria-label",
+      translatedText
+    );
+  }
+
+  /*
+    앱이 시작된 뒤 카드와 Ko-fi 링크가 생성될 수 있기 때문에
+    화면 변경을 계속 감시합니다.
+  */
+  const observer = new MutationObserver(() => {
+    convertSecondKofiButton();
+  });
+
+  function startGameButtonSetup() {
+    convertSecondKofiButton();
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    /*
+      기존 히브리어/영어 버튼을 눌렀을 때
+      게임 버튼 문구도 함께 다시 확인합니다.
+    */
+    document.addEventListener("click", () => {
+      window.setTimeout(() => {
+        updateGameButtonLanguage();
+      }, 100);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      startGameButtonSetup
+    );
+  } else {
+    startGameButtonSetup();
+  }
+})();
+
+/* =====================================================
+   Continue Your Korean Journey의 Support 카드를
+   Korean Letter Game 카드로 변경
+===================================================== */
+
+(function connectKoreanLetterGameCard() {
+  const GAME_URL = "./game/index.html";
+
+  const GAME_TITLES = [
+    "Korean Letter Game",
+    "משחק הרכבת מילים בקוריאנית"
+  ];
+
+  function normalizeText(value) {
+    return String(value || "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isGameTitleElement(element) {
+    const text = normalizeText(element.textContent);
+
+    return GAME_TITLES.some((title) => text.includes(title));
+  }
+
+  function findGameTitle() {
+    const possibleTitles = document.querySelectorAll(
+      "h1, h2, h3, h4, h5, strong, .title, .card-title"
+    );
+
+    return Array.from(possibleTitles).find(isGameTitleElement) || null;
+  }
+
+  function findGameCard(titleElement) {
+    if (!titleElement) {
+      return null;
+    }
+
+    /*
+      카드에 자주 사용되는 태그와 클래스부터 찾습니다.
+      정확한 클래스 이름을 몰라도 작동하도록 여러 형태를 검사합니다.
+    */
+    return (
+      titleElement.closest(
+        "a, article, li, .journey-card, .affiliate-card, .resource-card, .card"
+      ) ||
+      titleElement.parentElement?.parentElement ||
+      titleElement.parentElement
+    );
+  }
+
+  function getCurrentGameLanguage() {
+    const htmlLanguage =
+      document.documentElement.lang?.toLowerCase() || "";
+
+    if (htmlLanguage.startsWith("en")) {
+      return "en";
+    }
+
+    const storedKeys = [
+      "language",
+      "selectedLanguage",
+      "appLanguage",
+      "currentLang",
+      "aiKoreanLanguage"
+    ];
+
+    for (const key of storedKeys) {
+      const value = localStorage.getItem(key);
+
+      if (value === "en") {
+        return "en";
+      }
+
+      if (value === "he") {
+        return "he";
+      }
+    }
+
+    return "he";
+  }
+
+  function getPlayText() {
+    return getCurrentGameLanguage() === "en"
+      ? "Play"
+      : "שחקו";
+  }
+
+  function updateGameCard() {
+    const titleElement = findGameTitle();
+
+    if (!titleElement) {
+      return false;
+    }
+
+    const card = findGameCard(titleElement);
+
+    if (!card) {
+      return false;
+    }
+
+    /*
+      카드 안의 기존 Ko-fi 링크를 찾습니다.
+    */
+    let gameLink = card.matches("a")
+      ? card
+      : card.querySelector(
+          'a[href*="ko-fi"], a[href*="kofi"], a'
+        );
+
+    /*
+      카드 안에 링크가 없을 경우 카드 자체를 클릭 가능하게 만듭니다.
+    */
+    if (!gameLink) {
+      card.setAttribute("role", "link");
+      card.setAttribute("tabindex", "0");
+      card.style.cursor = "pointer";
+
+      card.onclick = function () {
+        window.location.href = GAME_URL;
+      };
+
+      card.onkeydown = function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.location.href = GAME_URL;
+        }
+      };
+    } else {
+      gameLink.href = GAME_URL;
+      gameLink.removeAttribute("target");
+      gameLink.removeAttribute("rel");
+    }
+
+    /*
+      카드 아래에 표시되는 Ko-fi 글자만 Play/שחקו로 변경합니다.
+      카드 전체 내용을 덮어쓰지는 않습니다.
+    */
+    const cardElements = card.querySelectorAll(
+      "a, button, span, strong, p, div"
+    );
+
+    cardElements.forEach((element) => {
+      const currentText = normalizeText(element.textContent);
+
+      if (currentText === "Ko-fi") {
+        element.textContent = getPlayText();
+      }
+    });
+
+    card.dataset.koreanGameConnected = "true";
+
+    return true;
+  }
+
+  function initializeGameCard() {
+    updateGameCard();
+
+    /*
+      앱이 카드를 나중에 생성하거나 언어를 변경해도
+      게임 링크와 버튼 문구를 다시 적용합니다.
+    */
+    const observer = new MutationObserver(() => {
+      updateGameCard();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
+    document.addEventListener("click", () => {
+      window.setTimeout(updateGameCard, 100);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeGameCard
+    );
+  } else {
+    initializeGameCard();
+  }
+})();

@@ -1,0 +1,730 @@
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(196, 143, 27, 0.18), transparent 34%),
+    radial-gradient(circle at 15% 40%, rgba(117, 77, 8, 0.08), transparent 26%),
+    #030303;
+  color: #ffffff;
+
+  /*
+    현재 한글앱의 body font-family를 아래에 그대로 넣으세요.
+    지정하지 않으면 브라우저 기본 글꼴을 사용합니다.
+  */
+  font-family: var(--font-he);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.game-app {
+  width: min(100%, 840px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding:
+    max(14px, env(safe-area-inset-top))
+    14px
+    max(24px, env(safe-area-inset-bottom));
+}
+
+.game-header {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(235, 193, 68, 0.72);
+  border-radius: 50%;
+  background: rgba(8, 8, 8, 0.88);
+  color: #ffffff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.daily-status {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.daily-status strong {
+  color: #f5d468;
+  font-size: 1rem;
+}
+
+.timer-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 88px;
+  padding: 9px 12px;
+  border: 1px solid rgba(235, 193, 68, 0.72);
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.88);
+  color: #f5d468;
+  font-variant-numeric: tabular-nums;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.panel {
+  padding: clamp(22px, 5vw, 38px);
+  border: 1px solid rgba(228, 182, 53, 0.55);
+  border-radius: 24px;
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.025), transparent 45%),
+    rgba(6, 6, 6, 0.94);
+  box-shadow:
+    0 22px 55px rgba(0, 0, 0, 0.48),
+    inset 0 0 28px rgba(227, 176, 32, 0.035);
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #d9b54a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.panel h1,
+.panel h2,
+.panel h3 {
+  margin-top: 0;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.65;
+}
+
+.difficulty-box {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 0;
+  border: 0;
+}
+
+.difficulty-box legend {
+  width: 100%;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.difficulty-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid rgba(226, 181, 51, 0.4);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.018);
+  text-align: start;
+  cursor: pointer;
+}
+
+.difficulty-option:has(input:checked) {
+  border-color: rgba(248, 209, 85, 0.9);
+  box-shadow: 0 0 18px rgba(210, 151, 19, 0.13);
+}
+
+.difficulty-option input {
+  flex: 0 0 auto;
+  accent-color: #d9a927;
+}
+
+.difficulty-option span {
+  display: grid;
+  gap: 4px;
+}
+
+.difficulty-option small {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 52px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-button {
+  border: 1px solid #ffe381;
+  background: linear-gradient(180deg, #e5b735, #a66b09);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(196, 130, 9, 0.2);
+}
+
+.secondary-button {
+  border: 1px solid rgba(235, 193, 68, 0.58);
+  background: rgba(255, 255, 255, 0.035);
+  color: #ffffff;
+}
+
+.play-heading {
+  text-align: center;
+}
+
+.instruction {
+  margin: 5px 0 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.listen-button {
+  min-height: 44px;
+  padding: 9px 16px;
+  border: 1px solid rgba(228, 182, 53, 0.62);
+  border-radius: 999px;
+  background: rgba(8, 8, 8, 0.9);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.target-word {
+  margin: 16px 0 8px;
+  color: #ffffff;
+  font-size: clamp(2.15rem, 8vw, 3.6rem);
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.55),
+  0 0 6px rgba(216, 170, 51, 0.45),
+  0 0 13px rgba(151, 91, 8, 0.32);
+}
+
+.mistake-status {
+  display: inline-flex;
+  gap: 8px;
+  margin: 6px 0 10px;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.selected-letters {
+  min-height: 54px;
+  margin: 8px 0 10px;
+  padding: 10px;
+  border-bottom: 1px solid rgba(228, 182, 53, 0.4);
+  color: #ffffff;
+  font-size: clamp(1.25rem, 5vw, 1.9rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.14em;
+}
+
+.letter-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(4px, 1.5vw, 12px);
+  width: 100%;
+  margin: 0 auto;
+  padding: 8px 0 16px;
+}
+
+.letter-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  border: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle,
+    rgba(189, 137, 29, 0.07),
+    rgba(0, 0, 0, 0) 64%
+  );
+  color: #ffffff;
+
+  /*
+    한글앱에서 한글 전용 폰트를 따로 쓰고 있다면
+    아래 font-family에 그 이름을 직접 넣으세요.
+  */
+  font-family: var(--font-ko);
+  font-size: clamp(1.2rem, 5vw, 2.45rem);
+  font-weight: 950;
+  cursor: pointer;
+  text-shadow:
+  -1px -1px 0 rgba(184, 137, 27, 0.68),
+  1px -1px 0 rgba(210, 170, 63, 0.62),
+  -1px 1px 0 rgba(105, 63, 4, 0.68),
+  1px 1px 0 rgba(188, 139, 25, 0.68),
+  0 0 3px rgba(255, 255, 255, 0.35),
+  0 0 8px rgba(187, 130, 13, 0.38);
+  animation: floatLetter 3.6s ease-in-out infinite alternate;
+}
+
+.letter-cell:nth-child(3n) {
+  animation-delay: -0.8s;
+}
+
+.letter-cell:nth-child(4n) {
+  animation-delay: -1.7s;
+}
+
+.letter-cell:nth-child(5n) {
+  animation-delay: -2.5s;
+}
+
+.letter-cell::before,
+.letter-cell::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: #f1c64d;
+  opacity: 0.28;
+  pointer-events: none;
+}
+
+.letter-cell::before {
+  width: 3px;
+  height: 3px;
+  top: 19%;
+  right: 14%;
+  box-shadow:
+    -8px 12px 0 rgba(241, 198, 77, 0.5),
+    9px 16px 0 rgba(241, 198, 77, 0.28);
+}
+
+.letter-cell::after {
+  width: 2px;
+  height: 2px;
+  bottom: 18%;
+  left: 14%;
+  box-shadow: 11px -4px 0 rgba(255, 226, 120, 0.46);
+}
+
+.letter-cell:hover,
+.letter-cell:focus-visible {
+  outline: 2px solid rgba(255, 222, 106, 0.78);
+  transform: scale(1.07);
+}
+
+.letter-cell.selected {
+  background:
+    radial-gradient(
+      circle,
+      rgba(207, 157, 39, 0.24),
+      rgba(71, 43, 2, 0.06) 72%
+    );
+
+  box-shadow:
+    0 0 9px rgba(200, 145, 23, 0.34);
+
+  opacity: 0.72;
+}
+
+.letter-cell.wrong {
+  color: #ff7777;
+  animation: wrongShake 0.4s ease;
+}
+
+.result-panel {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.result-word {
+  margin-top: 16px;
+  color: #ffffff;
+  font-size: clamp(2.3rem, 10vw, 4rem);
+  font-weight: 950;
+}
+
+.result-meaning {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.learned-words {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 26px;
+}
+
+.learned-word {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 14px;
+  border: 1px solid rgba(228, 182, 53, 0.42);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.learned-word strong {
+  font-size: 1.2rem;
+}
+
+.learned-word span {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@keyframes floatLetter {
+  from {
+    transform: translateY(-2px) rotate(-0.5deg);
+  }
+
+  to {
+    transform: translateY(4px) rotate(0.5deg);
+  }
+}
+
+@keyframes wrongShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 540px) {
+  .game-app {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .game-header {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: 7px;
+  }
+
+  .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .timer-box {
+    min-width: 74px;
+    padding: 8px 9px;
+  }
+
+  .panel {
+    padding: 22px 14px;
+    border-radius: 19px;
+  }
+
+  .letter-grid {
+    gap: 2px;
+  }
+
+  .letter-cell {
+    font-size: clamp(1.08rem, 6.6vw, 1.8rem);
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+
+  .button-row button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .daily-status span {
+    display: none;
+  }
+
+  .letter-cell {
+    font-size: 1.12rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter-cell {
+    animation: none;
+  }
+}
+.target-word,
+.result-word,
+.learned-word strong,
+.selected-letters{
+
+    font-family: var(--font-ko);
+
+}
+/* ==================================================
+   한 화면 맞춤형 게임 레이아웃
+   데스크탑 + 모바일 공통
+================================================== */
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.game-app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+
+  width: min(100%, 760px);
+  height: 100dvh;
+  min-height: 0;
+
+  margin: 0 auto;
+
+  padding:
+    max(8px, env(safe-area-inset-top))
+    12px
+    max(8px, env(safe-area-inset-bottom));
+
+  overflow: hidden;
+}
+
+/* 위쪽 진행 상황과 시간 표시 */
+.game-header {
+  margin-bottom: 5px;
+}
+
+/* 실제 게임 화면 */
+#playScreen.active {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+/* 설명·듣기·제시어가 차지하는 높이 축소 */
+.play-heading {
+  flex: 0 0 auto;
+}
+
+.instruction {
+  margin: 2px 0 5px;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.listen-button {
+  min-height: 34px;
+  padding: 5px 12px;
+  font-size: 0.82rem;
+}
+
+.target-word {
+  margin: 5px 0 2px;
+
+  font-size: clamp(1.8rem, 5vh, 3rem);
+  line-height: 1.05;
+}
+
+.mistake-status {
+  margin: 2px 0 3px;
+  font-size: 0.8rem;
+}
+
+/* 사용자가 현재까지 고른 자모 표시 */
+.selected-letters {
+  flex: 0 0 auto;
+
+  min-height: 32px;
+  margin: 2px 0 4px;
+  padding: 3px;
+
+  font-size: clamp(1rem, 2.8vh, 1.5rem);
+  line-height: 1.2;
+}
+
+/* 6×6 보드 */
+.letter-grid {
+  flex: 1 1 auto;
+
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+
+  width: min(
+    100%,
+    calc(100dvh - 205px),
+    620px
+  );
+
+  height: min(
+    calc(100dvh - 205px),
+    620px
+  );
+
+  min-height: 0;
+
+  margin: 0 auto;
+  padding: 2px 0;
+
+  gap: clamp(1px, 0.5vw, 6px);
+}
+
+/* 기존 정사각형 강제 크기를 해제 */
+.letter-cell {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  aspect-ratio: auto;
+
+  padding: 0;
+
+  font-size: clamp(
+    1rem,
+    min(4.1vw, 4.1vh),
+    2rem
+  );
+}
+
+/* 숫자가 히브리어 방향 때문에 뒤집히지 않도록 처리 */
+.daily-status strong,
+.mistake-status strong,
+.timer-box strong {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* 작은 휴대전화 */
+@media (max-width: 540px) {
+  .game-app {
+    width: 100%;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .game-header {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 5px;
+  }
+
+  .icon-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .timer-box {
+    min-width: 68px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .target-word {
+    font-size: clamp(1.65rem, 8vw, 2.3rem);
+  }
+
+  .letter-grid {
+    width: min(
+      100%,
+      calc(100dvh - 190px)
+    );
+
+    height: min(
+      calc(100dvh - 190px),
+      calc(100vw - 14px)
+    );
+
+    gap: 1px;
+  }
+
+  .letter-cell {
+    font-size: clamp(1rem, 6vw, 1.55rem);
+  }
+}
+
+/* 세로가 특히 짧은 화면 */
+@media (max-height: 680px) {
+  .instruction {
+    display: none;
+  }
+
+  .target-word {
+    margin-top: 2px;
+    font-size: 1.75rem;
+  }
+
+  .selected-letters {
+    min-height: 27px;
+    margin-bottom: 2px;
+  }
+
+  .letter-grid {
+    width: min(
+      100%,
+      calc(100dvh - 155px),
+      540px
+    );
+
+    height: min(
+      calc(100dvh - 155px),
+      540px
+    );
+  }
+}
