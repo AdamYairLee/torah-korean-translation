@@ -669,6 +669,45 @@
     clearTimer();
     window.speechSynthesis?.cancel();
   });
+  /* ==================================================
+     모바일 브라우저의 실제 사용 가능 높이 계산
+  ================================================== */
+
+  function updateGameViewportHeight() {
+    const viewportHeight =
+      window.visualViewport?.height || window.innerHeight;
+
+    document.documentElement.style.setProperty(
+      "--game-viewport-height",
+      `${viewportHeight}px`
+    );
+  }
+
+  updateGameViewportHeight();
+
+  window.addEventListener(
+    "resize",
+    updateGameViewportHeight
+  );
+
+  window.addEventListener(
+    "orientationchange",
+    () => {
+      window.setTimeout(updateGameViewportHeight, 150);
+    }
+  );
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+      "resize",
+      updateGameViewportHeight
+    );
+
+    window.visualViewport.addEventListener(
+      "scroll",
+      updateGameViewportHeight
+    );
+  }
 
   initialize();
 })();

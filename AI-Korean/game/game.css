@@ -728,3 +728,282 @@ body {
     );
   }
 }
+/* ==================================================
+   최종 모바일 전체 화면 맞춤
+   6×6 글자판의 여섯 줄이 반드시 화면 안에 표시됨
+================================================== */
+
+html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
+  height: var(--game-viewport-height, 100svh);
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+/*
+  전체 게임 영역을 모바일 브라우저에서 실제로 보이는 높이에 맞춤
+*/
+.game-app {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+
+  width: min(100%, 760px);
+  height: var(--game-viewport-height, 100svh);
+  min-height: 0;
+
+  margin: 0 auto;
+
+  padding:
+    max(6px, env(safe-area-inset-top))
+    8px
+    max(5px, env(safe-area-inset-bottom));
+
+  overflow: hidden;
+}
+
+/*
+  상단 진행 표시
+*/
+.game-header {
+  min-height: 0;
+  margin: 0 0 4px;
+}
+
+/*
+  활성화된 플레이 화면은 남은 공간 전체만 사용
+*/
+#playScreen.active {
+  display: grid;
+  grid-template-rows:
+    auto
+    auto
+    minmax(0, 1fr);
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/*
+  듣기 버튼, 제시어, 오답 표시 영역
+*/
+.play-heading {
+  min-height: 0;
+  margin: 0;
+}
+
+.instruction {
+  margin: 1px 0 4px;
+  font-size: clamp(0.7rem, 2.5vw, 0.82rem);
+  line-height: 1.2;
+}
+
+.listen-button {
+  min-height: 32px;
+  padding: 4px 11px;
+  font-size: clamp(0.72rem, 2.7vw, 0.84rem);
+}
+
+.target-word {
+  margin: 3px 0 1px;
+  font-size: clamp(1.55rem, 6.5vw, 2.4rem);
+  line-height: 1;
+}
+
+.mistake-status {
+  margin: 1px 0 2px;
+  font-size: clamp(0.7rem, 2.6vw, 0.82rem);
+}
+
+/*
+  지금까지 선택한 자모
+*/
+.selected-letters {
+  min-height: 29px;
+  margin: 0 0 3px;
+  padding: 2px 4px;
+
+  font-size: clamp(0.95rem, 4.4vw, 1.3rem);
+  line-height: 1.15;
+}
+
+/*
+  핵심 수정:
+  글자판을 정사각형으로 만들지 않고
+  남은 높이를 여섯 줄에 정확히 나눔
+*/
+.letter-grid {
+  display: grid;
+
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
+  padding: 0;
+
+  gap: clamp(1px, 0.7vw, 5px);
+
+  overflow: hidden;
+}
+
+/*
+  각 글자 칸은 부모가 나눈 공간에 맞춤
+  aspect-ratio를 제거해야 마지막 줄이 잘리지 않음
+*/
+.letter-cell {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  aspect-ratio: auto;
+  padding: 0;
+  margin: 0;
+
+  font-size: clamp(
+    0.95rem,
+    min(5vw, 3.8vh),
+    1.8rem
+  );
+
+  line-height: 1;
+}
+
+/*
+  RTL 화면에서도 숫자 순서가 뒤집히지 않음
+*/
+.daily-status strong,
+.mistake-status strong,
+.timer-box strong {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ==================================================
+   일반 휴대전화
+================================================== */
+
+@media (max-width: 600px) {
+  .game-app {
+    width: 100%;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .game-header {
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 5px;
+  }
+
+  .icon-button {
+    width: 36px;
+    height: 36px;
+    font-size: 1.05rem;
+  }
+
+  .timer-box {
+    min-width: 68px;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .daily-status {
+    font-size: 0.72rem;
+  }
+
+  .daily-status strong {
+    font-size: 0.95rem;
+  }
+
+  .letter-cell {
+    font-size: clamp(
+      0.92rem,
+      min(6vw, 3.7vh),
+      1.5rem
+    );
+  }
+}
+
+/* ==================================================
+   화면 높이가 짧은 휴대전화
+================================================== */
+
+@media (max-height: 760px) {
+  .instruction {
+    display: none;
+  }
+
+  .game-header {
+    margin-bottom: 2px;
+  }
+
+  .listen-button {
+    min-height: 29px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .target-word {
+    margin: 2px 0 0;
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  }
+
+  .selected-letters {
+    min-height: 25px;
+    margin-bottom: 2px;
+  }
+
+  .letter-cell {
+    font-size: clamp(
+      0.86rem,
+      min(5.6vw, 3.5vh),
+      1.38rem
+    );
+  }
+}
+
+/* ==================================================
+   화면 높이가 매우 짧은 휴대전화
+================================================== */
+
+@media (max-height: 640px) {
+  .daily-status span {
+    display: none;
+  }
+
+  .listen-button {
+    min-height: 27px;
+  }
+
+  .mistake-status {
+    margin: 0;
+  }
+
+  .selected-letters {
+    min-height: 22px;
+    padding: 1px;
+  }
+
+  .letter-cell {
+    font-size: clamp(
+      0.8rem,
+      min(5.2vw, 3.2vh),
+      1.2rem
+    );
+  }
+}
