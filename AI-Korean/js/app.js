@@ -403,7 +403,15 @@ renderMain();
 ================================================== */
 
 (function setupKoreanGameEntry() {
-  const GAME_URL = "./game/index.html";
+    function getGameUrl() {
+    const currentLanguage = getMainAppLanguage();
+
+    if (currentLanguage === "en") {
+      return "./game/index.html?lang=en";
+    }
+
+    return "./game/index.html?lang=he";
+  }
 
   function getMainAppLanguage() {
     const possibleKeys = [
@@ -472,7 +480,7 @@ renderMain();
       return true;
     }
 
-    duplicateKofiButton.href = GAME_URL;
+    duplicateKofiButton.href = getGameUrl();
     duplicateKofiButton.removeAttribute("target");
     duplicateKofiButton.removeAttribute("rel");
 
@@ -573,8 +581,7 @@ renderMain();
 ===================================================== */
 
 (function connectKoreanLetterGameCard() {
-  const GAME_URL = "./game/index.html";
-
+  
   const GAME_TITLES = [
     "Korean Letter Game",
     "משחק הרכבת מילים בקוריאנית"
@@ -686,17 +693,17 @@ renderMain();
       card.style.cursor = "pointer";
 
       card.onclick = function () {
-        window.location.href = GAME_URL;
+        window.location.href = getGameUrl();
       };
 
       card.onkeydown = function (event) {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          window.location.href = GAME_URL;
+          window.location.href = getGameUrl();
         }
       };
     } else {
-      gameLink.href = GAME_URL;
+      gameLink.href = getGameUrl();
       gameLink.removeAttribute("target");
       gameLink.removeAttribute("rel");
     }
