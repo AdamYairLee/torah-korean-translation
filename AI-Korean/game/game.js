@@ -122,23 +122,69 @@
   let roundFinished = false;
 
   function getCurrentLanguage() {
-    const possibleKeys = [
-      "language",
-      "selectedLanguage",
-      "appLanguage",
-      "currentLang",
-      "aiKoreanLanguage"
-    ];
+  /*
+    1순위:
+    메인 앱에서 게임 주소에 전달한 언어
+    예: game/index.html?lang=en
+  */
+  const urlLanguage = new URLSearchParams(
+    window.location.search
+  ).get("lang");
 
-    for (const key of possibleKeys) {
-      const value = localStorage.getItem(key);
-      if (value === "en") return "en";
-      if (value === "he") return "he";
-    }
+  if (urlLanguage === "en" || urlLanguage === "he") {
+    localStorage.setItem(
+      "aiKoreanGameLanguage",
+      urlLanguage
+    );
 
-    const htmlLang = document.documentElement.lang;
-    return htmlLang === "en" ? "en" : "he";
+    return urlLanguage;
   }
+
+  /*
+    2순위:
+    게임에서 최근 사용한 언어
+  */
+  const savedGameLanguage = localStorage.getItem(
+    "aiKoreanGameLanguage"
+  );
+
+  if (
+    savedGameLanguage === "en" ||
+    savedGameLanguage === "he"
+  ) {
+    return savedGameLanguage;
+  }
+
+  /*
+    3순위:
+    메인 한글앱에 저장된 언어
+  */
+  const possibleKeys = [
+    "language",
+    "selectedLanguage",
+    "appLanguage",
+    "currentLang",
+    "aiKoreanLanguage"
+  ];
+
+  for (const key of possibleKeys) {
+    const value = localStorage.getItem(key);
+
+    if (value === "en" || value === "he") {
+      localStorage.setItem(
+        "aiKoreanGameLanguage",
+        value
+      );
+
+      return value;
+    }
+  }
+
+  /*
+    저장 정보가 전혀 없을 때만 히브리어 사용
+  */
+  return "he";
+}
 
   function applyLanguage() {
     language = getCurrentLanguage();
@@ -309,6 +355,10 @@
     });
 
     screenElement.classList.add("active");
+
+    if (screenElement === elements.playScreen) {
+  scheduleBoardFit();
+}
   }
 
   function updateStatus() {
@@ -328,6 +378,8 @@
   }
 
   function beginGame() {
+    applyLanguage();
+text = GAME_I18N[language];
     if (state.failedForToday) {
       showLockedScreen(false);
       return;
@@ -344,6 +396,9 @@
   }
 
   function startCurrentRound() {
+    language = getCurrentLanguage();
+text = GAME_I18N[language];
+applyLanguage();
     clearTimer();
     roundFinished = false;
     selectedAnswer = [];
@@ -370,6 +425,7 @@
     }
 
     showScreen(elements.playScreen);
+    scheduleBoardFit();
     startTimer();
 
     window.setTimeout(() => {
@@ -432,6 +488,8 @@
   }
 
   function registerRoundFailure(reason) {
+    language = getCurrentLanguage();
+text = GAME_I18N[language];
     if (roundFinished) return;
 
     roundFinished = true;
@@ -460,6 +518,8 @@
   }
 
   function finishRoundSuccess() {
+    language = getCurrentLanguage();
+  text = GAME_I18N[language];
     if (roundFinished) return;
 
     roundFinished = true;
@@ -517,6 +577,9 @@
   }
 
   function showCompleteScreen(alreadyCompleted) {
+    language = getCurrentLanguage();
+  text = GAME_I18N[language];
+  applyLanguage();
     clearTimer();
 
     elements.completeTitle.textContent = alreadyCompleted
@@ -548,6 +611,9 @@
   }
 
   function showLockedScreen(alreadyCompleted) {
+    language = getCurrentLanguage();
+  text = GAME_I18N[language];
+  applyLanguage();
     clearTimer();
 
     elements.lockedTitle.textContent = alreadyCompleted
@@ -669,43 +735,97 @@
     clearTimer();
     window.speechSynthesis?.cancel();
   });
-  /* ==================================================
-     모바일 브라우저의 실제 사용 가능 높이 계산
+    /* ==================================================
+     휴대전화에서 실제 보이는 화면 높이에 맞춰
+     6×6 글자판 높이를 자동 계산
   ================================================== */
 
-  function updateGameViewportHeight() {
-    const viewportHeight =
-      window.visualViewport?.height || window.innerHeight;
+  function fitLetterBoardToScreen() {
+    const board = document.getElementById("letterGrid");
+
+    if (!board) {
+      return;
+    }
+
+    /*
+      모바일 Chrome에서 실제로 현재 보이는 화면 높이.
+      상태표시줄·브라우저 UI 변화도 가능한 한 반영합니다.
+    */
+    const visibleHeight =
+      window.visualViewport?.height ||
+      document.documentElement.clientHeight ||
+      window.innerHeight;
 
     document.documentElement.style.setProperty(
-      "--game-viewport-height",
-      `${viewportHeight}px`
+      "--real-viewport-height",
+      `${visibleHeight}px`
+    );
+
+    /*
+      글자판이 실제로 시작되는 화면 위치를 구합니다.
+    */
+    const boardTop = board.getBoundingClientRect().top;
+
+    /*
+      하단 내비게이션바와 안전 여백을 고려하여
+      화면 맨 아래에서 10px를 비워 둡니다.
+    */
+    const bottomSafetySpace = 10;
+
+    let availableHeight =
+      visibleHeight -
+      boardTop -
+      bottomSafetySpace;
+
+    /*
+      지나치게 작은 값이나 잘못된 측정 방지
+    */
+    if (!Number.isFinite(availableHeight)) {
+      return;
+    }
+
+    availableHeight = Math.max(240, availableHeight);
+
+    document.documentElement.style.setProperty(
+      "--letter-board-height",
+      `${Math.floor(availableHeight)}px`
     );
   }
 
-  updateGameViewportHeight();
+  function scheduleBoardFit() {
+    window.requestAnimationFrame(() => {
+      fitLetterBoardToScreen();
+
+      /*
+        폰트와 화면 배치가 한 프레임 뒤에 바뀌는
+        모바일 브라우저를 위해 한 번 더 계산합니다.
+      */
+      window.setTimeout(fitLetterBoardToScreen, 80);
+      window.setTimeout(fitLetterBoardToScreen, 250);
+    });
+  }
 
   window.addEventListener(
     "resize",
-    updateGameViewportHeight
+    scheduleBoardFit
   );
 
   window.addEventListener(
     "orientationchange",
     () => {
-      window.setTimeout(updateGameViewportHeight, 150);
+      window.setTimeout(scheduleBoardFit, 200);
     }
   );
 
   if (window.visualViewport) {
     window.visualViewport.addEventListener(
       "resize",
-      updateGameViewportHeight
+      scheduleBoardFit
     );
 
     window.visualViewport.addEventListener(
       "scroll",
-      updateGameViewportHeight
+      scheduleBoardFit
     );
   }
 
