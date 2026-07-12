@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-korean-master-v1-3';
+const CACHE_NAME = 'ai-korean-master-v1-5-game-fix';
 const CORE_ASSETS = [
   './',
   './index.html',

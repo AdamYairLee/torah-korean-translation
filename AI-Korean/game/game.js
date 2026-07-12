@@ -122,69 +122,30 @@
   let roundFinished = false;
 
   function getCurrentLanguage() {
-  /*
-    1순위:
-    메인 앱에서 게임 주소에 전달한 언어
-    예: game/index.html?lang=en
-  */
-  const urlLanguage = new URLSearchParams(
-    window.location.search
-  ).get("lang");
+    // URL parameter is authoritative when entering from the main app.
+    const urlLanguage = new URLSearchParams(window.location.search).get("lang");
 
-  if (urlLanguage === "en" || urlLanguage === "he") {
-    localStorage.setItem(
-      "aiKoreanGameLanguage",
-      urlLanguage
-    );
-
-    return urlLanguage;
-  }
-
-  /*
-    2순위:
-    게임에서 최근 사용한 언어
-  */
-  const savedGameLanguage = localStorage.getItem(
-    "aiKoreanGameLanguage"
-  );
-
-  if (
-    savedGameLanguage === "en" ||
-    savedGameLanguage === "he"
-  ) {
-    return savedGameLanguage;
-  }
-
-  /*
-    3순위:
-    메인 한글앱에 저장된 언어
-  */
-  const possibleKeys = [
-    "language",
-    "selectedLanguage",
-    "appLanguage",
-    "currentLang",
-    "aiKoreanLanguage"
-  ];
-
-  for (const key of possibleKeys) {
-    const value = localStorage.getItem(key);
-
-    if (value === "en" || value === "he") {
-      localStorage.setItem(
-        "aiKoreanGameLanguage",
-        value
-      );
-
-      return value;
+    if (urlLanguage === "en" || urlLanguage === "he") {
+      localStorage.setItem("aiKoreanGameLanguage", urlLanguage);
+      return urlLanguage;
     }
-  }
 
-  /*
-    저장 정보가 전혀 없을 때만 히브리어 사용
-  */
-  return "he";
-}
+    // Fall back to the main app's actual language key.
+    const mainAppLanguage = localStorage.getItem("ui_lang");
+
+    if (mainAppLanguage === "en" || mainAppLanguage === "he") {
+      localStorage.setItem("aiKoreanGameLanguage", mainAppLanguage);
+      return mainAppLanguage;
+    }
+
+    const savedGameLanguage = localStorage.getItem("aiKoreanGameLanguage");
+
+    if (savedGameLanguage === "en" || savedGameLanguage === "he") {
+      return savedGameLanguage;
+    }
+
+    return "he";
+  }
 
   function applyLanguage() {
     language = getCurrentLanguage();
