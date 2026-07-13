@@ -251,16 +251,8 @@ function renderContent(scrollKey = null) {
     if (!currentData) return;
     const container = document.getElementById('torah-container');
     container.innerHTML = '';
-    const nav = document.createElement('div');
-nav.className = 'mishna-nav';
 
-nav.innerHTML = `
-  <button onclick="showMishnaTractates('zeraim')">← 제라임으로</button>
-  <button onclick="showMishnaOrders()">미슈나 목차</button>
-  <button onclick="showHome()">홈</button>
-`;
-
-container.appendChild(nav);
+    // 일반 토라/슈타인잘쯔 본문에는 미슈나 전용 탐색 버튼을 표시하지 않습니다.
     renderToolbar(container, getTitleFromFilename(currentFilename));
 
     const steinsaltzMode = isSteinsaltzFile(currentFilename);
@@ -513,6 +505,16 @@ function renderMishnahContent(book) {
     if (!container) return;
 
     container.innerHTML = '';
+
+    // 미슈나 전용 탐색 버튼은 실제 미슈나 본문에서만 표시합니다.
+    const nav = document.createElement('div');
+    nav.className = 'mishna-nav';
+    nav.innerHTML = `
+      <button onclick="showMishnaTractates('zeraim')">← 제라임으로</button>
+      <button onclick="showMishnaOrders()">미슈나 목차</button>
+      <button onclick="showHome()">홈</button>
+    `;
+    container.appendChild(nav);
 
     const title = document.createElement('h1');
     title.textContent = book.titleKo || book.title || '미슈나';

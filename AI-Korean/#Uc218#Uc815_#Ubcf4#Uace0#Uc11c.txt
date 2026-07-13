@@ -1,0 +1,60 @@
+AI Korean Master 수정 보고서
+
+수정 범위
+- 기존 학습 콘텐츠, 데이터 JSON, 디자인 CSS, 이미지, 아이콘, 설정 파일은 수정하지 않았습니다.
+- 실제로 변경한 파일은 아래 5개뿐입니다.
+  1) js/app.js
+  2) game/game.js
+  3) index.html
+  4) game/index.html
+  5) sw.js
+
+문제 원인
+1. 메인 앱의 실제 언어 저장 키는 ui_lang이었는데, 추가된 게임 연결 코드들은 language, selectedLanguage, appLanguage 등의 존재하지 않는 키를 찾고 있었습니다.
+2. Continue Your Korean Journey의 세 번째 카드는 원래 app.js의 renderJourneySection() 안에서 버튼으로 직접 생성되고 있었습니다. 그런데 뒤에 추가된 코드들은 화면이 만들어진 뒤 Ko-fi 링크나 카드 요소를 다시 찾아 바꾸려 했습니다.
+3. 같은 카드에 대해 서로 다른 자동 변환 코드가 두 덩어리 들어가 있었고, MutationObserver와 onclick 재지정이 겹치면서 데스크탑에서 클릭이 막히거나 링크가 잘못 적용될 수 있었습니다.
+4. 게임은 URL 언어값보다 별도의 저장값을 우선하거나, 메인 앱의 실제 ui_lang 값을 읽지 못할 가능성이 있었습니다.
+5. 브라우저와 서비스워커 캐시에 예전 app.js와 game.js가 남아 최신 수정이 바로 반영되지 않을 수 있었습니다.
+
+개선 내용
+1. Continue Your Korean Journey 세 번째 카드를 원본 생성 코드에서 직접 게임 카드로 변경했습니다.
+   - 영어: Korean Letter Game / Play
+   - 히브리어: משחק הרכבת מילים בקוריאנית / שחקו
+2. 게임 버튼은 별도의 DOM 검색이나 MutationObserver 없이 openKoreanGame()을 직접 호출합니다.
+3. 영어 선택 시 ./game/index.html?lang=en 으로 이동합니다.
+4. 히브리어 선택 시 ./game/index.html?lang=he 으로 이동합니다.
+5. game.js는 언어를 아래 순서로 읽습니다.
+   - URL의 lang 값
+   - 메인 앱의 실제 저장 키 ui_lang
+   - 게임 자체 저장값
+   - 기본값 히브리어
+6. 이전에 뒤에 붙었던 중복 게임 카드 자동 변환 코드 두 덩어리를 제거했습니다.
+7. app.js, game.js, game-i18n.js, game-data.js, CSS 파일에 캐시 버전 번호를 붙였습니다.
+8. 서비스워커 캐시 이름을 변경해 이전 캐시가 새 배포를 막지 않도록 했습니다.
+
+유지한 부분
+- 게임의 모바일 화면 맞춤 코드
+- 6×6 자모판
+- 하루 5문제 제한
+- 60초 제한
+- 3회 실패 제한
+- 영어/히브리어 번역 데이터
+- 기존 한글앱의 모든 학습 메뉴와 데이터
+- 기존 Ko-fi 메인 후원 배너
+- Korean Beauty 및 Visit Korea 카드
+
+배포 방법
+1. 수정된 폴더의 내용을 기존 AI-Korean 폴더에 덮어씁니다.
+2. Git에서 변경 파일을 확인합니다.
+3. Commit 합니다.
+4. 반드시 Push 또는 Sync Changes까지 실행합니다.
+5. GitHub Pages 배포가 끝난 뒤 사이트를 다시 엽니다.
+
+확인할 주소
+- 영어 게임: /AI-Korean/game/index.html?lang=en
+- 히브리어 게임: /AI-Korean/game/index.html?lang=he
+
+검증
+- js/app.js JavaScript 문법 검사 통과
+- game/game.js JavaScript 문법 검사 통과
+- 게임 파일 경로 및 로딩 순서 확인
