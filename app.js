@@ -3,6 +3,7 @@ let currentData = null;
 let currentFilename = null;
 let currentChapter = null;
 let currentActiveElement = null;
+let currentParashaIndex = null;
 
 const SEARCH_FILES = [
     { file: 'data/shemot.json', label: '슈모트 / 출애굽기' },
@@ -59,9 +60,10 @@ function showMainHome() {
     currentData = null;
     currentFilename = null;
     currentChapter = null;
+    currentParashaIndex = null;
     currentActiveElement = null;
     clearActiveButtons();
-    document.querySelectorAll('.sub-menu').forEach(menu => menu.classList.remove('active'));
+    closeAllMenus();
     const welcome = document.getElementById('welcome-message');
     if (welcome) welcome.style.display = '';
     const container = document.getElementById('torah-container');
@@ -81,16 +83,26 @@ function getTitleFromFilename(filename) {
     return '본문';
 }
 
+function closeAllMenus() {
+    document.querySelectorAll('.sub-menu').forEach(menu => menu.classList.remove('active'));
+}
+
 function toggleMenu(menuId) {
     const targetMenu = document.getElementById(menuId);
     if (!targetMenu) return;
+
     const isActive = targetMenu.classList.contains('active');
-    document.querySelectorAll('.sub-menu').forEach(menu => menu.classList.remove('active'));
+    closeAllMenus();
+
     if (!isActive) {
         targetMenu.classList.add('active');
+
+        // 중첩 메뉴를 열 때는 상위 메뉴만 다시 펼칩니다.
         let parent = targetMenu.parentElement;
         while (parent) {
-            if (parent.classList && parent.classList.contains('sub-menu')) parent.classList.add('active');
+            if (parent.classList && parent.classList.contains('sub-menu')) {
+                parent.classList.add('active');
+            }
             parent = parent.parentElement;
         }
     }
@@ -143,7 +155,7 @@ function appendTorahSupportNote(container) {
 
 function showCenterChoice(title, items) {
     hideWelcome();
-    document.querySelectorAll('.sub-menu').forEach(menu => menu.classList.remove('active'));
+    closeAllMenus();
     const container = document.getElementById('torah-container');
     container.innerHTML = `
         <div class="mishna-overlay-box fade-in-center">
@@ -169,13 +181,8 @@ function showOralTorahMenu() {
 }
 
 function showMishnaOrders() {
-    showCenterChoice('미슈나 · 여섯 질서', [
-        { label: '제라임', subtitle: 'Zeraim', action: () => showMishnaTractates('zeraim') },
-        { label: '모에드', subtitle: 'Moed', action: () => showWorkingMishnaOrder('모에드') },
-        { label: '나쉼', subtitle: 'Nashim', action: () => showWorkingMishnaOrder('나쉼') },
-        { label: '네지킨', subtitle: 'Nezikin', action: () => showWorkingMishnaOrder('네지킨') },
-        { label: '코다쉼', subtitle: 'Kodashim', action: () => showWorkingMishnaOrder('코다쉼') },
-        { label: '타하로트', subtitle: 'Taharot', action: () => showWorkingMishnaOrder('타하로트') }
+    showCenterChoice('미슈나', [
+        { label: '제라임', subtitle: 'Zeraim', action: () => showMishnaTractates('zeraim') }
     ]);
 }
 
@@ -196,6 +203,50 @@ function showWorkingMishnaOrder(name) {
     ]);
 }
 
+function isSteinsaltzFile(filename) {
+    return typeof filename === 'string' && filename.includes('steinsaltz_');
+}
+
+function getParashaSections(data) {
+    const content = data.content || [];
+    const titleIndexes = [];
+
+    content.forEach((item, index) => {
+        if (item.type === 'title' && typeof item.text === 'string') {
+            titleIndexes.push(index);
+        }
+    });
+
+    return titleIndexes.map((startIndex, position) => ({
+        startIndex,
+        endIndex: titleIndexes[position + 1] ?? content.length,
+        fullTitle: content[startIndex].text,
+        // 원문 JSON에 적힌 이름을 그대로 사용하고 공통 접두어만 화면에서 제거합니다.
+        buttonTitle: content[startIndex].text.replace(/^파라샤트\s*/, '')
+    }));
+}
+
+function renderParashaNav(container, data) {
+    const sections = getParashaSections(data);
+    if (!sections.length) return;
+
+    const nav = document.createElement('div');
+    nav.className = 'chapter-nav parasha-nav';
+
+    sections.forEach((section, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'chapter-btn' + (currentParashaIndex === index ? ' active' : '');
+        btn.textContent = section.buttonTitle;
+        btn.onclick = () => {
+            currentParashaIndex = index;
+            renderContent();
+        };
+        nav.appendChild(btn);
+    });
+
+    container.appendChild(nav);
+}
+
 function renderContent(scrollKey = null) {
     if (!currentData) return;
     const container = document.getElementById('torah-container');
@@ -211,8 +262,18 @@ nav.innerHTML = `
 
 container.appendChild(nav);
     renderToolbar(container, getTitleFromFilename(currentFilename));
-    renderChapters(container, currentData);
-    (currentData.content || []).forEach(item => {
+
+    const steinsaltzMode = isSteinsaltzFile(currentFilename);
+    const parashaSections = steinsaltzMode ? getParashaSections(currentData) : [];
+
+    if (steinsaltzMode) renderParashaNav(container, currentData);
+    else renderChapters(container, currentData);
+
+    (currentData.content || []).forEach((item, itemIndex) => {
+        if (steinsaltzMode && currentParashaIndex !== null) {
+            const section = parashaSections[currentParashaIndex];
+            if (section && (itemIndex < section.startIndex || itemIndex >= section.endIndex)) return;
+        }
         if (!item.type && currentChapter !== null && item.chapter !== currentChapter) return;
         const div = document.createElement('div');
         if (item.type) {
@@ -259,8 +320,10 @@ function loadContent(filename, element, options = {}) {
         currentActiveElement = element;
     }
     hideWelcome();
+    closeAllMenus();
     currentFilename = filename;
     currentChapter = options.chapter ?? null;
+    currentParashaIndex = null;
     fetch(filename)
         .then(response => {
             if (!response.ok) throw new Error('파일 없음');
@@ -377,34 +440,74 @@ function closeInfo() {
 
 function loadBlog(filename, index = 0) {
     hideWelcome();
+    closeAllMenus();
+
     fetch(filename)
         .then(response => response.json())
         .then(data => {
             const container = document.getElementById('torah-container');
             const allItems = data.content || [];
+            const itemsPerPage = 5;
+            let currentTocPage = Math.floor(index / itemsPerPage);
+            let currentPostIndex = index;
+
             container.innerHTML = '';
             renderToolbar(container, '노아하이드 강의');
+
             const toc = document.createElement('div');
             toc.className = 'toc-card';
-            toc.innerHTML = '<h4 style="margin:0 0 10px 0;">강의 목차</h4>';
-            allItems.forEach((item, i) => {
-                const link = document.createElement('span');
-                link.innerText = `${i + 1}. ${item.title}`;
-                link.className = 'toc-link';
-                link.onclick = () => {
-                    const postArea = document.getElementById('post-area');
-                    postArea.innerHTML = `<h2>${item.title}</h2><small>${item.date}</small><p>${item.body}</p>`;
-                };
-                toc.appendChild(link);
-            });
             container.appendChild(toc);
+
             const postArea = document.createElement('div');
             postArea.id = 'post-area';
-            const initialItem = allItems[index] || {title:'', date:'', body:''};
-            postArea.innerHTML = `<h2>${initialItem.title}</h2><small>${initialItem.date}</small><p>${initialItem.body}</p>`;
             container.appendChild(postArea);
+
+            function showPost(itemIndex) {
+                const item = allItems[itemIndex] || { title: '', date: '', body: '' };
+                currentPostIndex = itemIndex;
+                postArea.innerHTML = `<h2>${item.title}</h2><small>${item.date}</small><p>${item.body}</p>`;
+                renderTocPage();
+            }
+
+            function renderTocPage() {
+                toc.innerHTML = '<h4 style="margin:0 0 10px 0;">강의 목차</h4>';
+
+                const startIndex = currentTocPage * itemsPerPage;
+                const pageItems = allItems.slice(startIndex, startIndex + itemsPerPage);
+
+                pageItems.forEach((item, localIndex) => {
+                    const itemIndex = startIndex + localIndex;
+                    const link = document.createElement('span');
+                    link.innerText = `${itemIndex + 1}. ${item.title}`;
+                    link.className = 'toc-link' + (itemIndex === currentPostIndex ? ' active' : '');
+                    link.onclick = () => showPost(itemIndex);
+                    toc.appendChild(link);
+                });
+
+                const pageCount = Math.ceil(allItems.length / itemsPerPage);
+                if (pageCount > 1) {
+                    const pagination = document.createElement('div');
+                    pagination.className = 'chapter-nav blog-pagination';
+
+                    for (let page = 0; page < pageCount; page += 1) {
+                        const pageBtn = document.createElement('button');
+                        pageBtn.className = 'chapter-btn' + (page === currentTocPage ? ' active' : '');
+                        pageBtn.textContent = `[${page + 1}]`;
+                        pageBtn.onclick = () => {
+                            currentTocPage = page;
+                            renderTocPage();
+                        };
+                        pagination.appendChild(pageBtn);
+                    }
+
+                    toc.appendChild(pagination);
+                }
+            }
+
+            showPost(currentPostIndex);
         });
 }
+
 function renderMishnahContent(book) {
     const container = document.getElementById('torah-container');
     if (!container) return;
