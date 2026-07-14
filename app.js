@@ -14,7 +14,8 @@ const SEARCH_FILES = [
     { file: 'data/steinsaltz_bamidbar.json', label: '슈타인잘쯔 바미드바르' },
     { file: 'data/steinsaltz_devarim.json', label: '슈타인잘쯔 드바림' },
     { file: 'data/noahide.json', label: '노아하이드 강의' },
-    { file: 'data/mishna/berakhot.json', label: '미슈나 베락호트' }
+    { file: 'data/mishna/berakhot.json', label: '미슈나 베락호트' },
+    { file: 'data/mishna/demai.json', label: '미슈나 데마이' }
 ];
 
 window.onload = function() {
@@ -67,7 +68,10 @@ function showMainHome() {
     const welcome = document.getElementById('welcome-message');
     if (welcome) welcome.style.display = '';
     const container = document.getElementById('torah-container');
-    if (container) container.innerHTML = '본문을 선택해주세요.';
+    if (container) {
+        container.classList.remove('demai-reader');
+        container.innerHTML = '본문을 선택해주세요.';
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -80,6 +84,7 @@ function getTitleFromFilename(filename) {
     if (filename.includes('bamidbar')) return '바미드바르 / 민수기';
     if (filename.includes('devarim')) return '드바림 / 신명기';
     if (filename.includes('mishna/berakhot')) return '미슈나 베락호트';
+    if (filename.includes('mishna/demai')) return '미슈나 데마이';
     return '본문';
 }
 
@@ -157,6 +162,7 @@ function showCenterChoice(title, items) {
     hideWelcome();
     closeAllMenus();
     const container = document.getElementById('torah-container');
+    container.classList.remove('demai-reader');
     container.innerHTML = `
         <div class="mishna-overlay-box fade-in-center">
             <button class="modal-close-mini" onclick="showMainHome()">×</button>
@@ -191,6 +197,7 @@ function showMishnaTractates(order) {
         showCenterChoice('미슈나 · 제라임', [
             { label: '베락호트', subtitle: 'Berakhot', action: () => loadContent('data/mishna/berakhot.json', null) },
             { label: '페아', subtitle: 'Peah', action: () => loadContent('data/mishna/peah.json') },
+            { label: '데마이', subtitle: 'Demai', action: () => loadContent('data/mishna/demai.json') },
         ]);
         return;
     }
@@ -250,6 +257,7 @@ function renderParashaNav(container, data) {
 function renderContent(scrollKey = null) {
     if (!currentData) return;
     const container = document.getElementById('torah-container');
+    container.classList.remove('demai-reader');
     container.innerHTML = '';
 
     // 일반 토라/슈타인잘쯔 본문에는 미슈나 전용 탐색 버튼을 표시하지 않습니다.
@@ -323,6 +331,13 @@ function loadContent(filename, element, options = {}) {
         })
         .then(data => {
     currentData = data;
+
+    // 드마이는 기존 문헌과 다른 JSON 필드(title/body)를 사용하므로
+    // 이 파일에만 적용되는 전용 렌더러로 표시합니다.
+    if (currentFilename === 'data/mishna/demai.json') {
+        renderDemaiContent(currentData);
+        return;
+    }
 
     if (currentData.chapters && currentData.chapters[0]?.mishnayot) {
         renderMishnahContent(currentData);
@@ -500,10 +515,98 @@ function loadBlog(filename, index = 0) {
         });
 }
 
+function renderDemaiContent(book, selectedChapter = null) {
+    const container = document.getElementById('torah-container');
+    if (!container) return;
+
+    const entries = Array.isArray(book.content) ? book.content : [];
+    const chapters = [...new Set(entries.map(item => Number(item.chapter)).filter(Number.isFinite))].sort((a, b) => a - b);
+    const activeChapter =
+    selectedChapter === 0
+        ? 0
+        : (chapters[0] || 1);
+    container.innerHTML = '';
+    container.classList.add('demai-reader');
+
+    const nav = document.createElement('div');
+    nav.className = 'mishna-nav demai-top-nav';
+    nav.innerHTML = `
+      <button type="button" onclick="showMishnaTractates('zeraim')">← 제라임으로</button>
+      <button type="button" onclick="showMishnaOrders()">미슈나 목차</button>
+      <button type="button" onclick="showMainHome()">홈</button>
+    `;
+    container.appendChild(nav);
+
+    const header = document.createElement('section');
+    header.className = 'demai-header';
+    header.innerHTML = `
+        <p class="demai-kicker">미슈나 · 제라임</p>
+        <h1>${escapeHtml(book.title || book.titleKo || '미슈나 데마이')}</h1>
+        <p class="demai-summary">장을 선택하면 해당 장의 미슈나만 표시됩니다.</p>
+    `;
+    container.appendChild(header);
+
+    const chapterNav = document.createElement('div');
+    chapterNav.className = 'demai-chapter-nav';
+    chapterNav.setAttribute('aria-label', '데마이 장 선택');
+    const allButton = document.createElement('button');
+allButton.type = 'button';
+allButton.className = 'demai-chapter-btn' + (activeChapter === 0 ? ' active' : '');
+allButton.textContent = '전체';
+allButton.onclick = () => {
+    renderDemaiContent(book, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+chapterNav.appendChild(allButton);
+    chapters.forEach(chapter => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'demai-chapter-btn' + (chapter === activeChapter ? ' active' : '');
+        button.textContent = `${chapter}장`;
+        button.onclick = () => {
+            renderDemaiContent(book, chapter);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        chapterNav.appendChild(button);
+    });
+    container.appendChild(chapterNav);
+
+    const chapterHeading = document.createElement('h2');
+    chapterHeading.className = 'demai-chapter-heading';
+    chapterHeading.textContent = `제 ${activeChapter}장`;
+    container.appendChild(chapterHeading);
+
+    (activeChapter === 0
+    ? entries
+    : entries.filter(item => Number(item.chapter) === activeChapter)
+).forEach(item => {
+        const article = document.createElement('article');
+        article.className = 'content-card demai-card';
+
+        const heading = document.createElement('h3');
+        heading.className = 'demai-item-title';
+        const ref = item.ref || `Demai ${item.chapter}:${item.verse}`;
+        heading.innerHTML = `<span class="demai-ref">${escapeHtml(ref)}</span>${item.title ? `<span>${escapeHtml(item.title)}</span>` : ''}`;
+
+        const body = document.createElement('div');
+        body.className = 'demai-body';
+        body.innerHTML = item.body || item.korean || '';
+
+        article.appendChild(heading);
+        article.appendChild(body);
+        container.appendChild(article);
+    });
+
+    const bottomNav = nav.cloneNode(true);
+    bottomNav.classList.add('demai-bottom-nav');
+    container.appendChild(bottomNav);
+}
+
 function renderMishnahContent(book) {
     const container = document.getElementById('torah-container');
     if (!container) return;
 
+    container.classList.remove('demai-reader');
     container.innerHTML = '';
 
     // 미슈나 전용 탐색 버튼은 실제 미슈나 본문에서만 표시합니다.

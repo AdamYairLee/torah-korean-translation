@@ -571,3 +571,182 @@ button:hover {
 .mishna-nav button:hover {
   transform: translateY(-2px);
 }
+
+/* Mishna Demai only: reader and mobile optimization */
+.demai-reader {
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+
+.demai-header {
+  margin: 8px auto 22px;
+  padding: 24px 22px;
+  text-align: center;
+  border: 1px solid rgba(120, 82, 45, 0.16);
+  border-radius: 22px;
+  background: rgba(255, 250, 240, 0.72);
+}
+
+.demai-header h1 {
+  margin: 4px 0 8px;
+  line-height: 1.3;
+}
+
+.demai-kicker,
+.demai-summary {
+  margin: 0;
+  color: #76624b;
+}
+
+.demai-kicker {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.demai-summary {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.demai-chapter-nav {
+  display: flex;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  margin: 0 0 14px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.demai-chapter-btn {
+  flex: 0 0 auto;
+  min-width: 62px;
+  min-height: 44px;
+  border: 1px solid rgba(90, 65, 35, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.9);
+  color: #3a2a1d;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demai-chapter-btn.active {
+  background: #6f4d2f;
+  color: #fffaf0;
+  border-color: #6f4d2f;
+}
+
+.demai-chapter-heading {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.demai-card {
+  margin-bottom: 16px;
+  padding: 22px;
+  overflow-wrap: anywhere;
+}
+
+.demai-item-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+
+.demai-ref {
+  color: #8a653c;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.demai-body {
+  font-size: 1.03rem;
+  line-height: 1.95;
+  word-break: keep-all;
+}
+
+.demai-bottom-nav {
+  margin-top: 28px;
+  padding-bottom: 24px;
+}
+
+.dark-mode .demai-header,
+.dark-mode .demai-chapter-btn {
+  background: rgba(28, 25, 21, 0.86);
+  color: #eee7d8;
+}
+
+.dark-mode .demai-kicker,
+.dark-mode .demai-summary,
+.dark-mode .demai-ref {
+  color: #c9ad82;
+}
+
+.dark-mode .demai-chapter-btn.active {
+  background: #c7a675;
+  color: #221b14;
+  border-color: #c7a675;
+}
+
+@media (max-width: 600px) {
+  .demai-reader {
+    width: 100%;
+  }
+
+  .demai-top-nav,
+  .demai-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin: 8px 0 18px;
+  }
+
+  .demai-top-nav button,
+  .demai-bottom-nav button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 9px 6px;
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  .demai-header {
+    padding: 20px 14px;
+    border-radius: 17px;
+  }
+
+  .demai-header h1 {
+    font-size: 1.65rem;
+  }
+
+  .demai-chapter-nav {
+    margin-left: -4px;
+    margin-right: -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .demai-chapter-btn {
+    min-width: 58px;
+    min-height: 46px;
+  }
+
+  .demai-card {
+    padding: 18px 15px;
+    border-radius: 16px;
+  }
+
+  .demai-item-title {
+    font-size: 1.05rem;
+  }
+
+  .demai-body {
+    font-size: 1rem;
+    line-height: 1.85;
+    word-break: normal;
+  }
+}
