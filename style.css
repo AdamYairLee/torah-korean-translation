@@ -750,3 +750,6 @@ button:hover {
     word-break: normal;
   }
 }
+/* 양떼를 지켜라: 기존 토라웹과 분리된 게임 진입 버튼 */
+.shepherd-game-btn{background:linear-gradient(#d7c49c,#a88e62)!important;color:#2c251b!important;border:2px solid #846b45!important;font-weight:800!important;box-shadow:inset 0 1px 0 #fff8,0 3px 7px #0002!important}
+.shepherd-game-btn:hover{background:linear-gradient(#ead9b3,#b99b6a)!important;color:#1f1a13!important}

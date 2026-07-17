@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>양떼를 지켜라 · 공개 알파 데모 v0.4</title>
+<link rel="stylesheet" href="game.css?v=2.0.36">
+</head>
+<body>
+<div id="mobileBlock" class="overlay hidden"><div class="stone-panel"><h1>양떼를 지켜라</h1><p>이 게임은 데스크탑 환경에 맞게 제작되었습니다.<br>더 넓은 화면과 키보드·마우스로 플레이해 주세요.</p><a href="../index.html">토라웹으로 돌아가기</a></div></div>
+<div id="titleScreen" class="screen active">
+  <div class="title-bg"></div>
+  <div class="title-wrap">
+    <h1 class="stone-title">양떼를 지켜라</h1>
+    <p class="alpha-badge">개발 중 공개 알파 데모</p>
+<p class="subtitle">고대 예루샬라임과 광야 3D 액션 · v0.5 Alpha</p>
+    <p class="alpha-note">이 버전은 게임의 핵심 콘셉트와 플레이 방식을 소개하기 위한 공개 개발판입니다.<br>일부 지형, 충돌, 인공지능 동작과 그래픽은 계속 변경될 수 있습니다.</p>
+    <button id="startBtn" class="primary">새 게임</button>
+    <button id="continueBtn">이어하기</button>
+    <button id="settingsBtn">설정</button>
+    <a class="back-link" href="../index.html">토라웹으로 돌아가기</a>
+    <p class="rights">© 2026 Adam / JewishKorean. All rights reserved.<br>코드·그래픽·음원·게임 자산의 무단 복제, 재배포 및 상업적 이용을 금합니다.</p>
+  </div>
+</div>
+<div id="characterScreen" class="screen">
+  <h2>캐릭터 선택</h2>
+  <p>현재 다비드 플레이만 활성화되어 있습니다.</p>
+  <div class="cards single-character">
+    <button id="davidCard" class="character-card selected david-only" data-character="david" aria-label="다비드로 게임 시작">
+      <img class="character-preview" src="assets/ui/david-character-select.jpg" alt="청소년 다비드 캐릭터 선택 완성본">
+      <b>다비드</b><span>청소년 목동 · 회전식 돌팔매</span>
+    </button>
+  </div>
+  <button id="playBtn" class="primary">다비드로 시작</button>
+</div>
+<div id="gameScreen" class="screen">
+  <div id="rendererHost"></div>
+  <div id="hud">
+    <div id="timePhase"><strong id="timePhaseLabel">아침</strong><span id="timeClock">07:00</span></div>
+    <div id="thirstHud"><span>양떼의 갈증</span><div><i id="thirstBar"></i></div><b id="thirstValue">100</b></div>
+    <div class="hud-top-right">
+      <div class="hud-status"><div class="meter"><span>체력</span><div><i id="hpBar"></i></div></div><div id="stoneCount">돌 15</div><div id="respect">존중 0</div><div id="money">0 셰켈</div></div>
+      <div id="weaponHud"><span>무기</span><div id="weaponIcon" class="weapon-icon sling" role="img" aria-label="회전식 돌팔매"></div><small>Tab으로 전환</small></div>
+    </div>
+    <canvas id="minimap" width="190" height="190"></canvas>
+    <div id="jerusalemLandmark">예루샬라임</div>
+    <div id="mission">양을 다음 구유가 있는 야영지까지 보호하십시오.</div>
+    <div id="skillToast"><strong>돌팔매 기술 +2</strong><div><i id="skillToastBar"></i></div><span id="skillToastValue">0/50</span></div>
+    <div id="crosshair">＋</div>
+    <div id="charge"><i></i></div>
+    <div id="fullscreenHint">전체 화면 종료: Esc 또는 F11 · 다른 창으로 전환: Alt+Tab</div>
+    <div id="dangerNotice"></div><div id="cameraModeNotice"></div><div id="worldRegionLabel"></div><div id="enemyHealthLayer"></div>
+    <div id="missionResult"><strong></strong><span></span></div>
+    <div id="reconnectHint">게임 화면으로 돌아오면 WASD 또는 화면 클릭으로 시점을 다시 연결할 수 있습니다.</div>
+    <div id="notice"></div>
+    <div id="help">WASD 이동 · 마우스 360° 시점 · V 시점 변경 · Space 뛰기 · Shift 점프 · Z 양 호출 · 우클릭 조준 · 좌클릭 발사 · E 또는 Ctrl 돌 줍기 · Tab 무기 전환 · Enter 치트 콘솔 · Esc 메뉴</div>
+  </div>
+  <div id="practicePrompt" class="overlay hidden" aria-label="돌팔매 연습 선택"><div class="stone-panel"><h2>돌팔매 연습을 하시겠습니까?</h2><p>야영지의 과녁을 향해 최대 5번 연습합니다.</p><button id="practiceYesBtn" class="primary">예</button><button id="practiceNoBtn">아니오</button></div></div>
+  <div id="pause" class="overlay hidden" aria-label="일시정지 메뉴"><div class="stone-panel"><h2>일시정지</h2><p class="keyboard-help">Tab 또는 방향키로 선택 · Enter로 실행</p><button id="resumeBtn">계속</button><button id="pauseSettingsBtn">설정</button><button id="saveBtn">저장</button><button id="quitBtn">메인 화면</button></div></div>
+  <div id="settingsPanel" class="overlay hidden" aria-label="설정 메뉴"><div class="stone-panel settings-panel"><h2>설정</h2><p class="keyboard-help">Tab 또는 방향키로 선택 · Enter로 실행</p><label for="sensitivityRange">마우스 감도 <strong id="sensitivityValue">60</strong></label><label class="sound-toggle"><input id="soundEnabled" type="checkbox" checked> 환경음과 효과음 사용</label><label for="volumeRange">게임 볼륨 <strong id="volumeValue">55</strong></label><input id="volumeRange" type="range" min="0" max="100" step="1" value="55"><input id="sensitivityRange" type="range" min="10" max="100" step="1" value="60"><p class="settings-help">낮을수록 천천히, 높을수록 빠르게 시야가 움직입니다.</p><button id="settingsCloseBtn" class="primary">확인</button></div></div>
+  <div id="cheatConsole" class="console hidden"><input id="cheatInput" autocomplete="off" placeholder="치트키 입력"></div>
+  <div id="gameOver" class="overlay hidden"><div class="stone-panel"><h2 id="gameOverTitle">쓰러졌습니다</h2><p id="gameOverText">마지막 저장 지점에서 다시 시작하시겠습니까?</p><button id="restartBtn" class="primary">다시 시작</button></div></div>
+</div>
+<script type="module" src="game.js?v=2.0.36"></script>
+</body>
+</html>
