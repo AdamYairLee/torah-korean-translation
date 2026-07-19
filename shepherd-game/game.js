@@ -1,6 +1,89 @@
 import * as t from "./three.module.js";
 import { FBXLoader } from "./FBXLoader.js";
 import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
+import { GLTFLoader } from "./GLTFLoader.js";
+import { JERUSALEM_DATA } from "./jerusalemData.js";
+let jerusalemMapReady = false;
+let jerusalemMapBaseY = 0;
+const JERUSALEM_SCALE = JERUSALEM_DATA.scale || 260;
+
+function sampleJerusalemGround(worldX, worldZ) {
+  const [xmin, xmax, zmin, zmax] = JERUSALEM_DATA.bounds;
+  const lx = worldX / JERUSALEM_SCALE;
+  const lz = worldZ / JERUSALEM_SCALE;
+  if (lx < xmin || lx > xmax || lz < zmin || lz > zmax) return null;
+  const n = JERUSALEM_DATA.heightN;
+  const gx = ((lx - xmin) / (xmax - xmin)) * (n - 1);
+  const gz = ((lz - zmin) / (zmax - zmin)) * (n - 1);
+  const x0 = Math.max(0, Math.min(n - 1, Math.floor(gx)));
+  const z0 = Math.max(0, Math.min(n - 1, Math.floor(gz)));
+  const x1 = Math.min(n - 1, x0 + 1);
+  const z1 = Math.min(n - 1, z0 + 1);
+  const fx = gx - x0, fz = gz - z0;
+  const h = JERUSALEM_DATA.height;
+  const a = h[z0 * n + x0], b = h[z0 * n + x1];
+  const c = h[z1 * n + x0], d = h[z1 * n + x1];
+  const localY = (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
+  return jerusalemMapBaseY + (localY - JERUSALEM_DATA.minY) * JERUSALEM_SCALE;
+}
+
+function loadJerusalemMap() {
+  if (!i || mt.jerusalemMap) return;
+  const loader = new GLTFLoader();
+  loader.load(
+    "./assets/models/jerusalem_optimized.glb",
+    (gltf) => {
+      const model = gltf.scene;
+      const box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      jerusalemMapBaseY = $t(0, 0) - 8;
+      model.scale.setScalar(JERUSALEM_SCALE);
+      model.position.set(-center.x * JERUSALEM_SCALE, jerusalemMapBaseY - box.min.y * JERUSALEM_SCALE, -center.z * JERUSALEM_SCALE);
+      model.rotation.y = 0;
+      model.name = "OptimizedJerusalemFirstTempleMap";
+      model.traverse((obj) => {
+        if (!obj.isMesh) return;
+        obj.castShadow = false;
+        obj.receiveShadow = true;
+        if (obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => {
+            if (m.map) m.map.anisotropy = Math.min(4, c.capabilities.getMaxAnisotropy());
+            m.roughness = Math.max(0.72, m.roughness ?? 0.72);
+          });
+        }
+      });
+      if (mt.jerusalem) mt.jerusalem.visible = false;
+      i.add(model);
+      mt.jerusalemMap = model;
+      // 기존 고해상도 성전 모델은 새 도시의 성전산 위치에 색감 보강용으로 유지합니다.
+      if (mt.importedTemple) {
+        i.attach(mt.importedTemple);
+        mt.importedTemple.visible = true;
+        mt.importedTemple.position.set(-1020, jerusalemMapBaseY + 255, 760);
+        mt.importedTemple.scale.setScalar(1.5);
+        mt.importedTemple.rotation.y = 0;
+      }
+      // 기존 절차형 도시 충돌을 지우고 새 지도에서 추출한 건물/성벽 충돌을 등록합니다.
+      for (let idx = z.length - 1; idx >= 0; idx--) {
+        if (["building", "wall", "temple", "temple-wall"].includes(z[idx].type)) z.splice(idx, 1);
+      }
+      for (const rect of JERUSALEM_DATA.rects) {
+        Ot(rect[0] * JERUSALEM_SCALE, rect[1] * JERUSALEM_SCALE, Math.max(22, rect[2] * JERUSALEM_SCALE), Math.max(22, rect[3] * JERUSALEM_SCALE), 0, "jerusalem-map");
+      }
+      jerusalemMapReady = true;
+      eo("제1성전 시대 예루샬라임 3D 지도가 적용되었습니다.");
+    },
+    undefined,
+    (error) => {
+      console.error("예루샬라임 3D 지도 로드 실패:", error);
+      jerusalemMapReady = false;
+      if (mt.jerusalem) mt.jerusalem.visible = true;
+      eo("3D 지도 로드에 실패하여 기존 예루샬라임 지도를 사용합니다.");
+    },
+  );
+}
+
 const e = (t) => document.querySelector(t),
   o = [...document.querySelectorAll(".screen")],
   n =
@@ -122,9 +205,9 @@ const pt = 33,
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
   Mt = new t.Vector3(),
-  yt = -2280,
-  xt = 520,
-  gt = 480;
+  yt = -2050,
+  xt = 540,
+  gt = 460;
 let vt = null;
 function zt(t, e, o = 0) {
   return Math.abs(t - 260) < xt + o && Math.abs(e - yt) < gt + o;
@@ -814,23 +897,27 @@ async function At(e) {
                 c = [ge(10454629), ge(12099192), ge(13810577)],
                 l = (ge(6049085), c[1]);
               r.position.set(o, 0, n);
-              const h = 196,
+              const h = 132,
                 d = [
                   { name: "남문", x: 0, z: a, rot: 0 },
                   { name: "북문", x: 0, z: -a, rot: 0 },
-                  { name: "북동문", x: 1360, z: -2020, rot: 0.52 },
-                  { name: "동문", x: s, z: 120, rot: Math.PI / 2 },
-                  { name: "서문", x: -s, z: 260, rot: Math.PI / 2 },
+                  { name: "동문", x: s, z: -120, rot: Math.PI / 2 },
                 ],
                 p = [];
-              for (let t = 0; t < h; t++) {
-                const e = (t / h) * Math.PI * 2,
+              for (let wallIndex = 0; wallIndex < h; wallIndex++) {
+                const e = (wallIndex / h) * Math.PI * 2,
                   o = 1 + 0.035 * Math.sin(3 * e) - 0.018 * Math.cos(5 * e);
-                p.push({
-                  a: e,
-                  x: Math.sin(e) * s * o,
-                  z: Math.cos(e) * a * o,
-                });
+                let wallX = Math.sin(e) * s * o,
+                  wallZ = Math.cos(e) * a * o;
+                // Expand only the north-east city wall toward the Kidron shoulder.
+                // The extension stops before the valley and creates a broad interior
+                // circulation area beside the Temple Mount without enlarging the west.
+                if (wallX > 0 && wallZ < -700) {
+                  const northBlend = t.MathUtils.smoothstep(-wallZ, 700, 2350),
+                    eastBlend = t.MathUtils.smoothstep(wallX, 0, s);
+                  wallX += 330 * northBlend * eastBlend;
+                }
+                p.push({ a: e, x: wallX, z: wallZ });
               }
               const u = (t, e) =>
                 d.some((o) => Math.hypot(t - o.x, e - o.z) < 189);
@@ -954,18 +1041,19 @@ async function At(e) {
               for (const t of d) pe(r, o, n, t.x, t.z, 270, l, 0, t.rot, 1);
               (function (e, o, n, s, a, i, r) {
                 const c = ee(20260716);
-                for (let t = 1; t <= 9; t++) {
-                  const o = 12 + 7 * t,
+                for (let t = 1; t <= 7; t++) {
+                  const o = 8 + 5 * t,
                     n = 0.1 + 0.087 * t;
                   for (let a = 0; a < o; a++) {
                     const l = (a / o) * Math.PI * 2 + (t % 2) * 0.055,
-                      h = 1130 * Math.sin(l) * n + 30 * (c() - 0.5),
-                      d = 2020 * Math.cos(l) * n + 38 * (c() - 0.5);
+                      h = 610 * Math.sin(l) * n + 30 * (c() - 0.5),
+                      d = 1520 * Math.cos(l) * n + 38 * (c() - 0.5);
                     if (!Kt(i + h, r + d, -145)) continue;
                     if (Zt(h, d, 126)) continue;
                     if (zt(i + h, r + d, 175)) continue;
-                    if (d < -720 && Math.abs(h) < 530) continue;
-                    if (d < 350 && h > 330) continue;
+                    // Temple Mount and its eastern access road must contain no houses.
+                    if (d < -620) continue;
+                    if (h > 170 && d < 120) continue;
                     const p = d > 250;
                     ue(
                       e,
@@ -999,6 +1087,44 @@ async function At(e) {
                 ];
                 for (const [t, o, n] of h) me(e, t, o, n, i, r, ge(12559742));
               })(r, 0, 0, c, 0, o, n),
+                // Restore a dense southern residential quarter while preserving all mapped roads.
+                (function (group, materials, cityX, cityZ) {
+                  const rnd = ee(2026071903);
+                  let placed = 0;
+                  for (let attempt = 0; attempt < 260 && placed < 58; attempt++) {
+                    const localX = -650 + rnd() * 1300;
+                    const localZ = 300 + rnd() * 1500;
+                    const worldX = cityX + localX;
+                    const worldZ = cityZ + localZ;
+                    if (!Kt(worldX, worldZ, -125)) continue;
+                    if (Zt(localX, localZ, 125)) continue;
+                    if (zt(worldX, worldZ, 145)) continue;
+                    // Keep the Siloam approach and main southern gate plaza open.
+                    if (localZ > 1320 && Math.abs(localX) < 190) continue;
+                    // Keep the entire northern Temple Mount and curved eastern approach clear.
+                    if (localZ < -620) continue;
+                    if (localX > 170 && localZ < 140) continue;
+                    const width = 62 + rnd() * 54;
+                    const depth = 58 + rnd() * 48;
+                    const height = 92 + rnd() * 88;
+                    const rot = (rnd() - 0.5) * 0.22;
+                    // Reject overlaps with already registered houses/walls.
+                    if (jt(new t.Vector3(worldX, te(worldX, worldZ) + 4, worldZ), 42)) continue;
+                    ue(
+                      group,
+                      localX,
+                      localZ,
+                      width,
+                      depth,
+                      height,
+                      materials[placed % materials.length],
+                      cityX,
+                      cityZ,
+                      rot,
+                    );
+                    placed++;
+                  }
+                })(r, c, o, n),
                 (function (e, o, n, s) {
                   const a = 40,
                     i = -410,
@@ -1061,12 +1187,12 @@ async function At(e) {
                     d = Math.min(...h),
                     p = Math.max(...h) + 12,
                     u = p - d + 35,
-                    m = new t.Mesh(new t.BoxGeometry(695, u, 445), o[0]);
+                    m = new t.Mesh(new t.BoxGeometry(575, u, 365), o[0]);
                   m.position.set(i, d + u / 2 - 5, r),
                     (m.castShadow = !0),
                     (m.receiveShadow = !0),
                     a.add(m);
-                  const f = new t.Mesh(new t.BoxGeometry(c, 16, l), o[2]);
+                  const f = new t.Mesh(new t.BoxGeometry(c, 14, l), o[2]);
                   f.position.set(i, p + 8, r), (f.receiveShadow = !0), a.add(f);
                   const w = [
                     [-150, 0, 165, 170, 170],
@@ -1098,28 +1224,32 @@ async function At(e) {
                   e.add(a), Ot(n + i, s + r, 468, 259.2, 0, "palace");
                 })(r, c, o, n),
                 (function (e, o, n, s) {
-                  const a = 260,
-                    i = -2280,
+                  const a = 70,
+                    i = -2050,
                     r = new t.Group();
                   r.position.set(a, 0, i);
-                  const c = 500,
-                    l = 460,
+                  const c = 650,
+                    l = 520,
                     h = [];
                   for (const t of [-500, -250, 0, 250, 500])
                     for (const e of [-460, -230, 0, 230, 460])
                       h.push($t(n + a + t, s + i + e));
-                  const d = Math.min(...h) + 1.5,
+                  // Keep the court only slightly above the natural summit. The previous
+                  // max+18 calculation forced a visible artificial pedestal.
+                  const summitAverage = h.reduce((sum, value) => sum + value, 0) / h.length,
+                    d = t.MathUtils.clamp(summitAverage + 2, 166, 178),
                     p = [
-                      { x: n + 80, z: s - 1050 },
-                      { x: n + 130, z: s - 1320 },
-                      { x: n + 180, z: s - 1570 },
-                      { x: n + 250, z: s - 1780 },
-                      { x: n + 430, z: s - 1980 },
-                      { x: n + 760, z: s - 2280 },
+                      { x: n + 360, z: s - 720 },
+                      { x: n + 470, z: s - 980 },
+                      { x: n + 590, z: s - 1240 },
+                      { x: n + 670, z: s - 1480 },
+                      { x: n + 690, z: s - 1700 },
+                      { x: n + 700, z: s - 1880 },
+                      { x: n + a + c, z: s + i },
                     ];
                   dt = {
                     points: p,
-                    halfWidth: 175,
+                    halfWidth: 410,
                     courtY: d,
                     startY: $t(p[0].x, p[0].z) + 2,
                     steps: 0,
@@ -1127,76 +1257,105 @@ async function At(e) {
                     courtXMax: n + a + c,
                     courtZMin: s + i - l,
                     courtZMax: s + i + l,
+                    courtSurfaceY: d + 4,
+                    altarX: n + a + 205,
+                    altarZ: s + i,
+                    altarHalfX: 85,
+                    altarHalfZ: 85,
+                    altarTopY: d + 107,
+                    altarRampXMin: n + a + 125,
+                    altarRampXMax: n + a + 285,
+                    altarRampZMin: s + i + 90,
+                    altarRampZMax: s + i + 250,
                   };
                   if (mt.terrain?.geometry?.attributes?.position) {
-                    const e = mt.terrain.geometry.attributes.position,
-                      o = 90;
+                    const e = mt.terrain.geometry.attributes.position;
+                    // Rebuild the visible terrain from the same height function used by
+                    // player/animal movement. This prevents the eastern approach from
+                    // visually or physically dropping below the ground.
                     for (let t = 0; t < e.count; t++) {
-                      const a = e.getX(t),
-                        i = e.getZ(t),
-                        r = Math.max(dt.courtXMin - a, 0, a - dt.courtXMax),
-                        c = Math.max(dt.courtZMin - i, 0, i - dt.courtZMax),
-                        l = Math.hypot(r, c);
-                      if (
-                        a >= dt.courtXMin &&
-                        a <= dt.courtXMax &&
-                        i >= dt.courtZMin &&
-                        i <= dt.courtZMax
-                      )
-                        e.setY(t, d);
-                      else if (l > 0 && l < o) {
-                        const n = l / o,
-                          s = n * n * (3 - 2 * n);
-                        e.setY(t, d + (e.getY(t) - d) * s);
-                      }
+                      const terrainX = e.getX(t), terrainZ = e.getZ(t);
+                      const underTempleCourt =
+                        terrainX >= dt.courtXMin &&
+                        terrainX <= dt.courtXMax &&
+                        terrainZ >= dt.courtZMin &&
+                        terrainZ <= dt.courtZMax;
+                      // The visible terrain is deliberately recessed below the marble slab.
+                      // Player/animal movement still uses the exact marble surface height via te().
+                      // This separation removes z-fighting, brown ridge bleed-through and pits.
+                      e.setY(t, underTempleCourt ? d - 3 : te(terrainX, terrainZ));
                     }
-                    (e.needsUpdate = !0),
-                      mt.terrain.geometry.computeVertexNormals();
+                    e.needsUpdate = true;
+                    mt.terrain.geometry.computeVertexNormals();
+                    mt.terrain.geometry.computeBoundingSphere();
                   }
                   const templeMarble = new t.MeshToonMaterial({
                     color: 15790320,
                     flatShading: !0,
                   });
+                  // The temple court is now cut directly into the summit terrain.
+                  // Keep only a shallow buried footing instead of a raised platform.
+                  const foundationBase = d - 4;
+                  const foundationHeight = 4;
+                  const foundation = new t.Mesh(
+                    new t.BoxGeometry(1300, foundationHeight, 1040),
+                    o[0],
+                  );
+                  foundation.position.set(0, foundationBase + foundationHeight / 2, 0);
+                  foundation.castShadow = true;
+                  foundation.receiveShadow = true;
+                  r.add(foundation);
+                  // One continuous marble slab covers the entire court. A shallow box is
+                  // used instead of a single plane so the floor never flickers or reveals
+                  // terrain cracks when the camera is close to the surface.
                   const u = new t.Mesh(
-                    new t.PlaneGeometry(1e3, 920, 1, 1),
+                    new t.BoxGeometry(1312, 8, 1052),
                     templeMarble,
                   );
-                  (u.rotation.x = -Math.PI / 2),
-                    (u.position.y = d + 0.22),
-                    (u.receiveShadow = !0),
-                    r.add(u);
+                  u.position.y = d;
+                  u.receiveShadow = !0;
+                  u.castShadow = !1;
+                  r.add(u);
                   const m = 170,
                     f = 40,
                     w = 196;
+                  // Temple enclosure walls leave broad circulation lanes at the north-west
+                  // and north-east corners. This keeps the Jerusalem north gate connected
+                  // to both sides of the Temple Mount instead of trapping the player.
                   for (const [e, n, s, a] of [
-                    [0, -460, 1e3, f],
-                    [0, l, 1e3, f],
-                    [-500, 0, f, 920],
+                    [0, -520, 1060, f],
+                    [0, l, 1300, f],
+                    // Shortened western wall: leaves a broad north-west alley from
+                    // Jerusalem's north gate into the Temple Mount circulation area.
+                    [-650, 250, f, 360],
                   ]) {
                     const i = new t.Mesh(new t.BoxGeometry(s, m, a), o[1]);
                     i.position.set(e, d + 85, n), (i.castShadow = !0), r.add(i);
                   }
-                  for (const e of [-1, 1]) {
-                    const n = new t.Mesh(new t.BoxGeometry(f, m, 362), o[1]);
-                    n.position.set(c, d + 85, 279 * e), r.add(n);
+                  // East wall is split into shorter southern and northern sections. The
+                  // middle gate remains wide, and the north-east projection is removed.
+                  // Keep only the south-east enclosure section. The former north-east
+                  // projection stuck outside Jerusalem's city wall and blocked the approach.
+                  for (const [wallZ, wallDepth] of [[330, 260]]) {
+                    const n = new t.Mesh(new t.BoxGeometry(f, m, wallDepth), o[1]);
+                    n.position.set(c, d + 85, wallZ), r.add(n);
                   }
                   const M = new t.Mesh(new t.BoxGeometry(60, 54, w), o[2]);
                   M.position.set(c, d + m - 27, 0), r.add(M);
                   const templeEntryLip = new t.Mesh(
-                    new t.BoxGeometry(34, 4, w - 34),
+                    new t.BoxGeometry(30, 4, w - 40),
                     templeMarble,
                   );
                   templeEntryLip.position.set(c - 20, d + 2, 0),
                     (templeEntryLip.receiveShadow = !0),
                     r.add(templeEntryLip),
-                    de(r, 1e3, d + m, 0, -460, 0, o[2], 34, -20),
-                    de(r, 1e3, d + m, 0, l, 0, o[2], 34, 20),
-                    de(r, 920, d + m, -500, 0, Math.PI / 2, o[2], 34, -20),
-                    Ot(n + a, s + i - l, 988, f, 0, "temple-wall"),
-                    Ot(n + a, s + i + l, 988, f, 0, "temple-wall"),
-                    Ot(n + a - c, s + i, f, 908, 0, "temple-wall"),
-                    Ot(n + a + c, s + i - 248, f, 270, 0, "temple-wall"),
-                    Ot(n + a + c, s + i + 248, f, 270, 0, "temple-wall");
+                    de(r, 1080, d + m, 0, -460, 0, o[2], 34, -20),
+                    de(r, 1080, d + m, 0, l, 0, o[2], 34, 20),
+                    de(r, 920, d + m, -540, 0, Math.PI / 2, o[2], 34, -20),
+                    Ot(n + a, s + i - l, 1048, f, 0, "temple-wall"),
+                    Ot(n + a, s + i + l, 1288, f, 0, "temple-wall"),
+                    Ot(n + a - c, s + i + 250, f, 348, 0, "temple-wall"),
+                    Ot(n + a + c, s + i + 330, f, 248, 0, "temple-wall");
                   const y = -210,
                     x = new t.Mesh(new t.BoxGeometry(420, 430, 320), o[2]);
                   x.position.set(-315, d + 239, 0),
@@ -1255,8 +1414,8 @@ async function At(e) {
                     L = new t.Mesh(new t.BoxGeometry(170, 105, G), P);
                   L.position.set(b, d + 2 + 52.5, 0),
                     (L.castShadow = !0),
-                    r.add(L),
-                    Ot(n + a + b, s + i + 0, 170, G, 0, "altar");
+                    (L.receiveShadow = !0),
+                    r.add(L);
                   for (const e of [-1, 1])
                     for (const o of [-1, 1]) {
                       const n = new t.Mesh(
@@ -1468,9 +1627,10 @@ async function At(e) {
                 c.position.set(s, te(s, a) + 0.35 * r, a),
                 c.rotation.set(e(), e() * Math.PI, e()),
                 (c.castShadow = !0),
-                i.add(c),
-                r > 14 && Nt(s, a, 0.55 * r, "rock");
-            }
+                i.add(c);
+                // Decorative wilderness rocks no longer create invisible movement blockers.
+                // Buildings, walls and trees retain collision, but open ground stays traversable.
+              }
             oe(1550, 900, 1.05),
               oe(1900, 250, 0.9),
               oe(-1750, 850, 0.8),
@@ -1768,6 +1928,7 @@ async function At(e) {
           addEventListener("resize", Le),
           c.setAnimationLoop(Qe);
       })(),
+    // v1.0: imported museum GLB disabled; Jerusalem is rebuilt as the playable world itself.
     Te(),
     e && no(),
     (S = !0),
@@ -1777,7 +1938,8 @@ async function At(e) {
     document.documentElement.requestFullscreen?.().catch(() => {}),
     c.domElement.requestPointerLock?.(),
     eo(
-      "예루샬라임과 주변 광야\n성 안에서는 강도를, 성 밖에서는 야생 동물을 경계하십시오.",
+      `다비드의 도시 · 성전산 · 키드론 골짜기 · 올리브산
+성문과 골목을 따라 성전산까지 올라갈 수 있습니다.`,
     );
 }
 (Lt.wind.loop = !0), (Lt.birds.loop = !0), (Lt.night.loop = !0);
@@ -1786,15 +1948,15 @@ const Ft = [
       name: "예루샬라임",
       x: 0,
       z: 0,
-      r: 3100,
+      r: 2280,
       size: "capital",
-      wallR: 2900,
-      wallRX: 1750,
-      wallRZ: 3100,
+      wallR: 2100,
+      wallRX: 980,
+      wallRZ: 3000,
     },
   ],
   Wt = 232,
-  qt = { x: -1500, z: 1120 };
+  qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
 }
@@ -1802,7 +1964,7 @@ function Ot(t, e, o, n, s = 0, a = "building") {
   z.push({ shape: "rect", x: t, z: e, w: o, d: n, rotation: s, type: a });
 }
 function jt(t, e = 18) {
-  if (Math.abs(t.x) > 3720 || Math.abs(t.z) > 3720) return !0;
+  if (Math.abs(t.x) > 4050 || Math.abs(t.z) > 4050) return !0;
   for (const o of z)
     if ("rect" === o.shape) {
       const n = t.x - o.x,
@@ -1826,28 +1988,43 @@ function jt(t, e = 18) {
   return !1;
 }
 function Ht(t, e, o, n = 0) {
-  const s = (t.wallRX || t.wallR) + n,
-    a = (t.wallRZ || t.wallR) + n;
-  return ((e - t.x) * (e - t.x)) / (s * s) + ((o - t.z) * (o - t.z)) / (a * a);
+  let s = (t.wallRX || t.wallR) + n;
+  const a = (t.wallRZ || t.wallR) + n,
+    localX = e - t.x,
+    localZ = o - t.z;
+  // Match the visible north-east wall extension. This preserves the Kidron drop
+  // outside the wall while giving the Temple Mount a usable interior forecourt.
+  if (localX > 0 && localZ < -700) {
+    const northBlend = Math.max(0, Math.min(1, (-localZ - 700) / 1650)),
+      eastBlend = Math.max(0, Math.min(1, localX / Math.max(s, 1)));
+    s += 330 * northBlend * eastBlend;
+  }
+  return (localX * localX) / (s * s) + (localZ * localZ) / (a * a);
 }
 function Kt(t, e, o = 0) {
   return Ht(Ft[0], t, e, o) < 1;
 }
 const Xt = [
-  [[0, 2250], [0, -1280], 118],
-  [[-980, 1450], [980, 1450], 92],
-  [[-1080, 760], [1080, 760], 94],
-  [[-1110, 80], [1110, 80], 98],
-  [[-940, -590], [940, -590], 104],
-  [[0, 1320], [540, 760], 96],
-  [[540, 760], [980, 180], 104],
-  [[980, 180], [820, -420], 112],
-  [[820, -420], [590, -1020], 116],
-  [[590, -1020], [720, -1390], 126],
-  [[0, 780], [-740, 300], 88],
-  [[-740, 300], [-700, -680], 88],
-  [[590, -1020], [850, -1160], 124],
-  [[850, -1160], [980, -1450], 128],
+  [[0, 1700], [0, -1320], 108],
+  [[-420, 1180], [420, 1180], 72],
+  [[-500, 680], [500, 680], 76],
+  [[-520, 180], [520, 180], 78],
+  [[-460, -340], [460, -340], 84],
+  [[0, 1260], [310, 850], 74],
+  [[310, 850], [430, 360], 76],
+  [[430, 360], [350, -260], 82],
+  [[350, -260], [350, -760], 92],
+  // Broad eastern approach to the Temple Mount: the road leaves the eastern
+  // city lane, bends north, then turns gently west into the eastern gate.
+  [[350, -760], [430, -780], 110],
+  [[430, -780], [560, -1050], 126],
+  [[560, -1050], [690, -1320], 132],
+  [[690, -1320], [790, -1560], 138],
+  [[790, -1560], [800, -1780], 142],
+  [[800, -1780], [760, -1930], 146],
+  [[760, -1930], [720, -2050], 150],
+  [[0, 980], [-350, 620], 68],
+  [[-350, 620], [-390, -260], 70],
 ];
 function Zt(t, e, o = 95) {
   return Xt.some(
@@ -1879,8 +2056,8 @@ function _t(e, o) {
   for (const [e, o] of n)
     if (
       !(
-        Math.abs(e) > 3620 ||
-        Math.abs(o) > 3620 ||
+        Math.abs(e) > 3980 ||
+        Math.abs(o) > 3980 ||
         he(e, o) > 0.68 ||
         jt(new t.Vector3(e, te(e, o) + 4, o), 28)
       )
@@ -1903,40 +2080,65 @@ function Qt(t) {
     (Qt.timer = setTimeout(() => o.classList.remove("show"), 2800)));
 }
 function $t(e, o) {
-  let n = 70;
-  const s = Ht(Ft[0], e, o, 0);
-  if (s < 1.55) {
-    const a = 1 - t.MathUtils.smoothstep(s, 0.72, 1.55);
-    (n +=
-      a *
-      (105 +
-        165 * t.MathUtils.clamp((1120 - o) / 2350, 0, 1) +
-        72 * Math.exp(-((e + 70) ** 2) / 25e4))),
-      (n +=
-        a *
-        (14 * Math.sin(0.006 * (o + 1100)) + 9 * Math.sin(0.008 * (e - o))));
-  }
-  (n += 72 * Math.exp(-((e + 40) ** 2) / 31e4 - (o + 510) ** 2 / 18e4)),
-    (n += 105 * Math.exp(-((e - 10) ** 2) / 39e4 - (o + 1030) ** 2 / 23e4)),
-    (n += 205 * Math.exp(-((e - 260) ** 2) / 76e4 - (o + 2280) ** 2 / 9e5)),
-    (n += 62 * Math.exp(-((e - 300) ** 2) / 12e5 - (o + 1830) ** 2 / 145e4));
-  const a = 2150 + 90 * Math.sin(0.0012 * (o + 180));
-  return (
-    (n -= 330 * Math.exp(-((e - a) ** 2) / 105e3)),
-    (n -= 110 * Math.exp(-((e - a - 165) ** 2) / 19e4)),
-    (n +=
-      190 *
-      Math.exp(-((e - 2880) ** 2) / 6e5) *
-      Math.exp(-((o + 120) ** 2) / 56e5)),
-    (n -= 82 * Math.exp(-((e + 820) ** 2) / 12e4)),
-    (n -= 88 * Math.exp(-((e - 80) ** 2 + (o - 1505) ** 2) / 23e4)),
-    e > 2850 && (n -= 130 * t.MathUtils.smoothstep(e, 2850, 5200)),
-    (n +=
-      10 * Math.sin(0.0042 * e) +
-      8 * Math.cos(0.0047 * o) +
-      5 * Math.sin(0.006 * (e + o))),
-    n
-  );
+  // v1.0 playable geography: City of David ridge, Temple Mount,
+  // Kidron Valley and the Mount of Olives. Western terrain remains open pasture.
+  let n = 58;
+
+  // Broad natural undulation.
+  n += 11 * Math.sin(0.0036 * e) + 8 * Math.cos(0.0041 * o);
+  n += 5 * Math.sin(0.0052 * (e + o));
+
+  // Narrow north-south ridge of ancient Jerusalem / City of David.
+  const ridgeWidth = 520 + 80 * t.MathUtils.clamp((900 - o) / 2400, 0, 1);
+  const ridge = Math.exp(-(e * e) / (ridgeWidth * ridgeWidth));
+  const northRise = 105 + 150 * t.MathUtils.clamp((1250 - o) / 2700, 0, 1);
+  n += ridge * northRise;
+
+  // Southern City of David spur, descending toward Siloam.
+  n += 62 * Math.exp(-((e + 20) ** 2) / 170000 - ((o - 720) ** 2) / 720000);
+  n -= 70 * Math.exp(-((e + 10) ** 2) / 240000 - ((o - 1720) ** 2) / 220000);
+
+  // Temple Mount: a broad continuation of the northern ridge. The mountain rises
+  // gradually from the city on the south and west, while its eastern shoulder stops
+  // before the Kidron Valley instead of spilling down into it.
+  const templeBase = Math.exp(-((e - 40) ** 2) / 3600000 - ((o + 1780) ** 2) / 4700000);
+  const templeShoulder = Math.exp(-((e - 10) ** 2) / 2600000 - ((o + 1500) ** 2) / 3400000);
+  const templeSummit = Math.exp(-((e - 70) ** 2) / 1750000 - ((o + 2050) ** 2) / 1550000);
+  // Keep the Temple Mount lower than the previous versions. It is a broad,
+  // gently raised continuation of the city ridge, not a separate earthen tower.
+  n += 22 * templeBase + 14 * templeShoulder + 16 * templeSummit;
+  n += 16 * Math.exp(-((e - 430) ** 2) / 1700000 - ((o + 1050) ** 2) / 2200000);
+  n += 18 * Math.exp(-((e - 650) ** 2) / 1300000 - ((o + 1450) ** 2) / 2100000);
+  n += 20 * Math.exp(-((e - 760) ** 2) / 1100000 - ((o + 1800) ** 2) / 1700000);
+  n += 16 * Math.exp(-((e + 380) ** 2) / 2200000 - ((o + 1700) ** 2) / 3200000);
+  // A wide low summit replaces the former steep mound. The blend is smooth,
+  // so the eastern road reaches the court without a sudden climb or drop.
+  const lowSummitInfluence = Math.exp(-((e - 70) ** 2) / 2100000 - ((o + 2050) ** 2) / 2200000);
+  n = t.MathUtils.lerp(n, 172, 0.82 * lowSummitInfluence);
+
+  // Kidron Valley: a deep, traversable north-south valley east of the city.
+  const kidronX = 1080 + 70 * Math.sin(0.0014 * (o + 300));
+  n -= 245 * Math.exp(-((e - kidronX) ** 2) / 105000);
+  n -= 55 * Math.exp(-((e - kidronX - 150) ** 2) / 250000);
+
+  // Mount of Olives rises east of Kidron, with broad climbable slopes.
+  n += 245 * Math.exp(-((e - 2200) ** 2) / 820000) *
+       Math.exp(-((o + 100) ** 2) / 5000000);
+
+  // Tyropoeon / western saddle. West remains open grazing terrain.
+  n -= 55 * Math.exp(-((e + 720) ** 2) / 170000);
+  n += 45 * Math.exp(-((e + 1750) ** 2) / 1800000) *
+       Math.exp(-((o - 200) ** 2) / 5000000);
+
+  // Siloam basin and Gihon spring vicinity.
+  n -= 42 * Math.exp(-((e - 900) ** 2 + (o - 1050) ** 2) / 150000);
+  n -= 52 * Math.exp(-((e - 180) ** 2 + (o - 1640) ** 2) / 170000);
+
+  // Keep distant map edges below the core elevations without creating cliffs.
+  const edge = Math.max(Math.abs(e), Math.abs(o));
+  if (edge > 3100) n -= 90 * t.MathUtils.smoothstep(edge, 3100, 5200);
+
+  return n;
 }
 function te(e, o) {
   const n = $t(e, o),
@@ -1977,12 +2179,54 @@ function te(e, o) {
       i = t.MathUtils.smoothstep(a.distance, 0.68 * s.halfWidth, s.halfWidth);
     return t.MathUtils.lerp(o, n, i);
   }
-  return e >= s.courtXMin &&
+  // Blend the temple court into the surrounding summit instead of cutting a hard
+  // rectangular cliff. The inner court stays level, while a broad shoulder transitions
+  // smoothly back to the natural hill on all sides.
+  const dx = Math.max(s.courtXMin - e, 0, e - s.courtXMax);
+  const dz = Math.max(s.courtZMin - o, 0, o - s.courtZMax);
+  const outsideDistance = Math.hypot(dx, dz);
+  const inside =
+    e >= s.courtXMin &&
     e <= s.courtXMax &&
     o >= s.courtZMin &&
-    o <= s.courtZMax
-    ? s.courtY
-    : n;
+    o <= s.courtZMax;
+  if (inside) {
+    const courtSurfaceY = s.courtSurfaceY ?? s.courtY + 4;
+
+    // Walkable altar ramp: the southern end begins flush with the marble court
+    // and rises continuously to the altar platform.
+    const onAltarRamp =
+      e >= s.altarRampXMin &&
+      e <= s.altarRampXMax &&
+      o >= s.altarRampZMin &&
+      o <= s.altarRampZMax;
+    if (onAltarRamp) {
+      const rampProgress = t.MathUtils.clamp(
+        (s.altarRampZMax - o) / Math.max(s.altarRampZMax - s.altarRampZMin, 1),
+        0,
+        1,
+      );
+      const easedRamp = rampProgress * rampProgress * (3 - 2 * rampProgress);
+      return t.MathUtils.lerp(courtSurfaceY, s.altarTopY, easedRamp);
+    }
+
+    // The altar top itself is a stable walkable surface at one fixed height.
+    if (
+      Math.abs(e - s.altarX) <= s.altarHalfX &&
+      Math.abs(o - s.altarZ) <= s.altarHalfZ
+    )
+      return s.altarTopY;
+
+    // Every other point inside the Temple court uses the exact marble height.
+    // No natural terrain height is allowed to leak through this area.
+    return courtSurfaceY;
+  }
+  if (outsideDistance < 560) {
+    // The lowered court merges into the natural ridge without producing a mound.
+    const shoulderBlend = 1 - t.MathUtils.smoothstep(outsideDistance, 70, 560);
+    return t.MathUtils.lerp(n, s.courtY, 0.5 * shoulderBlend * shoulderBlend);
+  }
+  return n;
 }
 function ee(t) {
   let e = t >>> 0;
@@ -3846,7 +4090,7 @@ function _e(o, n) {
         n = e("#jerusalemLandmark");
       n && n.classList.toggle("show", o),
         zt(t.x, t.z, 135)
-          ? Qt("성전")
+          ? Qt("성전산")
           : o
             ? Qt("예루샬라임 성내")
             : t.x > 520
@@ -4673,9 +4917,7 @@ function _e(o, n) {
         const n = [
           [0, t.wallRZ],
           [0, -t.wallRZ],
-          [1360, -2020],
-          [t.wallRX, 120],
-          [-t.wallRX, 260],
+          [t.wallRX, -120],
         ];
         s.fillStyle = "#7a5a38";
         for (const [e, o] of n) {
@@ -4685,18 +4927,18 @@ function _e(o, n) {
         o < 1482 &&
           ((s.fillStyle = "#5d4530"), s.fillText(t.name, e.x + 5, e.z - 8));
       }
-      const r = i({ x: 260, z: yt });
+      const r = i({ x: 70, z: yt });
       if (Math.hypot(r.dx, r.dz) <= 2420) {
         (s.strokeStyle = "#8a6a3f"), (s.lineWidth = 3);
         const t = [
-          [-520, -480],
-          [xt, -480],
-          [xt, gt],
-          [-520, gt],
+          [-650, -520],
+          [650, -520],
+          [650, 520],
+          [-650, 520],
         ];
         s.beginPath(),
           t.forEach(([t, e], o) => {
-            const n = i({ x: 260 + t, z: yt + e });
+            const n = i({ x: 70 + t, z: yt + e });
             0 === o ? s.moveTo(n.x, n.z) : s.lineTo(n.x, n.z);
           }),
           s.closePath(),
