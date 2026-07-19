@@ -1,4 +1,6 @@
 import * as t from "./three.module.js";
+import { FBXLoader } from "./FBXLoader.js";
+import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 const e = (t) => document.querySelector(t),
   o = [...document.querySelectorAll(".screen")],
   n =
@@ -59,6 +61,8 @@ let Z = new t.Vector3(-1150, 0, 1050),
   Y = "",
   templeObjText = "",
   templeObjPromise = null,
+  lionModelPromise = null,
+  lionModelTemplate = null,
   _ = null,
   J = null,
   Q = null,
@@ -2668,8 +2672,88 @@ function be(e, o, n) {
 function Ge(t) {
   t.userData.healthUI?.wrap?.remove(), (t.userData.healthUI = null);
 }
+function loadLionModel() {
+  if (lionModelPromise) return lionModelPromise;
+  lionModelPromise = new Promise((resolve, reject) => {
+    const loader = new FBXLoader();
+    loader.load(
+      "./assets/models/lion_walk.fbx",
+      (model) => {
+        lionModelTemplate = model;
+        model.traverse((obj) => {
+          if (obj.isMesh || obj.isSkinnedMesh) {
+            obj.castShadow = true;
+            obj.receiveShadow = true;
+            const materials = Array.isArray(obj.material)
+              ? obj.material
+              : [obj.material];
+            for (const material of materials) {
+              if (!material) continue;
+              material.side = t.FrontSide;
+              material.transparent = false;
+              material.depthWrite = true;
+              if (material.map) {
+                material.map.colorSpace = t.SRGBColorSpace;
+                material.map.anisotropy = Math.min(4, i?.capabilities?.getMaxAnisotropy?.() || 1);
+                material.map.needsUpdate = true;
+              }
+              material.needsUpdate = true;
+            }
+          }
+        });
+        resolve(model);
+      },
+      undefined,
+      (error) => {
+        console.warn("사자 3D 모델을 불러오지 못해 기존 사자 모델을 사용합니다.", error);
+        lionModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return lionModelPromise;
+}
+function applyLionModel(enemy, fallbackModel) {
+  loadLionModel()
+    .then((template) => {
+      if (!enemy.parent || enemy.userData.type !== "lion") return;
+      const model = cloneSkinnedModel(template);
+      model.name = "Lion3DModel";
+      model.updateMatrixWorld(true);
+      const initialBox = new t.Box3().setFromObject(model);
+      const initialSize = initialBox.getSize(new t.Vector3());
+      const longest = Math.max(initialSize.x, initialSize.z, 0.001);
+      const scale = 92 / longest;
+      model.scale.setScalar(scale);
+      model.updateMatrixWorld(true);
+      const box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      model.rotation.y = -Math.PI / 2;
+      enemy.add(model);
+      fallbackModel.visible = false;
+      const clips = template.animations || [];
+      if (clips.length) {
+        const mixer = new t.AnimationMixer(model);
+        const walkClip = clips.find((clip) => /walk/i.test(clip.name)) || clips[0];
+        const action = mixer.clipAction(walkClip);
+        action.reset();
+        action.setLoop(t.LoopRepeat, Infinity);
+        action.play();
+        enemy.userData.mixer = mixer;
+        enemy.userData.walkAction = action;
+      }
+      enemy.userData.lion3D = model;
+    })
+    .catch(() => {
+      fallbackModel.visible = true;
+    });
+}
 function Pe(o = "lion") {
   const n = new t.Group(),
+    lionFallback = new t.Group(),
     s = {
       lion: {
         hp: 105,
@@ -2722,19 +2806,20 @@ function Pe(o = "lion") {
       ve(n, [7, 46, 7], [8, 4, 0], 5060908),
       (ve(n, [8, 54, 8], [27, 38, 0], 5978916).rotation.z = -0.35);
   else if ("lion" === o) {
-    (ve(n, [72, 33, 31], [0, 27, 0], a.body).scale.x = 1.22),
-      ve(n, [31, 31, 30], [47, 34, 0], a.head);
+    n.add(lionFallback);
+    (ve(lionFallback, [72, 33, 31], [0, 27, 0], a.body).scale.x = 1.22),
+      ve(lionFallback, [31, 31, 30], [47, 34, 0], a.head);
     const e = new t.Mesh(new t.IcosahedronGeometry(24, 1), ge(7030056));
     e.scale.set(0.78, 1.05, 0.92),
       e.position.set(39, 36, 0),
-      n.add(e),
-      ve(n, [27, 28, 27], [49, 35, 0], a.head);
+      lionFallback.add(e),
+      ve(lionFallback, [27, 28, 27], [49, 35, 0], a.head);
     for (const t of [-11, 11])
-      ve(n, [8, 38, 8], [-24, 9, t], a.body),
-        ve(n, [8, 38, 8], [29, 9, t], a.body);
-    ze(n, 3, 4, 58, [-48, 34, 0], a.body, 7).rotation.z = -1.1;
+      ve(lionFallback, [8, 38, 8], [-24, 9, t], a.body),
+        ve(lionFallback, [8, 38, 8], [29, 9, t], a.body);
+    ze(lionFallback, 3, 4, 58, [-48, 34, 0], a.body, 7).rotation.z = -1.1;
     const o = new t.Mesh(new t.IcosahedronGeometry(8, 1), ge(7030056));
-    o.position.set(-72, 53, 0), n.add(o);
+    o.position.set(-72, 53, 0), lionFallback.add(o);
   } else if ("bear" === o) {
     const e = new t.Mesh(new t.IcosahedronGeometry(34, 1), ge(a.body));
     e.scale.set(1.35, 0.95, 0.85), e.position.set(-2, 34, 0), n.add(e);
@@ -2797,6 +2882,7 @@ function Pe(o = "lion") {
     }),
     n.scale.setScalar(a.scale),
     i.add(n),
+    "lion" === o && applyLionModel(n, lionFallback),
     mt.enemies.push(n),
     (function (t) {
       const o = document.createElement("div");
@@ -4206,6 +4292,7 @@ function _e(o, n) {
           })(),
           (O = 1 / 0)));
       for (const e of mt.enemies) {
+        e.userData.mixer?.update(t);
         if (e.userData.hp <= 0) continue;
         if (
           ("bandit" === e.userData.type) !==
@@ -4225,6 +4312,7 @@ function _e(o, n) {
         const s = o.position.x - e.position.x,
           a = o.position.z - e.position.z,
           r = Math.hypot(s, a);
+        if (e.userData.walkAction) e.userData.walkAction.paused = r <= 42;
         r > 42
           ? ((e.position.x += (s / r) * e.userData.speed * t),
             (e.position.z += (a / r) * e.userData.speed * t),
