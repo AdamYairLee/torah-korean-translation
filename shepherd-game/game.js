@@ -146,6 +146,10 @@ let Z = new t.Vector3(-1150, 0, 1050),
   templeObjPromise = null,
   lionModelPromise = null,
   lionModelTemplate = null,
+  foxModelPromise = null,
+  foxModelTemplate = null,
+  wolfModelPromise = null,
+  wolfModelTemplate = null,
   _ = null,
   J = null,
   Q = null,
@@ -181,6 +185,7 @@ const pt = 33,
     cheatUsed: !1,
     thirst: 100,
     thirstFailed: !1,
+    flockLost: !1,
     worldTime: 0.29,
   },
   mt = {
@@ -2890,6 +2895,8 @@ function Se(e) {
       lastBleat: 0,
       legs: f,
       runPhase: 0.9 * e,
+      hp: 100,
+      maxHp: 100,
     }),
     i.add(o),
     mt.sheep.push(o),
@@ -2975,7 +2982,7 @@ function applyLionModel(enemy, fallbackModel) {
       model.position.x -= center.x;
       model.position.z -= center.z;
       model.position.y -= box.min.y;
-      model.rotation.y = -Math.PI / 2;
+      model.rotation.y = 0;
       enemy.add(model);
       fallbackModel.visible = false;
       const clips = template.animations || [];
@@ -2994,6 +3001,114 @@ function applyLionModel(enemy, fallbackModel) {
     .catch(() => {
       fallbackModel.visible = true;
     });
+}
+
+function prepareImportedAnimalModel(model) {
+  model.traverse((obj) => {
+    if (!(obj.isMesh || obj.isSkinnedMesh)) return;
+    obj.castShadow = true;
+    obj.receiveShadow = true;
+    const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+    for (const material of materials) {
+      if (!material) continue;
+      material.side = t.FrontSide;
+      material.transparent = false;
+      material.depthWrite = true;
+      material.roughness = Math.max(0.68, material.roughness ?? 0.68);
+      if (material.map) {
+        material.map.colorSpace = t.SRGBColorSpace;
+        material.map.anisotropy = Math.min(4, c?.capabilities?.getMaxAnisotropy?.() || 1);
+        material.map.needsUpdate = true;
+      }
+      material.needsUpdate = true;
+    }
+  });
+  return model;
+}
+function loadFoxModel() {
+  if (foxModelTemplate) return Promise.resolve(foxModelTemplate);
+  if (foxModelPromise) return foxModelPromise;
+  foxModelPromise = new Promise((resolve, reject) => {
+    new FBXLoader().load(
+      "./assets/models/fox_rigged.fbx",
+      (model) => {
+        foxModelTemplate = prepareImportedAnimalModel(model);
+        resolve(foxModelTemplate);
+      },
+      undefined,
+      (error) => {
+        console.warn("여우 3D 모델을 불러오지 못해 기존 여우 모델을 사용합니다.", error);
+        foxModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return foxModelPromise;
+}
+function loadWolfModel() {
+  if (wolfModelTemplate) return Promise.resolve(wolfModelTemplate);
+  if (wolfModelPromise) return wolfModelPromise;
+  wolfModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/wolf_lowpoly.glb",
+      (gltf) => {
+        const scene = prepareImportedAnimalModel(gltf.scene);
+        scene.animations = gltf.animations || [];
+        wolfModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("늑대 3D 모델을 불러오지 못해 기존 늑대 모델을 사용합니다.", error);
+        wolfModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return wolfModelPromise;
+}
+function applyImportedPredatorModel(enemy, type) {
+  const config = {
+    fox: { load: loadFoxModel, targetLength: 138, rotationY: 0, rotationX: -Math.PI / 2, skinned: true },
+    wolf: { load: loadWolfModel, targetLength: 122, rotationY: 0, rotationX: 0, skinned: false },
+  }[type];
+  if (!config) return;
+  const fallbackChildren = [...enemy.children];
+  config.load()
+    .then((template) => {
+      if (!enemy.parent || enemy.userData.type !== type) return;
+      const model = config.skinned ? cloneSkinnedModel(template) : template.clone(true);
+      model.name = type === "fox" ? "Fox3DModel" : "Wolf3DModel";
+      model.updateMatrixWorld(true);
+      const initialBox = new t.Box3().setFromObject(model);
+      const initialSize = initialBox.getSize(new t.Vector3());
+      const horizontalLength = Math.max(initialSize.x, initialSize.z, 0.001);
+      const scale = config.targetLength / horizontalLength;
+      model.scale.setScalar(scale);
+      model.rotation.x = config.rotationX || 0;
+      model.rotation.y = config.rotationY || 0;
+      model.updateMatrixWorld(true);
+      const box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      enemy.add(model);
+      fallbackChildren.forEach((child) => { child.visible = false; });
+      const clips = template.animations || [];
+      if (clips.length) {
+        const mixer = new t.AnimationMixer(model);
+        const clip = clips.find((item) => /walk|run|take/i.test(item.name)) || clips[0];
+        const action = mixer.clipAction(clip);
+        action.reset().setLoop(t.LoopRepeat, Infinity).play();
+        enemy.userData.mixer = mixer;
+        enemy.userData.walkAction = action;
+      }
+      enemy.userData.importedModel = model;
+      enemy.userData.importedModelBaseY = model.position.y;
+      enemy.userData.importedModelPhase = Math.random() * Math.PI * 2;
+    })
+    .catch(() => fallbackChildren.forEach((child) => { child.visible = true; }));
 }
 function Pe(o = "lion") {
   const n = new t.Group(),
@@ -3127,6 +3242,7 @@ function Pe(o = "lion") {
     n.scale.setScalar(a.scale),
     i.add(n),
     "lion" === o && applyLionModel(n, lionFallback),
+    ("wolf" === o || "fox" === o) && applyImportedPredatorModel(n, o),
     mt.enemies.push(n),
     (function (t) {
       const o = document.createElement("div");
@@ -3142,10 +3258,11 @@ function Pe(o = "lion") {
   );
 }
 function Te() {
-  [mt.player, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
+  [mt.player, mt.sheepShop, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
     .filter(Boolean)
     .forEach((t) => i.remove(t)),
     (mt.sheep = []),
+    (mt.sheepShop = null),
     (mt.rocks = []),
     (mt.enemies = []),
     (mt.projectiles = []),
@@ -3234,6 +3351,7 @@ function Te() {
     [1750, -900],
     [1820, -1040],
   ].forEach((t, e) => be(s[e % 4], t[0], t[1])),
+    createSheepShop(),
     $e(),
     e("#thirstHud").classList.add("show"),
     (e("#thirstBar").style.width = ut.thirst + "%"),
@@ -3308,11 +3426,13 @@ function Ve(t) {
 }
 function Ue(t) {
   if (t && !(t.userData.hp > 0)) {
-    if (
-      ((t.visible = !1),
-      (ut.money = Math.min(1e7, ut.money + 15)),
-      "wolf" === t.userData.type)
-    ) {
+    t.visible = !1;
+    const rewardAllowed = mt.sheep.length >= 5;
+    if (rewardAllowed) ut.money = Math.min(1e7, ut.money + 15);
+    const rewardText = rewardAllowed
+      ? "+15 셰켈"
+      : "남은 양이 5마리 미만이어서 셰켈 보상 없음";
+    if ("wolf" === t.userData.type) {
       if (
         mt.enemies.some(
           (e) =>
@@ -3321,18 +3441,141 @@ function Ue(t) {
             e.userData.packId === t.userData.packId &&
             e.userData.hp > 0,
         )
-      )
-        return void eo("늑대 한 마리를 물리쳤습니다. +15 셰켈");
-      (ut.respect = Math.min(100, ut.respect + 10)),
-        eo("늑대 떼를 모두 물리쳤습니다. 존중 +10 · +15 셰켈");
-    } else
-      (ut.respect = Math.min(100, ut.respect + 5)),
-        eo(t.userData.label + "을 물리쳤습니다. 존중 +5 · +15 셰켈");
-    (j = 300),
-      (function (t = !1) {
-        (O = Oe(t)), (H = !1), je("");
-      })(!1);
+      ) {
+        eo("늑대 한 마리를 물리쳤습니다. " + rewardText);
+        return;
+      }
+      ut.respect = Math.min(100, ut.respect + 10);
+      eo("늑대 떼를 모두 물리쳤습니다. 존중 +10 · " + rewardText);
+    } else {
+      ut.respect = Math.min(100, ut.respect + 5);
+      eo(t.userData.label + "을 물리쳤습니다. 존중 +5 · " + rewardText);
+    }
+    j = 300;
+    (function (t = !1) {
+      (O = Oe(t)), (H = !1), je("");
+    })(!1);
   }
+}
+
+
+function isTempleMountRestricted(x, z) {
+  return z < -1280 && Math.abs(x) < 920;
+}
+function updateTempleSheepHold() {
+  const player = mt.player;
+  if (!player) return;
+  const waiting = isTempleMountRestricted(player.position.x, player.position.z);
+  mt.sheep.forEach((sheep, index) => {
+    if (waiting) {
+      const row = Math.floor(index / 5), col = index % 5;
+      sheep.userData.safeHold = true;
+      sheep.userData.target.set(610 + (col - 2) * 34, 0, -1170 + row * 38);
+    } else if (sheep.userData.safeHold) {
+      sheep.userData.safeHold = false;
+      sheep.userData.target.set(0, 0, 0);
+      sheep.userData.recallUntil = performance.now() + 12000;
+    }
+  });
+}
+function damageSheep(sheep, attacker) {
+  if (!sheep || !mt.sheep.includes(sheep) || sheep.userData.safeHold) return false;
+  const type = attacker?.userData?.type || "fox";
+  const damage = { fox: 8, wolf: 11, lion: 15, bear: 18 }[type] || 8;
+  sheep.userData.hp = Math.max(0, (sheep.userData.hp ?? 100) - damage);
+  kt("sheep");
+  if (sheep.userData.hp <= 0) return removeSheepFromFlock(sheep, attacker);
+  if (sheep.userData.hp <= 35 && !sheep.userData.lowHpWarned) {
+    sheep.userData.lowHpWarned = true;
+    eo("양 한 마리가 위험합니다. 맹수를 빨리 막으십시오.");
+  }
+  return false;
+}
+function createSheepShop() {
+  if (mt.sheepShop) return mt.sheepShop;
+  const shop = new t.Group();
+  shop.position.set(230, te(230, 3190) + 1, 3190);
+  const mat = ge(11776947), dark = ge(6049085), wool = ge(15985899);
+  const canopy = new t.Mesh(new t.ConeGeometry(92, 48, 4), mat);
+  canopy.position.y = 92; canopy.rotation.y = Math.PI / 4; shop.add(canopy);
+  for (const x of [-58,58]) for (const zc of [-48,48]) {
+    const post = new t.Mesh(new t.CylinderGeometry(4,5,92,6), dark);
+    post.position.set(x,44,zc); shop.add(post);
+  }
+  const pen = new t.Mesh(new t.BoxGeometry(150,5,120), dark);
+  pen.position.y=3; shop.add(pen);
+  const sheepIcon = new t.Mesh(new t.IcosahedronGeometry(25,1), wool);
+  sheepIcon.scale.set(1.35,0.9,0.9); sheepIcon.position.set(0,36,0); shop.add(sheepIcon);
+  shop.userData = { sheepShop:true, price:100 };
+  i.add(shop); mt.sheepShop=shop; return shop;
+}
+function tryBuySheep() {
+  const shop = mt.sheepShop;
+  if (!shop || !mt.player || mt.player.position.distanceTo(shop.position) > 185) return false;
+  if (ut.money < 100) { eo("양 한 마리는 100셰켈입니다. 셰켈이 부족합니다."); return true; }
+  ut.money -= 100;
+  const sheep = Se(mt.sheep.length);
+  const angle = Math.random()*Math.PI*2;
+  sheep.position.set(shop.position.x + Math.sin(angle)*105, te(shop.position.x + Math.sin(angle)*105, shop.position.z + Math.cos(angle)*105)+1, shop.position.z + Math.cos(angle)*105);
+  sheep.userData.recallUntil = performance.now()+15000;
+  eo("양 한 마리를 100셰켈에 샀습니다. 현재 " + mt.sheep.length + "마리");
+  $e();
+  return true;
+}
+function updateRockRespawns(now) {
+  if (!mt.player || now < (ut.nextRockSpawnAt || 0)) return;
+  ut.nextRockSpawnAt = now + 10000 + Math.random()*9000;
+  const visible = mt.rocks.filter(r => r?.visible).length;
+  if (visible >= 95) return;
+  const qualities=["거친 돌","둥근 돌","좋은 돌","큰 돌"];
+  let made=0;
+  for (let tries=0; tries<100 && made<4; tries++) {
+    const angle=Math.random()*Math.PI*2, dist=850+Math.random()*1800;
+    const x=mt.player.position.x+Math.sin(angle)*dist, zc=mt.player.position.z+Math.cos(angle)*dist;
+    if (Math.abs(x)>3300 || Math.abs(zc)>3300 || jt(new t.Vector3(x,te(x,zc)+4,zc),16) || he(x,zc)>0.5) continue;
+    be(qualities[Math.floor(Math.random()*qualities.length)],x,zc); made++;
+  }
+}
+
+function removeSheepFromFlock(sheep, attacker) {
+  if (!sheep || !mt.sheep.includes(sheep) || sheep.userData.safeHold) return !1;
+  const index = mt.sheep.indexOf(sheep);
+  if (index < 0) return !1;
+  mt.sheep.splice(index, 1);
+  i.remove(sheep);
+  kt("sheep");
+  Ae(sheep.position, "enemy");
+  if (attacker?.userData) {
+    attacker.userData.targetEntity = null;
+    attacker.userData.nextTargetAt = 0;
+    attacker.userData.nextSheepAttackAt = performance.now() + 1300;
+  }
+  const remaining = mt.sheep.length;
+  if (remaining > 0) {
+    eo("맹수가 양 한 마리를 공격했습니다. 남은 양 " + remaining + "마리");
+  }
+  return !0;
+}
+
+function triggerFlockGameOver() {
+  if (ut.flockLost) return;
+  ut.flockLost = !0;
+  ut.money = 0;
+  ut.respect = 0;
+  ut.skill = 0;
+  ut.stones = 0;
+  ut.missionDone = !1;
+  ut.cheatUsed = !1;
+  localStorage.removeItem("shepherdGame3DSave");
+  $e();
+  b = !0;
+  e("#gameOver").classList.remove("mission-fail");
+  e("#gameOverTitle").textContent = "모든 양을 잃었습니다";
+  e("#gameOverText").textContent =
+    "양 떼를 모두 잃어 셰켈과 존중을 포함한 모든 진행 상황이 초기화되었습니다. 처음부터 다시 시작하십시오.";
+  e("#gameOver").classList.remove("hidden");
+  document.exitPointerLock?.();
+  setTimeout(() => ke(e("#gameOver"), 0), 0);
 }
 function Ae(e, o = "ground") {
   const n = new t.Group();
@@ -3723,7 +3966,6 @@ document.addEventListener(
               new t.MeshToonMaterial({ color: 14270606, side: t.DoubleSide }),
             ));
         o.position.set(0, 108, 0),
-          (o.rotation.y = Math.PI),
           e.add(o),
           [
             [43, 8273711],
@@ -3735,7 +3977,6 @@ document.addEventListener(
               new t.MeshBasicMaterial({ color: n, side: t.DoubleSide }),
             );
             a.position.set(0, 108, -0.7 - 0.15 * s),
-              (a.rotation.y = Math.PI),
               e.add(a);
           });
         const n = Math.atan2(
@@ -3777,12 +4018,18 @@ document.addEventListener(
   (e("#saveBtn").onclick = oo),
   (e("#quitBtn").onclick = () => location.reload()),
   (e("#restartBtn").onclick = () => {
-    no() || Te(),
-      (ut.thirstFailed = !1),
-      e("#gameOver").classList.add("hidden"),
-      e("#gameOver").classList.remove("mission-fail"),
-      (b = !1),
-      c?.domElement.requestPointerLock?.();
+    if (ut.flockLost) {
+      localStorage.removeItem("shepherdGame3DSave");
+      Te();
+    } else {
+      no() || Te();
+    }
+    ut.thirstFailed = !1;
+    ut.flockLost = !1;
+    e("#gameOver").classList.add("hidden");
+    e("#gameOver").classList.remove("mission-fail");
+    b = !1;
+    c?.domElement.requestPointerLock?.();
   }),
   e("#cheatInput").addEventListener("keydown", (t) => {
     if ("Enter" === t.key) {
@@ -3931,6 +4178,7 @@ function _e(o, n) {
       try {
         !(function () {
           if (!S || b || !mt.player || !Array.isArray(mt.rocks)) return;
+          if (tryBuySheep()) return;
           if ((Number.isFinite(ut.stones) || (ut.stones = 0), ut.stones >= 25))
             return void eo("돌은 최대 25개까지 지닐 수 있습니다.");
           const t = mt.player.position?.x,
@@ -3946,7 +4194,8 @@ function _e(o, n) {
             Number.isFinite(r) && r < n && ((n = r), (o = s));
           }
           if (o) {
-            (o.visible = !1),
+            i.remove(o),
+              mt.rocks.splice(mt.rocks.indexOf(o), 1),
               (ut.stones = Math.min(25, ut.stones + 1)),
               (ut.quality = o.userData?.quality || "거친 돌");
             try {
@@ -4281,60 +4530,7 @@ function _e(o, n) {
       }
     })(o),
     (function (e, o) {
-      !(function () {
-        const t = mt.player?.position;
-        if (!t) return;
-        const e = Ft.find((e) => Ht(e, t.x, t.z, -120) < 1);
-        e
-          ? ((Fe && Fe.name === e.name) || ((Fe = e), We.copy(qe(e, t))),
-            mt.sheep.forEach((t, e) => {
-              const o = (e / mt.sheep.length) * Math.PI * 2;
-              (t.userData.safeHold = !0),
-                t.userData.target.set(
-                  We.x + 90 * Math.sin(o),
-                  0,
-                  We.z + 90 * Math.cos(o),
-                );
-            }))
-          : Fe &&
-            Ht(Fe, t.x, t.z, 180) > 1 &&
-            ((Fe = null),
-            mt.sheep.forEach((t) => {
-              (t.userData.safeHold = !1), t.userData.target.set(0, 0, 0);
-            }));
-      })(),
-        (function () {
-          const t = mt.player;
-          if (!t) return;
-          const e = Ft[0];
-          if (Ht(e, t.position.x, t.position.z, 120) > 1)
-            for (let o = 0; o < mt.sheep.length; o++) {
-              const n = mt.sheep[o],
-                s =
-                  Ht(e, n.position.x, n.position.z, 35) < 1 ||
-                  jt(n.position, 10),
-                a = n.position.distanceTo(t.position) > 520,
-                i = (n.userData.stuckTime || 0) > 1.6;
-              if (s && (a || i)) {
-                if (
-                  ((n.userData.cityTrapTime =
-                    (n.userData.cityTrapTime || 0) + 1 / 60),
-                  n.userData.cityTrapTime > 1)
-                ) {
-                  const s = qe(e, t.position),
-                    a = (o / Math.max(1, mt.sheep.length)) * Math.PI * 2,
-                    i = _t(s.x + 90 * Math.sin(a), s.z + 90 * Math.cos(a));
-                  n.position.set(i.x, te(i.x, i.z) + 1, i.z),
-                    n.userData.target.set(t.position.x, 0, t.position.z),
-                    (n.userData.recallUntil = performance.now() + 15e3),
-                    (n.userData.stuckTime = 0),
-                    (n.userData.cityTrapTime = 0),
-                    (n.userData.safeHold = !1),
-                    (n.userData.rescueAttempts = 0);
-                }
-              } else n.userData.cityTrapTime = 0;
-            }
-        })(),
+      updateTempleSheepHold(),
         y && Math.random() < 0.012 * e && kt("sheep");
       const n = mt.player;
       if (
@@ -4348,35 +4544,7 @@ function _e(o, n) {
               n.position.z - 110 + 110 * Math.cos(t),
             );
           }
-          const r = (function (t, e) {
-              const o = Ft[0],
-                n = Ht(o, t.position.x, t.position.z, -20) < 1,
-                s = Ht(o, e.x, e.z, -20) < 1;
-              if (n) return qe(o, t.position);
-              if (s) return qe(o, e);
-              if (
-                Ht(o, (t.position.x + e.x) / 2, (t.position.z + e.z) / 2, 80) <
-                1
-              ) {
-                const n = [
-                  [0, o.wallRZ + 125],
-                  [0, -o.wallRZ - 125],
-                  [o.wallRX + 125, 120],
-                  [-o.wallRX - 125, 260],
-                ];
-                return (
-                  n.sort(
-                    (o, n) =>
-                      Math.hypot(t.position.x - o[0], t.position.z - o[1]) +
-                      Math.hypot(e.x - o[0], e.z - o[1]) -
-                      (Math.hypot(t.position.x - n[0], t.position.z - n[1]) +
-                        Math.hypot(e.x - n[0], e.z - n[1])),
-                  ),
-                  Mt.set(n[0][0], 0, n[0][1])
-                );
-              }
-              return e;
-            })(s, i),
+          const r = i,
             c = r.x - s.position.x,
             l = r.z - s.position.z,
             h = Math.hypot(c, l),
@@ -4391,7 +4559,7 @@ function _e(o, n) {
             let i = s.position.x + (c / h) * o * e,
               r = s.position.z + (l / h) * o * e,
               p = new t.Vector3(i, te(i, r) + 5, r);
-            if (Kt(i, r, -18) || jt(p, 10)) {
+            if (jt(p, 10)) {
               const t = a % 2 ? 1 : -1,
                 n = (-l / h) * t,
                 d = (c / h) * t;
@@ -4399,9 +4567,7 @@ function _e(o, n) {
                 (r = s.position.z + d * o * 0.82 * e),
                 p.set(i, te(i, r) + 5, r);
             }
-            Kt(i, r, -18) ||
-              jt(p, 10) ||
-              ((s.position.x = i), (s.position.z = r));
+            jt(p, 10) || ((s.position.x = i), (s.position.z = r));
             const u = Math.atan2(-l, c);
             let m =
               t.MathUtils.euclideanModulo(
@@ -4545,24 +4711,50 @@ function _e(o, n) {
           (e.userData.hp = 0), Ge(e), i.remove(e);
           continue;
         }
-        let o = mt.sheep[0],
-          n = 1 / 0;
-        for (const t of mt.sheep) {
-          if (t.userData.safeHold) continue;
-          const s = t.position.distanceTo(e.position);
-          s < n && ((n = s), (o = t));
+        const now = performance.now();
+        updateRockRespawns(now);
+        let o = e.userData.targetEntity;
+        const isAnimal = e.userData.type !== "bandit";
+        const validSheep = mt.sheep.filter((sheep) => !sheep.userData.safeHold);
+        const targetInvalid =
+          !o ||
+          (o !== mt.player && !mt.sheep.includes(o)) ||
+          (o !== mt.player && o.userData.safeHold);
+        if (targetInvalid || now >= (e.userData.nextTargetAt || 0)) {
+          if (isAnimal && validSheep.length && Math.random() < 0.58) {
+            o = validSheep[Math.floor(Math.random() * validSheep.length)];
+          } else {
+            o = mt.player;
+          }
+          e.userData.targetEntity = o;
+          e.userData.nextTargetAt = now + 2500 + Math.random() * 3000;
         }
-        e.position.distanceTo(mt.player.position) < 360 && (o = mt.player);
+        if (!o) o = mt.player;
         const s = o.position.x - e.position.x,
           a = o.position.z - e.position.z,
           r = Math.hypot(s, a);
         if (e.userData.walkAction) e.userData.walkAction.paused = r <= 42;
-        r > 42
-          ? ((e.position.x += (s / r) * e.userData.speed * t),
-            (e.position.z += (a / r) * e.userData.speed * t),
-            (e.rotation.y = Math.atan2(s, a)))
-          : o !== mt.player || ut.invincible || (ut.hp -= 8.5 * t),
-          (e.position.y = te(e.position.x, e.position.z) + 1);
+        if (e.userData.importedModel && !e.userData.mixer) {
+          e.userData.importedModelPhase += t * (r > 42 ? 9 : 2.2);
+          const moving = r > 42;
+          e.userData.importedModel.position.y =
+            e.userData.importedModelBaseY +
+            (moving ? Math.abs(Math.sin(e.userData.importedModelPhase)) * 2.2 : Math.sin(e.userData.importedModelPhase) * 0.45);
+          e.userData.importedModel.rotation.z = moving
+            ? Math.sin(e.userData.importedModelPhase) * 0.025
+            : 0;
+        }
+        if (r > 42) {
+          e.position.x += (s / r) * e.userData.speed * t;
+          e.position.z += (a / r) * e.userData.speed * t;
+          e.rotation.y = Math.atan2(s, a);
+        } else if (o === mt.player) {
+          if (!ut.invincible) ut.hp -= 8.5 * t;
+        } else if (isAnimal && now >= (e.userData.nextSheepAttackAt || 0)) {
+          damageSheep(o, e);
+          e.userData.nextSheepAttackAt = now + 2000;
+        }
+        e.position.y = te(e.position.x, e.position.z) + 1;
       }
     })(o),
     (function (e) {
@@ -4822,7 +5014,9 @@ function _e(o, n) {
               })(Ke)
             : Ke());
     })(),
-    ut.hp <= 0 &&
+    updateRockRespawns(performance.now()),
+    mt.sheep.length <= 0 && !ut.flockLost && triggerFlockGameOver(),
+    ut.hp <= 0 && !ut.flockLost &&
       ((ut.hp = 0),
       e("#gameOver").classList.remove("mission-fail"),
       (e("#gameOverTitle").textContent = "쓰러졌습니다"),
@@ -5077,6 +5271,7 @@ function no() {
         ? t.MathUtils.clamp(e.cameraMode, 0, 3)
         : 0),
       (ut.thirstFailed = !1),
+      (ut.flockLost = !1),
       ($ = e.missionCycle || 1),
       e.goal &&
         (Z.set(e.goal.x, 0, e.goal.z),
