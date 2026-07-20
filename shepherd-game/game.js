@@ -4925,7 +4925,7 @@ function _e(o, n) {
           s.fillRect(n.x - 3, n.z - 3, 6, 6);
         }
         o < 1482 &&
-          ((s.fillStyle = "#5d4530"), s.fillText(t.name, e.x + 5, e.z - 8));
+          ((s.fillStyle = "#5d4530"), s.fillText(window.ShepherdI18n?.tr(t.name) || t.name, e.x + 5, e.z - 8));
       }
       const r = i({ x: 70, z: yt });
       if (Math.hypot(r.dx, r.dz) <= 2420) {

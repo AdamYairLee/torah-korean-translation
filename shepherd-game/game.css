@@ -167,3 +167,12 @@
 .alpha-badge{display:inline-block;margin:4px 0 8px;padding:6px 12px;border:1px solid #efd79a;background:#5f3f20cc;color:#ffe9ad;border-radius:999px;font-size:14px;font-weight:800;letter-spacing:.04em}.alpha-note{max-width:580px;margin:0 auto 24px;color:#f6ecd7;font-size:14px;line-height:1.6;text-shadow:0 2px 5px #000}.rights{margin:20px auto 0;max-width:620px;color:#d9cdb4;font-size:11px;line-height:1.55;opacity:.9}.title-wrap{max-width:760px}.title-wrap .subtitle{margin-bottom:14px}
 
 /* v0.2 multilingual UI */
+
+/* Persistent Korean/Hebrew language selector */
+.language-switch{position:fixed;top:12px;right:12px;z-index:10050;display:flex;gap:4px;padding:5px;background:rgba(24,18,13,.88);border:1px solid rgba(232,208,158,.55);border-radius:8px;box-shadow:0 3px 12px rgba(0,0,0,.35)}
+.language-switch button{min-width:62px;padding:7px 10px;margin:0;border:1px solid rgba(232,208,158,.4);border-radius:6px;background:#403226;color:#f5e9cc;font:600 13px/1.2 Arial,sans-serif;cursor:pointer}
+.language-switch button.active{background:#d5b56c;color:#21180f;border-color:#f2d88f}
+html[dir="rtl"] .language-switch{right:auto;left:12px}
+html[dir="rtl"] .stone-panel,html[dir="rtl"] .title-wrap,html[dir="rtl"] #notice,html[dir="rtl"] #dangerNotice,html[dir="rtl"] #missionResult{text-align:right}
+html[dir="rtl"] #hud,html[dir="rtl"] #minimap,html[dir="rtl"] #crosshair,html[dir="rtl"] #charge{direction:ltr}
+html[dir="rtl"] #mission,html[dir="rtl"] #help,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconnectHint,html[dir="rtl"] #worldRegionLabel{direction:rtl;text-align:right}
