@@ -3,6 +3,7 @@ import { FBXLoader } from "./FBXLoader.js";
 import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 import { GLTFLoader } from "./GLTFLoader.js";
 import { JERUSALEM_DATA } from "./jerusalemData.js";
+import { createDavidModel } from "./davidModel.js";
 let jerusalemMapReady = false;
 let jerusalemMapBaseY = 0;
 const JERUSALEM_SCALE = JERUSALEM_DATA.scale || 260;
@@ -171,7 +172,9 @@ let Z = new t.Vector3(-1150, 0, 1050),
   ct = !1,
   lt = !1,
   ht = 0,
-  dt = null;
+  dt = null,
+  citySheepWaitingForPickup = !1,
+  playerWasInsideJerusalem = !1;
 const pt = 33,
   ut = {
     hp: 100,
@@ -302,8 +305,21 @@ const Lt = {
     new Audio("./assets/audio/sheep2.mp3"),
     new Audio("./assets/audio/sheep3.mp3"),
     new Audio("./assets/audio/sheep4.mp3"),
+    new Audio("./assets/audio/sheep5.mp3"),
+    new Audio("./assets/audio/sheep6.mp3"),
+    new Audio("./assets/audio/sheep7.mp3"),
+    new Audio("./assets/audio/sheep8.mp3"),
   ],
 };
+Lt.sheep.forEach((audio) => {
+  audio.preload = "auto";
+  audio.addEventListener("error", () => {
+    audio.dataset.unavailable = "1";
+  });
+  audio.addEventListener("canplaythrough", () => {
+    delete audio.dataset.unavailable;
+  });
+});
 let currentSheepBleatAudio = null;
 function Ct() {
   const t = y ? v : 0;
@@ -319,15 +335,25 @@ function Ct() {
 function kt(t) {
   if (!y) return;
   if ("sheep" === t) {
-    try {
-      currentSheepBleatAudio &&
-        (currentSheepBleatAudio.pause(),
-        (currentSheepBleatAudio.currentTime = 0));
-      const t = Lt.sheep[Math.floor(Math.random() * Lt.sheep.length)];
-      (currentSheepBleatAudio = t),
-        (t.currentTime = 0),
-        t.play().catch(() => {});
-    } catch {}
+    const playAvailableBleat = (attempt = 0) => {
+      try {
+        currentSheepBleatAudio &&
+          (currentSheepBleatAudio.pause(),
+          (currentSheepBleatAudio.currentTime = 0));
+        const available = Lt.sheep.filter(
+          (audio) => audio.dataset.unavailable !== "1",
+        );
+        if (!available.length || attempt >= Lt.sheep.length) return;
+        const audio = available[Math.floor(Math.random() * available.length)];
+        currentSheepBleatAudio = audio;
+        audio.currentTime = 0;
+        audio.play().catch(() => {
+          audio.dataset.unavailable = "1";
+          playAvailableBleat(attempt + 1);
+        });
+      } catch {}
+    };
+    playAvailableBleat();
     return;
   }
   const e = Lt[t];
@@ -2031,6 +2057,204 @@ const Xt = [
   [[0, 980], [-350, 620], 68],
   [[-350, 620], [-390, -260], 70],
 ];
+
+// 성내 양 이동용 도로 그래프. 양은 건물 사이를 직선으로 가로지르지
+// 않고 이 도로망의 중심선을 따라가며, 각 선분의 폭은 안전 여유로 쓴다.
+let citySheepRoadGraph = null;
+function closestPointOnCityRoad(x, z) {
+  let best = null;
+  for (let index = 0; index < Xt.length; index++) {
+    const [start, end, width] = Xt[index];
+    const dx = end[0] - start[0];
+    const dz = end[1] - start[1];
+    const lengthSq = dx * dx + dz * dz || 1;
+    const amount = Math.max(
+      0,
+      Math.min(1, ((x - start[0]) * dx + (z - start[1]) * dz) / lengthSq),
+    );
+    const px = start[0] + dx * amount;
+    const pz = start[1] + dz * amount;
+    const distance = Math.hypot(x - px, z - pz);
+    if (!best || distance < best.distance) {
+      best = { x: px, z: pz, distance, index, amount, width };
+    }
+  }
+  return best;
+}
+function buildCitySheepRoadGraph() {
+  if (citySheepRoadGraph) return citySheepRoadGraph;
+  const nodes = [];
+  const keyToIndex = new Map();
+  const nodeIndex = (point) => {
+    const key = `${point[0].toFixed(3)},${point[1].toFixed(3)}`;
+    if (!keyToIndex.has(key)) {
+      keyToIndex.set(key, nodes.length);
+      nodes.push({ x: point[0], z: point[1], edges: [] });
+    }
+    return keyToIndex.get(key);
+  };
+  const pointsBySegment = Xt.map(([start, end]) => [
+    { point: [...start], amount: 0 },
+    { point: [...end], amount: 1 },
+  ]);
+  for (let first = 0; first < Xt.length; first++) {
+    const [a, b] = Xt[first];
+    const rX = b[0] - a[0];
+    const rZ = b[1] - a[1];
+    for (let second = first + 1; second < Xt.length; second++) {
+      const [c, d] = Xt[second];
+      const sX = d[0] - c[0];
+      const sZ = d[1] - c[1];
+      const denominator = rX * sZ - rZ * sX;
+      if (Math.abs(denominator) < 1e-6) continue;
+      const cax = c[0] - a[0];
+      const caz = c[1] - a[1];
+      const firstAmount = (cax * sZ - caz * sX) / denominator;
+      const secondAmount = (cax * rZ - caz * rX) / denominator;
+      if (
+        firstAmount < -1e-6 ||
+        firstAmount > 1 + 1e-6 ||
+        secondAmount < -1e-6 ||
+        secondAmount > 1 + 1e-6
+      )
+        continue;
+      const point = [
+        a[0] + rX * firstAmount,
+        a[1] + rZ * firstAmount,
+      ];
+      pointsBySegment[first].push({ point, amount: firstAmount });
+      pointsBySegment[second].push({ point, amount: secondAmount });
+    }
+  }
+  for (const segmentPoints of pointsBySegment) {
+    segmentPoints.sort((a, b) => a.amount - b.amount);
+    for (let index = 1; index < segmentPoints.length; index++) {
+      const start = segmentPoints[index - 1].point;
+      const end = segmentPoints[index].point;
+      if (Math.hypot(end[0] - start[0], end[1] - start[1]) < 0.01)
+        continue;
+      const from = nodeIndex(start);
+      const to = nodeIndex(end);
+      const distance = Math.hypot(end[0] - start[0], end[1] - start[1]);
+      nodes[from].edges.push({ to, distance });
+      nodes[to].edges.push({ to: from, distance });
+    }
+  }
+  citySheepRoadGraph = { nodes };
+  return citySheepRoadGraph;
+}
+function shortestCityRoadNodePath(startIndex, goalIndex) {
+  const { nodes } = buildCitySheepRoadGraph();
+  const distances = nodes.map(() => Infinity);
+  const previous = nodes.map(() => -1);
+  const visited = nodes.map(() => false);
+  distances[startIndex] = 0;
+  for (let pass = 0; pass < nodes.length; pass++) {
+    let current = -1;
+    for (let index = 0; index < nodes.length; index++) {
+      if (
+        !visited[index] &&
+        (current < 0 || distances[index] < distances[current])
+      )
+        current = index;
+    }
+    if (current < 0 || !Number.isFinite(distances[current])) break;
+    if (current === goalIndex) break;
+    visited[current] = true;
+    for (const edge of nodes[current].edges) {
+      const nextDistance = distances[current] + edge.distance;
+      if (nextDistance < distances[edge.to]) {
+        distances[edge.to] = nextDistance;
+        previous[edge.to] = current;
+      }
+    }
+  }
+  if (!Number.isFinite(distances[goalIndex])) return null;
+  const path = [];
+  for (let at = goalIndex; at >= 0; at = previous[at]) {
+    path.push(at);
+    if (at === startIndex) break;
+  }
+  return { indices: path.reverse(), distance: distances[goalIndex] };
+}
+function makeCitySheepPath(startX, startZ, goalX, goalZ) {
+  const startRoad = closestPointOnCityRoad(startX, startZ);
+  const goalRoad = closestPointOnCityRoad(goalX, goalZ);
+  if (!startRoad || !goalRoad) return [];
+  if (startRoad.index === goalRoad.index) {
+    return [
+      { x: startRoad.x, z: startRoad.z },
+      { x: goalRoad.x, z: goalRoad.z },
+    ];
+  }
+  const graph = buildCitySheepRoadGraph();
+  const startSegment = Xt[startRoad.index];
+  const goalSegment = Xt[goalRoad.index];
+  const nodeFor = (point) =>
+    graph.nodes.findIndex(
+      (node) => node.x === point[0] && node.z === point[1],
+    );
+  const startCandidates = [startSegment[0], startSegment[1]];
+  const goalCandidates = [goalSegment[0], goalSegment[1]];
+  let best = null;
+  for (const startPoint of startCandidates) {
+    for (const goalPoint of goalCandidates) {
+      const startIndex = nodeFor(startPoint);
+      const goalIndex = nodeFor(goalPoint);
+      const route = shortestCityRoadNodePath(startIndex, goalIndex);
+      if (!route) continue;
+      const total =
+        Math.hypot(startRoad.x - startPoint[0], startRoad.z - startPoint[1]) +
+        route.distance +
+        Math.hypot(goalRoad.x - goalPoint[0], goalRoad.z - goalPoint[1]);
+      if (!best || total < best.total) best = { total, route };
+    }
+  }
+  if (!best) return [{ x: goalRoad.x, z: goalRoad.z }];
+  return [
+    { x: startRoad.x, z: startRoad.z },
+    ...best.route.indices.map((index) => ({
+      x: graph.nodes[index].x,
+      z: graph.nodes[index].z,
+    })),
+    { x: goalRoad.x, z: goalRoad.z },
+  ];
+}
+function nearestClearCityRoadPoint(x, z, clearance = 24) {
+  const nearest = closestPointOnCityRoad(x, z);
+  if (!nearest) return null;
+  if (!jt(nearest, clearance)) return nearest;
+  const [start, end] = Xt[nearest.index];
+  for (let step = 1; step <= 12; step++) {
+    for (const direction of [-1, 1]) {
+      const amount = Math.max(
+        0,
+        Math.min(1, nearest.amount + direction * step * 0.035),
+      );
+      const point = {
+        x: start[0] + (end[0] - start[0]) * amount,
+        z: start[1] + (end[1] - start[1]) * amount,
+      };
+      if (!jt(point, clearance)) return point;
+    }
+  }
+  let bestClear = null;
+  for (const [start, end] of Xt) {
+    for (let step = 0; step <= 20; step++) {
+      const amount = step / 20;
+      const point = {
+        x: start[0] + (end[0] - start[0]) * amount,
+        z: start[1] + (end[1] - start[1]) * amount,
+      };
+      if (jt(point, clearance)) continue;
+      const distance = Math.hypot(point.x - x, point.z - z);
+      if (!bestClear || distance < bestClear.distance) {
+        bestClear = { ...point, distance };
+      }
+    }
+  }
+  return bestClear;
+}
 function Zt(t, e, o = 95) {
   return Xt.some(
     ([n, s, a]) =>
@@ -2048,6 +2272,29 @@ function Zt(t, e, o = 95) {
 }
 function Yt(t, e, o = 0) {
   return Ft.some((n) => Ht(n, t, e, o) < 1);
+}
+function isSheepBlockedAt(point, clearance = 24) {
+  if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.z)) return !0;
+  if (jt(point, clearance)) return !0;
+  // Sheep never enter Jerusalem. This also prevents a sheep from being
+  // squeezed into a wall segment while trying to follow a player through a gate.
+  if (Yt(point.x, point.z, 72 + clearance)) return !0;
+  if (
+    mt.sheepShop &&
+    Math.hypot(
+      point.x - mt.sheepShop.position.x,
+      point.z - mt.sheepShop.position.z,
+    ) <
+      158 + clearance
+  )
+    return !0;
+  if (
+    mt.siloam &&
+    Math.hypot(point.x - mt.siloam.position.x, point.z - mt.siloam.position.z) <
+      218 + clearance
+  )
+    return !0;
+  return !1;
 }
 function _t(e, o) {
   const n = [[e, o]];
@@ -2631,6 +2878,14 @@ function ze(e, o, n, s, a, i, r = 7) {
   return c.position.set(...a), (c.castShadow = !0), e.add(c), c;
 }
 function De() {
+  return createDavidModel({
+    THREE: t,
+    material: ge,
+    groundOffset: pt,
+    scene: i,
+    runtime: mt,
+  });
+  /*
   return (function () {
     const e = new t.Group();
     (e.userData.velocity = new t.Vector3()),
@@ -2813,7 +3068,7 @@ function De() {
       })(e),
       e
     );
-  })();
+  })(); */
 }
 function Se(e) {
   const o = new t.Group(),
@@ -3279,6 +3534,8 @@ function Te() {
     (ot = 0),
     (nt = !1),
     (st = []),
+    (citySheepWaitingForPickup = !1),
+    (playerWasInsideJerusalem = !1),
     Object.assign(ut, {
       hp: 100,
       stones: 15,
@@ -3459,23 +3716,89 @@ function Ue(t) {
 }
 
 
-function isTempleMountRestricted(x, z) {
-  return z < -1280 && Math.abs(x) < 920;
+const JERUSALEM_SHEEP_PICKUP = { x: -80, z: 3225, radius: 285 };
+function findJerusalemSheepHoldSlot(index) {
+  const columns = 5;
+  const preferredColumn = index % columns;
+  const preferredRow = Math.floor(index / columns);
+  const candidates = [];
+  for (let ring = 0; ring <= 8; ring++) {
+    for (let column = 0; column < columns; column++) {
+      const orderedColumn = (preferredColumn + column) % columns;
+      const x =
+        JERUSALEM_SHEEP_PICKUP.x +
+        (orderedColumn - (columns - 1) / 2) * 39 +
+        (preferredRow % 2) * 12;
+      const z =
+        JERUSALEM_SHEEP_PICKUP.z +
+        preferredRow * 42 +
+        ring * 36;
+      candidates.push({ x, z });
+      if (ring > 0) candidates.push({ x, z: z - ring * 72 });
+    }
+  }
+  for (const candidate of candidates) {
+    if (!isSheepBlockedAt(candidate, 28)) return candidate;
+  }
+  // Fixed last-resort strip south-west of the shop. It is deliberately outside
+  // Jerusalem and beyond both the shop and Siloam collision radii.
+  return {
+    x: -145 - (index % 4) * 38,
+    z: 3290 + Math.floor(index / 4) * 42,
+  };
 }
-function updateTempleSheepHold() {
+function parkSheepAtJerusalemHold(sheep, index) {
+  let slot = sheep.userData.jerusalemHoldSlot;
+  if (!slot || isSheepBlockedAt(slot, 28)) {
+    slot = findJerusalemSheepHoldSlot(index);
+    sheep.userData.jerusalemHoldSlot = slot;
+  }
+  sheep.userData.safeHold = !0;
+  sheep.userData.cityGateHold = !0;
+  sheep.userData.target.set(slot.x, 0, slot.z);
+  sheep.userData.cityPath = null;
+  sheep.userData.cityPathIndex = 0;
+  sheep.userData.cityPathGoal = null;
+  sheep.userData.stuckTime = 0;
+  sheep.userData.lostSince = 0;
+  sheep.position.set(slot.x, te(slot.x, slot.z) + 1, slot.z);
+  sheep.userData.lastPos.copy(sheep.position);
+}
+function updateJerusalemSheepHold() {
   const player = mt.player;
   if (!player) return;
-  const waiting = isTempleMountRestricted(player.position.x, player.position.z);
-  mt.sheep.forEach((sheep, index) => {
-    if (waiting) {
-      const row = Math.floor(index / 5), col = index % 5;
-      sheep.userData.safeHold = true;
-      sheep.userData.target.set(610 + (col - 2) * 34, 0, -1170 + row * 38);
-    } else if (sheep.userData.safeHold) {
-      sheep.userData.safeHold = false;
+  const insideJerusalem = Yt(player.position.x, player.position.z, -55);
+  if (insideJerusalem && !playerWasInsideJerusalem) {
+    citySheepWaitingForPickup = !0;
+    mt.sheep.forEach((sheep) => {
+      sheep.userData.jerusalemHoldSlot = null;
+    });
+    eo("양들은 남문 밖 양 상점 곁의 안전한 대기장에서 기다립니다.");
+  }
+  playerWasInsideJerusalem = insideJerusalem;
+
+  const reachedPickup =
+    citySheepWaitingForPickup &&
+    !insideJerusalem &&
+    Math.hypot(
+      player.position.x - JERUSALEM_SHEEP_PICKUP.x,
+      player.position.z - JERUSALEM_SHEEP_PICKUP.z,
+    ) <= JERUSALEM_SHEEP_PICKUP.radius;
+  if (reachedPickup) {
+    citySheepWaitingForPickup = !1;
+    mt.sheep.forEach((sheep) => {
+      sheep.userData.safeHold = !1;
+      sheep.userData.cityGateHold = !1;
+      sheep.userData.jerusalemHoldSlot = null;
       sheep.userData.target.set(0, 0, 0);
       sheep.userData.recallUntil = performance.now() + 12000;
-    }
+    });
+    kt("sheep");
+    eo("남문 밖 대기장에서 양 떼와 다시 합류했습니다.");
+  }
+
+  mt.sheep.forEach((sheep, index) => {
+    if (citySheepWaitingForPickup) parkSheepAtJerusalemHold(sheep, index);
   });
 }
 function damageSheep(sheep, attacker) {
@@ -3816,11 +4139,11 @@ document.addEventListener(
               const e = t.position.clone().sub(o.position);
               e.y = 0;
               const n = e.length();
-              n < 125 &&
+              n < 155 &&
                 n > 0 &&
-                e.normalize().dot(a) > 0.15 &&
-                ((t.userData.hp -= 34),
-                t.position.addScaledVector(a, 42),
+                e.normalize().dot(a) > -0.18 &&
+                ((t.userData.hp -= 38),
+                t.position.addScaledVector(a, 48),
                 (s = !0),
                 t.userData.hp <= 0 && Ue(t));
             }
@@ -4430,6 +4753,20 @@ function _e(o, n) {
           (u.rightLeg.rotation.x = -d),
           (u.leftArm.rotation.x = 0.72 * -d),
           (u.rightArm.rotation.x = 0.72 * d));
+        o.userData.tzitzit?.forEach((corner, index) => {
+          const direction = index % 2 ? -1 : 1;
+          corner.rotation.x = 0.08 * Math.sin(o.userData.walkPhase + index);
+          corner.rotation.z =
+            direction * 0.035 * Math.sin(o.userData.walkPhase * 0.72 + index);
+        });
+        const importedAvatar = o.userData.importedAvatar;
+        if (importedAvatar) {
+          const baseY = o.userData.importedAvatarBaseY || 0;
+          importedAvatar.position.y =
+            baseY + Math.abs(Math.sin(o.userData.walkPhase)) * (h ? 2.4 : 1.35);
+          importedAvatar.rotation.z =
+            Math.sin(o.userData.walkPhase) * (h ? 0.035 : 0.018);
+        }
       } else {
         const n = o.userData.bodyRoot || o;
         (n.rotation.x = t.MathUtils.lerp(n.rotation.x, 0, Math.min(1, 8 * e))),
@@ -4442,6 +4779,24 @@ function _e(o, n) {
         if (s)
           for (const t of Object.values(s))
             t.rotation.x *= Math.max(0, 1 - 10 * e);
+        o.userData.tzitzit?.forEach((corner) => {
+          corner.rotation.x *= Math.max(0, 1 - 7 * e);
+          corner.rotation.z *= Math.max(0, 1 - 7 * e);
+        });
+        const importedAvatar = o.userData.importedAvatar;
+        if (importedAvatar) {
+          const baseY = o.userData.importedAvatarBaseY || 0;
+          importedAvatar.position.y = t.MathUtils.lerp(
+            importedAvatar.position.y,
+            baseY,
+            Math.min(1, 10 * e),
+          );
+          importedAvatar.rotation.z = t.MathUtils.lerp(
+            importedAvatar.rotation.z,
+            0,
+            Math.min(1, 10 * e),
+          );
+        }
       }
       const l = te(o.position.x, o.position.z) + pt,
         h = o.userData.bodyRoot || o;
@@ -4530,7 +4885,7 @@ function _e(o, n) {
       }
     })(o),
     (function (e, o) {
-      updateTempleSheepHold(),
+      updateJerusalemSheepHold(),
         y && Math.random() < 0.012 * e && kt("sheep");
       const n = mt.player;
       if (
@@ -4544,6 +4899,68 @@ function _e(o, n) {
               n.position.z - 110 + 110 * Math.cos(t),
             );
           }
+          const baseGoalX = i.x;
+          const baseGoalZ = i.z;
+          const followsCityRoad =
+            !s.userData.safeHold &&
+            (Kt(s.position.x, s.position.z, -55) ||
+              Kt(n.position.x, n.position.z, -55));
+          if (followsCityRoad) {
+            if (jt(s.position, 22)) {
+              const clearRoadPoint = nearestClearCityRoadPoint(
+                s.position.x,
+                s.position.z,
+                28,
+              );
+              if (clearRoadPoint) {
+                s.position.x = clearRoadPoint.x;
+                s.position.z = clearRoadPoint.z;
+                s.position.y = te(clearRoadPoint.x, clearRoadPoint.z) + 1;
+                s.userData.cityPath = null;
+              }
+            }
+            const goalMoved =
+              !s.userData.cityPathGoal ||
+              Math.hypot(
+                baseGoalX - s.userData.cityPathGoal.x,
+                baseGoalZ - s.userData.cityPathGoal.z,
+              ) > 80;
+            if (
+              !s.userData.cityPath?.length ||
+              goalMoved ||
+              performance.now() > (s.userData.cityPathRefreshAt || 0)
+            ) {
+              s.userData.cityPath = makeCitySheepPath(
+                s.position.x,
+                s.position.z,
+                baseGoalX,
+                baseGoalZ,
+              );
+              s.userData.cityPathIndex = 0;
+              s.userData.cityPathGoal = { x: baseGoalX, z: baseGoalZ };
+              s.userData.cityPathRefreshAt = performance.now() + 1100;
+            }
+            while (
+              s.userData.cityPathIndex <
+                Math.max(0, s.userData.cityPath.length - 1) &&
+              Math.hypot(
+                s.position.x -
+                  s.userData.cityPath[s.userData.cityPathIndex].x,
+                s.position.z -
+                  s.userData.cityPath[s.userData.cityPathIndex].z,
+              ) < 34
+            ) {
+              s.userData.cityPathIndex++;
+            }
+            i =
+              s.userData.cityPath[s.userData.cityPathIndex] ||
+              closestPointOnCityRoad(baseGoalX, baseGoalZ) ||
+              i;
+          } else {
+            s.userData.cityPath = null;
+            s.userData.cityPathIndex = 0;
+            s.userData.cityPathGoal = null;
+          }
           const r = i,
             c = r.x - s.position.x,
             l = r.z - s.position.z,
@@ -4556,18 +4973,32 @@ function _e(o, n) {
                 : d
                   ? 82
                   : 58;
-            let i = s.position.x + (c / h) * o * e,
-              r = s.position.z + (l / h) * o * e,
-              p = new t.Vector3(i, te(i, r) + 5, r);
-            if (jt(p, 10)) {
-              const t = a % 2 ? 1 : -1,
-                n = (-l / h) * t,
-                d = (c / h) * t;
-              (i = s.position.x + n * o * 0.82 * e),
-                (r = s.position.z + d * o * 0.82 * e),
-                p.set(i, te(i, r) + 5, r);
+            let moveX = s.position.x;
+            let moveZ = s.position.z;
+            const desiredAngle = Math.atan2(l, c);
+            const turnOrder = followsCityRoad
+              ? [0, 0.28, -0.28, 0.52, -0.52, 0.82, -0.82, 1.2, -1.2]
+              : [0, 0.48, -0.48, 0.9, -0.9, 1.45, -1.45];
+            const clearance = followsCityRoad ? 24 : 12;
+            for (const turn of turnOrder) {
+              const angle = desiredAngle + turn;
+              const candidateX =
+                s.position.x + Math.cos(angle) * o * e;
+              const candidateZ =
+                s.position.z + Math.sin(angle) * o * e;
+              const candidate = new t.Vector3(
+                candidateX,
+                te(candidateX, candidateZ) + 5,
+                candidateZ,
+              );
+              if (!isSheepBlockedAt(candidate, clearance)) {
+                moveX = candidateX;
+                moveZ = candidateZ;
+                break;
+              }
             }
-            jt(p, 10) || ((s.position.x = i), (s.position.z = r));
+            s.position.x = moveX;
+            s.position.z = moveZ;
             const u = Math.atan2(-l, c);
             let m =
               t.MathUtils.euclideanModulo(
@@ -4588,15 +5019,28 @@ function _e(o, n) {
                   s.userData.lostSince || performance.now()),
                 Ne();
               const t = (a / Math.max(1, mt.sheep.length)) * Math.PI * 2,
-                e = _t(
-                  n.position.x + 92 * Math.sin(t),
-                  n.position.z + 92 * Math.cos(t),
-                );
+                cityRescue = followsCityRoad
+                  ? nearestClearCityRoadPoint(
+                      s.position.x,
+                      s.position.z,
+                      26,
+                    )
+                  : null,
+                e =
+                  cityRescue ||
+                  _t(
+                    n.position.x + 92 * Math.sin(t),
+                    n.position.z + 92 * Math.cos(t),
+                  );
               s.userData.target.set(e.x, 0, e.z),
-                performance.now() - s.userData.lostSince > 3e4 &&
-                  s.userData.rescueAttempts >= 6 &&
+                ((followsCityRoad &&
+                  s.userData.stuckTime > 1.1 &&
+                  s.userData.rescueAttempts >= 2) ||
+                  (performance.now() - s.userData.lostSince > 3e4 &&
+                    s.userData.rescueAttempts >= 6)) &&
                   (s.position.set(e.x, te(e.x, e.z) + 1, e.z),
                   s.userData.lastPos.copy(s.position),
+                  (s.userData.cityPath = null),
                   (s.userData.rescueAttempts = 0),
                   (s.userData.lostSince = 0)),
                 (s.userData.stuckTime = 0);
