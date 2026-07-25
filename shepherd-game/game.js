@@ -69,6 +69,7 @@ function loadJerusalemMap() {
       for (let idx = z.length - 1; idx >= 0; idx--) {
         if (["building", "wall", "temple", "temple-wall"].includes(z[idx].type)) z.splice(idx, 1);
       }
+      collisionRevision++;
       for (const rect of JERUSALEM_DATA.rects) {
         Ot(rect[0] * JERUSALEM_SCALE, rect[1] * JERUSALEM_SCALE, Math.max(22, rect[2] * JERUSALEM_SCALE), Math.max(22, rect[3] * JERUSALEM_SCALE), 0, "jerusalem-map");
       }
@@ -111,6 +112,16 @@ let i,
   g = 0,
   v = Number(localStorage.getItem("shepherdVolume") ?? 55) / 100;
 const z = [];
+const performanceState = {
+  nextOcclusionAt: 0,
+  nextMinimapAt: 0,
+  nextTargetLockAt: 0,
+  nextHudAt: 0,
+  hiddenCameraMeshes: [],
+  occlusionRaycaster: new t.Raycaster(),
+  targetRaycaster: new t.Raycaster(),
+  targetCenter: new t.Vector2(0, 0),
+};
 let D = "",
   S = !1,
   b = !1,
@@ -645,6 +656,12 @@ async function At(e) {
               templeObjText = "";
             })),
         templeObjPromise),
+    // Decode the larger predator assets on the loading screen. Loading and
+    // parsing them only when an enemy first appears causes a noticeable
+    // one-time hitch during active play.
+    loadLionModel().catch(() => null),
+    loadFoxModel().catch(() => null),
+    loadWolfModel().catch(() => null),
   ]),
     (async function () {
       if ((Ct(), y))
@@ -1990,22 +2007,92 @@ const Ft = [
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
+  collisionRevision++;
 }
 function Ot(t, e, o, n, s = 0, a = "building") {
   z.push({ shape: "rect", x: t, z: e, w: o, d: n, rotation: s, type: a });
+  collisionRevision++;
+}
+const COLLISION_CELL_SIZE = 320;
+let collisionRevision = 0,
+  indexedCollisionRevision = -1,
+  collisionQueryStamp = 0;
+const collisionGrid = new Map(),
+  globalCollisionObjects = [];
+function collisionCellKey(x, z) {
+  return `${x},${z}`;
+}
+function rebuildCollisionIndex() {
+  collisionGrid.clear();
+  globalCollisionObjects.length = 0;
+  for (const collider of z) {
+    let halfX, halfZ;
+    if ("rect" === collider.shape) {
+      const cos = Math.abs(Math.cos(collider.rotation || 0)),
+        sin = Math.abs(Math.sin(collider.rotation || 0));
+      halfX = 0.5 * (cos * collider.w + sin * collider.d);
+      halfZ = 0.5 * (sin * collider.w + cos * collider.d);
+    } else {
+      halfX = halfZ = collider.r;
+    }
+    const minX = Math.floor((collider.x - halfX) / COLLISION_CELL_SIZE),
+      maxX = Math.floor((collider.x + halfX) / COLLISION_CELL_SIZE),
+      minZ = Math.floor((collider.z - halfZ) / COLLISION_CELL_SIZE),
+      maxZ = Math.floor((collider.z + halfZ) / COLLISION_CELL_SIZE),
+      occupiedCells = (maxX - minX + 1) * (maxZ - minZ + 1);
+    if (occupiedCells > 196) {
+      globalCollisionObjects.push(collider);
+      continue;
+    }
+    for (let cellX = minX; cellX <= maxX; cellX++)
+      for (let cellZ = minZ; cellZ <= maxZ; cellZ++) {
+        const key = collisionCellKey(cellX, cellZ);
+        let bucket = collisionGrid.get(key);
+        bucket || (collisionGrid.set(key, (bucket = [])));
+        bucket.push(collider);
+      }
+  }
+  indexedCollisionRevision = collisionRevision;
+}
+function colliderBlocksPoint(collider, point, clearance) {
+  if ("rect" === collider.shape) {
+    const dx = point.x - collider.x,
+      dz = point.z - collider.z,
+      cos = Math.cos(-collider.rotation),
+      sin = Math.sin(-collider.rotation),
+      localX = dx * cos - dz * sin,
+      localZ = dx * sin + dz * cos;
+    return (
+      Math.abs(localX) < collider.w / 2 + clearance &&
+      Math.abs(localZ) < collider.d / 2 + clearance
+    );
+  }
+  return (
+    Math.hypot(point.x - collider.x, point.z - collider.z) <
+    collider.r + clearance
+  );
 }
 function jt(t, e = 18) {
   if (Math.abs(t.x) > 4050 || Math.abs(t.z) > 4050) return !0;
-  for (const o of z)
-    if ("rect" === o.shape) {
-      const n = t.x - o.x,
-        s = t.z - o.z,
-        a = Math.cos(-o.rotation),
-        i = Math.sin(-o.rotation),
-        r = n * a - s * i,
-        c = n * i + s * a;
-      if (Math.abs(r) < o.w / 2 + e && Math.abs(c) < o.d / 2 + e) return !0;
-    } else if (Math.hypot(t.x - o.x, t.z - o.z) < o.r + e) return !0;
+  indexedCollisionRevision !== collisionRevision && rebuildCollisionIndex();
+  collisionQueryStamp++;
+  const testCollider = (collider) => {
+    if (collider._collisionQueryStamp === collisionQueryStamp) return !1;
+    collider._collisionQueryStamp = collisionQueryStamp;
+    return colliderBlocksPoint(collider, t, e);
+  };
+  for (const collider of globalCollisionObjects)
+    if (testCollider(collider)) return !0;
+  const minX = Math.floor((t.x - e) / COLLISION_CELL_SIZE),
+    maxX = Math.floor((t.x + e) / COLLISION_CELL_SIZE),
+    minZ = Math.floor((t.z - e) / COLLISION_CELL_SIZE),
+    maxZ = Math.floor((t.z + e) / COLLISION_CELL_SIZE);
+  for (let cellX = minX; cellX <= maxX; cellX++)
+    for (let cellZ = minZ; cellZ <= maxZ; cellZ++) {
+      const bucket = collisionGrid.get(collisionCellKey(cellX, cellZ));
+      if (!bucket) continue;
+      for (const collider of bucket) if (testCollider(collider)) return !0;
+    }
   if (mt.goalSite?.userData?.campTreeLocal) {
     const o = mt.goalSite.localToWorld(
       mt.goalSite.userData.campTreeLocal.clone(),
@@ -4492,6 +4579,7 @@ function Ye(e, o, n) {
   return new t.Color(e).lerp(new t.Color(o), n);
 }
 function _e(o, n) {
+  const frameNow = n * 1000;
   (function () {
     if (!ct || lt) return;
     ct = !1;
@@ -4671,20 +4759,26 @@ function _e(o, n) {
     })(),
     (function () {
       const e = mt.player;
-      if (!e || !mt.jerusalem) return;
-      mt.jerusalem.traverse((t) => {
-        t.isMesh &&
-          t.userData.cameraHidden &&
-          ((t.visible = !0), (t.userData.cameraHidden = !1));
-      });
+      if (
+        !e ||
+        !mt.jerusalem ||
+        !mt.jerusalem.visible ||
+        frameNow < performanceState.nextOcclusionAt
+      )
+        return;
+      performanceState.nextOcclusionAt = frameNow + 100;
+      for (const mesh of performanceState.hiddenCameraMeshes) {
+        mesh.visible = !0;
+        mesh.userData.cameraHidden = !1;
+      }
+      performanceState.hiddenCameraMeshes.length = 0;
       const o = e.position.clone().sub(r.position),
         n = o.length(),
-        s = new t.Raycaster(
-          r.position,
-          o.normalize(),
-          0,
-          Math.max(0, n - 28),
-        ).intersectObjects(mt.jerusalem.children, !0);
+        raycaster = performanceState.occlusionRaycaster;
+      raycaster.set(r.position, o.normalize()),
+        (raycaster.near = 0),
+        (raycaster.far = Math.max(0, n - 28));
+      const s = raycaster.intersectObjects(mt.jerusalem.children, !0);
       for (const t of s) {
         const e = t.object;
         e?.isMesh &&
@@ -4692,7 +4786,9 @@ function _e(o, n) {
           t.distance > 45 &&
           t.distance < n - 25 &&
           e.geometry?.parameters?.height < 260 &&
-          ((e.visible = !1), (e.userData.cameraHidden = !0));
+          ((e.visible = !1),
+          (e.userData.cameraHidden = !0),
+          performanceState.hiddenCameraMeshes.push(e));
       }
     })(),
     (function (e) {
@@ -4986,7 +5082,7 @@ function _e(o, n) {
                 s.position.x + Math.cos(angle) * o * e;
               const candidateZ =
                 s.position.z + Math.sin(angle) * o * e;
-              const candidate = new t.Vector3(
+              const candidate = Mt.set(
                 candidateX,
                 te(candidateX, candidateZ) + 5,
                 candidateZ,
@@ -5155,8 +5251,7 @@ function _e(o, n) {
           (e.userData.hp = 0), Ge(e), i.remove(e);
           continue;
         }
-        const now = performance.now();
-        updateRockRespawns(now);
+        const now = frameNow;
         let o = e.userData.targetEntity;
         const isAnimal = e.userData.type !== "bandit";
         const validSheep = mt.sheep.filter((sheep) => !sheep.userData.safeHold);
@@ -5458,7 +5553,7 @@ function _e(o, n) {
               })(Ke)
             : Ke());
     })(),
-    updateRockRespawns(performance.now()),
+    updateRockRespawns(frameNow),
     mt.sheep.length <= 0 && !ut.flockLost && triggerFlockGameOver(),
     ut.hp <= 0 && !ut.flockLost &&
       ((ut.hp = 0),
@@ -5474,21 +5569,25 @@ function _e(o, n) {
       e("#gameOver").classList.remove("hidden"),
       document.exitPointerLock?.(),
       setTimeout(() => ke(e("#gameOver"), 0), 0)),
-    $e(),
+    frameNow >= performanceState.nextHudAt &&
+      ((performanceState.nextHudAt = frameNow + 100), $e()),
     (function () {
       const o = e("#crosshair");
-      if (!o) return;
+      if (!o || frameNow < performanceState.nextTargetLockAt) return;
+      performanceState.nextTargetLockAt = frameNow + 66;
       let n = !1;
       if (G && ut.skill >= 50 && mt.enemies.some((t) => t.userData.hp > 0)) {
-        const e = new t.Raycaster();
-        e.setFromCamera(new t.Vector2(0, 0), r),
-          (n = e
+        const raycaster = performanceState.targetRaycaster;
+        raycaster.setFromCamera(performanceState.targetCenter, r),
+          (n = raycaster
             .intersectObjects(mt.enemies, !0)
             .some((t) => t.distance < 1100));
       }
       o.classList.toggle("target-lock", n);
     })(),
     (function () {
+      if (frameNow < performanceState.nextMinimapAt) return;
+      performanceState.nextMinimapAt = frameNow + 100;
       const t = 190,
         e = 95;
       s.clearRect(0, 0, t, t),
