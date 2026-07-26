@@ -117,6 +117,7 @@ let Z = new t.Vector3(-1150, 0, 1050),
   Y = "",
   templeObjText = "",
   templeObjPromise = null,
+  templeAltarPromise = null,
   lionModelPromise = null,
   lionModelTemplate = null,
   foxModelPromise = null,
@@ -606,6 +607,109 @@ function addImportedTempleModel(parent, courtY) {
     console.error("성전 모델 적용 실패:", error);
     return false;
   }
+}
+function addPreparedTempleAltar(parent, courtY, fallbackAltar, fallbackRamp) {
+  if (templeAltarPromise) return templeAltarPromise;
+  templeAltarPromise = new GLTFLoader()
+    .loadAsync("./assets/models/temple_altar_square.glb")
+    .then((gltf) => {
+      const altar = gltf.scene;
+      altar.name = "PreparedSquareTempleAltar";
+      // The cleaned source altar body is 0.60 x 0.794 units. Scale each
+      // horizontal axis independently so the actual body is 170 x 170 in-game,
+      // then turn its stair run toward the existing southern approach.
+      altar.scale.set(283.3, 466.7, 214.1);
+      altar.rotation.y = -Math.PI / 2;
+      altar.position.set(205, courtY + 2, 34);
+      altar.traverse((child) => {
+        if (!child.isMesh) return;
+        child.castShadow = true;
+        child.receiveShadow = true;
+        child.frustumCulled = true;
+        child.userData.neverOcclude = true;
+        if (child.material) {
+          child.material.roughness = Math.max(child.material.roughness ?? 0.8, 0.72);
+          child.material.metalness = Math.min(child.material.metalness ?? 0, 0.08);
+        }
+      });
+      // The former full-size closure box produced a huge exposed brown wall,
+      // and projecting the scanned material onto that box corrupted its UVs.
+      // Never use a second full altar body as a visual repair layer.
+      fallbackAltar.visible = false;
+      parent.add(altar);
+      mt.templeAltarModel = altar;
+      fallbackRamp.visible = false;
+
+      // Repair only the two genuinely open parts of the scan.  Use one continuous
+      // masonry surface instead of rows of plain temporary-looking boxes.
+      const brickCanvas = document.createElement("canvas");
+      brickCanvas.width = 512;
+      brickCanvas.height = 512;
+      const brickContext = brickCanvas.getContext("2d");
+      brickContext.fillStyle = "#b99d70";
+      brickContext.fillRect(0, 0, 512, 512);
+      const rows = 8;
+      const rowHeight = 512 / rows;
+      const brickWidth = 128;
+      for (let row = 0; row < rows; row++) {
+        const y = row * rowHeight;
+        const offset = row % 2 ? -brickWidth / 2 : 0;
+        for (let x = offset; x < 512; x += brickWidth) {
+          const shade = 166 + ((row * 19 + Math.round(x)) % 23);
+          brickContext.fillStyle = `rgb(${shade + 19},${shade + 1},${shade - 31})`;
+          brickContext.fillRect(x + 3, y + 3, brickWidth - 6, rowHeight - 6);
+          brickContext.strokeStyle = "rgba(92,70,43,0.38)";
+          brickContext.lineWidth = 3;
+          brickContext.strokeRect(x + 3, y + 3, brickWidth - 6, rowHeight - 6);
+          brickContext.fillStyle = "rgba(255,239,201,0.14)";
+          brickContext.fillRect(x + 7, y + 7, brickWidth - 14, 5);
+        }
+      }
+      const brickTexture = new t.CanvasTexture(brickCanvas);
+      brickTexture.colorSpace = t.SRGBColorSpace;
+      brickTexture.wrapS = t.RepeatWrapping;
+      brickTexture.wrapT = t.RepeatWrapping;
+      brickTexture.repeat.set(2.25, 1.25);
+      brickTexture.anisotropy = 4;
+      const repairMaterial = new t.MeshToonMaterial({
+        color: 0xffffff,
+        map: brickTexture,
+      });
+      const repairGroup = new t.Group();
+      repairGroup.name = "AltarLocalStoneRepairs";
+      repairGroup.userData.neverOcclude = true;
+
+      // Solid walkable centre below the fire: closes the empty-looking upper well.
+      const topInfill = new t.Mesh(
+        new t.BoxGeometry(132, 8, 122),
+        repairMaterial,
+      );
+      topInfill.position.set(205, courtY + 105, -2);
+      topInfill.castShadow = true;
+      topInfill.receiveShadow = true;
+      topInfill.userData.neverOcclude = true;
+      repairGroup.add(topInfill);
+
+      // One complete rear wall face fills the scan opening edge-to-edge.  It stays
+      // inset inside the altar footprint and cannot protrude across the court.
+      const rearWall = new t.Mesh(
+        new t.BoxGeometry(150, 88, 6),
+        repairMaterial,
+      );
+      rearWall.position.set(205, courtY + 48, -78);
+      rearWall.castShadow = true;
+      rearWall.receiveShadow = true;
+      rearWall.userData.neverOcclude = true;
+      repairGroup.add(rearWall);
+      parent.add(repairGroup);
+      mt.templeAltarRepairs = repairGroup;
+      return altar;
+    })
+    .catch((error) => {
+      console.error("정리된 성전 제단 모델 적용 실패:", error);
+      return null;
+    });
+  return templeAltarPromise;
 }
 
 async function At(e) {
@@ -1306,8 +1410,8 @@ async function At(e) {
                     altarTopY: d + 107,
                     altarRampXMin: n + a + 125,
                     altarRampXMax: n + a + 285,
-                    altarRampZMin: s + i + 90,
-                    altarRampZMax: s + i + 250,
+                    altarRampZMin: s + i + 70,
+                    altarRampZMax: s + i + 175,
                   };
                   if (mt.terrain?.geometry?.attributes?.position) {
                     const e = mt.terrain.geometry.attributes.position;
@@ -1476,16 +1580,6 @@ async function At(e) {
                     (L.castShadow = !0),
                     (L.receiveShadow = !0),
                     r.add(L);
-                  for (const e of [-1, 1])
-                    for (const o of [-1, 1]) {
-                      const n = new t.Mesh(
-                        new t.CylinderGeometry(7, 12, 32, 6),
-                        P,
-                      );
-                      n.position.set(b + 72 * e, T + 16, 0 + 72 * o),
-                        (n.castShadow = !0),
-                        r.add(n);
-                    }
                   const C = new t.BufferGeometry(),
                     k = d + 3,
                     B = T - 2;
@@ -1521,16 +1615,23 @@ async function At(e) {
                     C.computeVertexNormals();
                   const I = new t.Mesh(C, P);
                   (I.castShadow = !0), (I.receiveShadow = !0), r.add(I);
-                  const E = new t.Mesh(
-                    new t.CylinderGeometry(61, 69, 10, 12),
-                    ge(4274740),
-                  );
-                  E.position.set(b, T + 6, 0), r.add(E);
-                  const R = new t.Mesh(
-                    new t.CylinderGeometry(47, 54, 7, 10),
-                    new t.MeshBasicMaterial({ color: 16742948 }),
-                  );
-                  R.position.set(b, T + 12, 0), r.add(R), (mt.templeEmber = R);
+                  // Keep the original lightweight altar until the cleaned GLB is ready,
+                  // then replace only its visible body and ramp. Fire and smoke below
+                  // remain separate effects and therefore survive the replacement.
+                  addPreparedTempleAltar(r, d, L, I);
+                  // Height-aware side collision prevents entering the altar body from
+                  // ground level while allowing David to stand and move on its top.
+                  Ot(n + a + b - 85, s + i, 12, 170, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 85, s + i, 12, 170, 0, "temple", d + 2, T);
+                  Ot(n + a + b, s + i - 85, 170, 12, 0, "temple", d + 2, T);
+                  // Close the rear corners as well. The opening is only on the
+                  // southern stair side; no ground-level pocket remains behind
+                  // the altar where the player can become trapped.
+                  Ot(n + a + b - 70, s + i - 92, 30, 28, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 70, s + i - 92, 30, 28, 0, "temple", d + 2, T);
+                  // Stair flanks are blocked, while the full southern stair face stays open.
+                  Ot(n + a + b - 85, s + i + 130, 12, 90, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 85, s + i + 130, 12, 90, 0, "temple", d + 2, T);
                   const V = new t.Group();
                   for (let e = 0; e < 8; e++) {
                     const o = new t.MeshBasicMaterial({
@@ -5575,6 +5676,25 @@ function _e(o, n) {
       }
       const l = samplePlayerSurface(o.position.x, o.position.z, o.position.y) + pt,
         h = o.userData.bodyRoot || o;
+      // Altar fail-safe: when crossing the scanned model's rim, never allow the
+      // player to drop into its hollow visual shell.  The stair remains the normal
+      // approach, while any position still inside the square footprint resolves
+      // to the real, reinforced top surface.
+      if (dt) {
+        const insideAltar =
+          Math.abs(o.position.x - dt.altarX) <= dt.altarHalfX - 2 &&
+          Math.abs(o.position.z - dt.altarZ) <= dt.altarHalfZ - 2;
+        const altarStandingY = dt.altarTopY + pt;
+        if (
+          insideAltar &&
+          o.position.y < altarStandingY - 8 &&
+          o.position.y > dt.courtSurfaceY + pt - 12
+        ) {
+          o.position.y = altarStandingY;
+          o.userData.verticalVelocity = 0;
+          o.userData.grounded = true;
+        }
+      }
       N &&
         o.userData.grounded &&
         ((o.userData.verticalVelocity = 245), (o.userData.grounded = !1)),
