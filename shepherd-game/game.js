@@ -117,6 +117,8 @@ const performanceState = {
   nextMinimapAt: 0,
   nextTargetLockAt: 0,
   nextHudAt: 0,
+  nextAdaptiveQualityAt: 0,
+  currentPixelRatio: 0,
   hiddenCameraMeshes: [],
   occlusionRaycaster: new t.Raycaster(),
   targetRaycaster: new t.Raycaster(),
@@ -162,6 +164,12 @@ let Z = new t.Vector3(-1150, 0, 1050),
   foxModelTemplate = null,
   wolfModelPromise = null,
   wolfModelTemplate = null,
+  sheepModelPromise = null,
+  sheepModelTemplate = null,
+  banditModelPromise = null,
+  banditModelTemplate = null,
+  oliveTreeModelPromise = null,
+  oliveTreeModelTemplate = null,
   _ = null,
   J = null,
   Q = null,
@@ -186,6 +194,19 @@ let Z = new t.Vector3(-1150, 0, 1050),
   dt = null,
   citySheepWaitingForPickup = !1,
   playerWasInsideJerusalem = !1;
+const nightWatch = {
+  active: !1,
+  camp: new t.Vector3(),
+  startedAt: 0,
+  lastPhase: "",
+};
+const routeChoice = {
+  id: "",
+  name: "",
+  spawnMultiplier: 1,
+  rewardRespect: 0,
+  lastNoticeAt: 0,
+};
 const pt = 33,
   ut = {
     hp: 100,
@@ -662,6 +683,9 @@ async function At(e) {
     loadLionModel().catch(() => null),
     loadFoxModel().catch(() => null),
     loadWolfModel().catch(() => null),
+    loadSheepModel().catch(() => null),
+    loadBanditModel().catch(() => null),
+    loadOliveTreeModel().catch(() => null),
   ]),
     (async function () {
       if ((Ct(), y))
@@ -688,7 +712,7 @@ async function At(e) {
             antialias: !0,
             powerPreference: "high-performance",
           })),
-          c.setPixelRatio(Math.min(devicePixelRatio, 1.6)),
+          c.setPixelRatio(Math.min(devicePixelRatio, 1.25)),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
           (c.shadowMap.type = t.PCFSoftShadowMap),
@@ -703,7 +727,7 @@ async function At(e) {
         (h = e),
           e.position.set(-700, 1200, 500),
           (e.castShadow = !0),
-          e.shadow.mapSize.set(2048, 2048),
+          e.shadow.mapSize.set(1024, 1024),
           (e.shadow.camera.left = -1300),
           (e.shadow.camera.right = 1300),
           (e.shadow.camera.top = 1300),
@@ -1618,15 +1642,12 @@ async function At(e) {
                     o.push([e + 30 * Math.sin(0.002 * (n + 80 * t)), n]);
                   we(o, 10125923, 12, 0.72);
                 }
-                for (let t = 0; t < 96; t++) {
-                  const e = (t % 32) * 135 - 2050;
-                  Me(
-                    2520 + 300 * Math.floor(t / 32) + (t % 4) * 34,
-                    e,
-                    0.48 + (t % 6) * 0.05,
-                  );
-                }
+                // Only the Mount of Olives receives olive trees. The imported
+                // model is instanced in several spatial batches so the grove is
+                // dense without multiplying geometry, materials, or draw calls.
+                createMountOfOlivesGrove();
               })(),
+              createDistantMountainHorizon(),
               (function () {
                 const e = new t.LineBasicMaterial({
                     color: 5984583,
@@ -1752,8 +1773,10 @@ async function At(e) {
                   c = 18,
                   l = new t.Mesh(new t.BoxGeometry(88, 18, 8), s);
                 (l.position.y = -72), (l.receiveShadow = !0), o.add(l);
-                const h = new t.Mesh(new t.PlaneGeometry(250, 170), a);
-                (h.rotation.x = -Math.PI / 2), (h.position.y = -48), o.add(h);
+                // Fill the stepped pool so that only the uppermost stair remains
+                // above the water line; the lower six steps are submerged.
+                const h = new t.Mesh(new t.PlaneGeometry(304, 224), a);
+                (h.rotation.x = -Math.PI / 2), (h.position.y = -7.5), o.add(h);
                 for (let e = 0; e < 7; e++) {
                   const s = 9 * -e,
                     a = 340 - e * c * 2,
@@ -2620,7 +2643,10 @@ function oe(e, o, n = 1) {
 function ne(t = 4300) {
   const o = e("#mission");
   o &&
-    ((o.textContent = "양을 다음 구유가 있는 야영지까지 보호하십시오."),
+    ((o.textContent =
+      "밤" === Ze(ut.worldTime).name || nightWatch.active
+        ? "이 야영지에 머물며 밤이 끝날 때까지 양 떼를 지키십시오."
+        : "양을 다음 구유가 있는 야영지까지 보호하십시오."),
     (o.style.display = "block"),
     o.classList.remove("prompt-show"),
     o.offsetWidth,
@@ -2648,7 +2674,11 @@ function ae() {
 function ie() {
   (ut.missionDone = !1),
     ne(4300),
-    eo("멀리 새로운 목동 야영지가 정해졌습니다.");
+    eo(
+      "밤" === Ze(ut.worldTime).name
+        ? "밤 동안에는 이 야영지에 머물러 양 떼를 지키십시오."
+        : "멀리 새로운 목동 야영지가 정해졌습니다.",
+    );
 }
 function re(t) {
   (at.active = !1),
@@ -3239,9 +3269,16 @@ function Se(e) {
       runPhase: 0.9 * e,
       hp: 100,
       maxHp: 100,
+      fear: 0,
+      fearDirection: new t.Vector3(),
+      fearJitter: (e * 1.61803398875 % 1 - 0.5) * 0.9,
+      // 86% is the absolute largest sheep. Most of the flock remains smaller,
+      // so no sheep visually rivals David's body size.
+      modelScale: 0.68 + ((e * 37) % 10) * 0.02,
     }),
     i.add(o),
     mt.sheep.push(o),
+    applySheepModel(o),
     o
   );
 }
@@ -3408,6 +3445,284 @@ function loadWolfModel() {
     );
   });
   return wolfModelPromise;
+}
+function loadSheepModel() {
+  if (sheepModelTemplate) return Promise.resolve(sheepModelTemplate);
+  if (sheepModelPromise) return sheepModelPromise;
+  sheepModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/sheep_tripo_static.glb",
+      (gltf) => {
+        const scene = prepareImportedAnimalModel(gltf.scene);
+        sheepModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("양 3D 모델을 불러오지 못해 기존 양 모델을 사용합니다.", error);
+        sheepModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return sheepModelPromise;
+}
+function applySheepModel(sheep) {
+  if (!sheep || sheep.userData.sheepModelAttachStarted) return;
+  sheep.userData.sheepModelAttachStarted = true;
+  const fallbackChildren = [...sheep.children];
+  loadSheepModel()
+    .then((template) => {
+      if (!sheep.parent || !mt.sheep.includes(sheep) || sheep.userData.importedSheepModel) return;
+      const model = template.clone(true);
+      model.name = "SheepTripoStaticModel";
+      // The source sheep faces diagonally (+X/+Z). Align its nose with the
+      // procedural flock's +X forward axis so turning remains correct from
+      // the front, rear, left, and right.
+      model.rotation.set(0, Math.PI / 4, 0);
+      model.updateMatrixWorld(true);
+      let box = new t.Box3().setFromObject(model);
+      const size = box.getSize(new t.Vector3());
+      const targetHeight = 72 * (sheep.userData.modelScale || 1);
+      model.scale.setScalar(targetHeight / Math.max(size.y, 0.001));
+      model.updateMatrixWorld(true);
+      box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      sheep.add(model);
+      fallbackChildren.forEach((child) => {
+        child.visible = false;
+      });
+      sheep.userData.importedSheepModel = model;
+      sheep.userData.importedSheepBaseY = model.position.y;
+    })
+    .catch(() => {
+      fallbackChildren.forEach((child) => {
+        child.visible = true;
+      });
+    });
+}
+function loadBanditModel() {
+  if (banditModelTemplate) return Promise.resolve(banditModelTemplate);
+  if (banditModelPromise) return banditModelPromise;
+  banditModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/bandit_tripo_static.glb",
+      (gltf) => {
+        const scene = prepareImportedAnimalModel(gltf.scene);
+        scene.animations = gltf.animations || [];
+        banditModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("강도 3D 모델을 불러오지 못해 기존 강도 모델을 사용합니다.", error);
+        banditModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return banditModelPromise;
+}
+function loadOliveTreeModel() {
+  if (oliveTreeModelTemplate) return Promise.resolve(oliveTreeModelTemplate);
+  if (oliveTreeModelPromise) return oliveTreeModelPromise;
+  oliveTreeModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/olive_tree_game.glb",
+      (gltf) => {
+        const scene = gltf.scene;
+        scene.traverse((obj) => {
+          if (!obj.isMesh) return;
+          obj.castShadow = false;
+          obj.receiveShadow = true;
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = t.FrontSide;
+            material.transparent = false;
+            material.depthWrite = true;
+            material.roughness = Math.max(0.72, material.roughness ?? 0.72);
+            if (material.map) {
+              material.map.colorSpace = t.SRGBColorSpace;
+              material.map.anisotropy = Math.min(2, c?.capabilities?.getMaxAnisotropy?.() || 1);
+            }
+          });
+        });
+        oliveTreeModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("올리브나무 모델을 불러오지 못했습니다.", error);
+        oliveTreeModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return oliveTreeModelPromise;
+}
+function createMountOfOlivesGrove() {
+  loadOliveTreeModel()
+    .then((template) => {
+      if (!i || mt.oliveGrove) return;
+      let sourceMesh = null;
+      template.traverse((obj) => {
+        if (!sourceMesh && obj.isMesh) sourceMesh = obj;
+      });
+      if (!sourceMesh) return;
+      const random = ee(118611);
+      // Eight smaller instance batches allow whole sections behind the camera
+      // or beyond the fog to be culled, instead of drawing all 88 detailed trees.
+      const zones = Array.from({ length: 8 }, () => []);
+      let attempts = 0;
+      while (zones.reduce((sum, zone) => sum + zone.length, 0) < 88 && attempts++ < 1800) {
+        // Bias the distribution toward the western and central slopes rather
+        // than stacking rows on the far-eastern summit.
+        const westBiased = random() < 0.62;
+        const x = westBiased
+          ? 1460 + 780 * Math.pow(random(), 0.82)
+          : 2180 + 760 * random();
+        const z = -1900 + 3800 * random();
+        const kidronCenter = 1080 + 70 * Math.sin(0.0014 * (z + 300));
+        // Keep the Kidron floor completely treeless. A few trees begin only on
+        // the rising route and western foot of the Mount of Olives.
+        if (x < kidronCenter + 300) continue;
+        if (he(x, z, 34) > 0.57 || Kt(x, z, 70) || zt(x, z, 80)) continue;
+        const zone = Math.min(7, Math.max(0, Math.floor((z + 1900) / 475)));
+        zones[zone].push({
+          x,
+          z,
+          scale: 112 + 42 * random(),
+          rotation: random() * Math.PI * 2,
+        });
+      }
+      const grove = new t.Group();
+      grove.name = "MountOfOlivesGrove";
+      const dummy = new t.Object3D();
+      for (const zone of zones) {
+        if (!zone.length) continue;
+        const instances = new t.InstancedMesh(
+          sourceMesh.geometry,
+          sourceMesh.material,
+          zone.length,
+        );
+        instances.castShadow = false;
+        instances.receiveShadow = true;
+        instances.frustumCulled = true;
+        zone.forEach((tree, index) => {
+          dummy.position.set(tree.x, te(tree.x, tree.z), tree.z);
+          dummy.rotation.set(0, tree.rotation, 0);
+          dummy.scale.setScalar(tree.scale);
+          dummy.updateMatrix();
+          instances.setMatrixAt(index, dummy.matrix);
+        });
+        instances.instanceMatrix.needsUpdate = true;
+        instances.computeBoundingSphere();
+        grove.add(instances);
+      }
+      i.add(grove);
+      mt.oliveGrove = grove;
+    })
+    .catch(() => {
+      // Keep the wilderness treeless rather than substituting acacias on the
+      // Mount of Olives when the olive asset is unavailable.
+    });
+}
+function createDistantMountainHorizon() {
+  if (!i || mt.distantMountains) return;
+  const horizon = new t.Group();
+  horizon.name = "DistantDetailedMountainHorizon";
+  const materials = [
+    new t.MeshToonMaterial({ color: 10062454, flatShading: true, fog: false }),
+    new t.MeshToonMaterial({ color: 11180920, flatShading: true, fog: false }),
+    new t.MeshToonMaterial({ color: 12234612, flatShading: true, fog: false }),
+  ];
+  const segments = 80;
+  for (let layer = 0; layer < 3; layer++) {
+    const positions = [];
+    const indices = [];
+    for (let index = 0; index <= segments; index++) {
+      const angle = (index / segments) * Math.PI * 2;
+      const eastness = Math.max(0, Math.cos(angle));
+      // East of Jerusalem opens toward the Dead Sea descent, so its opposite
+      // ridge sits substantially farther away than the north/west/south ring.
+      const radius =
+        5350 + layer * 620 +
+        eastness * eastness * (2600 + layer * 320) +
+        180 * Math.sin(angle * 5 + layer * 1.7);
+      const outer = radius + 360 + 80 * Math.sin(angle * 9 + layer);
+      const baseY = -35 + layer * 22;
+      const peak =
+        230 + layer * 105 +
+        95 * Math.sin(angle * 7 + layer * 2.1) +
+        52 * Math.sin(angle * 17 - layer);
+      const x = Math.cos(angle);
+      const zc = Math.sin(angle);
+      positions.push(x * (radius - 260), baseY, zc * (radius - 260));
+      positions.push(x * radius, baseY + Math.max(115, peak), zc * radius);
+      positions.push(x * outer, baseY - 20, zc * outer);
+      if (index < segments) {
+        const a = index * 3;
+        const b = (index + 1) * 3;
+        indices.push(a, b, a + 1, b, b + 1, a + 1);
+        indices.push(a + 1, b + 1, a + 2, b + 1, b + 2, a + 2);
+      }
+    }
+    const geometry = new t.BufferGeometry();
+    geometry.setAttribute("position", new t.Float32BufferAttribute(positions, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    const ridge = new t.Mesh(geometry, materials[layer]);
+    ridge.castShadow = false;
+    ridge.receiveShadow = false;
+    ridge.frustumCulled = true;
+    ridge.renderOrder = -2 - layer;
+    horizon.add(ridge);
+  }
+  i.add(horizon);
+  mt.distantMountains = horizon;
+}
+function applyBanditModel(enemy) {
+  if (enemy.userData.banditModelAttachStarted) return;
+  enemy.userData.banditModelAttachStarted = true;
+  const fallbackChildren = [...enemy.children];
+  loadBanditModel()
+    .then((template) => {
+      if (!enemy.parent || enemy.userData.type !== "bandit") return;
+      if (enemy.userData.importedModel) return;
+      const model = template.clone(true);
+      model.name = "BanditTripoStaticModel";
+      model.rotation.set(0, 0, 0);
+      model.updateMatrixWorld(true);
+      let box = new t.Box3().setFromObject(model);
+      const size = box.getSize(new t.Vector3());
+      // Keep bandits visibly larger than David without making their hitbox or
+      // movement behavior feel oversized.
+      const scale = 190 / Math.max(size.y, 0.001);
+      model.scale.setScalar(scale);
+      model.updateMatrixWorld(true);
+      box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      enemy.add(model);
+      fallbackChildren.forEach((child) => {
+        child.visible = false;
+      });
+      enemy.userData.importedModel = model;
+      enemy.userData.importedModelBaseY = model.position.y;
+      enemy.userData.importedModelPhase = Math.random() * Math.PI * 2;
+    })
+    .catch(() => {
+      enemy.userData.banditModelAttachStarted = false;
+      fallbackChildren.forEach((child) => {
+        child.visible = true;
+      });
+    });
 }
 function applyImportedPredatorModel(enemy, type) {
   const config = {
@@ -3585,6 +3900,7 @@ function Pe(o = "lion") {
     i.add(n),
     "lion" === o && applyLionModel(n, lionFallback),
     ("wolf" === o || "fox" === o) && applyImportedPredatorModel(n, o),
+    "bandit" === o && applyBanditModel(n),
     mt.enemies.push(n),
     (function (t) {
       const o = document.createElement("div");
@@ -3623,6 +3939,14 @@ function Te() {
     (st = []),
     (citySheepWaitingForPickup = !1),
     (playerWasInsideJerusalem = !1),
+    (nightWatch.active = !1),
+    nightWatch.camp.set(0, 0, 0),
+    (nightWatch.startedAt = 0),
+    (nightWatch.lastPhase = ""),
+    (routeChoice.id = ""),
+    (routeChoice.name = ""),
+    (routeChoice.spawnMultiplier = 1),
+    (routeChoice.rewardRespect = 0),
     Object.assign(ut, {
       hp: 100,
       stones: 15,
@@ -3705,7 +4029,7 @@ function Le() {
   (r.aspect = innerWidth / innerHeight),
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
-    c.setPixelRatio(Math.min(devicePixelRatio, 1.6));
+    c.setPixelRatio(Math.min(devicePixelRatio, 1.25));
 }
 function Ce(t) {
   return [
@@ -4471,8 +4795,11 @@ function qe(e, o) {
 }
 function Ne() {
   const e = mt.player?.position;
+  if (!e || Yt(e.x, e.z, -55) || citySheepWaitingForPickup) {
+    nt = !1;
+    return;
+  }
   if (
-    !e ||
     !mt.sheep.some(
       (t) => Math.hypot(t.position.x - e.x, t.position.z - e.z) > W,
     )
@@ -4487,9 +4814,15 @@ function Oe(t = !1) {
     n = Ze(ut.worldTime).name;
   let s = o ? (t ? 240 : 360) : t ? 190 : 285,
     a = o ? (t ? 480 : 720) : t ? 390 : 560;
-  return (
-    o || "저녁" !== n || ((s *= 0.62), (a *= 0.66)), s + Math.random() * (a - s)
-  );
+  if (!o && "밤" === n) {
+    // Night watch is the most dangerous period. Encounters are deliberately
+    // much more frequent than during travel in daylight.
+    s = nightWatch.active ? 38 : 55;
+    a = nightWatch.active ? 68 : 95;
+  }
+  o || "저녁" !== n || ((s *= 0.62), (a *= 0.66));
+  const routeFactor = o ? 1 : routeChoice.spawnMultiplier || 1;
+  return (s + Math.random() * (a - s)) / routeFactor;
 }
 function je(t, o = 4200) {
   const n = e("#dangerNotice");
@@ -4502,13 +4835,13 @@ function je(t, o = 4200) {
 }
 let He = !1;
 function Ke() {
-  (ut.respect = Math.min(100, ut.respect + 2)),
+  (ut.respect = Math.min(100, ut.respect + 2 + routeChoice.rewardRespect)),
     (ut.money = Math.min(1e7, ut.money + 15)),
     (ut.thirst = 100),
     ut.hp < 100 && (ut.hp = Math.min(100, ut.hp + 14)),
     e("#thirstHud").classList.add("show"),
     (e("#mission").style.display = "none"),
-    Ve(2),
+    Ve(2 + routeChoice.rewardRespect),
     $e();
   const o = !(
     at.active ||
@@ -4561,6 +4894,10 @@ function Ke() {
       ($ += 1),
       ce();
   })(),
+    (routeChoice.id = ""),
+    (routeChoice.name = ""),
+    (routeChoice.spawnMultiplier = 1),
+    (routeChoice.rewardRespect = 0),
     oo(!0),
     o || setTimeout(ie, 4300);
 }
@@ -4575,11 +4912,72 @@ const Xe = [
 function Ze(t) {
   return Xe.find((e) => t >= e.start && t < e.end) || Xe[0];
 }
+function updateRouteChoice(now) {
+  const player = mt.player?.position;
+  if (!player || Yt(player.x, player.z, -60) || nightWatch.active) return;
+  let next = null;
+  // The lower Kidron/wadi route is the shortest direct crossing, but exposes
+  // the flock to far more predators. The olive ridge is longer and safer.
+  if (player.x > 720 && player.x < 1420)
+    next = {
+      id: "wadi",
+      name: "짧고 위험한 와디 길",
+      spawnMultiplier: 1.8,
+      rewardRespect: 2,
+      notice: "짧은 와디 길: 맹수가 자주 나타나지만 도착 시 존중 보너스를 받습니다.",
+    };
+  else if (player.x >= 1420 && player.x < 3100)
+    next = {
+      id: "ridge",
+      name: "길고 안전한 올리브산 능선길",
+      spawnMultiplier: 0.58,
+      rewardRespect: 0,
+      notice: "올리브산 능선길: 더 멀지만 맹수 출현이 적습니다.",
+    };
+  else if (
+    Math.hypot(player.x - ft.x, player.z - ft.z) < ft.r + 360 ||
+    Math.hypot(player.x - 330, player.z - 2860) < 520
+  )
+    next = {
+      id: "water",
+      name: "물이 있는 샘길",
+      spawnMultiplier: 0.9,
+      rewardRespect: 0,
+      notice: "샘길: 기혼 샘이나 쉴로악흐에서 양 떼의 갈증을 채울 수 있습니다.",
+    };
+  if (!next || routeChoice.id === next.id) return;
+  Object.assign(routeChoice, next);
+  if (now - routeChoice.lastNoticeAt > 4500) {
+    routeChoice.lastNoticeAt = now;
+    eo(next.notice);
+  }
+}
+function updateAdaptiveRendering(now) {
+  if (!c || !mt.player || now < performanceState.nextAdaptiveQualityAt) return;
+  performanceState.nextAdaptiveQualityAt = now + 900;
+  const player = mt.player.position;
+  const onOliveMount = player.x > 1050 && player.x < 3300;
+  const targetRatio = Math.min(devicePixelRatio, onOliveMount ? 1 : 1.25);
+  if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
+    performanceState.currentPixelRatio = targetRatio;
+    c.setPixelRatio(targetRatio);
+  }
+  // Keep the full grove visible, but let fog and eight spatial batches discard
+  // expensive tree geometry that is not relevant to the current view.
+  if (mt.oliveGrove) {
+    mt.oliveGrove.children.forEach((batch) => {
+      if (!batch.boundingSphere) batch.computeBoundingSphere?.();
+      batch.frustumCulled = true;
+    });
+  }
+}
 function Ye(e, o, n) {
   return new t.Color(e).lerp(new t.Color(o), n);
 }
 function _e(o, n) {
   const frameNow = n * 1000;
+  updateAdaptiveRendering(frameNow);
+  updateRouteChoice(frameNow);
   (function () {
     if (!ct || lt) return;
     ct = !1;
@@ -4984,9 +5382,83 @@ function _e(o, n) {
       updateJerusalemSheepHold(),
         y && Math.random() < 0.012 * e && kt("sheep");
       const n = mt.player;
+      const activePredators = mt.enemies.filter(
+        (enemy) => enemy.userData.hp > 0 && enemy.userData.type !== "bandit",
+      );
       if (
         (mt.sheep.forEach((s, a) => {
           let i = s.userData.target;
+          const now = performance.now();
+          let nearestPredator = null;
+          let nearestPredatorDistance = Infinity;
+          if (!s.userData.safeHold) {
+            for (const enemy of activePredators) {
+              const distance = Math.hypot(
+                enemy.position.x - s.position.x,
+                enemy.position.z - s.position.z,
+              );
+              if (distance < nearestPredatorDistance) {
+                nearestPredatorDistance = distance;
+                nearestPredator = enemy;
+              }
+            }
+          }
+          const playerDistance = Math.hypot(
+            n.position.x - s.position.x,
+            n.position.z - s.position.z,
+          );
+          if (nearestPredator && nearestPredatorDistance < 430) {
+            const proximity = 1 - nearestPredatorDistance / 430;
+            s.userData.fear = Math.min(
+              1,
+              (s.userData.fear || 0) + e * (0.42 + proximity * 1.9),
+            );
+            const awayX = s.position.x - nearestPredator.position.x;
+            const awayZ = s.position.z - nearestPredator.position.z;
+            const length = Math.max(1, Math.hypot(awayX, awayZ));
+            const angle = Math.atan2(awayZ / length, awayX / length) + s.userData.fearJitter;
+            s.userData.fearDirection.set(Math.cos(angle), 0, Math.sin(angle));
+          } else {
+            const calmingRate = playerDistance < 260 ? 0.56 : 0.18;
+            s.userData.fear = Math.max(0, (s.userData.fear || 0) - e * calmingRate);
+          }
+          if ((s.userData.fear || 0) > 0.18 && !s.userData.safeHold) {
+            const panicDistance = 150 + 210 * s.userData.fear;
+            i = wt.set(
+              s.position.x + s.userData.fearDirection.x * panicDistance,
+              0,
+              s.position.z + s.userData.fearDirection.z * panicDistance,
+            );
+            s.userData.recallUntil = Math.max(s.userData.recallUntil || 0, now + 900);
+          } else if (
+            !s.userData.safeHold &&
+            !s.userData.target.lengthSq() &&
+            mt.sheep.length > 1
+          ) {
+            let centerX = 0;
+            let centerZ = 0;
+            let nearbyCount = 0;
+            for (const other of mt.sheep) {
+              if (other === s || other.userData.safeHold) continue;
+              const distance = Math.hypot(
+                other.position.x - s.position.x,
+                other.position.z - s.position.z,
+              );
+              if (distance > 520) continue;
+              centerX += other.position.x;
+              centerZ += other.position.z;
+              nearbyCount++;
+            }
+            if (nearbyCount && playerDistance > 125) {
+              centerX /= nearbyCount;
+              centerZ /= nearbyCount;
+              i = wt.set(
+                centerX * 0.46 + (n.position.x - 105) * 0.54,
+                0,
+                centerZ * 0.46 + (n.position.z - 105) * 0.54,
+              );
+            }
+          }
           if (0 === i.lengthSq()) {
             const t = (a / mt.sheep.length) * Math.PI * 2 + s.userData.phase;
             i = wt.set(
@@ -5064,6 +5536,9 @@ function _e(o, n) {
             d = (s.userData.recallUntil || 0) > performance.now();
           if (h > 18) {
             const o =
+              (s.userData.fear || 0) > 0.18
+                ? 98 + 52 * s.userData.fear
+                :
               (s.userData.urgeUntil || 0) > performance.now()
                 ? 112
                 : d
@@ -5148,15 +5623,16 @@ function _e(o, n) {
               (s.userData.target.set(0, 0, 0), (s.userData.recallUntil = 0));
           const p = h > 18;
           if (p && s.userData.legs) {
-            s.userData.runPhase += e * (d ? 12 : 8);
-            const o = Math.sin(s.userData.runPhase) * (d ? 0.55 : 0.34);
+            const panicking = (s.userData.fear || 0) > 0.18;
+            s.userData.runPhase += e * (panicking ? 14 : d ? 12 : 8);
+            const o = Math.sin(s.userData.runPhase) * (panicking ? 0.62 : d ? 0.55 : 0.34);
             (s.userData.legs[0].rotation.z = o),
               (s.userData.legs[3].rotation.z = o),
               (s.userData.legs[1].rotation.z = -o),
               (s.userData.legs[2].rotation.z = -o),
               (s.rotation.z = t.MathUtils.lerp(
                 s.rotation.z,
-                d ? -0.055 : 0,
+                panicking ? -0.07 : d ? -0.055 : 0,
                 Math.min(1, 7 * e),
               ));
           } else if (s.userData.legs) {
@@ -5214,7 +5690,16 @@ function _e(o, n) {
                     : o < 0.74
                       ? "wolf"
                       : "fox",
-              s = "wolf" === n ? 2 : 1,
+              s =
+                "밤" === Ze(ut.worldTime).name
+                  ? "wolf" === n
+                    ? 3
+                    : "fox" === n
+                      ? 2
+                      : 1
+                  : "wolf" === n
+                    ? 2
+                    : 1,
               a = "wolf" === n ? ++it : 0;
             for (let o = 0; o < s; o++) {
               let s, i;
@@ -5241,6 +5726,7 @@ function _e(o, n) {
               );
           })(),
           (O = 1 / 0)));
+      const availableSheep = mt.sheep.filter((sheep) => !sheep.userData.safeHold);
       for (const e of mt.enemies) {
         e.userData.mixer?.update(t);
         if (e.userData.hp <= 0) continue;
@@ -5254,7 +5740,7 @@ function _e(o, n) {
         const now = frameNow;
         let o = e.userData.targetEntity;
         const isAnimal = e.userData.type !== "bandit";
-        const validSheep = mt.sheep.filter((sheep) => !sheep.userData.safeHold);
+        const validSheep = availableSheep;
         const targetInvalid =
           !o ||
           (o !== mt.player && !mt.sheep.includes(o)) ||
@@ -5510,6 +5996,38 @@ function _e(o, n) {
     })(o, n),
     (function () {
       if (ut.missionDone || ut.thirstFailed || at.active) return;
+      const phase = Ze(ut.worldTime).name;
+      if (nightWatch.active) {
+        const mission = e("#mission");
+        if (mission) {
+          mission.textContent =
+            "이 야영지에 머물며 밤이 끝날 때까지 양 떼를 지키십시오.";
+          mission.style.display = "block";
+        }
+        // The camp marker and goal remain fixed throughout the whole night.
+        Z.copy(nightWatch.camp);
+        if (phase !== "밤" && nightWatch.lastPhase === "밤") {
+          nightWatch.active = !1;
+          nightWatch.lastPhase = phase;
+          ut.missionDone = !0;
+          eo("새벽이 되었습니다. 밤새 양 떼를 지켜냈습니다.");
+          Ke();
+        } else {
+          nightWatch.lastPhase = phase;
+          const playerDistance = Math.hypot(
+            mt.player.position.x - nightWatch.camp.x,
+            mt.player.position.z - nightWatch.camp.z,
+          );
+          if (
+            playerDistance > 620 &&
+            performance.now() - nightWatch.startedAt > 6000
+          ) {
+            je("야영지에서 너무 멀리 벗어났습니다. 양 떼 곁으로 돌아가십시오.", 3200);
+            nightWatch.startedAt = performance.now();
+          }
+        }
+        return;
+      }
       let e = 0;
       for (const t of mt.sheep)
         Math.hypot(t.position.x - Z.x, t.position.z - Z.z) < 365 && e++;
@@ -5518,40 +6036,15 @@ function _e(o, n) {
         ? ((et += 1 / 60), et > 2.2 && (Ne(), (et = 0)))
         : (et = 0),
         e >= o &&
-          ((ut.missionDone = !0),
-          "밤" === Ze(ut.worldTime).name
-            ? (function (e) {
-                if (He) return void e();
-                He = !0;
-                const o = mt.player,
-                  n = o?.userData?.bodyRoot || o,
-                  s = mt.sheep.reduce(
-                    (t, e) =>
-                      !t ||
-                      e.position.distanceTo(o.position) <
-                        t.position.distanceTo(o.position)
-                        ? e
-                        : t,
-                    null,
-                  ),
-                  a = n?.rotation.x || 0,
-                  i = n?.position.y || 0;
-                if ((n && ((n.rotation.x = 0.42), (n.position.y = i - 7)), s)) {
-                  const e = new t.Vector3().subVectors(s.position, o.position);
-                  (e.y = 0),
-                    e.lengthSq() > 0 &&
-                      (e.normalize(),
-                      s.position.copy(o.position).addScaledVector(e, 45),
-                      (s.position.y = te(s.position.x, s.position.z) + 22));
-                }
-                eo("양젖을 짜고 있습니다."),
-                  setTimeout(() => {
-                    n && ((n.rotation.x = a), (n.position.y = i)),
-                      (He = !1),
-                      e();
-                  }, 2400);
-              })(Ke)
-            : Ke());
+          ("밤" === phase
+            ? ((nightWatch.active = !0),
+              nightWatch.camp.copy(Z),
+              (nightWatch.startedAt = performance.now()),
+              (nightWatch.lastPhase = "밤"),
+              (O = Math.min(O, Oe(!0))),
+              ne(7e3),
+              eo("야영지에 도착했습니다. 이곳에서 밤이 끝날 때까지 양 떼를 지키십시오."))
+            : ((ut.missionDone = !0), Ke()));
     })(),
     updateRockRespawns(frameNow),
     mt.sheep.length <= 0 && !ut.flockLost && triggerFlockGameOver(),
