@@ -368,7 +368,10 @@ export function createDavidModel({
   const flame = new T.Mesh(new T.ConeGeometry(8.5, 28, 9), flameMaterial);
   flame.position.y = 18;
   torch.add(flame);
-  const glow = new T.PointLight(0xff925d, 0, 520, 1.15);
+  // Wide practical night light around David's staff. Intensity is animated by
+  // game.js; the distance must stay large enough to illuminate streets and
+  // nearby house fronts instead of only the flame itself.
+  const glow = new T.PointLight(0xff925d, 0, 920, 1.15);
   glow.position.y = 16;
   torch.add(glow);
   torch.userData = {

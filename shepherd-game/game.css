@@ -144,8 +144,8 @@
 
 /* v2.0.5: single David character selection */
 .cards.single-character{justify-content:center;margin:18px 0 24px}
-.character-card.david-only{width:340px;height:470px;padding:14px;background:#171512e8}
-.character-preview{display:block;width:100%;height:380px;object-fit:contain;object-position:center;border-radius:8px;margin:0 0 12px;background:#0f0f0f}
+.character-card.david-only{width:340px;height:470px;padding:14px;background:#000}
+.character-preview{display:block;width:100%;height:380px;object-fit:contain;object-position:center;border-radius:8px;margin:0 0 12px;background:#000}
 .character-card.david-only b{font-size:26px}
 
 /* v2.0.6: clickable David card and compact permanent flock-thirst HUD */

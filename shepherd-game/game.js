@@ -6,6 +6,7 @@ import { JERUSALEM_DATA } from "./jerusalemData.js";
 import { createDavidModel } from "./davidModel.js";
 let jerusalemMapReady = false;
 let jerusalemMapBaseY = 0;
+let jerusalemMapDeformedMinY = JERUSALEM_DATA.minY;
 const JERUSALEM_SCALE = JERUSALEM_DATA.scale || 260;
 
 function sampleJerusalemGround(worldX, worldZ) {
@@ -27,89 +28,21 @@ function sampleJerusalemGround(worldX, worldZ) {
   const localY = (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
   const southernDrop = 132 * t.MathUtils.smoothstep(worldZ, 320, 2700) *
     Math.exp(-(worldX * worldX) / 1300000);
-  return jerusalemMapBaseY + (localY - JERUSALEM_DATA.minY) * JERUSALEM_SCALE - southernDrop;
+  // This is the exact transform used by the visible GLB after its southern
+  // vertices have been regraded.  Using the old procedural te() height here
+  // buried every added house below the imported city surface.
+  return jerusalemMapBaseY +
+    (localY - southernDrop / JERUSALEM_SCALE - jerusalemMapDeformedMinY) *
+      JERUSALEM_SCALE;
 }
 
 function loadJerusalemMap() {
-  if (!i || mt.jerusalemMap) return;
-  const loader = new GLTFLoader();
-  loader.load(
-    "./assets/models/jerusalem_optimized.glb",
-    (gltf) => {
-      const model = gltf.scene;
-      const box = new t.Box3().setFromObject(model);
-      const center = box.getCenter(new t.Vector3());
-      // Regrade the integrated map itself (not only the invisible walking
-      // height) so the southern city visibly descends away from the Temple
-      // Mount. The broad blend avoids a square-edged terrain patch.
-      model.traverse((obj) => {
-        if (!obj.isMesh || !obj.geometry?.attributes?.position) return;
-        const position = obj.geometry.attributes.position;
-        for (let index = 0; index < position.count; index++) {
-          const localX = position.getX(index) - center.x;
-          const localZ = position.getZ(index) - center.z;
-          const worldX = localX * JERUSALEM_SCALE;
-          const worldZ = localZ * JERUSALEM_SCALE;
-          const drop = 132 * t.MathUtils.smoothstep(worldZ, 320, 2700) *
-            Math.exp(-(worldX * worldX) / 1300000);
-          position.setY(index, position.getY(index) - drop / JERUSALEM_SCALE);
-        }
-        position.needsUpdate = true;
-        obj.geometry.computeVertexNormals();
-        obj.geometry.computeBoundingBox();
-        obj.geometry.computeBoundingSphere();
-      });
-      box.setFromObject(model);
-      jerusalemMapBaseY = $t(0, 0) - 8;
-      model.scale.setScalar(JERUSALEM_SCALE);
-      model.position.set(-center.x * JERUSALEM_SCALE, jerusalemMapBaseY - box.min.y * JERUSALEM_SCALE, -center.z * JERUSALEM_SCALE);
-      model.rotation.y = 0;
-      model.name = "OptimizedJerusalemFirstTempleMap";
-      model.traverse((obj) => {
-        if (!obj.isMesh) return;
-        obj.castShadow = false;
-        // The baked city material already supplies enough depth. Receiving a
-        // dynamic shadow on every triangle was one of the largest city costs.
-        obj.receiveShadow = false;
-        if (obj.material) {
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach((m) => {
-            if (m.map) m.map.anisotropy = Math.min(4, c.capabilities.getMaxAnisotropy());
-            m.roughness = Math.max(0.72, m.roughness ?? 0.72);
-          });
-        }
-      });
-      if (mt.jerusalem) mt.jerusalem.visible = false;
-      i.add(model);
-      mt.jerusalemMap = model;
-      // 기존 고해상도 성전 모델은 새 도시의 성전산 위치에 색감 보강용으로 유지합니다.
-      if (mt.importedTemple) {
-        i.attach(mt.importedTemple);
-        mt.importedTemple.visible = true;
-        mt.importedTemple.position.set(-1020, jerusalemMapBaseY + 255, 760);
-        mt.importedTemple.scale.setScalar(1.5);
-        mt.importedTemple.rotation.y = 0;
-      }
-      // 기존 절차형 도시 충돌을 지우고 새 지도에서 추출한 건물/성벽 충돌을 등록합니다.
-      for (let idx = z.length - 1; idx >= 0; idx--) {
-        if (["building", "wall", "temple", "temple-wall"].includes(z[idx].type)) z.splice(idx, 1);
-      }
-      collisionRevision++;
-      for (const rect of JERUSALEM_DATA.rects) {
-        Ot(rect[0] * JERUSALEM_SCALE, rect[1] * JERUSALEM_SCALE, Math.max(22, rect[2] * JERUSALEM_SCALE), Math.max(22, rect[3] * JERUSALEM_SCALE), 0, "jerusalem-map");
-      }
-      createSouthernJerusalemUpgrade();
-      jerusalemMapReady = true;
-      eo("제1성전 시대 예루샬라임 3D 지도가 적용되었습니다.");
-    },
-    undefined,
-    (error) => {
-      console.error("예루샬라임 3D 지도 로드 실패:", error);
-      jerusalemMapReady = false;
-      if (mt.jerusalem) mt.jerusalem.visible = true;
-      eo("3D 지도 로드에 실패하여 기존 예루샬라임 지도를 사용합니다.");
-    },
-  );
+  // Disabled deliberately. The imported city GLB uses a completely different
+  // scale and surface from the playable procedural Jerusalem. Loading it here
+  // created a second oversized ground layer around the camera. The original
+  // city, Temple Mount, walls and their collision data remain authoritative.
+  jerusalemMapReady = false;
+  if (mt.jerusalem) mt.jerusalem.visible = true;
 }
 
 const e = (t) => document.querySelector(t),
@@ -236,6 +169,7 @@ const routeChoice = {
 const southernJerusalemUpgrade = {
   created: false,
   roads: [],
+  houses: [],
   projectileColliders: new Set(["building", "wall", "temple", "temple-wall", "jerusalem-map"]),
 };
 const pt = 33,
@@ -1052,7 +986,8 @@ async function At(e) {
                 const G = Math.min(...b),
                   P = Math.max(...b),
                   T = Math.atan2(-v, g),
-                  L = 300 + 32 * Math.sin(3 * i),
+                  southWallBlend = t.MathUtils.smoothstep(y, 2050, 2760),
+                  L = t.MathUtils.lerp(300 + 32 * Math.sin(3 * i), 176, southWallBlend),
                   C = G - 18,
                   k = P + L,
                   B = k - C,
@@ -1194,7 +1129,10 @@ async function At(e) {
                 (function (group, materials, cityX, cityZ) {
                   const rnd = ee(2026071903);
                   let placed = 0;
-                  for (let attempt = 0; attempt < 260 && placed < 58; attempt++) {
+                  // The southern quarter is built by createSouthernJerusalemUpgrade().
+                  // Keeping this older random pass as well made the final density depend
+                  // on collision-registration order and could paradoxically remove houses.
+                  for (let attempt = 0; attempt < 0 && placed < 0; attempt++) {
                     const localX = -650 + rnd() * 1300;
                     const localZ = 300 + rnd() * 1500;
                     const worldX = cityX + localX;
@@ -1435,16 +1373,30 @@ async function At(e) {
                     const i = new t.Mesh(new t.BoxGeometry(s, m, a), o[1]);
                     i.position.set(e, d + 85, n), (i.castShadow = !0), r.add(i);
                   }
-                  // East wall is split into shorter southern and northern sections. The
-                  // middle gate remains wide, and the north-east projection is removed.
-                  // Keep only the south-east enclosure section. The former north-east
-                  // projection stuck outside Jerusalem's city wall and blocked the approach.
-                  for (const [wallZ, wallDepth] of [[330, 260]]) {
+                  // Complete eastern enclosure wall, split only at the gate opening.
+                  for (const [wallZ, wallDepth] of [[330, 260], [-330, 260]]) {
                     const n = new t.Mesh(new t.BoxGeometry(f, m, wallDepth), o[1]);
                     n.position.set(c, d + 85, wallZ), r.add(n);
                   }
-                  const M = new t.Mesh(new t.BoxGeometry(60, 54, w), o[2]);
-                  M.position.set(c, d + m - 27, 0), r.add(M);
+                  // Close the two gaps that used to remain between the gate piers
+                  // and the eastern enclosure wall.  Together these pieces leave
+                  // only the actual doorway opening at the centre.
+                  for (const wallZ of [-149, 149]) {
+                    const n = new t.Mesh(new t.BoxGeometry(f, m, 102), o[1]);
+                    n.position.set(c, d + 85, wallZ);
+                    n.castShadow = true;
+                    n.receiveShadow = true;
+                    r.add(n);
+                  }
+                  const M = new t.Mesh(new t.BoxGeometry(60, 72, w), o[2]);
+                  M.position.set(c, d + m + 10, 0), r.add(M);
+                  for (const gateZ of [-76, 76]) {
+                    const pier = new t.Mesh(new t.BoxGeometry(60, m, 44), o[1]);
+                    pier.position.set(c, d + m / 2, gateZ);
+                    pier.castShadow = true;
+                    pier.receiveShadow = true;
+                    r.add(pier);
+                  }
                   const templeEntryLip = new t.Mesh(
                     new t.BoxGeometry(30, 4, w - 40),
                     templeMarble,
@@ -1458,7 +1410,12 @@ async function At(e) {
                     Ot(n + a, s + i - l, 1048, f, 0, "temple-wall"),
                     Ot(n + a, s + i + l, 1288, f, 0, "temple-wall"),
                     Ot(n + a - c, s + i + 250, f, 348, 0, "temple-wall"),
-                    Ot(n + a + c, s + i + 330, f, 248, 0, "temple-wall");
+                    Ot(n + a + c, s + i + 330, f, 248, 0, "temple-wall"),
+                    Ot(n + a + c, s + i - 330, f, 248, 0, "temple-wall"),
+                    Ot(n + a + c, s + i - 149, f, 102, 0, "temple-wall"),
+                    Ot(n + a + c, s + i + 149, f, 102, 0, "temple-wall"),
+                    Ot(n + a + c, s + i - 76, f, 44, 0, "temple-wall"),
+                    Ot(n + a + c, s + i + 76, f, 44, 0, "temple-wall");
                   const y = -210,
                     x = new t.Mesh(new t.BoxGeometry(420, 430, 320), o[2]);
                   x.position.set(-315, d + 239, 0),
@@ -1647,19 +1604,36 @@ async function At(e) {
                 ];
               for (const [t, e, s] of f) me(r, t, e, s, o, n, m);
               (function (e, o, n) {
-                const s = [];
-                for (let t = -1650; t <= 1550; t += 310)
-                  s.push([-86, t], [86, t]);
-                for (let t = -730; t <= 730; t += 290)
-                  s.push([t, 1260], [t, -540]);
-                for (let t = 0; t < 7; t++) {
-                  const e = t / 6;
-                  s.push([820 - 560 * e, 120 - 930 * e]);
+                const candidates = [];
+                for (const [start, end, width] of Xt) {
+                  const dx = end[0] - start[0];
+                  const dz = end[1] - start[1];
+                  const length = Math.hypot(dx, dz);
+                  const count = Math.max(1, Math.floor(length / 330));
+                  for (let index = 0; index <= count; index++) {
+                    const amount = index / count;
+                    const cx = t.MathUtils.lerp(start[0], end[0], amount);
+                    const cz = t.MathUtils.lerp(start[1], end[1], amount);
+                    const side = (index + candidates.length) % 2 ? 1 : -1;
+                    const offset = Math.min(34, Math.max(22, width * 0.36));
+                    candidates.push([
+                      cx - (dz / (length || 1)) * offset * side,
+                      cz + (dx / (length || 1)) * offset * side,
+                    ]);
+                  }
                 }
-                for (const [a, i] of s)
-                  Kt(o + a, n + i, -130) &&
-                    !jt(new t.Vector3(o + a, 0, n + i), 12) &&
-                    fe(e, o, n, a, i);
+                const accepted = [];
+                for (const [a, i] of candidates) {
+                  const worldX = o + a;
+                  const worldZ = n + i;
+                  if (
+                    !Kt(worldX, worldZ, -130) ||
+                    jt(new t.Vector3(worldX, te(worldX, worldZ) + 36, worldZ), 14) ||
+                    accepted.some(([x, z]) => Math.hypot(x - a, z - i) < 170)
+                  ) continue;
+                  accepted.push([a, i]);
+                  fe(e, o, n, a, i);
+                }
               })(r, o, n),
                 i.add(r),
                 (mt.jerusalem = r);
@@ -2033,7 +2007,6 @@ async function At(e) {
           addEventListener("resize", Le),
           c.setAnimationLoop(Qe);
       })(),
-    // v1.0: imported museum GLB disabled; Jerusalem is rebuilt as the playable world itself.
     Te(),
     e && no(),
     (S = !0),
@@ -2045,7 +2018,17 @@ async function At(e) {
     eo(
       `다비드의 도시 · 성전산 · 키드론 골짜기 · 올리브산
 성문과 골목을 따라 성전산까지 올라갈 수 있습니다.`,
-    );
+    ),
+    // Build only the lightweight residential layer on the existing playable
+    // Jerusalem surface. Never load the incompatible integrated GLB here.
+    setTimeout(() => {
+      if (!S || southernJerusalemUpgrade.created) return;
+      try {
+        createSouthernJerusalemUpgrade();
+      } catch (error) {
+        console.error("예루샬라임 주택·골목 생성 실패:", error);
+      }
+    }, 250);
 }
 (Lt.wind.loop = !0), (Lt.birds.loop = !0), (Lt.night.loop = !0);
 const Ft = [
@@ -2066,8 +2049,8 @@ function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
   collisionRevision++;
 }
-function Ot(t, e, o, n, s = 0, a = "building") {
-  z.push({ shape: "rect", x: t, z: e, w: o, d: n, rotation: s, type: a });
+function Ot(t, e, o, n, s = 0, a = "building", yMin = -Infinity, yMax = Infinity) {
+  z.push({ shape: "rect", x: t, z: e, w: o, d: n, rotation: s, type: a, yMin, yMax });
   collisionRevision++;
 }
 const COLLISION_CELL_SIZE = 320;
@@ -2111,7 +2094,14 @@ function rebuildCollisionIndex() {
   }
   indexedCollisionRevision = collisionRevision;
 }
-function colliderBlocksPoint(collider, point, clearance) {
+function colliderBlocksPoint(collider, point, clearance, verticalPadding = 0) {
+  if (
+    Number.isFinite(collider.yMin) &&
+    Number.isFinite(collider.yMax) &&
+    (point.y - verticalPadding >= collider.yMax - 5 ||
+      point.y + verticalPadding <= collider.yMin)
+  )
+    return false;
   if ("rect" === collider.shape) {
     const dx = point.x - collider.x,
       dz = point.z - collider.z,
@@ -2136,7 +2126,7 @@ function jt(t, e = 18) {
   const testCollider = (collider) => {
     if (collider._collisionQueryStamp === collisionQueryStamp) return !1;
     collider._collisionQueryStamp = collisionQueryStamp;
-    return colliderBlocksPoint(collider, t, e);
+    return colliderBlocksPoint(collider, t, e, pt);
   };
   for (const collider of globalCollisionObjects)
     if (testCollider(collider)) return !0;
@@ -2161,6 +2151,42 @@ function jt(t, e = 18) {
       return !0;
   }
   return !1;
+}
+function samplePlayerSurface(worldX, worldZ, currentPlayerY) {
+  let surface = te(worldX, worldZ);
+  // The player's origin sits pt units above the supporting surface.  A roof is
+  // eligible only when the feet have cleared its real upper face; this prevents
+  // entering a house volume and then being lifted from inside it.
+  const playerFeet = currentPlayerY - pt;
+  for (const collider of z) {
+    if (
+      collider.type !== "building" ||
+      !Number.isFinite(collider.yMax) ||
+      collider.yMax <= surface + 5 ||
+      playerFeet < collider.yMax - 6
+    )
+      continue;
+    const probe = { x: worldX, y: collider.yMax - 1, z: worldZ };
+    if (colliderBlocksPoint(collider, probe, 0, 0))
+      surface = Math.max(surface, collider.yMax);
+  }
+  return surface;
+}
+function movePlayerWithSweptCollision(player, delta) {
+  // Check the whole travelled segment instead of only its end point.  This
+  // prevents fast diagonal movement and frame-time spikes from crossing walls.
+  const distance = Math.hypot(delta.x, delta.z);
+  const steps = Math.max(1, Math.min(10, Math.ceil(distance / 7)));
+  const stepX = delta.x / steps;
+  const stepZ = delta.z / steps;
+  for (let step = 0; step < steps; step++) {
+    const xProbe = player.position.clone();
+    xProbe.x += stepX;
+    if (!jt(xProbe, 17)) player.position.x = xProbe.x;
+    const zProbe = player.position.clone();
+    zProbe.z += stepZ;
+    if (!jt(zProbe, 17)) player.position.z = zProbe.z;
+  }
 }
 function Ht(t, e, o, n = 0) {
   let s = (t.wallRX || t.wallR) + n;
@@ -2211,6 +2237,30 @@ const Xt = [
   [[-250, 2130], [250, 2130], 52],
   [[-390, 620], [-610, 900], 48],
   [[430, 360], [610, 900], 50],
+  [[-610, 900], [-300, 1080], 44],
+  [[-300, 1080], [0, 1260], 44],
+  [[610, 900], [300, 1080], 44],
+  [[300, 1080], [0, 1260], 44],
+  [[-610, 1510], [-250, 1580], 42],
+  [[-250, 1580], [120, 1510], 42],
+  [[120, 1510], [600, 1490], 42],
+  [[-480, 1840], [-100, 1900], 40],
+  [[-100, 1900], [250, 2130], 40],
+  // Fine-grained lanes between the southern housing blocks.  The same
+  // segments drive placement clearance, navigation, torches and the minimap.
+  [[-700, 560], [-700, 2050], 28],
+  [[-520, 500], [-520, 2160], 28],
+  [[-335, 470], [-335, 2200], 26],
+  [[-165, 440], [-165, 2240], 26],
+  [[165, 440], [165, 2240], 26],
+  [[335, 470], [335, 2200], 26],
+  [[520, 500], [520, 2160], 28],
+  [[700, 560], [700, 2050], 28],
+  [[-760, 760], [760, 760], 28],
+  [[-780, 1030], [780, 1030], 26],
+  [[-800, 1320], [800, 1320], 28],
+  [[-790, 1600], [790, 1600], 26],
+  [[-720, 1880], [720, 1880], 28],
 ];
 
 // 성내 양 이동용 도로 그래프. 양은 건물 사이를 직선으로 가로지르지
@@ -2484,19 +2534,6 @@ function Qt(t) {
   // banner every time the player crosses a regional boundary.
   o?.classList.remove("show");
 }
-function sampleSouthernWallAccessHeight(x, z, baseHeight) {
-  for (const centerX of [-455, 455]) {
-    if (Math.abs(x - centerX) > 62 || z < 2260 || z > 2760) continue;
-    const amount = t.MathUtils.smoothstep(z, 2260, 2760);
-    return Math.max(baseHeight, t.MathUtils.lerp(baseHeight, 238, amount));
-  }
-  // Walkable platforms on the two southern towers.
-  for (const centerX of [-455, 455]) {
-    if (Math.abs(x - centerX) < 95 && Math.abs(z - 2780) < 92)
-      return Math.max(baseHeight, 238);
-  }
-  return baseHeight;
-}
 function $t(e, o) {
   // v1.0 playable geography: City of David ridge, Temple Mount,
   // Kidron Valley and the Mount of Olives. Western terrain remains open pasture.
@@ -2560,7 +2597,7 @@ function $t(e, o) {
   const edge = Math.max(Math.abs(e), Math.abs(o));
   if (edge > 3100) n -= 90 * t.MathUtils.smoothstep(edge, 3100, 5200);
 
-  return sampleSouthernWallAccessHeight(e, o, n);
+  return n;
 }
 function te(e, o) {
   const n = $t(e, o),
@@ -2931,40 +2968,102 @@ function ue(e, o, n, s, a, i, r, c, l, h = 0) {
   Ot(c + o, l + n, 0.84 * s, 0.84 * a, h, "building");
 }
 function createSouthernJerusalemUpgrade() {
-  if (southernJerusalemUpgrade.created || !i) return;
+  if (southernJerusalemUpgrade.created || !i || !mt.jerusalem) return;
   southernJerusalemUpgrade.created = true;
   const group = new t.Group();
-  group.name = "SouthernJerusalemAlleysAndWallAccess";
+  group.name = "JerusalemProceduralSurfaceResidentialLayer";
+  // Houses and roads use the exact same height function as David, the visible
+  // terrain and the original city. No imported-map coordinates are involved.
+  const visibleGroundCache = new Map();
+  function visibleGroundAt(x, z) {
+    const key = `${Math.round(x / 4)},${Math.round(z / 4)}`;
+    if (visibleGroundCache.has(key)) return visibleGroundCache.get(key);
+    const ground = te(x, z) + 2;
+    visibleGroundCache.set(key, ground);
+    return ground;
+  }
   const stoneMaterials = [
     new t.MeshToonMaterial({ color: 0xbca579, flatShading: true }),
     new t.MeshToonMaterial({ color: 0xcab58a, flatShading: true }),
     new t.MeshToonMaterial({ color: 0xa98f65, flatShading: true }),
   ];
+  const roofMaterials = [
+    new t.MeshToonMaterial({ color: 0xd5c39c, flatShading: true }),
+    new t.MeshToonMaterial({ color: 0xc6b187, flatShading: true }),
+    new t.MeshToonMaterial({ color: 0xb9a078, flatShading: true }),
+  ];
   const doorMaterial = new t.MeshToonMaterial({ color: 0x493421, flatShading: true });
   const houseGeometry = new t.BoxGeometry(1, 1, 1);
+  const roofGeometry = new t.BoxGeometry(1, 1, 1);
+  const parapetGeometry = new t.BoxGeometry(1, 1, 1);
   const doorGeometry = new t.BoxGeometry(1, 1, 1);
-  const random = ee(2026072607);
+  const random = ee(2026072619);
   const houses = [];
-  for (let attempt = 0; attempt < 220 && houses.length < 34; attempt++) {
-    const x = -720 + random() * 1440;
-    const z = 520 + random() * 1560;
-    if (!Kt(x, z, -150) || Math.abs(x) < 125) continue;
-    const road = closestPointOnCityRoad(x, z);
-    if (road && road.distance < road.width + 52) continue;
-    const width = 58 + random() * 48;
-    const depth = 52 + random() * 42;
-    const height = 76 + random() * 82;
-    const rotation = Math.round(random() * 3) * Math.PI / 2 + (random() - 0.5) * 0.1;
-    if (houses.some((house) => Math.hypot(house.x - x, house.z - z) < 105)) continue;
-    houses.push({ x, z, width, depth, height, rotation, material: Math.floor(random() * 3) });
+  // Rebuilt from fixed lots. Roads are cut from this grid, rather than houses
+  // being added by an unreliable random-attempt loop.
+  for (let zBase = 400; zBase <= 2320; zBase += 92) {
+    for (let xBase = -860; xBase <= 860; xBase += 92) {
+      const x = xBase + (random() - 0.5) * 13;
+      const z = zBase + (random() - 0.5) * 13;
+      if (!Kt(x, z, -72)) continue;
+      const road = closestPointOnCityRoad(x, z);
+      if (road && road.distance < road.width * 0.5 + 15) continue;
+      const ground = visibleGroundAt(x, z);
+      if (!Number.isFinite(ground)) continue;
+      // Do not place a new lot through an original house, wall or landmark.
+      // The existing city remains authoritative and the new layer only fills
+      // genuinely open blocks between its streets.
+      if (jt(new t.Vector3(x, ground + 8, z), 34)) continue;
+      const width = 72 + random() * 12;
+      const depth = 70 + random() * 13;
+      const tierWave = Math.floor((Math.abs(xBase) / 92 + (zBase - 400) / 92) % 4);
+      const tier = Math.min(3, Math.max(0, tierWave + (random() > 0.82 ? 1 : 0)));
+      const height = 72 + tier * 22 + random() * 8;
+      const rotation = Math.round(random() * 3) * Math.PI / 2;
+      houses.push({
+        x,
+        z,
+        ground,
+        width,
+        depth,
+        height,
+        rotation,
+        material: Math.floor(random() * 3),
+      });
+    }
+  }
+  southernJerusalemUpgrade.houseCount = houses.length;
+  southernJerusalemUpgrade.houses = houses;
+
+  // Keep road coordinates for lot spacing, minimap and sheep navigation only.
+  // No visible stone-road geometry is generated inside the city.
+  const roadTiles = [];
+  for (const [start, end, width] of Xt) {
+    const dx = end[0] - start[0], dz = end[1] - start[1];
+    const length = Math.hypot(dx, dz);
+    const steps = Math.max(1, Math.ceil(length / 54));
+    const angle = Math.atan2(dx, dz);
+    for (let step = 0; step < steps; step++) {
+      const amount = (step + 0.5) / steps;
+      const x = t.MathUtils.lerp(start[0], end[0], amount);
+      const z = t.MathUtils.lerp(start[1], end[1], amount);
+      if (!Kt(x, z, -58)) continue;
+      roadTiles.push({
+        x,
+        z,
+        y: visibleGroundAt(x, z) + 2.2,
+        width: Math.max(24, width),
+        length: length / steps + 7,
+        angle,
+      });
+    }
   }
   for (let materialIndex = 0; materialIndex < stoneMaterials.length; materialIndex++) {
     const selected = houses.filter((house) => house.material === materialIndex);
     const mesh = new t.InstancedMesh(houseGeometry, stoneMaterials[materialIndex], selected.length);
     const dummy = new t.Object3D();
     selected.forEach((house, index) => {
-      const ground = te(house.x, house.z);
-      dummy.position.set(house.x, ground + house.height / 2, house.z);
+      dummy.position.set(house.x, house.ground + house.height / 2 + 2, house.z);
       dummy.rotation.set(0, house.rotation, 0);
       dummy.scale.set(house.width, house.height, house.depth);
       dummy.updateMatrix();
@@ -2974,7 +3073,49 @@ function createSouthernJerusalemUpgrade() {
     mesh.castShadow = false;
     mesh.receiveShadow = false;
     mesh.computeBoundingSphere();
+    mesh.frustumCulled = false;
     group.add(mesh);
+
+    const roofs = new t.InstancedMesh(roofGeometry, roofMaterials[materialIndex], selected.length);
+    selected.forEach((house, index) => {
+      dummy.position.set(house.x, house.ground + house.height + 5, house.z);
+      dummy.rotation.set(0, house.rotation, 0);
+      dummy.scale.set(house.width + 7, 10, house.depth + 7);
+      dummy.updateMatrix();
+      roofs.setMatrixAt(index, dummy.matrix);
+    });
+    roofs.instanceMatrix.needsUpdate = true;
+    roofs.frustumCulled = false;
+    group.add(roofs);
+  }
+  // Four low parapet runs per roof. These make the residential quarter read as
+  // real flat-roofed houses from street level without adding hundreds of meshes.
+  for (let edge = 0; edge < 4; edge++) {
+    const parapets = new t.InstancedMesh(
+      parapetGeometry,
+      roofMaterials[edge % roofMaterials.length],
+      houses.length,
+    );
+    const dummy = new t.Object3D();
+    houses.forEach((house, index) => {
+      const horizontal = edge < 2;
+      const side = edge % 2 === 0 ? -1 : 1;
+      const localX = horizontal ? 0 : side * (house.width / 2 + 1);
+      const localZ = horizontal ? side * (house.depth / 2 + 1) : 0;
+      const cos = Math.cos(house.rotation), sin = Math.sin(house.rotation);
+      dummy.position.set(
+        house.x + localX * cos + localZ * sin,
+        house.ground + house.height + 14,
+        house.z - localX * sin + localZ * cos,
+      );
+      dummy.rotation.set(0, house.rotation, 0);
+      dummy.scale.set(horizontal ? house.width + 7 : 8, 12, horizontal ? 8 : house.depth + 7);
+      dummy.updateMatrix();
+      parapets.setMatrixAt(index, dummy.matrix);
+    });
+    parapets.instanceMatrix.needsUpdate = true;
+    parapets.frustumCulled = false;
+    group.add(parapets);
   }
   const doors = new t.InstancedMesh(doorGeometry, doorMaterial, houses.length);
   const doorDummy = new t.Object3D();
@@ -2984,39 +3125,40 @@ function createSouthernJerusalemUpgrade() {
     const alongX = Math.sin(direction);
     const alongZ = Math.cos(direction);
     const outward = side % 2 === 0 ? house.depth / 2 + 1.2 : house.width / 2 + 1.2;
-    const ground = te(house.x, house.z);
-    doorDummy.position.set(house.x + alongX * outward, ground + 22, house.z + alongZ * outward);
+    const ground = house.ground;
+    doorDummy.position.set(house.x + alongX * outward, ground + 23, house.z + alongZ * outward);
     doorDummy.rotation.set(0, direction, 0);
     doorDummy.scale.set(18, 42, 3);
     doorDummy.updateMatrix();
     doors.setMatrixAt(index, doorDummy.matrix);
-    Ot(house.x, house.z, house.width * 0.9, house.depth * 0.9, house.rotation, "building");
+    // The roof box is centred five units above the wall and is ten units thick,
+    // so its true walkable upper face is wallTop + 10.
+    const roofSurface = ground + house.height + 10;
+    Ot(
+      house.x,
+      house.z,
+      house.width + 7,
+      house.depth + 7,
+      house.rotation,
+      "building",
+      ground,
+      roofSurface,
+    );
   });
   doors.instanceMatrix.needsUpdate = true;
   doors.castShadow = false;
   doors.computeBoundingSphere();
+  doors.frustumCulled = false;
   group.add(doors);
 
-  const stepGeometry = new t.BoxGeometry(112, 8, 28);
-  const stepMaterial = stoneMaterials[1];
-  for (const centerX of [-455, 455]) {
-    for (let step = 0; step < 18; step++) {
-      const z = 2265 + step * 28;
-      const y = sampleSouthernWallAccessHeight(centerX, z, te(centerX, z));
-      const mesh = new t.Mesh(stepGeometry, stepMaterial);
-      mesh.position.set(centerX, y - 4, z);
-      mesh.castShadow = false;
-      mesh.receiveShadow = false;
-      group.add(mesh);
-    }
-    const tower = new t.Mesh(new t.CylinderGeometry(92, 104, 190, 10), stoneMaterials[2]);
-    tower.position.set(centerX, 143, 2780);
-    tower.castShadow = false;
-    tower.receiveShadow = false;
-    group.add(tower);
-  }
+  // The earlier earthen ramps, raised towers and extra wall walk are deliberately
+  // removed. The original imported southern wall remains untouched at its native
+  // height and silhouette.
   i.add(group);
   mt.southernJerusalemUpgrade = group;
+  console.info(
+    `[Jerusalem] visible-surface quarter rendered: ${houses.length} houses; visible stone roads removed`,
+  );
 }
 function me(e, o, n, s, a, i, r) {
   const c = Math.max(12, Math.ceil(Math.hypot(n[0] - o[0], n[1] - o[1]) / 32)),
@@ -5359,15 +5501,8 @@ function _e(o, n) {
       if ((c.addScaledVector(a, n).addScaledVector(i, s), c.lengthSq() > 0)) {
         c.normalize();
         const n = (K.Space ? 310 : 145) * (G ? 0.55 : 1),
-          s = c.clone().multiplyScalar(n * e),
-          a = o.position.clone();
-        (a.x += s.x),
-          (a.y = te(a.x, a.z) + pt),
-          jt(a, 15) || (o.position.x = a.x);
-        const i = o.position.clone();
-        (i.z += s.z),
-          (i.y = te(i.x, i.z) + pt),
-          jt(i, 15) || (o.position.z = i.z);
+          s = c.clone().multiplyScalar(n * e);
+        movePlayerWithSweptCollision(o, s);
         const r = Math.atan2(c.x, c.z);
         let l =
           t.MathUtils.euclideanModulo(r - o.rotation.y + Math.PI, 2 * Math.PI) -
@@ -5438,7 +5573,7 @@ function _e(o, n) {
           );
         }
       }
-      const l = te(o.position.x, o.position.z) + pt,
+      const l = samplePlayerSurface(o.position.x, o.position.z, o.position.y) + pt,
         h = o.userData.bodyRoot || o;
       N &&
         o.userData.grounded &&
@@ -6310,6 +6445,17 @@ function _e(o, n) {
           const n = i({ x: t.x + e[0], z: t.z + e[1] }),
             a = i({ x: t.x + o[0], z: t.z + o[1] });
           s.beginPath(), s.moveTo(n.x, n.z), s.lineTo(a.x, a.z), s.stroke();
+        }
+        // The residential layer and minimap share these exact lot positions.
+        // Drawing compact footprints makes the new street blocks legible
+        // without turning the minimap into a dense texture.
+        if (t.name === "예루샬라임" && southernJerusalemUpgrade.houses.length) {
+          s.fillStyle = "#9c7a4f";
+          for (const house of southernJerusalemUpgrade.houses) {
+            const marker = i({ x: house.x, z: house.z });
+            if (Math.hypot(marker.dx, marker.dz) > W) continue;
+            s.fillRect(marker.x - 1.4, marker.z - 1.4, 2.8, 2.8);
+          }
         }
         const n = [
           [0, t.wallRZ],
