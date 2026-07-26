@@ -25,7 +25,9 @@ function sampleJerusalemGround(worldX, worldZ) {
   const a = h[z0 * n + x0], b = h[z0 * n + x1];
   const c = h[z1 * n + x0], d = h[z1 * n + x1];
   const localY = (a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz;
-  return jerusalemMapBaseY + (localY - JERUSALEM_DATA.minY) * JERUSALEM_SCALE;
+  const southernDrop = 132 * t.MathUtils.smoothstep(worldZ, 320, 2700) *
+    Math.exp(-(worldX * worldX) / 1300000);
+  return jerusalemMapBaseY + (localY - JERUSALEM_DATA.minY) * JERUSALEM_SCALE - southernDrop;
 }
 
 function loadJerusalemMap() {
@@ -37,6 +39,27 @@ function loadJerusalemMap() {
       const model = gltf.scene;
       const box = new t.Box3().setFromObject(model);
       const center = box.getCenter(new t.Vector3());
+      // Regrade the integrated map itself (not only the invisible walking
+      // height) so the southern city visibly descends away from the Temple
+      // Mount. The broad blend avoids a square-edged terrain patch.
+      model.traverse((obj) => {
+        if (!obj.isMesh || !obj.geometry?.attributes?.position) return;
+        const position = obj.geometry.attributes.position;
+        for (let index = 0; index < position.count; index++) {
+          const localX = position.getX(index) - center.x;
+          const localZ = position.getZ(index) - center.z;
+          const worldX = localX * JERUSALEM_SCALE;
+          const worldZ = localZ * JERUSALEM_SCALE;
+          const drop = 132 * t.MathUtils.smoothstep(worldZ, 320, 2700) *
+            Math.exp(-(worldX * worldX) / 1300000);
+          position.setY(index, position.getY(index) - drop / JERUSALEM_SCALE);
+        }
+        position.needsUpdate = true;
+        obj.geometry.computeVertexNormals();
+        obj.geometry.computeBoundingBox();
+        obj.geometry.computeBoundingSphere();
+      });
+      box.setFromObject(model);
       jerusalemMapBaseY = $t(0, 0) - 8;
       model.scale.setScalar(JERUSALEM_SCALE);
       model.position.set(-center.x * JERUSALEM_SCALE, jerusalemMapBaseY - box.min.y * JERUSALEM_SCALE, -center.z * JERUSALEM_SCALE);
@@ -45,7 +68,9 @@ function loadJerusalemMap() {
       model.traverse((obj) => {
         if (!obj.isMesh) return;
         obj.castShadow = false;
-        obj.receiveShadow = true;
+        // The baked city material already supplies enough depth. Receiving a
+        // dynamic shadow on every triangle was one of the largest city costs.
+        obj.receiveShadow = false;
         if (obj.material) {
           const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
           mats.forEach((m) => {
@@ -73,6 +98,7 @@ function loadJerusalemMap() {
       for (const rect of JERUSALEM_DATA.rects) {
         Ot(rect[0] * JERUSALEM_SCALE, rect[1] * JERUSALEM_SCALE, Math.max(22, rect[2] * JERUSALEM_SCALE), Math.max(22, rect[3] * JERUSALEM_SCALE), 0, "jerusalem-map");
       }
+      createSouthernJerusalemUpgrade();
       jerusalemMapReady = true;
       eo("제1성전 시대 예루샬라임 3D 지도가 적용되었습니다.");
     },
@@ -206,6 +232,11 @@ const routeChoice = {
   spawnMultiplier: 1,
   rewardRespect: 0,
   lastNoticeAt: 0,
+};
+const southernJerusalemUpgrade = {
+  created: false,
+  roads: [],
+  projectileColliders: new Set(["building", "wall", "temple", "temple-wall", "jerusalem-map"]),
 };
 const pt = 33,
   ut = {
@@ -712,10 +743,10 @@ async function At(e) {
             antialias: !0,
             powerPreference: "high-performance",
           })),
-          c.setPixelRatio(Math.min(devicePixelRatio, 1.25)),
+          c.setPixelRatio(Math.min(devicePixelRatio, 1.05)),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
-          (c.shadowMap.type = t.PCFSoftShadowMap),
+          (c.shadowMap.type = t.BasicShadowMap),
           (c.outputColorSpace = t.SRGBColorSpace),
           (c.toneMapping = t.ACESFilmicToneMapping),
           (c.toneMappingExposure = 1.13),
@@ -1759,7 +1790,10 @@ async function At(e) {
                   i.add(m);
               })(),
               (function () {
-                const e = 2860,
+                // The pool belongs outside the south-east wall on the Kidron
+                // shoulder, rather than projecting through the southern gate.
+                const poolX = 1035,
+                  e = 2380,
                   o = new t.Group(),
                   n = ge(10849385),
                   s = ge(7889999),
@@ -1769,7 +1803,7 @@ async function At(e) {
                     opacity: 0.92,
                     side: t.DoubleSide,
                   }),
-                  r = te(330, e),
+                  r = te(poolX, e),
                   c = 18,
                   l = new t.Mesh(new t.BoxGeometry(88, 18, 8), s);
                 (l.position.y = -72), (l.receiveShadow = !0), o.add(l);
@@ -1791,10 +1825,10 @@ async function At(e) {
                   const p = d.clone();
                   (p.position.x = -a / 2 + 9), o.add(p);
                 }
-                o.position.set(330, r + 28.35, e),
+                o.position.set(poolX, r + 28.35, e),
                   i.add(o),
                   (mt.siloam = o),
-                  q.push({ x: 330, z: e, r: 205, name: "쉴로악흐" });
+                  q.push({ x: poolX, z: e, r: 205, name: "쉴로악흐" });
               })();
           })(),
           (function () {
@@ -2166,6 +2200,17 @@ const Xt = [
   [[760, -1930], [720, -2050], 150],
   [[0, 980], [-350, 620], 68],
   [[-350, 620], [-390, -260], 70],
+  // Narrow southern-quarter alleys. These exact center lines are also drawn
+  // by the minimap, so the map and the playable lanes cannot drift apart.
+  [[-420, 1180], [-610, 1510], 52],
+  [[-610, 1510], [-480, 1840], 48],
+  [[420, 1180], [600, 1490], 54],
+  [[600, 1490], [470, 1830], 48],
+  [[-480, 1840], [-250, 2130], 50],
+  [[470, 1830], [250, 2130], 50],
+  [[-250, 2130], [250, 2130], 52],
+  [[-390, 620], [-610, 900], 48],
+  [[430, 360], [610, 900], 50],
 ];
 
 // 성내 양 이동용 도로 그래프. 양은 건물 사이를 직선으로 가로지르지
@@ -2435,11 +2480,22 @@ function Qt(t) {
   if (D === t) return;
   D = t;
   const o = e("#worldRegionLabel");
-  o &&
-    ((o.textContent = t),
-    o.classList.add("show"),
-    clearTimeout(Qt.timer),
-    (Qt.timer = setTimeout(() => o.classList.remove("show"), 2800)));
+  // Keep region state for ambience and missions without showing a feature
+  // banner every time the player crosses a regional boundary.
+  o?.classList.remove("show");
+}
+function sampleSouthernWallAccessHeight(x, z, baseHeight) {
+  for (const centerX of [-455, 455]) {
+    if (Math.abs(x - centerX) > 62 || z < 2260 || z > 2760) continue;
+    const amount = t.MathUtils.smoothstep(z, 2260, 2760);
+    return Math.max(baseHeight, t.MathUtils.lerp(baseHeight, 238, amount));
+  }
+  // Walkable platforms on the two southern towers.
+  for (const centerX of [-455, 455]) {
+    if (Math.abs(x - centerX) < 95 && Math.abs(z - 2780) < 92)
+      return Math.max(baseHeight, 238);
+  }
+  return baseHeight;
 }
 function $t(e, o) {
   // v1.0 playable geography: City of David ridge, Temple Mount,
@@ -2459,6 +2515,10 @@ function $t(e, o) {
   // Southern City of David spur, descending toward Siloam.
   n += 62 * Math.exp(-((e + 20) ** 2) / 170000 - ((o - 720) ** 2) / 720000);
   n -= 70 * Math.exp(-((e + 10) ** 2) / 240000 - ((o - 1720) ** 2) / 220000);
+  // Inside Jerusalem the southern ridge now descends continuously away from
+  // the Temple Mount. This removes the old raised southern lip.
+  const cityRidgeMask = Math.exp(-(e * e) / 760000);
+  n -= cityRidgeMask * 126 * t.MathUtils.smoothstep(o, 260, 2850);
 
   // Temple Mount: a broad continuation of the northern ridge. The mountain rises
   // gradually from the city on the south and west, while its eastern shoulder stops
@@ -2494,13 +2554,13 @@ function $t(e, o) {
 
   // Siloam basin and Gihon spring vicinity.
   n -= 42 * Math.exp(-((e - 900) ** 2 + (o - 1050) ** 2) / 150000);
-  n -= 52 * Math.exp(-((e - 180) ** 2 + (o - 1640) ** 2) / 170000);
+  n -= 52 * Math.exp(-((e - 1035) ** 2 + (o - 2380) ** 2) / 170000);
 
   // Keep distant map edges below the core elevations without creating cliffs.
   const edge = Math.max(Math.abs(e), Math.abs(o));
   if (edge > 3100) n -= 90 * t.MathUtils.smoothstep(edge, 3100, 5200);
 
-  return n;
+  return sampleSouthernWallAccessHeight(e, o, n);
 }
 function te(e, o) {
   const n = $t(e, o),
@@ -2869,6 +2929,94 @@ function ue(e, o, n, s, a, i, r, c, l, h = 0) {
       e.add(c);
   }
   Ot(c + o, l + n, 0.84 * s, 0.84 * a, h, "building");
+}
+function createSouthernJerusalemUpgrade() {
+  if (southernJerusalemUpgrade.created || !i) return;
+  southernJerusalemUpgrade.created = true;
+  const group = new t.Group();
+  group.name = "SouthernJerusalemAlleysAndWallAccess";
+  const stoneMaterials = [
+    new t.MeshToonMaterial({ color: 0xbca579, flatShading: true }),
+    new t.MeshToonMaterial({ color: 0xcab58a, flatShading: true }),
+    new t.MeshToonMaterial({ color: 0xa98f65, flatShading: true }),
+  ];
+  const doorMaterial = new t.MeshToonMaterial({ color: 0x493421, flatShading: true });
+  const houseGeometry = new t.BoxGeometry(1, 1, 1);
+  const doorGeometry = new t.BoxGeometry(1, 1, 1);
+  const random = ee(2026072607);
+  const houses = [];
+  for (let attempt = 0; attempt < 220 && houses.length < 34; attempt++) {
+    const x = -720 + random() * 1440;
+    const z = 520 + random() * 1560;
+    if (!Kt(x, z, -150) || Math.abs(x) < 125) continue;
+    const road = closestPointOnCityRoad(x, z);
+    if (road && road.distance < road.width + 52) continue;
+    const width = 58 + random() * 48;
+    const depth = 52 + random() * 42;
+    const height = 76 + random() * 82;
+    const rotation = Math.round(random() * 3) * Math.PI / 2 + (random() - 0.5) * 0.1;
+    if (houses.some((house) => Math.hypot(house.x - x, house.z - z) < 105)) continue;
+    houses.push({ x, z, width, depth, height, rotation, material: Math.floor(random() * 3) });
+  }
+  for (let materialIndex = 0; materialIndex < stoneMaterials.length; materialIndex++) {
+    const selected = houses.filter((house) => house.material === materialIndex);
+    const mesh = new t.InstancedMesh(houseGeometry, stoneMaterials[materialIndex], selected.length);
+    const dummy = new t.Object3D();
+    selected.forEach((house, index) => {
+      const ground = te(house.x, house.z);
+      dummy.position.set(house.x, ground + house.height / 2, house.z);
+      dummy.rotation.set(0, house.rotation, 0);
+      dummy.scale.set(house.width, house.height, house.depth);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(index, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.computeBoundingSphere();
+    group.add(mesh);
+  }
+  const doors = new t.InstancedMesh(doorGeometry, doorMaterial, houses.length);
+  const doorDummy = new t.Object3D();
+  houses.forEach((house, index) => {
+    const side = index % 4;
+    const direction = house.rotation + side * Math.PI / 2;
+    const alongX = Math.sin(direction);
+    const alongZ = Math.cos(direction);
+    const outward = side % 2 === 0 ? house.depth / 2 + 1.2 : house.width / 2 + 1.2;
+    const ground = te(house.x, house.z);
+    doorDummy.position.set(house.x + alongX * outward, ground + 22, house.z + alongZ * outward);
+    doorDummy.rotation.set(0, direction, 0);
+    doorDummy.scale.set(18, 42, 3);
+    doorDummy.updateMatrix();
+    doors.setMatrixAt(index, doorDummy.matrix);
+    Ot(house.x, house.z, house.width * 0.9, house.depth * 0.9, house.rotation, "building");
+  });
+  doors.instanceMatrix.needsUpdate = true;
+  doors.castShadow = false;
+  doors.computeBoundingSphere();
+  group.add(doors);
+
+  const stepGeometry = new t.BoxGeometry(112, 8, 28);
+  const stepMaterial = stoneMaterials[1];
+  for (const centerX of [-455, 455]) {
+    for (let step = 0; step < 18; step++) {
+      const z = 2265 + step * 28;
+      const y = sampleSouthernWallAccessHeight(centerX, z, te(centerX, z));
+      const mesh = new t.Mesh(stepGeometry, stepMaterial);
+      mesh.position.set(centerX, y - 4, z);
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+      group.add(mesh);
+    }
+    const tower = new t.Mesh(new t.CylinderGeometry(92, 104, 190, 10), stoneMaterials[2]);
+    tower.position.set(centerX, 143, 2780);
+    tower.castShadow = false;
+    tower.receiveShadow = false;
+    group.add(tower);
+  }
+  i.add(group);
+  mt.southernJerusalemUpgrade = group;
 }
 function me(e, o, n, s, a, i, r) {
   const c = Math.max(12, Math.ceil(Math.hypot(n[0] - o[0], n[1] - o[1]) / 32)),
@@ -4029,7 +4177,7 @@ function Le() {
   (r.aspect = innerWidth / innerHeight),
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
-    c.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+    c.setPixelRatio(Math.min(devicePixelRatio, 1.05));
 }
 function Ce(t) {
   return [
@@ -4936,7 +5084,7 @@ function updateRouteChoice(now) {
     };
   else if (
     Math.hypot(player.x - ft.x, player.z - ft.z) < ft.r + 360 ||
-    Math.hypot(player.x - 330, player.z - 2860) < 520
+    Math.hypot(player.x - 1035, player.z - 2380) < 520
   )
     next = {
       id: "water",
@@ -4947,17 +5095,15 @@ function updateRouteChoice(now) {
     };
   if (!next || routeChoice.id === next.id) return;
   Object.assign(routeChoice, next);
-  if (now - routeChoice.lastNoticeAt > 4500) {
-    routeChoice.lastNoticeAt = now;
-    eo(next.notice);
-  }
+  // Route effects remain active, but entering a road no longer interrupts play
+  // with a feature-description notice.
 }
 function updateAdaptiveRendering(now) {
   if (!c || !mt.player || now < performanceState.nextAdaptiveQualityAt) return;
   performanceState.nextAdaptiveQualityAt = now + 900;
   const player = mt.player.position;
   const onOliveMount = player.x > 1050 && player.x < 3300;
-  const targetRatio = Math.min(devicePixelRatio, onOliveMount ? 1 : 1.25);
+  const targetRatio = Math.min(devicePixelRatio, onOliveMount ? 0.85 : 1.05);
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
     c.setPixelRatio(targetRatio);
@@ -5784,9 +5930,9 @@ function _e(o, n) {
     })(o),
     (function (e) {
       for (const o of mt.projectiles) {
+        const previousProjectilePosition = o.position.clone();
         if (
-          (o.position.clone(),
-          (o.userData.velocity.y -= 120 * e),
+          ((o.userData.velocity.y -= 120 * e),
           o.position.addScaledVector(o.userData.velocity, e),
           (o.userData.life -= e),
           o.userData.trail)
@@ -5831,6 +5977,27 @@ function _e(o, n) {
                 t.userData.hp <= 0 && Ue(t);
               break;
             }
+        if (!n) {
+          // Sample the whole travelled segment so fast stones cannot tunnel
+          // through thin house fronts or walls between two frames.
+          const segmentDistance = previousProjectilePosition.distanceTo(o.position);
+          const samples = Math.max(1, Math.ceil(segmentDistance / 16));
+          for (let sample = 1; sample <= samples && !n; sample++) {
+            const point = previousProjectilePosition.clone().lerp(o.position, sample / samples);
+            for (const collider of z) {
+              if (
+                southernJerusalemUpgrade.projectileColliders.has(collider.type) &&
+                colliderBlocksPoint(collider, point, 3)
+              ) {
+                o.position.copy(point);
+                o.userData.life = 0;
+                Ae(o.position, "ground");
+                n = true;
+                break;
+              }
+            }
+          }
+        }
         const s = te(o.position.x, o.position.z);
         !n &&
           o.position.y < s &&
@@ -6080,7 +6247,7 @@ function _e(o, n) {
     })(),
     (function () {
       if (frameNow < performanceState.nextMinimapAt) return;
-      performanceState.nextMinimapAt = frameNow + 100;
+      performanceState.nextMinimapAt = frameNow + 150;
       const t = 190,
         e = 95;
       s.clearRect(0, 0, t, t),
