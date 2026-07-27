@@ -7248,7 +7248,7 @@ function _e(o, n) {
         M = m.rz / f;
       (s.fillStyle = "#2d241b"),
         (s.font = "bold 12px sans-serif"),
-        s.fillText("N", e + 75 * w - 4, e + 75 * M + 4),
+        s.fillText(window.ShepherdI18n?.tr("N") || "N", e + 75 * w - 4, e + 75 * M + 4),
         s.restore();
     })();
 }

@@ -190,3 +190,23 @@ html[dir="rtl"] .language-switch{right:auto;left:12px}
 html[dir="rtl"] .stone-panel,html[dir="rtl"] .title-wrap,html[dir="rtl"] #notice,html[dir="rtl"] #dangerNotice,html[dir="rtl"] #missionResult{text-align:right}
 html[dir="rtl"] #hud,html[dir="rtl"] #minimap,html[dir="rtl"] #crosshair,html[dir="rtl"] #charge{direction:ltr}
 html[dir="rtl"] #mission,html[dir="rtl"] #help,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconnectHint,html[dir="rtl"] #worldRegionLabel{direction:rtl;text-align:right}
+
+/* v2.0.79: complete Hebrew UI and deliberate RTL layout */
+html[dir="rtl"] body{font-family:Arial,"Noto Sans Hebrew","Rubik",sans-serif}
+html[dir="rtl"] .stone-panel,html[dir="rtl"] .title-wrap,html[dir="rtl"] #characterScreen{direction:rtl}
+html[dir="rtl"] .stone-panel h2,html[dir="rtl"] .stone-panel p,html[dir="rtl"] .settings-panel label{text-align:right}
+html[dir="rtl"] .title-wrap{text-align:center}
+html[dir="rtl"] .key-guide-list{direction:rtl;text-align:right}
+html[dir="rtl"] .key-guide-list p{flex-direction:row}
+html[dir="rtl"] .key-guide-list strong{direction:ltr;unicode-bidi:isolate}
+html[dir="rtl"] .hud-top-right{direction:rtl;right:20px;left:auto}
+html[dir="rtl"] .hud-status,html[dir="rtl"] #weaponHud{direction:rtl;text-align:right}
+html[dir="rtl"] .hud-status .meter{flex-direction:row}
+html[dir="rtl"] #weaponHud{text-align:center}
+html[dir="rtl"] #timePhase,html[dir="rtl"] #thirstHud{direction:rtl}
+html[dir="rtl"] #skillToast{direction:rtl;right:24px;left:auto;text-align:right}
+html[dir="rtl"] #skillToast span{text-align:left;direction:ltr}
+html[dir="rtl"] #jerusalemLandmark{direction:rtl;right:28px;left:auto}
+html[dir="rtl"] .console{direction:rtl;text-align:right}
+html[dir="rtl"] .console input{direction:rtl;text-align:right}
+html[dir="rtl"] #mission,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconnectHint{width:max-content;max-width:85vw;text-align:center}
