@@ -119,6 +119,8 @@ let Z = new t.Vector3(-1150, 0, 1050),
   templeObjText = "",
   templeObjPromise = null,
   templeAltarPromise = null,
+  firstTempleModelPromise = null,
+  firstTempleModelTemplate = null,
   lionModelPromise = null,
   lionModelTemplate = null,
   foxModelPromise = null,
@@ -279,6 +281,16 @@ function Tt() {
       ? (e("#pause").classList.remove("hidden"), (b = !0))
       : ((b = !1), c?.domElement.requestPointerLock?.()));
 }
+function openKeyGuide() {
+  e("#settingsPanel").classList.add("hidden");
+  e("#keyGuidePanel").classList.remove("hidden");
+  setTimeout(() => ke(e("#keyGuidePanel"), 0), 0);
+}
+function closeKeyGuide() {
+  e("#keyGuidePanel").classList.add("hidden");
+  e("#settingsPanel").classList.remove("hidden");
+  setTimeout(() => ke(e("#settingsPanel"), 0), 0);
+}
 (bt.value = Math.round(100 * v)),
   (Gt.textContent = bt.value),
   e("#sensitivityRange").addEventListener("input", (t) => {
@@ -289,6 +301,8 @@ function Tt() {
       localStorage.setItem("shepherdMouseSensitivity", String(E));
   }),
   (e("#settingsCloseBtn").onclick = Tt),
+  (e("#keyGuideBtn").onclick = openKeyGuide),
+  (e("#keyGuideCloseBtn").onclick = closeKeyGuide),
   St.addEventListener("change", () => {
     (y = St.checked),
       localStorage.setItem("shepherdSoundEnabled", y ? "1" : "0"),
@@ -750,23 +764,7 @@ async function At(e) {
               console.error("다비드 OBJ 로드 실패:", t), (Y = "");
             })),
         _),
-    templeObjText
-      ? Promise.resolve()
-      : (templeObjPromise ||
-          (templeObjPromise = fetch("./assets/models/temple_holyplace.obj")
-            .then((response) => {
-              if (!response.ok)
-                throw new Error(`Temple OBJ ${response.status}`);
-              return response.text();
-            })
-            .then((text) => {
-              templeObjText = text;
-            })
-            .catch((error) => {
-              console.error("성전 OBJ 로드 실패:", error);
-              templeObjText = "";
-            })),
-        templeObjPromise),
+    loadFirstTempleModel().catch(() => null),
     // Decode the larger predator assets on the loading screen. Loading and
     // parsing them only when an enemy first appears causes a noticeable
     // one-time hitch during active play.
@@ -1489,15 +1487,26 @@ async function At(e) {
                     courtZMin: s + i - l,
                     courtZMax: s + i + l,
                     courtSurfaceY: d + 4,
-                    altarX: n + a + 205,
-                    altarZ: s + i,
-                    altarHalfX: 85,
-                    altarHalfZ: 85,
+                    // Authored altar/fire-volume coordinates after the purchased
+                    // model is rotated to face east.
+                    altarX: n + a + 255,
+                    altarZ: s + i - 265,
+                    altarHalfX: 92,
+                    altarHalfZ: 92,
                     altarTopY: d + 107,
-                    altarRampXMin: n + a + 125,
-                    altarRampXMax: n + a + 285,
-                    altarRampZMin: s + i + 70,
-                    altarRampZMax: s + i + 175,
+                    altarRampXMin: n + a + 163,
+                    altarRampXMax: n + a + 347,
+                    altarRampZMin: s + i - 173,
+                    altarRampZMax: s + i - 70,
+                    templeStageXMin: n + a - 20,
+                    templeStageXMax: n + a + 290,
+                    templeStageZMin: s + i - 210,
+                    templeStageZMax: s + i + 150,
+                    templeStageTopY: d + 55,
+                    templeStageRampXMin: n + a + 290,
+                    templeStageRampXMax: n + a + 410,
+                    templeStageRampZMin: s + i - 145,
+                    templeStageRampZMax: s + i + 85,
                   };
                   if (mt.terrain?.geometry?.attributes?.position) {
                     const e = mt.terrain.geometry.attributes.position;
@@ -1596,16 +1605,11 @@ async function At(e) {
                     r.add(templeEntryLip),
                     de(r, 1080, d + m, 0, -460, 0, o[2], 34, -20),
                     de(r, 1080, d + m, 0, l, 0, o[2], 34, 20),
-                    de(r, 920, d + m, -540, 0, Math.PI / 2, o[2], 34, -20),
-                    Ot(n + a, s + i - l, 1048, f, 0, "temple-wall"),
-                    Ot(n + a, s + i + l, 1288, f, 0, "temple-wall"),
-                    Ot(n + a - c, s + i + 250, f, 348, 0, "temple-wall"),
-                    Ot(n + a + c, s + i + 330, f, 248, 0, "temple-wall"),
-                    Ot(n + a + c, s + i - 330, f, 248, 0, "temple-wall"),
-                    Ot(n + a + c, s + i - 149, f, 102, 0, "temple-wall"),
-                    Ot(n + a + c, s + i + 149, f, 102, 0, "temple-wall"),
-                    Ot(n + a + c, s + i - 76, f, 44, 0, "temple-wall"),
-                    Ot(n + a + c, s + i + 76, f, 44, 0, "temple-wall");
+                    de(r, 920, d + m, -540, 0, Math.PI / 2, o[2], 34, -20);
+                    // The former court-enclosure collision is intentionally gone.
+                    // The purchased model is used without its obsolete perimeter wall,
+                    // leaving the Temple Mount open on every side. Only the sanctuary
+                    // body and altar below register collision.
                   const y = -210,
                     x = new t.Mesh(new t.BoxGeometry(420, 430, 320), o[2]);
                   x.position.set(-315, d + 239, 0),
@@ -1640,29 +1644,27 @@ async function At(e) {
                   const S = new t.Mesh(new t.BoxGeometry(8, 245, 120), D);
                   S.position.set(28, d + 212, 0),
                     r.add(S),
-                    Ot(n + a + y - 105, s + i, 420, 320, 0, "temple"),
-                    Ot(n + a + y + 175, s + i, 124, 410, 0, "temple");
-                  const importedTempleApplied = addImportedTempleModel(r, d);
-                  if (importedTempleApplied) {
-                    x.visible = false;
-                    g.visible = false;
-                    v.visible = false;
-                    S.visible = false;
-                    r.children.forEach((child) => {
-                      if (
-                        child !== mt.importedTemple &&
-                        child.geometry?.type === "CylinderGeometry" &&
-                        child.position.x === 35
-                      )
-                        child.visible = false;
-                    });
-                  }
-                  const b = 205,
-                    G = 170,
+                    // Collision proxy for the purchased sanctuary's closed rear body.
+                    // The former 350 x 330 box covered the entrance landing and caused
+                    // an invisible block in the middle of the doors.  Keep the entire
+                    // eastern stair and landing open; only the masonry behind them blocks.
+                    Ot(
+                      n + a - 125,
+                      s + i - 30,
+                      190,
+                      310,
+                      0,
+                      "temple",
+                      d + 4,
+                      d + 620,
+                    );
+                  const b = 255,
+                    altarLocalZ = -265,
+                    G = 184,
                     P = ge(9332808),
                     T = d + 2 + 105,
                     L = new t.Mesh(new t.BoxGeometry(170, 105, G), P);
-                  L.position.set(b, d + 2 + 52.5, 0),
+                  L.position.set(b, d + 2 + 52.5, altarLocalZ),
                     (L.castShadow = !0),
                     (L.receiveShadow = !0),
                     r.add(L);
@@ -1704,41 +1706,57 @@ async function At(e) {
                   // Keep the original lightweight altar until the cleaned GLB is ready,
                   // then replace only its visible body and ramp. Fire and smoke below
                   // remain separate effects and therefore survive the replacement.
-                  addPreparedTempleAltar(r, d, L, I);
+                  // The purchased full-scene temple includes its own altar and
+                  // approach. Keep these lightweight meshes only as a fallback
+                  // if the new GLB cannot be loaded.
                   // Height-aware side collision prevents entering the altar body from
                   // ground level while allowing David to stand and move on its top.
-                  Ot(n + a + b - 85, s + i, 12, 170, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 85, s + i, 12, 170, 0, "temple", d + 2, T);
-                  Ot(n + a + b, s + i - 85, 170, 12, 0, "temple", d + 2, T);
+                  Ot(n + a + b - 92, s + i + altarLocalZ, 12, 184, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 92, s + i + altarLocalZ, 12, 184, 0, "temple", d + 2, T);
+                  Ot(n + a + b, s + i + altarLocalZ - 92, 184, 12, 0, "temple", d + 2, T);
                   // Close the rear corners as well. The opening is only on the
                   // southern stair side; no ground-level pocket remains behind
                   // the altar where the player can become trapped.
-                  Ot(n + a + b - 70, s + i - 92, 30, 28, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 70, s + i - 92, 30, 28, 0, "temple", d + 2, T);
+                  Ot(n + a + b - 76, s + i + altarLocalZ - 99, 32, 28, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 76, s + i + altarLocalZ - 99, 32, 28, 0, "temple", d + 2, T);
                   // Stair flanks are blocked, while the full southern stair face stays open.
-                  Ot(n + a + b - 85, s + i + 130, 12, 90, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 85, s + i + 130, 12, 90, 0, "temple", d + 2, T);
+                  Ot(n + a + b - 92, s + i + altarLocalZ + 137, 12, 90, 0, "temple", d + 2, T);
+                  Ot(n + a + b + 92, s + i + altarLocalZ + 137, 12, 90, 0, "temple", d + 2, T);
+                  // Replace every hidden procedural visual with the purchased model
+                  // before creating live effects. Fire, smoke and the laver are added
+                  // afterwards so loading the temple can never hide them again.
+                  addPurchasedFirstTemple(r, d, n + a, s + i);
                   const V = new t.Group();
-                  for (let e = 0; e < 8; e++) {
+                  // Flame spread is derived from the current altar footprint, so it
+                  // remains centred and proportionate if the court is resized again.
+                  const flameSpreadX = dt.altarHalfX * 0.46;
+                  const flameSpreadZ = dt.altarHalfZ * 0.28;
+                  const altarFireY = d + 82;
+                  for (let e = 0; e < 4; e++) {
+                    const column = e % 2;
+                    const row = Math.floor(e / 2);
                     const o = new t.MeshBasicMaterial({
-                        color: e % 2 ? 16757051 : 16735008,
+                        color: e % 3 === 0 ? 16772125 : e % 2 ? 16757051 : 16735008,
                         transparent: !0,
-                        opacity: 0.86,
+                        opacity: 0.82,
+                        depthWrite: !1,
                       }),
                       n = new t.Mesh(
                         new t.ConeGeometry(
-                          8 + (e % 3) * 3,
-                          32 + (e % 4) * 8,
-                          7,
+                          10 + (e % 2) * 3,
+                          30 + (e % 2) * 6,
+                          6,
                         ),
                         o,
                       );
                     n.position.set(
-                      b + 11 * (e - 3.5),
-                      T + 34 + (e % 2) * 5,
-                      0 + 11 * ((e % 3) - 1),
+                      b + t.MathUtils.lerp(-flameSpreadX, flameSpreadX, column),
+                      altarFireY + (e % 2) * 2,
+                      altarLocalZ + t.MathUtils.lerp(-flameSpreadZ, flameSpreadZ, row),
                     ),
+                      (n.rotation.y = 0.61 * e),
                       (n.userData.phase = 0.73 * e),
+                      (n.userData.baseY = n.position.y),
                       V.add(n);
                   }
                   r.add(V), (mt.templeFlames = V);
@@ -1754,47 +1772,33 @@ async function At(e) {
                   templeNightLight.castShadow = false;
                   r.add(templeNightLight);
                   mt.templeNightLight = templeNightLight;
-                  const U = new t.MeshBasicMaterial({
-                      color: 14209733,
-                      transparent: !0,
-                      opacity: 0.18,
-                      depthWrite: !1,
-                    }),
-                    A = new t.Mesh(
-                      new t.CylinderGeometry(11, 50, 11e3, 14, 4, !0),
-                      U,
-                    );
-                  A.position.set(b, T + 18 + 5500, 0),
-                    r.add(A),
-                    (mt.templeSmoke = A);
-                  const F = 365,
-                    W = 350,
-                    q = new t.Mesh(new t.CylinderGeometry(84, 59, 60, 14), z);
-                  q.position.set(F, d + 32, W), (q.castShadow = !0), r.add(q);
-                  const N = new t.Mesh(
-                    new t.CylinderGeometry(67, 67, 4, 18),
-                    new t.MeshBasicMaterial({
-                      color: 7317421,
-                      transparent: !0,
-                      opacity: 0.82,
-                    }),
+                  // Restore the earlier continuous white translucent smoke pillar.
+                  // Its lower edge begins directly over the fire and its tapered body
+                  // continues beyond the visible sky ceiling without puff clusters.
+                  const smokeHeight = 16000;
+                  const smokeMaterial = new t.MeshBasicMaterial({
+                    color: 0xf3f1e8,
+                    transparent: !0,
+                    opacity: 0.105,
+                    depthWrite: !1,
+                    side: t.DoubleSide,
+                  });
+                  const A = new t.Mesh(
+                    new t.CylinderGeometry(48, 30, smokeHeight, 10, 1, true),
+                    smokeMaterial,
                   );
-                  N.position.set(F, d + 63, W), r.add(N);
-                  for (let e = 0; e < 12; e++) {
-                    const o = (e / 12) * Math.PI * 2,
-                      n = F + 63 * Math.cos(o),
-                      s = W + 63 * Math.sin(o),
-                      a = new t.Mesh(new t.BoxGeometry(24, 30, 38), z);
-                    a.position.set(n, d + 2, s), (a.rotation.y = -o), r.add(a);
-                  }
-                  for (let e = 0; e < 6; e++) {
-                    const o = new t.Mesh(
-                      new t.CylinderGeometry(18, 13, 18, 10),
-                      z,
-                    );
-                    o.position.set(250 + 48 * e, d + 10, 325), r.add(o);
-                  }
-                  Nt(n + a + F, s + i + W, 78, "bronze-sea"), e.add(r);
+                  A.name = "TempleAltarContinuousSmokeColumn";
+                  A.position.set(
+                    b,
+                    altarFireY + 28 + smokeHeight / 2,
+                    altarLocalZ,
+                  );
+                  A.userData.baseX = A.position.x;
+                  A.userData.baseZ = A.position.z;
+                  r.add(A), (mt.templeSmoke = A);
+                  // Do not recreate the later procedural bronze basin. The purchased
+                  // model contains the original authored laver restored in the GLB.
+                  e.add(r);
                 })(r, c, o, n);
               const m = ge(13086339),
                 f = [
@@ -2210,7 +2214,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 233,
+  Wt = 234,
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -2883,6 +2887,37 @@ function te(e, o) {
   if (inside) {
     const courtSurfaceY = s.courtSurfaceY ?? s.courtY + 4;
 
+    // Purchased temple entrance: the broad eastern approach rises smoothly to
+    // the authored sanctuary platform. This collision height is deliberately
+    // simple and continuous so David cannot fall between decorative steps.
+    const onTempleStageRamp =
+      e >= s.templeStageRampXMin &&
+      e <= s.templeStageRampXMax &&
+      o >= s.templeStageRampZMin &&
+      o <= s.templeStageRampZMax;
+    if (onTempleStageRamp) {
+      const rampProgress = t.MathUtils.clamp(
+        (s.templeStageRampXMax - e) /
+          Math.max(s.templeStageRampXMax - s.templeStageRampXMin, 1),
+        0,
+        1,
+      );
+      const easedRamp =
+        rampProgress * rampProgress * (3 - 2 * rampProgress);
+      return t.MathUtils.lerp(
+        courtSurfaceY,
+        s.templeStageTopY,
+        easedRamp,
+      );
+    }
+    if (
+      e >= s.templeStageXMin &&
+      e <= s.templeStageXMax &&
+      o >= s.templeStageZMin &&
+      o <= s.templeStageZMax
+    )
+      return s.templeStageTopY;
+
     // Walkable altar ramp: the southern end begins flush with the marble court
     // and rises continuously to the altar platform.
     const onAltarRamp =
@@ -3397,7 +3432,19 @@ function me(e, o, n, s, a, i, r) {
 }
 function fe(e, o, n, s, a, i = 0) {
   const r = new t.Group(),
-    c = te(o + s, n + a) + i;
+    worldX = o + s,
+    worldZ = n + a;
+  // Road-derived city torches must not appear inside the purchased Temple
+  // architecture.  The Temple keeps its dedicated shadow-free night light.
+  if (
+    dt &&
+    worldX >= dt.courtXMin - 30 &&
+    worldX <= dt.courtXMax + 30 &&
+    worldZ >= dt.courtZMin - 30 &&
+    worldZ <= dt.courtZMax + 30
+  )
+    return null;
+  const c = te(worldX, worldZ) + i;
   r.position.set(s, c, a);
   const l = new t.Mesh(new t.CylinderGeometry(4.2, 5.6, 92, 9), ge(5978659));
   (l.position.y = 46), (l.castShadow = !0), r.add(l);
@@ -4102,6 +4149,116 @@ function loadDatePalmModel() {
     );
   });
   return datePalmModelPromise;
+}
+function loadFirstTempleModel() {
+  if (firstTempleModelTemplate) return Promise.resolve(firstTempleModelTemplate);
+  if (firstTempleModelPromise) return firstTempleModelPromise;
+  firstTempleModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/first_temple_game.glb",
+      (gltf) => {
+        const scene = gltf.scene;
+        scene.traverse((obj) => {
+          if (!obj.isMesh) return;
+          // The optimized temple is six material primitives in one mesh.
+          // Receiving shadows keeps it grounded; casting a full-building
+          // shadow would be disproportionately expensive.
+          obj.castShadow = false;
+          obj.receiveShadow = true;
+          obj.frustumCulled = true;
+          obj.userData.neverOcclude = true;
+          const materials = Array.isArray(obj.material)
+            ? obj.material
+            : [obj.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = t.FrontSide;
+            material.transparent = false;
+            material.depthWrite = true;
+            material.roughness = Math.max(0.5, material.roughness ?? 0.72);
+            // The purchased model's authored metal group contains the laver.
+            // Give it a matte copper finish without adding a glow or reflection pass.
+            if (material.name === "TempleGold") {
+              material.color.setHex(0xb87333);
+              // The optimized primitive still carries the source vertex colours.
+              // Disable their multiplication here so the authored laver cannot
+              // remain ivory even after the material colour is changed.
+              material.vertexColors = false;
+              material.metalness = 0.12;
+              material.roughness = 0.82;
+              material.needsUpdate = true;
+            }
+          });
+        });
+        firstTempleModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("최적화된 1차 성전 모델을 불러오지 못했습니다.", error);
+        firstTempleModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return firstTempleModelPromise;
+}
+function addPurchasedFirstTemple(parent, courtY, worldCenterX, worldCenterZ) {
+  if (!firstTempleModelTemplate) return false;
+  const model = firstTempleModelTemplate.clone(true);
+  // Face the sanctuary entrance toward geographic east (+X in this world).
+  // This is the opposite of the earlier placement, whose rear faced the
+  // eastern approach.
+  model.rotation.y = Math.PI / 2;
+  model.updateMatrixWorld(true);
+  const sourceBounds = new t.Box3().setFromObject(model);
+  const sourceSize = sourceBounds.getSize(new t.Vector3());
+  const sourceCenter = sourceBounds.getCenter(new t.Vector3());
+  // Leave a circulation margin inside the existing 1300 x 1040 court.
+  const modelScale = Math.min(
+    1180 / Math.max(sourceSize.x, 1),
+    930 / Math.max(sourceSize.z, 1),
+  );
+  // Preserve the optimized footprint while making the sanctuary visible from
+  // the Mount of Olives. Only the vertical axis is enlarged.
+  const verticalScale = modelScale * 1.28;
+  model.scale.set(modelScale, verticalScale, modelScale);
+  // The authored court is about 9.15% of the model height above the lowest
+  // decorative/column point. Align that actual walkable surface—not the lowest
+  // vertex—to the terrain. This removes the thigh-high floating platform.
+  const authoredCourtOffset = sourceSize.y * 0.0915;
+  model.position.set(
+    -sourceCenter.x * modelScale,
+    courtY + 4 - (sourceBounds.min.y + authoredCourtOffset) * verticalScale,
+    -sourceCenter.z * modelScale,
+  );
+  model.name = "PurchasedFirstTempleOptimized";
+  // Permanently remove the obsolete procedural temple, wall and basin meshes.
+  // Removing them (instead of toggling visibility) prevents the old enclosure
+  // from returning after entering/leaving the Temple Mount.
+  for (const child of [...parent.children]) {
+    if (!child.isLight) parent.remove(child);
+  }
+  parent.add(model);
+  // Collision follows the purchased outer wall footprint, split into broad
+  // entrances on all four sides. No collider from the former enclosure remains.
+  const wallHalfX = 590;
+  const wallHalfZ = 465;
+  const wallThickness = 22;
+  const gateHalfWidth = 105;
+  const horizontalWing = wallHalfX - gateHalfWidth;
+  const verticalWing = wallHalfZ - gateHalfWidth;
+  for (const z of [-wallHalfZ, wallHalfZ]) {
+    Ot(worldCenterX - ((wallHalfX + gateHalfWidth) / 2), worldCenterZ + z, horizontalWing, wallThickness, 0, "temple-model-wall", courtY + 2, courtY + 205);
+    Ot(worldCenterX + ((wallHalfX + gateHalfWidth) / 2), worldCenterZ + z, horizontalWing, wallThickness, 0, "temple-model-wall", courtY + 2, courtY + 205);
+  }
+  for (const x of [-wallHalfX, wallHalfX]) {
+    Ot(worldCenterX + x, worldCenterZ - ((wallHalfZ + gateHalfWidth) / 2), wallThickness, verticalWing, 0, "temple-model-wall", courtY + 2, courtY + 205);
+    Ot(worldCenterX + x, worldCenterZ + ((wallHalfZ + gateHalfWidth) / 2), wallThickness, verticalWing, 0, "temple-model-wall", courtY + 2, courtY + 205);
+  }
+  mt.purchasedFirstTemple = model;
+  mt.importedTemple = model;
+  return true;
 }
 function createDatePalmClone() {
   if (!datePalmModelTemplate) return null;
@@ -4869,7 +5026,7 @@ function createSheepShop() {
   if (mt.sheepShop) return mt.sheepShop;
   const shop = new t.Group();
   shop.position.set(230, te(230, 3190) + 1, 3190);
-  const mat = ge(11776947), dark = ge(6049085), wool = ge(15985899);
+  const mat = ge(11776947), dark = ge(6049085);
   const canopy = new t.Mesh(new t.ConeGeometry(92, 48, 4), mat);
   canopy.position.y = 92; canopy.rotation.y = Math.PI / 4; shop.add(canopy);
   for (const x of [-58,58]) for (const zc of [-48,48]) {
@@ -4878,8 +5035,37 @@ function createSheepShop() {
   }
   const pen = new t.Mesh(new t.BoxGeometry(150,5,120), dark);
   pen.position.y=3; shop.add(pen);
-  const sheepIcon = new t.Mesh(new t.IcosahedronGeometry(25,1), wool);
-  sheepIcon.scale.set(1.35,0.9,0.9); sheepIcon.position.set(0,36,0); shop.add(sheepIcon);
+  // Replace the temporary white marker with two small copies of the supplied
+  // sheep graphic. Geometry and materials are shared with the flock model.
+  loadSheepModel().then((template) => {
+    if (!shop.parent) return;
+    for (const [index, localX] of [-34, 34].entries()) {
+      const sheepDisplay = template.clone(true);
+      sheepDisplay.name = `SouthGateSheepShopDisplay${index + 1}`;
+      sheepDisplay.rotation.y = Math.PI / 4 + (index ? -0.24 : 0.24);
+      sheepDisplay.updateMatrixWorld(true);
+      let bounds = new t.Box3().setFromObject(sheepDisplay);
+      const size = bounds.getSize(new t.Vector3());
+      const displayHeight = 48;
+      const scale = displayHeight / Math.max(size.y, 0.001);
+      sheepDisplay.scale.setScalar(scale);
+      sheepDisplay.updateMatrixWorld(true);
+      bounds = new t.Box3().setFromObject(sheepDisplay);
+      const center = bounds.getCenter(new t.Vector3());
+      sheepDisplay.position.set(
+        localX - center.x,
+        5 - bounds.min.y,
+        -center.z,
+      );
+      sheepDisplay.traverse((obj) => {
+        if (!obj.isMesh) return;
+        obj.castShadow = false;
+        obj.receiveShadow = false;
+        obj.frustumCulled = true;
+      });
+      shop.add(sheepDisplay);
+    }
+  }).catch(() => null);
   shop.userData = { sheepShop:true, price:100 };
   i.add(shop); mt.sheepShop=shop; return shop;
 }
@@ -5020,6 +5206,7 @@ document.addEventListener(
         const e = (function () {
           for (const t of [
             "practicePrompt",
+            "keyGuidePanel",
             "settingsPanel",
             "pause",
             "gameOver",
@@ -5122,7 +5309,11 @@ document.addEventListener(
         "Enter" === t.code && S && (Ee(), t.preventDefault()),
         "Escape" === t.code &&
         S &&
-        !e("#settingsPanel").classList.contains("hidden")
+        !e("#keyGuidePanel").classList.contains("hidden")
+          ? closeKeyGuide()
+          : "Escape" === t.code &&
+            S &&
+            !e("#settingsPanel").classList.contains("hidden")
           ? Tt()
           : "Escape" === t.code &&
             S &&
@@ -6784,9 +6975,14 @@ function _e(o, n) {
     })(o),
     (function (t, e) {
       mt.templeSmoke &&
-        ((mt.templeSmoke.material.opacity = 0.17 + 0.035 * Math.sin(0.7 * e)),
-        (mt.templeSmoke.scale.x = 1 + 0.12 * Math.sin(0.45 * e)),
-        (mt.templeSmoke.scale.z = 1 + 0.1 * Math.cos(0.4 * e))),
+        ((mt.templeSmoke.position.x =
+          mt.templeSmoke.userData.baseX + 3.5 * Math.sin(0.23 * e)),
+        (mt.templeSmoke.position.z =
+          mt.templeSmoke.userData.baseZ + 2.8 * Math.cos(0.19 * e)),
+        (mt.templeSmoke.scale.x = 1 + 0.055 * Math.sin(0.31 * e)),
+        (mt.templeSmoke.scale.z = 1 + 0.045 * Math.cos(0.27 * e)),
+        (mt.templeSmoke.material.opacity =
+          0.105 + 0.015 * Math.sin(0.21 * e))),
         mt.templeEmber &&
           (mt.templeEmber.material.color.setHSL(
             0.055 + 0.012 * Math.sin(5 * e),
@@ -6799,7 +6995,7 @@ function _e(o, n) {
             const n = 5 * e + t.userData.phase;
             (t.scale.y = 0.75 + 0.28 * Math.sin(n)),
               (t.scale.x = 0.9 + 0.12 * Math.cos(0.8 * n)),
-              (t.position.y += 0.035 * Math.sin(n)),
+            (t.position.y = t.userData.baseY + 2.4 * Math.sin(n)),
               (t.material.opacity = 0.72 + 0.16 * Math.sin(0.7 * n));
           }),
         mt.birds &&

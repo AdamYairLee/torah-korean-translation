@@ -127,11 +127,6 @@
           있습니다.
         </div>
         <div id="notice"></div>
-        <div id="help">
-          WASD 이동 · 마우스 360° 시점 · V 시점 변경 · Space 뛰기 · Shift 점프 ·
-          Z 양 호출 · 우클릭 조준 · 좌클릭 발사 · E 또는 Ctrl 돌 줍기 · Tab 무기
-          전환 · Enter 치트 콘솔 · Esc 메뉴
-        </div>
       </div>
       <div
         id="practicePrompt"
@@ -184,11 +179,33 @@
           <p class="settings-help">
             낮을수록 천천히, 높을수록 빠르게 시야가 움직입니다.
           </p>
+          <button id="keyGuideBtn">키 소개</button>
           <button id="settingsCloseBtn" class="primary">확인</button>
+        </div>
+      </div>
+      <div id="keyGuidePanel" class="overlay hidden" aria-label="키 소개">
+        <div class="stone-panel key-guide-panel">
+          <h2>키 소개</h2>
+          <div class="key-guide-list">
+            <p><strong>WASD</strong><span>이동</span></p>
+            <p><strong>마우스</strong><span>360° 시점 조작</span></p>
+            <p><strong>V</strong><span>시점 변경</span></p>
+            <p><strong>Space</strong><span>뛰기</span></p>
+            <p><strong>Shift</strong><span>점프</span></p>
+            <p><strong>Z</strong><span>양 호출</span></p>
+            <p><strong>우클릭</strong><span>조준</span></p>
+            <p><strong>좌클릭</strong><span>발사</span></p>
+            <p><strong>E / Ctrl</strong><span>돌 줍기</span></p>
+            <p><strong>Tab</strong><span>무기 전환</span></p>
+            <p><strong>Enter</strong><span>치트 콘솔</span></p>
+            <p><strong>Esc</strong><span>메뉴</span></p>
+          </div>
+          <button id="keyGuideCloseBtn" class="primary">설정으로 돌아가기</button>
         </div>
       </div>
       <div id="cheatConsole" class="console hidden">
         <input id="cheatInput" autocomplete="off" placeholder="치트키 입력" />
+        <div class="cheat-note">(치트키는 제작자에게 물어보세요)</div>
       </div>
       <div id="gameOver" class="overlay hidden">
         <div class="stone-panel">
@@ -199,6 +216,6 @@
       </div>
     </div>
     <script src="i18n.js?v=3.0.0"></script>
-    <script type="module" src="game.js?v=2.0.71"></script>
+    <script type="module" src="game.js?v=2.0.78"></script>
   </body>
 </html>
