@@ -82,6 +82,7 @@ const performanceState = {
   occlusionRaycaster: new t.Raycaster(),
   targetRaycaster: new t.Raycaster(),
   targetCenter: new t.Vector2(0, 0),
+  onOliveMount: false,
 };
 let D = "",
   S = !1,
@@ -130,6 +131,9 @@ let Z = new t.Vector3(-1150, 0, 1050),
   banditModelTemplate = null,
   oliveTreeModelPromise = null,
   oliveTreeModelTemplate = null,
+  datePalmModelPromise = null,
+  datePalmModelTemplate = null,
+  datePalmPlacements = [],
   _ = null,
   J = null,
   Q = null,
@@ -159,6 +163,20 @@ const nightWatch = {
   camp: new t.Vector3(),
   startedAt: 0,
   lastPhase: "",
+  sheepLocked: !1,
+};
+const lightingPerformance = {
+  nextTorchUpdateAt: 0,
+  maxLocalPointLights: 3,
+  torchLightDistance: 760,
+  torchVisualDistance: 2100,
+  sunShadowEnabled: true,
+};
+const combatFeedback = {
+  shakeUntil: 0,
+  shakeDuration: 0,
+  shakeStrength: 0,
+  lastDamagePulseAt: 0,
 };
 const routeChoice = {
   id: "",
@@ -207,6 +225,9 @@ const pt = 33,
     practiceTarget: null,
     cityTorches: [],
     staffNightLight: null,
+    templeNightLight: null,
+    stars: null,
+    datePalmGrove: null,
   },
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
@@ -326,7 +347,7 @@ function Ct() {
     (Lt.night.volume = 0.45 * t),
     (Lt.pickup.volume = 0.8 * t),
     (Lt.mission.volume = 0.85 * t),
-    (Lt.danger.volume = 0.85 * t),
+    (Lt.danger.volume = 0.92 * t),
     (Lt.staff.volume = 0.7 * t),
     Lt.sheep.forEach((e) => (e.volume = 0.55 * t));
 }
@@ -755,6 +776,7 @@ async function At(e) {
     loadSheepModel().catch(() => null),
     loadBanditModel().catch(() => null),
     loadOliveTreeModel().catch(() => null),
+    loadDatePalmModel().catch(() => null),
   ]),
     (async function () {
       if ((Ct(), y))
@@ -820,6 +842,70 @@ async function At(e) {
             p = o;
             const n = new t.Mesh(e, o);
             i.add(n);
+            // A single GPU draw call supplies the whole star field.  Per-star
+            // reveal thresholds let dusk uncover stars gradually without
+            // creating lights, meshes, shadows or per-frame object loops.
+            const starCount = 520,
+              starPositions = new Float32Array(3 * starCount),
+              starColors = new Float32Array(3 * starCount),
+              starReveal = new Float32Array(starCount),
+              starSizes = new Float32Array(starCount);
+            for (let starIndex = 0; starIndex < starCount; starIndex++) {
+              const azimuth = Math.random() * Math.PI * 2,
+                elevation = 0.08 + Math.pow(Math.random(), 0.72) * 1.34,
+                radius = 4700,
+                horizontalRadius = Math.cos(elevation) * radius,
+                brightness = 0.48 + Math.pow(Math.random(), 2.1) * 0.52;
+              starPositions[3 * starIndex] =
+                Math.cos(azimuth) * horizontalRadius;
+              starPositions[3 * starIndex + 1] =
+                Math.sin(elevation) * radius;
+              starPositions[3 * starIndex + 2] =
+                Math.sin(azimuth) * horizontalRadius;
+              starColors[3 * starIndex] = 0.78 * brightness;
+              starColors[3 * starIndex + 1] = 0.86 * brightness;
+              starColors[3 * starIndex + 2] = brightness;
+              starReveal[starIndex] = Math.pow(Math.random(), 0.82);
+              starSizes[starIndex] =
+                1.45 + Math.pow(Math.random(), 3.2) * 3.4;
+            }
+            const starGeometry = new t.BufferGeometry();
+            starGeometry.setAttribute(
+              "position",
+              new t.BufferAttribute(starPositions, 3),
+            );
+            starGeometry.setAttribute(
+              "color",
+              new t.BufferAttribute(starColors, 3),
+            );
+            starGeometry.setAttribute(
+              "reveal",
+              new t.BufferAttribute(starReveal, 1),
+            );
+            starGeometry.setAttribute(
+              "starSize",
+              new t.BufferAttribute(starSizes, 1),
+            );
+            const starMaterial = new t.ShaderMaterial({
+              transparent: !0,
+              depthWrite: !1,
+              blending: t.AdditiveBlending,
+              uniforms: {
+                revealLimit: { value: 0 },
+                starOpacity: { value: 0 },
+              },
+              vertexShader:
+                "attribute vec3 color; attribute float reveal; attribute float starSize; varying vec3 vColor; varying float vReveal; void main(){vColor=color;vReveal=reveal;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=starSize;gl_Position=projectionMatrix*mv;}",
+              fragmentShader:
+                "uniform float revealLimit; uniform float starOpacity; varying vec3 vColor; varying float vReveal; void main(){if(vReveal>revealLimit)discard;float d=length(gl_PointCoord-vec2(0.5));float a=smoothstep(0.5,0.08,d)*starOpacity;if(a<0.015)discard;gl_FragColor=vec4(vColor,a);}",
+            });
+            const stars = new t.Points(starGeometry, starMaterial);
+            (stars.frustumCulled = !1),
+              // Draw after the opaque sky dome; terrain still occludes the
+              // points through the normal depth test.
+              (stars.renderOrder = 1),
+              i.add(stars),
+              (mt.stars = stars);
             const s = new t.Mesh(
               new t.CircleGeometry(95, 32),
               new t.MeshBasicMaterial({
@@ -1656,6 +1742,18 @@ async function At(e) {
                       V.add(n);
                   }
                   r.add(V), (mt.templeFlames = V);
+                  // One shadow-free light keeps the Temple readable at night.
+                  // It is enabled only while David is near the Temple Mount.
+                  const templeNightLight = new t.PointLight(
+                    16765872,
+                    0,
+                    980,
+                    1.45,
+                  );
+                  templeNightLight.position.set(-170, d + 255, 0);
+                  templeNightLight.castShadow = false;
+                  r.add(templeNightLight);
+                  mt.templeNightLight = templeNightLight;
                   const U = new t.MeshBasicMaterial({
                       color: 14209733,
                       transparent: !0,
@@ -1801,7 +1899,9 @@ async function At(e) {
               c.scale.set(0.8 + 0.9 * e(), 0.45 + 0.55 * e(), 0.7 + 1.1 * e()),
                 c.position.set(s, te(s, a) + 0.35 * r, a),
                 c.rotation.set(e(), e() * Math.PI, e()),
-                (c.castShadow = !0),
+                // Decorative wilderness rocks do not need hundreds of
+                // individual sun-shadow submissions.
+                (c.castShadow = !1),
                 i.add(c);
                 // Decorative wilderness rocks no longer create invisible movement blockers.
                 // Buildings, walls and trees retain collision, but open ground stays traversable.
@@ -1939,46 +2039,12 @@ async function At(e) {
                   (s.castShadow = !0),
                   e.add(s),
                   ze(e, 2.6, 3.5, 78, [205, 39, 35], 6833192, 6);
-                const a = new t.Group(),
-                  r = ge(6964524),
-                  c = ge(6450509),
-                  l = new t.Mesh(new t.CylinderGeometry(6.2, 8.8, 82, 8), r);
-                (l.position.y = 41),
-                  (l.castShadow = !0),
-                  (l.receiveShadow = !0),
-                  a.add(l),
-                  [
-                    [0, 92, 0],
-                    [28, 88, 5],
-                    [-27, 87, -4],
-                    [8, 99, -22],
-                    [-6, 96, 22],
-                  ].forEach(([e, o, n], s) => {
-                    const i = new t.Mesh(
-                      new t.IcosahedronGeometry(28 - 1.8 * s, 1),
-                      c,
-                    );
-                    i.scale.set(1.25, 0.43, 1),
-                      i.position.set(e, o, n),
-                      (i.castShadow = !0),
-                      (i.receiveShadow = !0),
-                      a.add(i);
-                  });
-                const h = new t.Mesh(
-                  new t.CircleGeometry(88, 24),
-                  new t.MeshBasicMaterial({
-                    color: 3683367,
-                    transparent: !0,
-                    opacity: 0.19,
-                    depthWrite: !1,
-                  }),
-                );
-                (h.rotation.x = -Math.PI / 2),
-                  (h.position.y = 0.8),
-                  (h.scale.y = 0.58),
-                  a.add(h),
-                  a.position.set(292, 0, 18),
-                  e.add(a),
+                const a = createDatePalmClone();
+                a &&
+                  (a.position.set(292, 0, 18),
+                  a.scale.setScalar(118),
+                  (a.rotation.y = 1.15),
+                  e.add(a)),
                   (e.userData.campTreeLocal = new t.Vector3(292, 0, 18)),
                   (e.userData.campTreeRadius = 18);
                 const d = new t.Group();
@@ -2144,7 +2210,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 232,
+  Wt = 233,
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -2253,6 +2319,68 @@ function jt(t, e = 18) {
   }
   return !1;
 }
+function collisionPenetrationScore(point, clearance = 18) {
+  // A player can occasionally finish a frame just inside camp furniture or a
+  // tree collider.  A boolean-only collision test then rejects every following
+  // step, including the step that would leave the collider.  Measure overlap so
+  // movement that strictly reduces it can be allowed without permitting entry.
+  let score = 0;
+  for (const collider of z) {
+    if (
+      Number.isFinite(collider.yMin) &&
+      Number.isFinite(collider.yMax) &&
+      (point.y - pt >= collider.yMax - 5 ||
+        point.y + pt <= collider.yMin)
+    )
+      continue;
+    if ("rect" === collider.shape) {
+      const dx = point.x - collider.x,
+        dz = point.z - collider.z,
+        cos = Math.cos(-(collider.rotation || 0)),
+        sin = Math.sin(-(collider.rotation || 0)),
+        localX = dx * cos - dz * sin,
+        localZ = dx * sin + dz * cos,
+        overlapX = collider.w / 2 + clearance - Math.abs(localX),
+        overlapZ = collider.d / 2 + clearance - Math.abs(localZ);
+      if (overlapX > 0 && overlapZ > 0) score += Math.min(overlapX, overlapZ);
+    } else {
+      const overlap =
+        collider.r +
+        clearance -
+        Math.hypot(point.x - collider.x, point.z - collider.z);
+      if (overlap > 0) score += overlap;
+    }
+  }
+  if (mt.goalSite?.userData?.campTreeLocal) {
+    const tree = mt.goalSite.localToWorld(
+        mt.goalSite.userData.campTreeLocal.clone(),
+      ),
+      overlap =
+        mt.goalSite.userData.campTreeRadius +
+        clearance -
+        Math.hypot(point.x - tree.x, point.z - tree.z);
+    if (overlap > 0) score += overlap;
+  }
+  return score;
+}
+function canPlayerMoveTo(current, candidate, clearance = 17) {
+  // During a night watch the flock and camp stay fixed, never David.  Camp
+  // props are intentionally non-blocking for the player inside the watch area
+  // so entering between several overlapping props cannot freeze every exit.
+  if (
+    nightWatch.active &&
+    Math.hypot(candidate.x - nightWatch.camp.x, candidate.z - nightWatch.camp.z) <
+      520
+  )
+    return !0;
+  if (!jt(candidate, clearance)) return !0;
+  const currentOverlap = collisionPenetrationScore(current, clearance);
+  if (currentOverlap <= 0) return !1;
+  return (
+    collisionPenetrationScore(candidate, clearance) <
+    currentOverlap - 0.001
+  );
+}
 function samplePlayerSurface(worldX, worldZ, currentPlayerY) {
   let surface = te(worldX, worldZ);
   // The player's origin sits pt units above the supporting surface.  A roof is
@@ -2283,10 +2411,12 @@ function movePlayerWithSweptCollision(player, delta) {
   for (let step = 0; step < steps; step++) {
     const xProbe = player.position.clone();
     xProbe.x += stepX;
-    if (!jt(xProbe, 17)) player.position.x = xProbe.x;
+    if (canPlayerMoveTo(player.position, xProbe, 17))
+      player.position.x = xProbe.x;
     const zProbe = player.position.clone();
     zProbe.z += stepZ;
-    if (!jt(zProbe, 17)) player.position.z = zProbe.z;
+    if (canPlayerMoveTo(player.position, zProbe, 17))
+      player.position.z = zProbe.z;
   }
 }
 function Ht(t, e, o, n = 0) {
@@ -2801,42 +2931,16 @@ function ee(t) {
 }
 function oe(e, o, n = 1) {
   if (zt(e, o, 120) || Kt(e, o, -20)) return null;
-  const s = new t.Group(),
-    a = ze(s, 3.2 * n, 5 * n, 35 * n, [0, 17 * n, 0], 7227696, 7);
-  (a.rotation.z = 0.08), (a.castShadow = !0), (a.receiveShadow = !0);
-  const r = ge(6713426);
-  [
-    [0, 40, 0],
-    [12, 38, 3],
-    [-13, 37, -2],
-    [4, 43, -10],
-  ].forEach(([e, o, a], i) => {
-    const c = new t.Mesh(new t.IcosahedronGeometry((13 - i) * n, 0), r);
-    (c.scale.y = 0.45),
-      c.position.set(e * n, o * n, a * n),
-      (c.castShadow = !0),
-      (c.receiveShadow = !0),
-      s.add(c);
+  datePalmPlacements.push({
+    x: e,
+    z: o,
+    y: te(e, o),
+    scale: 112 * n,
+    rotation: (0.73 * datePalmPlacements.length) % (Math.PI * 2),
   });
-  const c = new t.Mesh(
-    new t.CircleGeometry(34 * n, 18),
-    new t.MeshBasicMaterial({
-      color: 4143915,
-      transparent: !0,
-      opacity: 0.16,
-      depthWrite: !1,
-    }),
-  );
-  return (
-    (c.rotation.x = -Math.PI / 2),
-    (c.position.y = 0.7),
-    (c.scale.y = 0.62),
-    s.add(c),
-    s.position.set(e, te(e, o), o),
-    i.add(s),
-    Nt(e, o, 8.5 * n, "acacia"),
-    s
-  );
+  Nt(e, o, 8.5 * n, "date-palm");
+  rebuildDatePalmInstances();
+  return mt.datePalmGrove;
 }
 function ne(t = 4300) {
   const o = e("#mission");
@@ -3776,8 +3880,11 @@ function applyLionModel(enemy, fallbackModel) {
 function prepareImportedAnimalModel(model) {
   model.traverse((obj) => {
     if (!(obj.isMesh || obj.isSkinnedMesh)) return;
-    obj.castShadow = true;
-    obj.receiveShadow = true;
+    // Imported animal meshes are visually detailed and duplicated across the
+    // flock. Keeping them out of the shadow pass removes the largest repeated
+    // GPU cost while the terrain still supplies grounding shadows.
+    obj.castShadow = false;
+    obj.receiveShadow = false;
     const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
     for (const material of materials) {
       if (!material) continue;
@@ -3955,6 +4062,97 @@ function loadOliveTreeModel() {
   });
   return oliveTreeModelPromise;
 }
+function loadDatePalmModel() {
+  if (datePalmModelTemplate) return Promise.resolve(datePalmModelTemplate);
+  if (datePalmModelPromise) return datePalmModelPromise;
+  datePalmModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/date_palm_game.glb",
+      (gltf) => {
+        const scene = gltf.scene;
+        scene.traverse((obj) => {
+          if (!obj.isMesh) return;
+          obj.castShadow = false;
+          obj.receiveShadow = true;
+          const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = t.FrontSide;
+            material.transparent = false;
+            material.depthWrite = true;
+            material.roughness = Math.max(0.72, material.roughness ?? 0.72);
+            if (material.map) {
+              material.map.colorSpace = t.SRGBColorSpace;
+              material.map.anisotropy = Math.min(
+                2,
+                c?.capabilities?.getMaxAnisotropy?.() || 1,
+              );
+            }
+          });
+        });
+        datePalmModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("대추야자나무 모델을 불러오지 못했습니다.", error);
+        datePalmModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return datePalmModelPromise;
+}
+function createDatePalmClone() {
+  if (!datePalmModelTemplate) return null;
+  const palm = datePalmModelTemplate.clone(true);
+  palm.name = "CampDatePalm";
+  palm.traverse((obj) => {
+    if (!obj.isMesh) return;
+    obj.castShadow = false;
+    obj.receiveShadow = true;
+    obj.frustumCulled = true;
+  });
+  return palm;
+}
+function rebuildDatePalmInstances() {
+  if (!i || !datePalmModelTemplate || !datePalmPlacements.length) return;
+  let sourceMesh = null;
+  datePalmModelTemplate.traverse((obj) => {
+    if (!sourceMesh && obj.isMesh) sourceMesh = obj;
+  });
+  if (!sourceMesh) return;
+  if (mt.datePalmGrove) {
+    i.remove(mt.datePalmGrove);
+    mt.datePalmGrove.traverse((obj) => {
+      if (obj.isInstancedMesh) obj.instanceMatrix.dispose?.();
+    });
+  }
+  const grove = new t.Group();
+  grove.name = "AllFormerAcaciasAsDatePalms";
+  const dummy = new t.Object3D();
+  const instances = new t.InstancedMesh(
+    sourceMesh.geometry,
+    sourceMesh.material,
+    datePalmPlacements.length,
+  );
+  instances.castShadow = false;
+  instances.receiveShadow = true;
+  instances.frustumCulled = true;
+  datePalmPlacements.forEach((palm, index) => {
+    dummy.position.set(palm.x, palm.y, palm.z);
+    dummy.rotation.set(0, palm.rotation, 0);
+    dummy.scale.setScalar(palm.scale);
+    dummy.updateMatrix();
+    instances.setMatrixAt(index, dummy.matrix);
+  });
+  instances.instanceMatrix.needsUpdate = true;
+  instances.computeBoundingSphere();
+  instances.userData.datePalmBatch = true;
+  grove.add(instances);
+  i.add(grove);
+  mt.datePalmGrove = grove;
+}
 function createMountOfOlivesGrove() {
   loadOliveTreeModel()
     .then((template) => {
@@ -4012,6 +4210,7 @@ function createMountOfOlivesGrove() {
         });
         instances.instanceMatrix.needsUpdate = true;
         instances.computeBoundingSphere();
+        instances.userData.groveBatch = true;
         grove.add(instances);
       }
       i.add(grove);
@@ -4079,13 +4278,20 @@ function createDistantMountainHorizon() {
 function applyBanditModel(enemy) {
   if (enemy.userData.banditModelAttachStarted) return;
   enemy.userData.banditModelAttachStarted = true;
-  const fallbackChildren = [...enemy.children];
+  const fallback = enemy.userData.banditFallback;
   loadBanditModel()
     .then((template) => {
       if (!enemy.parent || enemy.userData.type !== "bandit") return;
       if (enemy.userData.importedModel) return;
       const model = template.clone(true);
       model.name = "BanditTripoStaticModel";
+      model.traverse((part) => {
+        if (!part.isMesh) return;
+        // The scanned model's complex shadow read as a second flattened body.
+        // Terrain lighting still grounds the character without that duplicate.
+        part.castShadow = false;
+        part.receiveShadow = false;
+      });
       model.rotation.set(0, 0, 0);
       model.updateMatrixWorld(true);
       let box = new t.Box3().setFromObject(model);
@@ -4099,20 +4305,27 @@ function applyBanditModel(enemy) {
       const center = box.getCenter(new t.Vector3());
       model.position.x -= center.x;
       model.position.z -= center.z;
-      model.position.y -= box.min.y;
+      // The unified scan contains the weapon tip well below the man's feet.
+      // Using box.min.y therefore plants the weapon on the terrain and leaves
+      // the whole body floating. Measurements of this exact GLB put the real
+      // sole plane 42.5% above the scan's minimum Y. Sink the attached lower
+      // weapon remnant and align the man's soles with the enemy origin.
+      const banditSoleY = box.min.y + box.getSize(new t.Vector3()).y * 0.425;
+      model.position.y -= banditSoleY;
       enemy.add(model);
-      fallbackChildren.forEach((child) => {
-        child.visible = false;
-      });
+      if (fallback?.parent === enemy) {
+        enemy.remove(fallback);
+        fallback.clear();
+      }
+      enemy.userData.banditFallback = null;
       enemy.userData.importedModel = model;
       enemy.userData.importedModelBaseY = model.position.y;
       enemy.userData.importedModelPhase = Math.random() * Math.PI * 2;
     })
     .catch(() => {
       enemy.userData.banditModelAttachStarted = false;
-      fallbackChildren.forEach((child) => {
-        child.visible = true;
-      });
+      if (fallback && fallback.parent !== enemy) enemy.add(fallback);
+      if (fallback) fallback.visible = true;
     });
 }
 function applyImportedPredatorModel(enemy, type) {
@@ -4161,6 +4374,7 @@ function applyImportedPredatorModel(enemy, type) {
 function Pe(o = "lion") {
   const n = new t.Group(),
     lionFallback = new t.Group(),
+    banditFallback = new t.Group(),
     s = {
       lion: {
         hp: 105,
@@ -4204,14 +4418,17 @@ function Pe(o = "lion") {
       },
     },
     a = s[o] || s.lion;
-  if ("bandit" === o)
-    ze(n, 9, 14, 52, [0, 40, 0], a.body, 7),
-      ze(n, 9, 9, 16, [0, 76, 0], a.head, 8),
-      ve(n, [8, 48, 8], [-18, 38, 0], a.body),
-      ve(n, [8, 48, 8], [18, 38, 0], a.body),
-      ve(n, [7, 46, 7], [-8, 4, 0], 5060908),
-      ve(n, [7, 46, 7], [8, 4, 0], 5060908),
-      (ve(n, [8, 54, 8], [27, 38, 0], 5978916).rotation.z = -0.35);
+  if ("bandit" === o) {
+    n.add(banditFallback);
+    n.userData.banditFallback = banditFallback;
+    ze(banditFallback, 9, 14, 52, [0, 40, 0], a.body, 7),
+      ze(banditFallback, 9, 9, 16, [0, 76, 0], a.head, 8),
+      ve(banditFallback, [8, 48, 8], [-18, 38, 0], a.body),
+      ve(banditFallback, [8, 48, 8], [18, 38, 0], a.body),
+      ve(banditFallback, [7, 46, 7], [-8, 4, 0], 5060908),
+      ve(banditFallback, [7, 46, 7], [8, 4, 0], 5060908),
+      (ve(banditFallback, [8, 54, 8], [27, 38, 0], 5978916).rotation.z = -0.35);
+  }
   else if ("lion" === o) {
     n.add(lionFallback);
     (ve(lionFallback, [72, 33, 31], [0, 27, 0], a.body).scale.x = 1.22),
@@ -4286,6 +4503,7 @@ function Pe(o = "lion") {
       state: "hunt",
       type: o,
       label: a.label,
+      banditFallback: "bandit" === o ? banditFallback : null,
     }),
     n.scale.setScalar(a.scale),
     i.add(n),
@@ -4334,6 +4552,7 @@ function Te() {
     nightWatch.camp.set(0, 0, 0),
     (nightWatch.startedAt = 0),
     (nightWatch.lastPhase = ""),
+    (nightWatch.sheepLocked = !1),
     (routeChoice.id = ""),
     (routeChoice.name = ""),
     (routeChoice.spawnMultiplier = 1),
@@ -4470,6 +4689,23 @@ function Re() {
     t.classList.toggle("staff", "staff" === L),
     t.setAttribute("aria-label", "sling" === L ? "회전식 돌팔매" : "지팡이"));
 }
+function triggerCombatFeedback(kind) {
+  const now = performance.now();
+  if (kind === "damage" && now - combatFeedback.lastDamagePulseAt < 420) return;
+  const duration = kind === "damage" ? 240 : 145;
+  combatFeedback.shakeUntil = now + duration;
+  combatFeedback.shakeDuration = duration;
+  combatFeedback.shakeStrength = kind === "damage" ? 4.2 : 2.15;
+  if (kind === "damage") {
+    combatFeedback.lastDamagePulseAt = now;
+    const overlay = e("#damageEdge");
+    if (overlay) {
+      overlay.classList.remove("pulse");
+      overlay.offsetWidth;
+      overlay.classList.add("pulse");
+    }
+  }
+}
 function Ve(t) {
   kt("mission"),
     Ut(440, 0.2, 0.085, "sine", 180),
@@ -4570,6 +4806,11 @@ function updateJerusalemSheepHold() {
   const player = mt.player;
   if (!player) return;
   const insideJerusalem = Yt(player.position.x, player.position.z, -55);
+  // The night camp lock takes priority over Jerusalem's usual gate hold.
+  if (nightWatch.active) {
+    playerWasInsideJerusalem = insideJerusalem;
+    return;
+  }
   if (insideJerusalem && !playerWasInsideJerusalem) {
     citySheepWaitingForPickup = !0;
     mt.sheep.forEach((sheep) => {
@@ -4601,6 +4842,14 @@ function updateJerusalemSheepHold() {
 
   mt.sheep.forEach((sheep, index) => {
     if (citySheepWaitingForPickup) parkSheepAtJerusalemHold(sheep, index);
+  });
+}
+function moveNightFlockToSouthGate() {
+  citySheepWaitingForPickup = !0;
+  mt.sheep.forEach((sheep, index) => {
+    sheep.userData.nightCampPosition = null;
+    sheep.userData.jerusalemHoldSlot = null;
+    parkSheepAtJerusalemHold(sheep, index);
   });
 }
 function damageSheep(sheep, attacker) {
@@ -4901,14 +5150,12 @@ document.addEventListener(
   }),
   document.addEventListener("pointerlockchange", () => {
     const t = document.pointerLockElement === c?.domElement;
-    e("#reconnectHint")?.classList.toggle("show", S && !b && !t),
-      e("#settingsPanel").classList.contains("hidden") &&
-        S &&
-        !b &&
-        !t &&
-        e("#cheatConsole").classList.contains("hidden") &&
-        e("#gameOver").classList.contains("hidden") &&
-        Ie();
+    e("#reconnectHint")?.classList.toggle("show", S && !b && !t);
+    // Losing pointer lock must never pause or stop the simulation. Browsers can
+    // release pointer lock when a notification/overlay is updated, which used
+    // to call Ie() and freeze David and the camera exactly as the night-watch
+    // mission began. WASD now keeps working; clicking the game restores mouse
+    // look. Explicit Escape still opens the real pause menu.
   }),
   window.addEventListener("focus", () => {
     S && !b && c?.domElement.requestPointerLock?.().catch?.(() => {});
@@ -4947,10 +5194,14 @@ document.addEventListener(
                 ((t.userData.hp -= 38),
                 t.position.addScaledVector(a, 48),
                 (s = !0),
+                triggerCombatFeedback("hit"),
                 t.userData.hp <= 0 && Ue(t));
             }
+            const hitEnemy = s;
             o.userData.urgedSheep = !1;
-            for (const e of mt.sheep) {
+            // The staff has two deliberately separate contexts: close defence
+            // when an enemy is in reach, otherwise quiet flock guidance.
+            for (const e of hitEnemy ? [] : mt.sheep) {
               const n = e.position.clone().sub(o.position);
               n.y = 0;
               const i = n.length();
@@ -5346,6 +5597,7 @@ function updateAdaptiveRendering(now) {
   performanceState.nextAdaptiveQualityAt = now + 900;
   const player = mt.player.position;
   const onOliveMount = player.x > 1050 && player.x < 3300;
+  performanceState.onOliveMount = onOliveMount;
   const targetRatio = Math.min(devicePixelRatio, onOliveMount ? 0.85 : 1.05);
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
@@ -5357,6 +5609,28 @@ function updateAdaptiveRendering(now) {
     mt.oliveGrove.children.forEach((batch) => {
       if (!batch.boundingSphere) batch.computeBoundingSphere?.();
       batch.frustumCulled = true;
+      const sphere = batch.boundingSphere;
+      if (sphere) {
+        const dx = player.x - sphere.center.x;
+        const dz = player.z - sphere.center.z;
+        batch.visible =
+          !onOliveMount ||
+          dx * dx + dz * dz <
+            Math.pow(1850 + Math.min(650, sphere.radius || 0), 2);
+      }
+    });
+  }
+  if (mt.datePalmGrove) {
+    mt.datePalmGrove.children.forEach((batch) => {
+      batch.frustumCulled = true;
+      if (!batch.boundingSphere) batch.computeBoundingSphere?.();
+      const sphere = batch.boundingSphere;
+      if (!sphere) return;
+      const dx = player.x - sphere.center.x;
+      const dz = player.z - sphere.center.z;
+      batch.visible =
+        dx * dx + dz * dz <
+        Math.pow(1750 + Math.min(500, sphere.radius || 0), 2);
     });
   }
 }
@@ -5439,8 +5713,29 @@ function _e(o, n) {
         M = Math.max(0, 1 - Math.abs(s - 0.7) / 0.12),
         v = Math.max(f, M),
         z = t.MathUtils.clamp((0.34 - l) / 0.34, 0, 1);
-      for (const t of mt.cityTorches || []) {
-        if (!t?.userData) continue;
+      const torchUpdateDue = n * 1000 >= lightingPerformance.nextTorchUpdateAt;
+      if (torchUpdateDue) {
+        lightingPerformance.nextTorchUpdateAt = n * 1000 + 80;
+        const playerPosition = mt.player?.position;
+        const torchCandidates = [];
+        for (const torch of mt.cityTorches || []) {
+          if (!torch?.userData) continue;
+          torch.getWorldPosition(wt);
+          const distanceSq = playerPosition
+            ? (wt.x - playerPosition.x) ** 2 + (wt.z - playerPosition.z) ** 2
+            : Infinity;
+          torch.userData.distanceSq = distanceSq;
+          if (distanceSq <= lightingPerformance.torchLightDistance ** 2)
+            torchCandidates.push(torch);
+        }
+        torchCandidates.sort(
+          (left, right) => left.userData.distanceSq - right.userData.distanceSq,
+        );
+        const localLights = new Set(
+          torchCandidates.slice(0, lightingPerformance.maxLocalPointLights),
+        );
+        for (const t of mt.cityTorches || []) {
+          if (!t?.userData) continue;
         const e =
             0.84 +
             0.16 * Math.sin(13 * n + t.userData.phase) +
@@ -5452,11 +5747,17 @@ function _e(o, n) {
                 ? Math.max(0.9, z)
                 : 0
             : z;
+        const showVisual =
+          t.userData.campTorch ||
+          t.userData.distanceSq <= lightingPerformance.torchVisualDistance ** 2;
+        const useRealLight = o > 0.025 && localLights.has(t);
+        t.userData.glow.visible = useRealLight;
         (t.userData.glow.intensity =
-          o * (t.userData.campTorch ? 5.2 : 4.4) * e),
+          useRealLight ? o * (t.userData.campTorch ? 4.5 : 3.8) * e : 0),
           (t.userData.flame.material.opacity = o * (0.78 + 0.18 * e)),
           (t.userData.flame.scale.y = 0.88 + 0.18 * e),
-          (t.visible = o > 0.025);
+          (t.visible = o > 0.025 && showVisual);
+        }
       }
       if (mt.staffNightLight?.userData) {
         const t = mt.staffNightLight,
@@ -5469,6 +5770,19 @@ function _e(o, n) {
           (t.userData.flame.material.opacity = o * (0.84 + 0.12 * e)),
           (t.userData.flame.scale.y = 0.92 + 0.18 * e),
           (t.visible = o > 0.02);
+      }
+      if (mt.templeNightLight) {
+        const playerPosition = mt.player?.position;
+        const nearTemple =
+          !!playerPosition &&
+          Math.hypot(playerPosition.x + 100, playerPosition.z + 2050) < 1180;
+        const templeDarkness =
+          ["저녁", "밤", "새벽"].includes(a.name) ? z : 0;
+        mt.templeNightLight.visible =
+          nearTemple && templeDarkness > 0.025;
+        mt.templeNightLight.intensity = mt.templeNightLight.visible
+          ? 2.75 * templeDarkness
+          : 0;
       }
       const D = Ye(1516347, 9547706, l).lerp(new t.Color(12026997), 0.32 * v),
         S = Ye(3687517, 14207406, l).lerp(new t.Color(14787709), 0.42 * v),
@@ -5492,6 +5806,24 @@ function _e(o, n) {
           h.color.copy(
             Ye(10200776, 16769187, l).lerp(new t.Color(16756088), 0.5 * v),
           );
+        const needsSunShadow = l > 0.16;
+        if (lightingPerformance.sunShadowEnabled !== needsSunShadow) {
+          lightingPerformance.sunShadowEnabled = needsSunShadow;
+          h.castShadow = needsSunShadow;
+          h.shadow.needsUpdate = needsSunShadow;
+        }
+      }
+      if (mt.stars?.material?.uniforms) {
+        let starAmount = 0;
+        if (s >= 0.64 && s < 0.78)
+          starAmount = t.MathUtils.smoothstep(s, 0.64, 0.78);
+        else if (s >= 0.78) starAmount = 1;
+        else if (s < 0.1)
+          starAmount = 1 - t.MathUtils.smoothstep(s, 0.015, 0.1);
+        mt.stars.material.uniforms.revealLimit.value = starAmount;
+        mt.stars.material.uniforms.starOpacity.value =
+          t.MathUtils.smoothstep(starAmount, 0.015, 0.24);
+        mt.stars.visible = starAmount > 0.006;
       }
       if (
         (d &&
@@ -5767,6 +6099,16 @@ function _e(o, n) {
       const b = z.clone().addScaledVector(y, 520);
       if (
         (r.lookAt(b),
+        (() => {
+          const remaining = combatFeedback.shakeUntil - performance.now();
+          if (remaining <= 0 || combatFeedback.shakeDuration <= 0) return;
+          const fade = remaining / combatFeedback.shakeDuration;
+          const strength = combatFeedback.shakeStrength * fade;
+          r.position.x += (Math.random() - 0.5) * strength;
+          r.position.y += (Math.random() - 0.5) * strength * 0.72;
+          r.position.z += (Math.random() - 0.5) * strength;
+          r.lookAt(b);
+        })(),
         r.updateMatrixWorld(),
         (o.visible = !(G || (!G && F[A].firstPerson))),
         mt.aimRig)
@@ -5790,6 +6132,24 @@ function _e(o, n) {
         (mt.sheep.forEach((s, a) => {
           let i = s.userData.target;
           const now = performance.now();
+          if (nightWatch.active) {
+            if (!s.userData.nightCampPosition)
+              s.userData.nightCampPosition = s.position.clone();
+            s.position.x = s.userData.nightCampPosition.x;
+            s.position.z = s.userData.nightCampPosition.z;
+            s.position.y = te(s.position.x, s.position.z) + 1;
+            s.userData.target?.set?.(0, 0, 0);
+            s.userData.recallUntil = 0;
+            s.userData.urgeUntil = 0;
+            s.userData.stuckTime = 0;
+            s.userData.lostSince = 0;
+            if (s.userData.legs)
+              for (const leg of s.userData.legs)
+                leg.rotation.z *= Math.max(0, 1 - 8 * e);
+            return;
+          } else if (s.userData.nightCampPosition) {
+            s.userData.nightCampPosition = null;
+          }
           let nearestPredator = null;
           let nearestPredatorDistance = Infinity;
           if (!s.userData.safeHold) {
@@ -5952,7 +6312,20 @@ function _e(o, n) {
               ? [0, 0.28, -0.28, 0.52, -0.52, 0.82, -0.82, 1.2, -1.2]
               : [0, 0.48, -0.48, 0.9, -0.9, 1.45, -1.45];
             const clearance = followsCityRoad ? 24 : 12;
-            for (const turn of turnOrder) {
+            const openMountain =
+              performanceState.onOliveMount && !followsCityRoad;
+            const shouldRefreshSteering =
+              !openMountain ||
+              now >= (s.userData.nextOpenGroundSteerAt || 0);
+            let selectedTurn = openMountain
+              ? s.userData.cachedOpenGroundTurn || 0
+              : 0;
+            const turnsToCheck = shouldRefreshSteering
+              ? openMountain
+                ? turnOrder.slice(0, 5)
+                : turnOrder
+              : [selectedTurn];
+            for (const turn of turnsToCheck) {
               const angle = desiredAngle + turn;
               const candidateX =
                 s.position.x + Math.cos(angle) * o * e;
@@ -5966,8 +6339,14 @@ function _e(o, n) {
               if (!isSheepBlockedAt(candidate, clearance)) {
                 moveX = candidateX;
                 moveZ = candidateZ;
+                selectedTurn = turn;
                 break;
               }
+            }
+            if (openMountain && shouldRefreshSteering) {
+              s.userData.cachedOpenGroundTurn = selectedTurn;
+              s.userData.nextOpenGroundSteerAt =
+                now + 95 + (a % 4) * 17;
             }
             s.position.x = moveX;
             s.position.z = moveZ;
@@ -6071,11 +6450,18 @@ function _e(o, n) {
           ((t.userData.hp = 0), Ge(t), i.remove(t));
       0 === mt.enemies.length &&
         ((O -= t),
-        !e &&
-          O <= 18 &&
+        O <= 18 &&
           O > 0 &&
           !H &&
-          ((H = !0), je("멀리서 맹수의 기척이 느껴집니다.", 5200)),
+          ((H = !0),
+          kt("danger"),
+          Ut(118, 0.42, 0.055, "sawtooth", -35),
+          je(
+            e
+              ? "성 안에서 강도의 기척이 느껴집니다."
+              : "멀리서 맹수의 기척이 느껴집니다.",
+            5200,
+          )),
         O <= 0 &&
           j <= 0 &&
           ((function () {
@@ -6165,7 +6551,9 @@ function _e(o, n) {
           const moving = r > 42;
           e.userData.importedModel.position.y =
             e.userData.importedModelBaseY +
-            (moving ? Math.abs(Math.sin(e.userData.importedModelPhase)) * 2.2 : Math.sin(e.userData.importedModelPhase) * 0.45);
+            // Keep both soles planted. A side-to-side lean communicates motion
+            // without lifting the entire static scan off the terrain.
+            (moving ? 0 : Math.sin(e.userData.importedModelPhase) * 0.12);
           e.userData.importedModel.rotation.z = moving
             ? Math.sin(e.userData.importedModelPhase) * 0.025
             : 0;
@@ -6175,7 +6563,10 @@ function _e(o, n) {
           e.position.z += (a / r) * e.userData.speed * t;
           e.rotation.y = Math.atan2(s, a);
         } else if (o === mt.player) {
-          if (!ut.invincible) ut.hp -= 8.5 * t;
+          if (!ut.invincible) {
+            ut.hp -= 8.5 * t;
+            triggerCombatFeedback("damage");
+          }
         } else if (isAnimal && now >= (e.userData.nextSheepAttackAt || 0)) {
           damageSheep(o, e);
           e.userData.nextSheepAttackAt = now + 2000;
@@ -6227,6 +6618,7 @@ function _e(o, n) {
                 (o.userData.life = 0),
                 (ut.skill = Math.min(50, ut.skill + 1)),
                 Ae(o.position, "enemy"),
+                triggerCombatFeedback("hit"),
                 eo(t.userData.label + " 명중!"),
                 (n = !0),
                 t.userData.hp <= 0 && Ue(t);
@@ -6430,9 +6822,11 @@ function _e(o, n) {
         Z.copy(nightWatch.camp);
         if (phase !== "밤" && nightWatch.lastPhase === "밤") {
           nightWatch.active = !1;
+          nightWatch.sheepLocked = !1;
+          moveNightFlockToSouthGate();
           nightWatch.lastPhase = phase;
           ut.missionDone = !0;
-          eo("새벽이 되었습니다. 밤새 양 떼를 지켜냈습니다.");
+          eo("새벽이 되었습니다. 양 떼가 예루샬라임 남문 대기장에 모였습니다.");
           Ke();
         } else {
           nightWatch.lastPhase = phase;
@@ -6450,19 +6844,29 @@ function _e(o, n) {
         }
         return;
       }
-      let e = 0;
-      for (const t of mt.sheep)
-        Math.hypot(t.position.x - Z.x, t.position.z - Z.z) < 365 && e++;
+      let sheepAtCampCount = 0;
+      for (const sheep of mt.sheep)
+        Math.hypot(sheep.position.x - Z.x, sheep.position.z - Z.z) < 365 &&
+          sheepAtCampCount++;
       const o = Math.max(1, mt.sheep.length);
-      e < o && e >= Math.max(1, o - 3)
+      sheepAtCampCount < o && sheepAtCampCount >= Math.max(1, o - 3)
         ? ((et += 1 / 60), et > 2.2 && (Ne(), (et = 0)))
         : (et = 0),
-        e >= o &&
+        sheepAtCampCount >= o &&
           ("밤" === phase
             ? ((nightWatch.active = !0),
               nightWatch.camp.copy(Z),
               (nightWatch.startedAt = performance.now()),
               (nightWatch.lastPhase = "밤"),
+              (nightWatch.sheepLocked = !0),
+              mt.sheep.forEach((sheep) => {
+                sheep.userData.nightCampPosition = sheep.position.clone();
+                sheep.userData.target?.set?.(0, 0, 0);
+                sheep.userData.recallUntil = 0;
+                sheep.userData.urgeUntil = 0;
+              }),
+              // Starting the watch changes only flock state. David, camera,
+              // pointer lock and pause state are deliberately untouched.
               (O = Math.min(O, Oe(!0))),
               ne(7e3),
               eo("야영지에 도착했습니다. 이곳에서 밤이 끝날 때까지 양 떼를 지키십시오."))

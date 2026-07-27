@@ -26,6 +26,20 @@
 #missionResult span{display:block;margin-top:10px;font-size:clamp(21px,2.3vw,34px);font-weight:900;color:#fff}
 #reconnectHint{position:absolute;left:50%;top:32px;transform:translateX(-50%);font-size:11px;color:#eadfc9;text-shadow:0 1px 3px #000;opacity:0;transition:opacity .2s;white-space:nowrap}
 #reconnectHint.show{opacity:1}
+#damageEdge{
+  position:absolute;inset:0;z-index:8;pointer-events:none;opacity:0;
+  background:
+    radial-gradient(ellipse at center,transparent 48%,rgba(130,0,0,.12) 68%,rgba(188,18,8,.62) 100%),
+    linear-gradient(103deg,rgba(160,0,0,.5),transparent 18% 77%,rgba(95,0,0,.48));
+  box-shadow:inset 18px -8px 42px rgba(181,10,4,.46),inset -13px 15px 36px rgba(104,0,0,.5);
+}
+#damageEdge.pulse{animation:damageEdgePulse .32s ease-out}
+@keyframes damageEdgePulse{
+  0%{opacity:0;transform:scale(1.012)}
+  18%{opacity:.92;transform:scale(1)}
+  52%{opacity:.48}
+  100%{opacity:0}
+}
 .console div{display:none!important}
 
 /* v0.5.1 weapon pictogram and wandering shepherd polish */
