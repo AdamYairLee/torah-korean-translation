@@ -755,3 +755,30 @@ button:hover {
 .shepherd-game-btn:hover{background:linear-gradient(#ead9b3,#b99b6a)!important;color:#1f1a13!important}
 
 .home-content{max-width:900px;margin:0 auto;text-align:left;line-height:1.9}.home-content h2{text-align:center}.home-directory{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}.home-directory a{display:inline-block;padding:10px 16px;border:1px solid #d8cdbb;border-radius:999px;text-decoration:none;color:inherit;background:#fffaf3}.dark-mode .home-directory a{background:#2a2a2a;border-color:#555}
+
+/* 2026-07-28: 메인 화면 상단 메뉴 버튼 크기 통일
+   하위 메뉴, 본문 버튼, 검색 버튼 및 다른 프로젝트에는 적용하지 않습니다. */
+.main-nav > .menu-item > button {
+    width: 164px !important;
+    min-width: 164px !important;
+    max-width: 164px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    font-size: 13px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .main-nav > .menu-item {
+        width: 100% !important;
+        align-items: center;
+    }
+
+    .main-nav > .menu-item > button {
+        width: min(100%, 280px) !important;
+        min-width: 0 !important;
+        max-width: 280px !important;
+    }
+}
+

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f5eddc">
+    <title>유대교 이모저모 | Jewish Korean</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=20260728-misc1">
+    <link rel="stylesheet" href="jewish-misc.css?v=20260728-misc1">
+</head>
+<body>
+    <header class="misc-simple-header">
+        <button type="button" class="misc-nav-btn" id="backButton">← 뒤로 가기</button>
+        <a class="misc-nav-btn" href="index.html">메인으로</a>
+    </header>
+
+    <main class="misc-page">
+        <section class="misc-shell">
+            <header class="misc-header">
+                <button type="button" id="titleHomeButton" class="misc-title-button" aria-label="글 목록으로 돌아가기">
+                    <h1 id="pageTitle">유대교 이모저모</h1>
+                </button>
+                <p id="pageDescription"></p>
+            </header>
+
+            <section id="listView" aria-live="polite">
+                <div class="misc-section-heading">
+                    <h2>글 목차</h2>
+                    <span>최근 글 5개</span>
+                </div>
+                <div id="postList" class="misc-list"></div>
+            </section>
+
+            <article id="postView" class="misc-article" hidden>
+                <div class="misc-article-actions">
+                    <button type="button" class="misc-nav-btn" id="listButton">← 글 목록</button>
+                    <a class="misc-nav-btn" href="index.html">메인으로</a>
+                </div>
+                <h2 id="postTitle"></h2>
+                <div id="postBody" class="misc-article-body"></div>
+            </article>
+
+            <div id="errorBox" class="misc-error" hidden>
+                글을 불러오지 못했습니다. <code>data/jewish-misc/posts.json</code> 파일을 확인하세요.
+            </div>
+        </section>
+    </main>
+
+    <script src="jewish-misc.js?v=20260728-misc1"></script>
+</body>
+</html>

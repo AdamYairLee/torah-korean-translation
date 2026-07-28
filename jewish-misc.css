@@ -1,0 +1,200 @@
+.misc-simple-header {
+    width: min(920px, calc(100% - 28px));
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px auto 0;
+}
+
+.misc-page {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 18px 14px 64px;
+}
+
+.misc-shell {
+    width: min(840px, 100%);
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: clamp(20px, 4vw, 38px);
+    border-radius: 24px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: var(--glass-bg, rgba(255,255,255,.72));
+    border: 1px solid var(--glass-border, rgba(123,94,50,.20));
+    box-shadow: var(--shadow-soft, 0 14px 35px rgba(69,46,15,.12));
+}
+
+.misc-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 112px;
+    height: 40px;
+    padding: 10px 16px;
+    border: 1px solid rgba(123,94,50,.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,.58);
+    color: #30261d;
+    text-decoration: none;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgba(69,46,15,.08);
+    transition: transform .2s ease, background .2s ease, color .2s ease;
+}
+
+.misc-nav-btn:hover,
+.misc-nav-btn:focus-visible {
+    transform: translateY(-2px);
+    background: rgba(63,45,21,.88);
+    color: #fff;
+}
+
+.misc-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.misc-title-button {
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: inherit !important;
+}
+
+.misc-title-button:hover {
+    transform: none !important;
+    background: transparent !important;
+    color: inherit !important;
+}
+
+.misc-header h1 {
+    margin: 0;
+    font-size: clamp(34px, 6vw, 52px);
+}
+
+.misc-header p {
+    max-width: 680px;
+    margin: 14px auto 0;
+    color: rgba(47,38,27,.72);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.misc-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 12px;
+    margin: 0 4px 18px;
+}
+
+.misc-section-heading h2 {
+    margin: 0;
+    font-size: 27px;
+}
+
+.misc-section-heading span {
+    color: rgba(47,38,27,.62);
+    font-size: 14px;
+}
+
+.misc-list {
+    display: grid;
+    gap: 14px;
+}
+
+.misc-post-card {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 68px;
+    padding: 18px 22px !important;
+    text-align: left;
+    white-space: normal !important;
+    border-radius: 18px !important;
+    background: rgba(255,255,255,.58) !important;
+}
+
+.misc-post-card h3 {
+    margin: 0;
+    font-size: clamp(19px, 2.6vw, 24px);
+    line-height: 1.5;
+}
+
+.misc-article {
+    padding: clamp(18px, 4vw, 38px);
+    border: 1px solid rgba(123,94,50,.18);
+    border-radius: 22px;
+    background: rgba(255,255,255,.50);
+}
+
+.misc-article-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.misc-article h2 {
+    margin: 0 0 28px;
+    text-align: center;
+    font-size: clamp(29px, 5vw, 44px);
+    line-height: 1.4;
+}
+
+.misc-article-body {
+    font-size: clamp(17px, 2.2vw, 20px);
+    line-height: 2;
+    color: #30261d;
+    word-break: keep-all;
+}
+
+.misc-error {
+    padding: 16px;
+    border: 1px solid rgba(170,50,50,.25);
+    border-radius: 16px;
+    background: rgba(255,235,235,.88);
+    color: #7b2626;
+    text-align: center;
+}
+
+.dark-mode .misc-shell,
+.dark-mode .misc-article,
+.dark-mode .misc-post-card {
+    background: rgba(40,36,31,.86) !important;
+}
+
+.dark-mode .misc-header p,
+.dark-mode .misc-section-heading span,
+.dark-mode .misc-article-body {
+    color: #eee7d8 !important;
+}
+
+@media (max-width: 600px) {
+    .misc-simple-header {
+        margin-top: 12px;
+    }
+
+    .misc-page {
+        padding: 12px 10px 44px;
+    }
+
+    .misc-shell {
+        padding: 18px 12px 26px;
+        border-radius: 20px;
+    }
+
+    .misc-post-card {
+        padding: 17px 16px !important;
+    }
+
+    .misc-nav-btn {
+        min-width: 106px;
+    }
+}
