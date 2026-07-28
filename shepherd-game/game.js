@@ -2761,6 +2761,31 @@ function isSheepBlockedAt(point, clearance = 24) {
     return !0;
   return !1;
 }
+function isNearJerusalemWall(point) {
+  if (!point) return false;
+  const wallBand = Ht(Ft[0], point.x, point.z, 0);
+  return wallBand > 0.68 && wallBand < 1.48;
+}
+function findSheepWallEscape(point, clearance = 38) {
+  const city = Ft[0];
+  let outwardX = point.x - city.x;
+  let outwardZ = point.z - city.z;
+  let length = Math.hypot(outwardX, outwardZ);
+  if (length < 0.001) {
+    outwardX = 0;
+    outwardZ = 1;
+    length = 1;
+  }
+  outwardX /= length;
+  outwardZ /= length;
+  for (let distance = 24; distance <= 1200; distance += 24) {
+    const x = point.x + outwardX * distance;
+    const z = point.z + outwardZ * distance;
+    const candidate = { x, y: te(x, z) + 5, z };
+    if (!isSheepBlockedAt(candidate, clearance)) return candidate;
+  }
+  return null;
+}
 function _t(e, o) {
   const n = [[e, o]];
   for (let t = 1; t <= 24; t++) {
@@ -3080,6 +3105,9 @@ function ce() {
         420,
       )),
       updateCampStoneGrounding());
+  mt.sheep.forEach((sheep) => {
+    sheep.userData.campArrivalCycle = -1;
+  });
 }
 
 function updateCampStoneGrounding() {
@@ -7077,6 +7105,22 @@ function _e(o, n) {
             n.position.x - s.position.x,
             n.position.z - s.position.z,
           );
+          // Repair sheep already embedded in the wall (including positions
+          // loaded from an older save) before any steering or flock separation.
+          if (
+            !s.userData.safeHold &&
+            isNearJerusalemWall(s.position) &&
+            Yt(s.position.x, s.position.z, 90)
+          ) {
+            const escape = findSheepWallEscape(s.position, 38);
+            if (escape) {
+              s.position.set(escape.x, te(escape.x, escape.z) + 1, escape.z);
+              s.userData.lastPos.copy(s.position);
+              s.userData.cityPath = null;
+              s.userData.stuckTime = 0;
+              s.userData.rescueAttempts = 0;
+            }
+          }
           // Resolve flock overlap once per pair. Sheep keep their own physical
           // footprint instead of oscillating into the same point while idle or
           // gathering around David.
@@ -7098,10 +7142,35 @@ function _e(o, n) {
               Math.min(7, (minimumSpacing - separationDistance) * 0.5);
             const normalX = separationX / separationDistance;
             const normalZ = separationZ / separationDistance;
-            s.position.x -= normalX * correction;
-            s.position.z -= normalZ * correction;
-            other.position.x += normalX * correction;
-            other.position.z += normalZ * correction;
+            const sCandidate = Mt.set(
+              s.position.x - normalX * correction,
+              te(
+                s.position.x - normalX * correction,
+                s.position.z - normalZ * correction,
+              ) + 5,
+              s.position.z - normalZ * correction,
+            );
+            if (!isSheepBlockedAt(sCandidate, isNearJerusalemWall(s) ? 34 : 18)) {
+              s.position.x = sCandidate.x;
+              s.position.z = sCandidate.z;
+            }
+            const otherCandidate = wt.set(
+              other.position.x + normalX * correction,
+              te(
+                other.position.x + normalX * correction,
+                other.position.z + normalZ * correction,
+              ) + 5,
+              other.position.z + normalZ * correction,
+            );
+            if (
+              !isSheepBlockedAt(
+                otherCandidate,
+                isNearJerusalemWall(other) ? 34 : 18,
+              )
+            ) {
+              other.position.x = otherCandidate.x;
+              other.position.z = otherCandidate.z;
+            }
           }
           if (nearestPredator && nearestPredatorDistance < 430) {
             const proximity = 1 - nearestPredatorDistance / 430;
@@ -7246,7 +7315,11 @@ function _e(o, n) {
             const turnOrder = followsCityRoad
               ? [0, 0.28, -0.28, 0.52, -0.52, 0.82, -0.82, 1.2, -1.2]
               : [0, 0.48, -0.48, 0.9, -0.9, 1.45, -1.45];
-            const clearance = followsCityRoad ? 24 : 12;
+            const clearance = isNearJerusalemWall(s)
+              ? 38
+              : followsCityRoad
+                ? 28
+                : 16;
             const openMountain =
               performanceState.onOliveMount && !followsCityRoad;
             const shouldRefreshSteering =
@@ -7262,18 +7335,35 @@ function _e(o, n) {
               : [selectedTurn];
             for (const turn of turnsToCheck) {
               const angle = desiredAngle + turn;
-              const candidateX =
-                s.position.x + Math.cos(angle) * o * e;
-              const candidateZ =
-                s.position.z + Math.sin(angle) * o * e;
-              const candidate = Mt.set(
-                candidateX,
-                te(candidateX, candidateZ) + 5,
-                candidateZ,
+              const fullStepX = Math.cos(angle) * o * e;
+              const fullStepZ = Math.sin(angle) * o * e;
+              const sweepSteps = Math.max(
+                1,
+                Math.min(8, Math.ceil(Math.hypot(fullStepX, fullStepZ) / 4)),
               );
-              if (!isSheepBlockedAt(candidate, clearance)) {
-                moveX = candidateX;
-                moveZ = candidateZ;
+              let sweptX = s.position.x;
+              let sweptZ = s.position.z;
+              let sweptClear = true;
+              for (let sweep = 1; sweep <= sweepSteps; sweep++) {
+                const candidateX =
+                  s.position.x + (fullStepX * sweep) / sweepSteps;
+                const candidateZ =
+                  s.position.z + (fullStepZ * sweep) / sweepSteps;
+                const candidate = Mt.set(
+                  candidateX,
+                  te(candidateX, candidateZ) + 5,
+                  candidateZ,
+                );
+                if (isSheepBlockedAt(candidate, clearance)) {
+                  sweptClear = false;
+                  break;
+                }
+                sweptX = candidateX;
+                sweptZ = candidateZ;
+              }
+              if (sweptClear) {
+                moveX = sweptX;
+                moveZ = sweptZ;
                 selectedTurn = turn;
                 break;
               }
@@ -7800,9 +7890,28 @@ function _e(o, n) {
         return;
       }
       let sheepAtCampCount = 0;
-      for (const sheep of mt.sheep)
-        Math.hypot(sheep.position.x - Z.x, sheep.position.z - Z.z) < 365 &&
-          sheepAtCampCount++;
+      const campCenter = mt.goalSite?.position || Z;
+      for (let sheepIndex = 0; sheepIndex < mt.sheep.length; sheepIndex++) {
+        const sheep = mt.sheep[sheepIndex];
+        if (
+          !Number.isFinite(sheep.position.x) ||
+          !Number.isFinite(sheep.position.z)
+        ) {
+          const angle =
+            (sheepIndex / Math.max(1, mt.sheep.length)) * Math.PI * 2;
+          const repairX = campCenter.x + Math.sin(angle) * 180;
+          const repairZ = campCenter.z + Math.cos(angle) * 180;
+          sheep.position.set(repairX, te(repairX, repairZ) + 1, repairZ);
+          sheep.userData.lastPos.copy(sheep.position);
+        }
+        const campDistance = Math.hypot(
+          sheep.position.x - campCenter.x,
+          sheep.position.z - campCenter.z,
+        );
+        if (campDistance <= 405) sheep.userData.campArrivalCycle = $;
+        else if (campDistance > 540) sheep.userData.campArrivalCycle = -1;
+        if (sheep.userData.campArrivalCycle === $) sheepAtCampCount++;
+      }
       const o = Math.max(1, mt.sheep.length);
       sheepAtCampCount < o && sheepAtCampCount >= Math.max(1, o - 3)
         ? ((et += 1 / 60), et > 2.2 && (Ne(), (et = 0)))
