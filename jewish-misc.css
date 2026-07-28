@@ -198,3 +198,11 @@
         min-width: 106px;
     }
 }
+.parenthetical-note {
+    font-size: 0.86em;
+    color: rgba(70, 70, 70, 0.68);
+    font-weight: 400;
+}
+.dark-mode .parenthetical-note {
+    color: rgba(225, 220, 210, 0.68);
+}

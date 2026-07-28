@@ -28,10 +28,56 @@
         if (updateUrl) history.replaceState(null, '', 'jewish-misc.html');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+function styleParentheses(rootElement) {
+    const walker = document.createTreeWalker(
+        rootElement,
+        NodeFilter.SHOW_TEXT
+    );
+
+    const textNodes = [];
+
+    while (walker.nextNode()) {
+        const node = walker.currentNode;
+        const parentTag = node.parentElement?.tagName;
+
+        // code 같은 특수 영역은 건드리지 않음
+        if (
+            parentTag !== 'SCRIPT' &&
+            parentTag !== 'STYLE' &&
+            parentTag !== 'CODE'
+        ) {
+            textNodes.push(node);
+        }
+    }
+
+    textNodes.forEach((textNode) => {
+        const text = textNode.nodeValue;
+
+        // 괄호가 없는 문장은 그대로 둠
+        if (!text || !/\([^()]+\)/.test(text)) return;
+
+        const fragment = document.createDocumentFragment();
+        const parts = text.split(/(\([^()]+\))/g);
+
+        parts.forEach((part) => {
+            if (/^\([^()]+\)$/.test(part)) {
+                const span = document.createElement('span');
+                span.className = 'parenthetical-note';
+                span.textContent = part;
+                fragment.appendChild(span);
+            } else {
+                fragment.appendChild(document.createTextNode(part));
+            }
+        });
+
+        textNode.replaceWith(fragment);
+    });
+}
 
     function showPost(post, updateUrl = true) {
         postTitle.textContent = post.title || '제목 없음';
         postBody.innerHTML = post.body || '';
+        styleParentheses(postBody);
         listView.hidden = true;
         postView.hidden = false;
         if (updateUrl) {
