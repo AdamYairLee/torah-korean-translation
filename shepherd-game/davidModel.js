@@ -335,7 +335,7 @@ export function createDavidModel({
     bodyRoot,
     new T.CylinderGeometry(4.6, 3.1, 164, 8),
     wood,
-    [-35, -5, -6],
+    [-29, 8, 8],
     null,
     [0, 0, -0.025],
   );

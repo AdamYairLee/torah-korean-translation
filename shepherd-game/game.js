@@ -83,6 +83,9 @@ const performanceState = {
   targetRaycaster: new t.Raycaster(),
   targetCenter: new t.Vector2(0, 0),
   onOliveMount: false,
+  smoothedFrameMs: 16.7,
+  slowFrameFor: 0,
+  campStoneNear: false,
 };
 let D = "",
   S = !1,
@@ -131,6 +134,8 @@ let Z = new t.Vector3(-1150, 0, 1050),
   sheepModelTemplate = null,
   banditModelPromise = null,
   banditModelTemplate = null,
+  guardModelPromise = null,
+  guardModelTemplate = null,
   oliveTreeModelPromise = null,
   oliveTreeModelTemplate = null,
   datePalmModelPromise = null,
@@ -169,9 +174,9 @@ const nightWatch = {
 };
 const lightingPerformance = {
   nextTorchUpdateAt: 0,
-  maxLocalPointLights: 3,
-  torchLightDistance: 760,
-  torchVisualDistance: 2100,
+  maxLocalPointLights: 2,
+  torchLightDistance: 680,
+  torchVisualDistance: 1800,
   sunShadowEnabled: true,
 };
 const combatFeedback = {
@@ -220,6 +225,9 @@ const pt = 33,
     terrain: null,
     goal: null,
     goalSite: null,
+    campStoneFar: null,
+    campStoneNear: null,
+    campStonePlacements: [],
     aimRig: null,
     jordan: null,
     deadSea: null,
@@ -230,6 +238,7 @@ const pt = 33,
     templeNightLight: null,
     stars: null,
     datePalmGrove: null,
+    southGateGuard: null,
   },
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
@@ -748,6 +757,18 @@ function addPreparedTempleAltar(parent, courtY, fallbackAltar, fallbackRamp) {
 }
 
 async function At(e) {
+  const loadingScreen = document.querySelector("#gameLoading");
+  const loadingBar = document.querySelector("#loadingBar");
+  const loadingPercent = document.querySelector("#loadingPercent");
+  loadingScreen?.classList.remove("hidden");
+  if (loadingBar) loadingBar.style.width = "8%";
+  if (loadingPercent) loadingPercent.textContent = "8%";
+  let loadingPulse = 8;
+  const loadingTimer = setInterval(() => {
+    loadingPulse = Math.min(92, loadingPulse + Math.max(1, (94 - loadingPulse) * 0.08));
+    if (loadingBar) loadingBar.style.width = `${loadingPulse}%`;
+    if (loadingPercent) loadingPercent.textContent = `${Math.round(loadingPulse)}%`;
+  }, 180);
   await Promise.all([
     Y
       ? Promise.resolve()
@@ -775,6 +796,7 @@ async function At(e) {
     loadBanditModel().catch(() => null),
     loadOliveTreeModel().catch(() => null),
     loadDatePalmModel().catch(() => null),
+    loadSouthGateGuardModel().catch(() => null),
   ]),
     (async function () {
       if ((Ct(), y))
@@ -785,7 +807,11 @@ async function At(e) {
     Et().then(() => {
       y && Ut(520, 0.12, 0.08, "sine", 160);
     }),
+    clearInterval(loadingTimer),
+    loadingBar && (loadingBar.style.width = "100%"),
+    loadingPercent && (loadingPercent.textContent = "100%"),
     Dt("gameScreen"),
+    setTimeout(() => loadingScreen?.classList.add("hidden"), 220),
     c ||
       (function () {
         (i = new t.Scene()),
@@ -1487,26 +1513,28 @@ async function At(e) {
                     courtZMin: s + i - l,
                     courtZMax: s + i + l,
                     courtSurfaceY: d + 4,
-                    // Authored altar/fire-volume coordinates after the purchased
-                    // model is rotated to face east.
-                    altarX: n + a + 255,
-                    altarZ: s + i - 265,
-                    altarHalfX: 92,
-                    altarHalfZ: 92,
-                    altarTopY: d + 107,
-                    altarRampXMin: n + a + 163,
-                    altarRampXMax: n + a + 347,
-                    altarRampZMin: s + i - 173,
-                    altarRampZMax: s + i - 70,
-                    templeStageXMin: n + a - 20,
-                    templeStageXMax: n + a + 290,
-                    templeStageZMin: s + i - 210,
-                    templeStageZMax: s + i + 150,
-                    templeStageTopY: d + 55,
-                    templeStageRampXMin: n + a + 290,
-                    templeStageRampXMax: n + a + 410,
-                    templeStageRampZMin: s + i - 145,
-                    templeStageRampZMax: s + i + 85,
+                    // Bounds measured from first_temple_game.glb after applying
+                    // the exact runtime rotation and non-uniform scale.
+                    altarX: n + a + 270,
+                    altarZ: s + i - 275,
+                    altarHalfX: 30,
+                    altarHalfZ: 35,
+                    altarTopY: d + 41.65,
+                    altarRampXMin: n + a + 250,
+                    altarRampXMax: n + a + 290,
+                    altarRampZMin: s + i - 240,
+                    altarRampZMax: s + i - 180,
+                    altarRampSteps: 5,
+                    templeStageXMin: n + a - 345,
+                    templeStageXMax: n + a + 90,
+                    templeStageZMin: s + i - 205,
+                    templeStageZMax: s + i + 15,
+                    templeStageTopY: d + 58.43,
+                    templeStageRampXMin: n + a + 90,
+                    templeStageRampXMax: n + a + 155,
+                    templeStageRampZMin: s + i - 105,
+                    templeStageRampZMax: s + i + 5,
+                    templeStageSteps: 10,
                   };
                   if (mt.terrain?.geometry?.attributes?.position) {
                     const e = mt.terrain.geometry.attributes.position;
@@ -1556,60 +1584,10 @@ async function At(e) {
                   u.receiveShadow = !0;
                   u.castShadow = !1;
                   r.add(u);
-                  const m = 170,
-                    f = 40,
-                    w = 196;
-                  // Temple enclosure walls leave broad circulation lanes at the north-west
-                  // and north-east corners. This keeps the Jerusalem north gate connected
-                  // to both sides of the Temple Mount instead of trapping the player.
-                  for (const [e, n, s, a] of [
-                    [0, -520, 1060, f],
-                    [0, l, 1300, f],
-                    // Shortened western wall: leaves a broad north-west alley from
-                    // Jerusalem's north gate into the Temple Mount circulation area.
-                    [-650, 250, f, 360],
-                  ]) {
-                    const i = new t.Mesh(new t.BoxGeometry(s, m, a), o[1]);
-                    i.position.set(e, d + 85, n), (i.castShadow = !0), r.add(i);
-                  }
-                  // Complete eastern enclosure wall, split only at the gate opening.
-                  for (const [wallZ, wallDepth] of [[330, 260], [-330, 260]]) {
-                    const n = new t.Mesh(new t.BoxGeometry(f, m, wallDepth), o[1]);
-                    n.position.set(c, d + 85, wallZ), r.add(n);
-                  }
-                  // Close the two gaps that used to remain between the gate piers
-                  // and the eastern enclosure wall.  Together these pieces leave
-                  // only the actual doorway opening at the centre.
-                  for (const wallZ of [-149, 149]) {
-                    const n = new t.Mesh(new t.BoxGeometry(f, m, 102), o[1]);
-                    n.position.set(c, d + 85, wallZ);
-                    n.castShadow = true;
-                    n.receiveShadow = true;
-                    r.add(n);
-                  }
-                  const M = new t.Mesh(new t.BoxGeometry(60, 72, w), o[2]);
-                  M.position.set(c, d + m + 10, 0), r.add(M);
-                  for (const gateZ of [-76, 76]) {
-                    const pier = new t.Mesh(new t.BoxGeometry(60, m, 44), o[1]);
-                    pier.position.set(c, d + m / 2, gateZ);
-                    pier.castShadow = true;
-                    pier.receiveShadow = true;
-                    r.add(pier);
-                  }
-                  const templeEntryLip = new t.Mesh(
-                    new t.BoxGeometry(30, 4, w - 40),
-                    templeMarble,
-                  );
-                  templeEntryLip.position.set(c - 20, d + 2, 0),
-                    (templeEntryLip.receiveShadow = !0),
-                    r.add(templeEntryLip),
-                    de(r, 1080, d + m, 0, -460, 0, o[2], 34, -20),
-                    de(r, 1080, d + m, 0, l, 0, o[2], 34, 20),
-                    de(r, 920, d + m, -540, 0, Math.PI / 2, o[2], 34, -20);
-                    // The former court-enclosure collision is intentionally gone.
-                    // The purchased model is used without its obsolete perimeter wall,
-                    // leaving the Temple Mount open on every side. Only the sanctuary
-                    // body and altar below register collision.
+                  // The court is intentionally open. Do not rebuild the obsolete
+                  // procedural perimeter, gate lintel, piers or entry lip around the
+                  // purchased columned court: from outside those meshes read as a
+                  // solid closed wall and no longer match the visible architecture.
                   const y = -210,
                     x = new t.Mesh(new t.BoxGeometry(420, 430, 320), o[2]);
                   x.position.set(-315, d + 239, 0),
@@ -1709,29 +1687,29 @@ async function At(e) {
                   // The purchased full-scene temple includes its own altar and
                   // approach. Keep these lightweight meshes only as a fallback
                   // if the new GLB cannot be loaded.
-                  // Height-aware side collision prevents entering the altar body from
-                  // ground level while allowing David to stand and move on its top.
-                  Ot(n + a + b - 92, s + i + altarLocalZ, 12, 184, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 92, s + i + altarLocalZ, 12, 184, 0, "temple", d + 2, T);
-                  Ot(n + a + b, s + i + altarLocalZ - 92, 184, 12, 0, "temple", d + 2, T);
-                  // Close the rear corners as well. The opening is only on the
-                  // southern stair side; no ground-level pocket remains behind
-                  // the altar where the player can become trapped.
-                  Ot(n + a + b - 76, s + i + altarLocalZ - 99, 32, 28, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 76, s + i + altarLocalZ - 99, 32, 28, 0, "temple", d + 2, T);
-                  // Stair flanks are blocked, while the full southern stair face stays open.
-                  Ot(n + a + b - 92, s + i + altarLocalZ + 137, 12, 90, 0, "temple", d + 2, T);
-                  Ot(n + a + b + 92, s + i + altarLocalZ + 137, 12, 90, 0, "temple", d + 2, T);
                   // Replace every hidden procedural visual with the purchased model
                   // before creating live effects. Fire, smoke and the laver are added
                   // afterwards so loading the temple can never hide them again.
                   addPurchasedFirstTemple(r, d, n + a, s + i);
+                  // addPurchasedFirstTemple removes the old visual construction, so
+                  // its old collision proxies must not survive invisibly. Rebuild the
+                  // collision set from the two actual solid bodies only.
+                  for (let colliderIndex = z.length - 1; colliderIndex >= 0; colliderIndex--)
+                    if (z[colliderIndex].type === "temple") z.splice(colliderIndex, 1);
+                  collisionRevision++;
+                  // Sanctuary masonry stops before the measured landing and stair.
+                  Ot(n + a - 125, s + i - 95, 190, 220, 0, "temple", d + 58, d + 620);
+                  // Altar: three thin faces stay exactly on the measured 60 x 80 body.
+                  // The entire stair side remains open, with no enlarged flank boxes.
+                  Ot(dt.altarX - dt.altarHalfX + 3, dt.altarZ, 6, dt.altarHalfZ * 2, 0, "temple", d + 2, dt.altarTopY);
+                  Ot(dt.altarX + dt.altarHalfX - 3, dt.altarZ, 6, dt.altarHalfZ * 2, 0, "temple", d + 2, dt.altarTopY);
+                  Ot(dt.altarX, dt.altarZ - dt.altarHalfZ + 3, dt.altarHalfX * 2, 6, 0, "temple", d + 2, dt.altarTopY);
                   const V = new t.Group();
                   // Flame spread is derived from the current altar footprint, so it
                   // remains centred and proportionate if the court is resized again.
                   const flameSpreadX = dt.altarHalfX * 0.46;
                   const flameSpreadZ = dt.altarHalfZ * 0.28;
-                  const altarFireY = d + 82;
+                  const altarFireY = dt.altarTopY + 10;
                   for (let e = 0; e < 4; e++) {
                     const column = e % 2;
                     const row = Math.floor(e / 2);
@@ -2028,15 +2006,62 @@ async function At(e) {
                   o = ge(11969151),
                   n = ge(8150085);
                 ge(6833192);
+                const campStoneFar = new t.Group();
+                campStoneFar.name = "CampStoneFarLOD";
+                const campStonePlacements = [];
                 for (let n = 0; n < 18; n++) {
                   const s = (n / 18) * Math.PI * 2;
                   if (Math.abs(Math.sin(s)) < 0.2 && Math.cos(s) < 0) continue;
                   const a = new t.Mesh(new t.BoxGeometry(38, 22, 18), o);
-                  a.position.set(155 * Math.sin(s), 11, 120 * Math.cos(s)),
+                  const localX = 155 * Math.sin(s);
+                  const localZ = 120 * Math.cos(s);
+                  a.position.set(localX, 11, localZ),
                     (a.rotation.y = s),
-                    (a.castShadow = !0),
-                    e.add(a);
+                    (a.castShadow = !1),
+                    (a.receiveShadow = !0),
+                    campStoneFar.add(a),
+                    campStonePlacements.push({
+                      x: localX,
+                      z: localZ,
+                      rotation: s,
+                    });
                 }
+                e.add(campStoneFar);
+                const stoneTextureLoader = new t.TextureLoader();
+                const stoneMap = stoneTextureLoader.load(
+                  "./assets/models/camp_stone_basecolor.jpg",
+                );
+                stoneMap.colorSpace = t.SRGBColorSpace;
+                stoneMap.anisotropy = Math.min(
+                  2,
+                  c?.capabilities?.getMaxAnisotropy?.() || 1,
+                );
+                const stoneNormalMap = stoneTextureLoader.load(
+                  "./assets/models/camp_stone_normal.jpg",
+                );
+                stoneNormalMap.anisotropy = 1;
+                const detailedStoneMaterial = new t.MeshStandardMaterial({
+                  color: 0xffffff,
+                  map: stoneMap,
+                  normalMap: stoneNormalMap,
+                  roughness: 0.92,
+                  metalness: 0,
+                });
+                const detailedStoneGeometry = new t.BoxGeometry(38, 22, 18, 2, 2, 2);
+                const campStoneNear = new t.InstancedMesh(
+                  detailedStoneGeometry,
+                  detailedStoneMaterial,
+                  campStonePlacements.length,
+                );
+                campStoneNear.name = "CampStoneDetailedNearLOD";
+                campStoneNear.castShadow = false;
+                campStoneNear.receiveShadow = true;
+                campStoneNear.frustumCulled = true;
+                campStoneNear.visible = false;
+                e.add(campStoneNear);
+                mt.campStoneFar = campStoneFar;
+                mt.campStoneNear = campStoneNear;
+                mt.campStonePlacements = campStonePlacements;
                 const s = new t.Mesh(new t.ConeGeometry(72, 68, 4), n);
                 (s.rotation.y = Math.PI / 4),
                   s.position.set(205, 34, 35),
@@ -2214,7 +2239,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 234,
+  Wt = 236,
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -2896,19 +2921,20 @@ function te(e, o) {
       o >= s.templeStageRampZMin &&
       o <= s.templeStageRampZMax;
     if (onTempleStageRamp) {
-      const rampProgress = t.MathUtils.clamp(
-        (s.templeStageRampXMax - e) /
-          Math.max(s.templeStageRampXMax - s.templeStageRampXMin, 1),
-        0,
-        1,
-      );
-      const easedRamp =
-        rampProgress * rampProgress * (3 - 2 * rampProgress);
-      return t.MathUtils.lerp(
-        courtSurfaceY,
-        s.templeStageTopY,
-        easedRamp,
-      );
+      // Exact tread tops sampled from the transformed GLB. The former equal
+      // interpolation did not match the authored tread widths or riser heights.
+      const localX = e - (s.templeStageRampXMin - 90);
+      if (localX > 151) return courtSurfaceY;
+      if (localX > 143) return s.courtY + 11.32;
+      if (localX > 137) return s.courtY + 16.5;
+      if (localX > 132) return s.courtY + 22;
+      if (localX > 123) return s.courtY + 27.03;
+      if (localX > 117) return s.courtY + 32.52;
+      if (localX > 112) return s.courtY + 37.5;
+      if (localX > 107) return s.courtY + 42.5;
+      if (localX > 98) return s.courtY + 47.97;
+      if (localX > 92) return s.courtY + 53;
+      return s.templeStageTopY;
     }
     if (
       e >= s.templeStageXMin &&
@@ -2926,13 +2952,14 @@ function te(e, o) {
       o >= s.altarRampZMin &&
       o <= s.altarRampZMax;
     if (onAltarRamp) {
-      const rampProgress = t.MathUtils.clamp(
-        (s.altarRampZMax - o) / Math.max(s.altarRampZMax - s.altarRampZMin, 1),
-        0,
-        1,
-      );
-      const easedRamp = rampProgress * rampProgress * (3 - 2 * rampProgress);
-      return t.MathUtils.lerp(courtSurfaceY, s.altarTopY, easedRamp);
+      const localZ = o - (s.altarRampZMax + 180);
+      if (localZ > -185) return courtSurfaceY;
+      if (localZ > -195) return s.courtY + 8.24;
+      if (localZ > -205) return s.courtY + 12.98;
+      if (localZ > -215) return s.courtY + 22.45;
+      if (localZ > -225) return s.courtY + 31.93;
+      if (localZ > -235) return s.courtY + 32.52;
+      return s.altarTopY;
     }
 
     // The altar top itself is a stable walkable surface at one fixed height.
@@ -2971,6 +2998,7 @@ function oe(e, o, n = 1) {
     z: o,
     y: te(e, o),
     scale: 112 * n,
+    heightScale: 174 * n,
     rotation: (0.73 * datePalmPlacements.length) % (Math.PI * 2),
   });
   Nt(e, o, 8.5 * n, "date-palm");
@@ -3046,11 +3074,54 @@ function ce() {
   var t;
   mt.goal && mt.goal.position.set(Z.x, te(Z.x, Z.z) + 3, Z.z),
     mt.goalSite &&
-      (mt.goalSite.position.set(Z.x, te(Z.x, Z.z) + 1, Z.z),
+      (mt.goalSite.position.set(Z.x, te(Z.x, Z.z), Z.z),
       (mt.goalSite.rotation.y = Math.atan2(
         ((t = Z.z), 90 * Math.sin(8e-4 * t) - 120 - Z.x),
         420,
-      )));
+      )),
+      updateCampStoneGrounding());
+}
+
+function updateCampStoneGrounding() {
+  const camp = mt.goalSite;
+  const far = mt.campStoneFar;
+  const near = mt.campStoneNear;
+  const placements = mt.campStonePlacements;
+  if (!camp || !far || !near || !placements?.length) return;
+  const dummy = new t.Object3D();
+  const up = new t.Vector3(0, 1, 0);
+  const normal = new t.Vector3();
+  const yaw = camp.rotation.y;
+  const cosYaw = Math.cos(yaw);
+  const sinYaw = Math.sin(yaw);
+  const worldPoint = (localX, localZ) => ({
+    x: camp.position.x + localX * cosYaw + localZ * sinYaw,
+    z: camp.position.z - localX * sinYaw + localZ * cosYaw,
+  });
+  placements.forEach((placement, index) => {
+    const center = worldPoint(placement.x, placement.z);
+    const plusX = worldPoint(placement.x + 8, placement.z);
+    const minusX = worldPoint(placement.x - 8, placement.z);
+    const plusZ = worldPoint(placement.x, placement.z + 8);
+    const minusZ = worldPoint(placement.x, placement.z - 8);
+    const centerY = te(center.x, center.z);
+    const slopeX = (te(plusX.x, plusX.z) - te(minusX.x, minusX.z)) / 16;
+    const slopeZ = (te(plusZ.x, plusZ.z) - te(minusZ.x, minusZ.z)) / 16;
+    normal.set(-slopeX, 1, -slopeZ).normalize();
+    dummy.position.set(placement.x, centerY - camp.position.y + 11, placement.z);
+    dummy.quaternion.setFromUnitVectors(up, normal);
+    dummy.rotateY(placement.rotation);
+    dummy.scale.set(1, 1, 1);
+    dummy.updateMatrix();
+    near.setMatrixAt(index, dummy.matrix);
+    const lowStone = far.children[index];
+    if (lowStone) {
+      lowStone.position.copy(dummy.position);
+      lowStone.quaternion.copy(dummy.quaternion);
+    }
+  });
+  near.instanceMatrix.needsUpdate = true;
+  near.computeBoundingSphere();
 }
 function le(e, o) {
   if (!Number.isFinite(e) || !Number.isFinite(o)) return !1;
@@ -3273,6 +3344,60 @@ function createSouthernJerusalemUpgrade() {
     }
   }
   southernJerusalemUpgrade.houseCount = houses.length;
+  // Fill the centres of the real blocks, not the shoulders of a road. The
+  // previous x=±142 candidates sat only 23 units from the x=±165 lanes, so the
+  // road-clearance test rejected every candidate and could add zero houses.
+  // These anchors lie between the shared road segments and never replace the
+  // grid houses above; they only add a compact house to a genuinely empty lot.
+  const infillBlockCentres = [];
+  for (const x of [-610, -425, -250, 250, 425, 610])
+    for (const z of [590, 895, 1175, 1460, 1740, 2020])
+      infillBlockCentres.push([x, z]);
+  let infillHouseCount = 0;
+  for (const [baseX, baseZ] of infillBlockCentres) {
+    const width = 54 + random() * 7;
+    const depth = 54 + random() * 7;
+    let chosen = null;
+    // Search a small area inside the same block. This handles an original
+    // imported house occupying the exact centre without crossing a road.
+    for (const [offsetX, offsetZ] of [
+      [0, 0], [-18, 0], [18, 0], [0, -18], [0, 18],
+    ]) {
+      const x = baseX + offsetX;
+      const z = baseZ + offsetZ;
+      if (!Kt(x, z, -72)) continue;
+      const road = closestPointOnCityRoad(x, z);
+      const lotRadius = Math.max(width, depth) * 0.5;
+      if (road && road.distance < road.width * 0.5 + lotRadius + 18) continue;
+      if (
+        houses.some(
+          (house) =>
+            Math.abs(house.x - x) < (house.width + width) * 0.54 &&
+            Math.abs(house.z - z) < (house.depth + depth) * 0.54,
+        )
+      )
+        continue;
+      const ground = visibleGroundAt(x, z);
+      if (
+        !Number.isFinite(ground) ||
+        jt(new t.Vector3(x, ground + 8, z), lotRadius + 5)
+      )
+        continue;
+      chosen = { x, z, ground };
+      break;
+    }
+    if (!chosen) continue;
+    houses.push({
+      ...chosen,
+      width,
+      depth,
+      height: 78 + random() * 34,
+      rotation: Math.round(random()) * Math.PI / 2,
+      material: Math.floor(random() * 3),
+    });
+    infillHouseCount++;
+  }
+  southernJerusalemUpgrade.houseCount = houses.length;
   southernJerusalemUpgrade.houses = houses;
 
   // Keep road coordinates for lot spacing, minimap and sheep navigation only.
@@ -3391,13 +3516,64 @@ function createSouthernJerusalemUpgrade() {
   doors.frustumCulled = false;
   group.add(doors);
 
+  // City torches are created before this residential layer. Revalidate them
+  // after all new house colliders exist, place them on an actual mapped lane,
+  // and keep only well-spaced fixtures. This prevents a later-added house from
+  // swallowing a torch while retaining the distance-based light optimisation.
+  const acceptedTorchPositions = [];
+  for (const torch of mt.cityTorches || []) {
+    if (!torch?.parent || torch.userData?.campTorch) continue;
+    torch.getWorldPosition(wt);
+    const road = closestPointOnCityRoad(wt.x, wt.z);
+    if (!road) {
+      torch.visible = false;
+      torch.userData.disabledByRoadValidation = true;
+      continue;
+    }
+    let placement = null;
+    const [roadStart, roadEnd] = Xt[road.index];
+    for (let step = 0; step <= 16 && !placement; step++) {
+      for (const direction of step ? [-1, 1] : [0]) {
+        const amount = t.MathUtils.clamp(
+          road.amount + direction * step * 0.022,
+          0,
+          1,
+        );
+        const x = t.MathUtils.lerp(roadStart[0], roadEnd[0], amount);
+        const z = t.MathUtils.lerp(roadStart[1], roadEnd[1], amount);
+        const probe = new t.Vector3(x, te(x, z) + 48, z);
+        if (
+          jt(probe, 11) ||
+          acceptedTorchPositions.some(
+            (other) => Math.hypot(other.x - x, other.z - z) < 175,
+          )
+        )
+          continue;
+        placement = { x, z };
+        break;
+      }
+    }
+    if (!placement) {
+      torch.visible = false;
+      torch.userData.disabledByRoadValidation = true;
+      continue;
+    }
+    const local = torch.parent.worldToLocal(
+      new t.Vector3(placement.x, te(placement.x, placement.z), placement.z),
+    );
+    torch.position.copy(local);
+    torch.userData.roadOnly = true;
+    torch.userData.disabledByRoadValidation = false;
+    acceptedTorchPositions.push(placement);
+  }
+
   // The earlier earthen ramps, raised towers and extra wall walk are deliberately
   // removed. The original imported southern wall remains untouched at its native
   // height and silhouette.
   i.add(group);
   mt.southernJerusalemUpgrade = group;
   console.info(
-    `[Jerusalem] visible-surface quarter rendered: ${houses.length} houses; visible stone roads removed`,
+    `[Jerusalem] visible-surface quarter rendered: ${houses.length} houses (${infillHouseCount} verified infill); visible stone roads removed`,
   );
 }
 function me(e, o, n, s, a, i, r) {
@@ -4071,6 +4247,514 @@ function loadBanditModel() {
   });
   return banditModelPromise;
 }
+function loadSouthGateGuardModel() {
+  if (guardModelTemplate) return Promise.resolve(guardModelTemplate);
+  if (guardModelPromise) return guardModelPromise;
+  guardModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/south_gate_guard.glb",
+      (gltf) => {
+        const scene = gltf.scene;
+        scene.traverse((part) => {
+          if (!part.isMesh) return;
+          part.castShadow = false;
+          part.receiveShadow = false;
+          part.frustumCulled = true;
+          const materials = Array.isArray(part.material)
+            ? part.material
+            : [part.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = t.FrontSide;
+            material.depthWrite = true;
+            material.roughness = Math.max(0.68, material.roughness ?? 0.68);
+            if (material.map) {
+              material.map.colorSpace = t.SRGBColorSpace;
+              material.map.anisotropy = Math.min(
+                2,
+                c?.capabilities?.getMaxAnisotropy?.() || 1,
+              );
+            }
+          });
+        });
+        guardModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("남문 경비병 모델을 불러오지 못했습니다.", error);
+        guardModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return guardModelPromise;
+}
+function ensureGuardAlertIndicator() {
+  let marker = document.querySelector("#guardAlertIndicator");
+  if (marker) return marker;
+  marker = document.createElement("div");
+  marker.id = "guardAlertIndicator";
+  marker.textContent = "✡";
+  marker.setAttribute("aria-label", "경비병 경계");
+  (document.querySelector("#weaponHud") || document.body).appendChild(marker);
+  return marker;
+}
+function setGuardAlerted(alerted) {
+  const guard = mt.southGateGuard;
+  if (!guard) return;
+  guard.userData.alerted = !!alerted;
+  ensureGuardAlertIndicator().classList.toggle("show", !!alerted);
+}
+function createSouthGateGuard() {
+  if (!i) return;
+  if (mt.southGateGuard?.parent) return;
+  // Remove every stale guard left by a restarted/continued session before
+  // creating the one authoritative south-gate instance.
+  const staleGuards = [];
+  i.traverse((object) => {
+    if (
+      object !== i &&
+      (object.name === "SingleSouthGateGuard" ||
+        object.name === "SouthGateGuardTripoSingleModel" ||
+        object.userData?.isSouthGateGuard)
+    ) staleGuards.push(object);
+  });
+  staleGuards.forEach((object) => object.parent?.remove(object));
+  const guard = new t.Group();
+  guard.name = "SingleSouthGateGuard";
+  // The old z=2865 point was still inside the south-wall ellipse. Starting a
+  // large NPC there made every first step overlap the wall. Keep the guard
+  // wholly outside, left of the open gate, with a clear approach to its centre.
+  const homeX = -170;
+  const homeZ = 3135;
+  guard.position.set(homeX, te(homeX, homeZ), homeZ);
+  guard.userData = {
+    homeX,
+    homeZ,
+    alerted: false,
+    chaseActivated: false,
+    runPhase: 0,
+    speed: 126,
+    hitRadius: 42,
+    importedModel: null,
+    importedModelBaseY: 0,
+    isSouthGateGuard: true,
+    // The extracted guard asset's authored front follows the same +Z heading
+    // used by NPC movement. The old PI offset made his back face David.
+    facingOffset: 0,
+    chasePose: 0,
+    // Larger than David, but small enough to negotiate the broad city lanes.
+    collisionRadius: 34,
+    bodyHeight: 168,
+    maxStepUp: 13,
+    maxDrop: 16,
+    maxSlope: 0.72,
+    lastSafePosition: new t.Vector3(homeX, te(homeX, homeZ), homeZ),
+    stuckFor: 0,
+    searchFor: 0,
+    searchPhase: 0,
+    searchWaypoint: 0,
+    searchWaypointFor: 0,
+    searchOriginX: homeX,
+    searchOriginZ: homeZ,
+    sightCheckFor: 0,
+    cachedHasSight: false,
+    returningHome: false,
+    returnStuckFor: 0,
+    sightLostFor: 0,
+    lastSeenX: homeX,
+    lastSeenZ: homeZ,
+    caughtCooldownUntil: 0,
+  };
+  i.add(guard);
+  mt.southGateGuard = guard;
+  ensureGuardAlertIndicator().classList.remove("show");
+  loadSouthGateGuardModel()
+    .then((template) => {
+      if (!guard.parent || mt.southGateGuard !== guard) return;
+      guard.clear();
+      const model = template.clone(true);
+      model.name = "SouthGateGuardTripoSingleModel";
+      model.rotation.set(0, 0, 0);
+      model.updateMatrixWorld(true);
+      let box = new t.Box3().setFromObject(model);
+      const size = box.getSize(new t.Vector3());
+      // Slightly smaller than the previous guard while remaining clearly
+      // taller than David.
+      model.scale.setScalar(176 / Math.max(size.y, 0.001));
+      model.updateMatrixWorld(true);
+      box = new t.Box3().setFromObject(model);
+      const center = box.getCenter(new t.Vector3());
+      model.position.x -= center.x;
+      model.position.z -= center.z;
+      model.position.y -= box.min.y;
+      guard.add(model);
+      guard.userData.importedModel = model;
+      guard.userData.importedModelBaseY = model.position.y;
+    })
+    .catch(() => {
+      if (guard.parent) i.remove(guard);
+      if (mt.southGateGuard === guard) mt.southGateGuard = null;
+    });
+}
+function hitSouthGateGuard() {
+  const guard = mt.southGateGuard;
+  if (!guard?.parent) return false;
+  setGuardAlerted(true);
+  guard.userData.returningHome = false;
+  guard.userData.searchFor = 0;
+  guard.userData.searchWaypoint = 0;
+  guard.userData.searchWaypointFor = 0;
+  guard.userData.sightLostFor = 0;
+  guard.userData.lastSeenX = mt.player.position.x;
+  guard.userData.lastSeenZ = mt.player.position.z;
+  if (Yt(mt.player.position.x, mt.player.position.z, -55))
+    guard.userData.chaseActivated = true;
+  eo("남문 경비병이 다비드를 추격합니다.");
+  return true;
+}
+function resetSouthGateGuard(guard, clearAlert = true) {
+  if (!guard) return;
+  if (clearAlert) setGuardAlerted(false);
+  guard.userData.chaseActivated = false;
+  guard.userData.stuckFor = 0;
+  guard.userData.searchFor = 0;
+  guard.userData.searchWaypoint = 0;
+  guard.userData.searchWaypointFor = 0;
+  guard.userData.returningHome = false;
+  guard.userData.returnStuckFor = 0;
+  guard.userData.sightLostFor = 0;
+  guard.position.set(
+    guard.userData.homeX,
+    te(guard.userData.homeX, guard.userData.homeZ),
+    guard.userData.homeZ,
+  );
+  guard.userData.lastSafePosition?.copy(guard.position);
+  // At the outside post the guard always resumes watching away from the city.
+  guard.rotation.y = guard.userData.facingOffset;
+}
+function hasClearNpcSight(npc, target) {
+  const dx = target.position.x - npc.position.x;
+  const dz = target.position.z - npc.position.z;
+  const distance = Math.hypot(dx, dz);
+  const samples = Math.max(2, Math.min(28, Math.ceil(distance / 30)));
+  const bodyY = (npc.userData.bodyHeight ?? 150) * 0.58;
+  for (let sample = 1; sample < samples; sample++) {
+    const ratio = sample / samples;
+    const x = npc.position.x + dx * ratio;
+    const z = npc.position.z + dz * ratio;
+    const ground = te(x, z);
+    if (!Number.isFinite(ground)) return false;
+    // A narrow sight probe is intentionally separate from the guard's broad
+    // body collision, so corners hide David without making sight too fragile.
+    if (jt(new t.Vector3(x, ground + bodyY, z), 5)) return false;
+  }
+  return true;
+}
+function beginGuardReturn(guard) {
+  if (!guard) return;
+  setGuardAlerted(false);
+  guard.userData.chaseActivated = false;
+  guard.userData.searchFor = 0;
+  guard.userData.stuckFor = 0;
+  guard.userData.sightLostFor = 0;
+  guard.userData.returningHome = true;
+  guard.userData.returnStuckFor = 0;
+}
+function showGuardCaught() {
+  const caught = e("#guardCaught");
+  const guard = mt.southGateGuard;
+  if (!caught || !guard || !caught.classList.contains("hidden")) return;
+  // Apply the arrest penalty exactly once, before the overlay blocks another
+  // catch event. Values are clamped so neither resource can become negative.
+  ut.money = Math.max(0, ut.money - 15);
+  ut.respect = Math.max(0, ut.respect - 5);
+  caught.classList.remove("hidden");
+  b = true;
+  document.exitPointerLock?.();
+  guard.userData.caughtCooldownUntil = performance.now() + 3400;
+  setTimeout(() => {
+    caught.classList.add("hidden");
+    resetSouthGateGuard(guard, true);
+    b = false;
+    c?.domElement?.requestPointerLock?.().catch?.(() => {});
+  }, 3000);
+}
+function canNpcMoveBetween(npc, from, to) {
+  const data = npc.userData;
+  const clearance = data.collisionRadius ?? 30;
+  const fromGround = te(from.x, from.z);
+  const toGround = te(to.x, to.z);
+  const rise = toGround - fromGround;
+  const horizontal = Math.max(0.001, Math.hypot(to.x - from.x, to.z - from.z));
+  if (
+    !Number.isFinite(toGround) ||
+    rise > (data.maxStepUp ?? 12) ||
+    rise < -(data.maxDrop ?? 15) ||
+    Math.abs(rise) / horizontal > (data.maxSlope ?? 0.75)
+  )
+    return false;
+  const probe = new t.Vector3(to.x, toGround + (data.bodyHeight ?? 150) * 0.45, to.z);
+  if (!jt(probe, clearance)) return true;
+  // If an NPC spawned or was pushed slightly into a collider, permit only a
+  // movement that strictly reduces penetration. This is essential for guards
+  // returning from a gate threshold instead of becoming permanently wedged.
+  const fromProbe = new t.Vector3(
+    from.x,
+    fromGround + (data.bodyHeight ?? 150) * 0.45,
+    from.z,
+  );
+  return (
+    collisionPenetrationScore(probe, clearance) + 0.001 <
+    collisionPenetrationScore(fromProbe, clearance)
+  );
+}
+function moveNpcWithSweptCollision(npc, angle, distance) {
+  const substeps = Math.max(1, Math.min(12, Math.ceil(distance / 5)));
+  const step = distance / substeps;
+  let moved = false;
+  for (let index = 0; index < substeps; index++) {
+    const from = npc.position.clone();
+    const to = from.clone();
+    to.x += Math.sin(angle) * step;
+    to.z += Math.cos(angle) * step;
+    if (!canNpcMoveBetween(npc, from, to)) break;
+    to.y = te(to.x, to.z);
+    npc.position.copy(to);
+    npc.userData.lastSafePosition?.copy(to);
+    moved = true;
+  }
+  return moved;
+}
+function tryMoveGuard(guard, dx, dz, distance, step) {
+  const desired = Math.atan2(dx, dz);
+  // Try the direct route first, then increasingly broad left/right detours.
+  // This lets the large guard follow alleys without ever passing through walls.
+  const offsets = [0, 0.34, -0.34, 0.68, -0.68, 1.02, -1.02, 1.4, -1.4];
+  for (const offset of offsets) {
+    const angle = desired + offset;
+    if (moveNpcWithSweptCollision(guard, angle, step)) return true;
+  }
+  return false;
+}
+function updateSouthGateGuard(delta) {
+  const guard = mt.southGateGuard;
+  const player = mt.player;
+  if (!guard?.parent || !player) return;
+  const playerInside = Yt(player.position.x, player.position.z, -55);
+  if (guard.userData.alerted && playerInside)
+    guard.userData.chaseActivated = true;
+  if (guard.userData.alerted && !playerInside && guard.userData.chaseActivated)
+    beginGuardReturn(guard);
+  const playerDx = player.position.x - guard.position.x;
+  const playerDz = player.position.z - guard.position.z;
+  const playerDistance = Math.max(0.001, Math.hypot(playerDx, playerDz));
+  // Sight ray sampling is one of the most expensive NPC operations.  Cache it
+  // briefly; pursuit remains responsive while avoiding dozens of collision
+  // probes every rendered frame.
+  guard.userData.sightCheckFor -= delta;
+  if (guard.userData.sightCheckFor <= 0) {
+    guard.userData.sightCheckFor = 0.11;
+    guard.userData.cachedHasSight =
+      guard.userData.alerted &&
+      playerInside &&
+      playerDistance < 920 &&
+      hasClearNpcSight(guard, player);
+  }
+  const hasSight = guard.userData.cachedHasSight;
+  if (hasSight) {
+    guard.userData.lastSeenX = player.position.x;
+    guard.userData.lastSeenZ = player.position.z;
+    guard.userData.sightLostFor = 0;
+  } else if (guard.userData.alerted && playerInside) {
+    guard.userData.sightLostFor += delta;
+  }
+  // When chasing from outside, route through the physical south-gate opening
+  // before pursuing David. A direct line to an interior player intersects the
+  // wall and leaves a large NPC wedged against it.
+  const guardInside = Yt(guard.position.x, guard.position.z, -42);
+  const gateWaypointActive =
+    guard.userData.alerted && playerInside && !guardInside;
+  let targetX = gateWaypointActive
+    ? 0
+    : hasSight
+      ? player.position.x
+      : guard.userData.lastSeenX;
+  let targetZ = gateWaypointActive
+    ? 2825
+    : hasSight
+      ? player.position.z
+      : guard.userData.lastSeenZ;
+  if (guard.userData.returningHome) {
+    // An interior guard first walks through the actual south-gate opening,
+    // then turns toward his outside post. He is never teleported home.
+    if (guardInside) {
+      targetX = 0;
+      targetZ = 3060;
+    } else {
+      targetX = guard.userData.homeX;
+      targetZ = guard.userData.homeZ;
+    }
+  }
+  const dx = targetX - guard.position.x;
+  const dz = targetZ - guard.position.z;
+  const distance = Math.max(0.001, Math.hypot(dx, dz));
+  let moving = false;
+  if (guard.userData.returningHome) {
+    if (distance <= 18 && !guardInside) {
+      guard.position.set(
+        guard.userData.homeX,
+        te(guard.userData.homeX, guard.userData.homeZ),
+        guard.userData.homeZ,
+      );
+      guard.userData.lastSafePosition?.copy(guard.position);
+      guard.userData.returningHome = false;
+      guard.userData.returnStuckFor = 0;
+      guard.rotation.y = guard.userData.facingOffset;
+    } else {
+      const step = Math.min(Math.max(0, distance - 10), guard.userData.speed * 0.72 * delta);
+      if (tryMoveGuard(guard, dx, dz, distance, step)) {
+        moving = true;
+        guard.userData.returnStuckFor = Math.max(
+          0,
+          guard.userData.returnStuckFor - delta * 2,
+        );
+      } else {
+        guard.userData.returnStuckFor += delta;
+        // Keep visibly searching for a walkable direction instead of vanishing.
+        guard.rotation.y += delta * 1.5;
+      }
+    }
+  } else if (guard.userData.searchFor > 0) {
+    guard.userData.searchFor -= delta;
+    guard.userData.searchPhase += delta * 2.7;
+    if (hasSight) {
+      guard.userData.searchFor = 0;
+      guard.userData.stuckFor = 0;
+    } else {
+      // Actively sweep several reachable points around the last sighting.
+      // When a doorway or alley is blocked the guard tries the next point,
+      // visibly turning and walking instead of rotating in one spot.
+      const searchOffsets = [
+        [0, 0], [95, 0], [-95, 0], [0, 95], [0, -95],
+        [72, 72], [-72, 72], [72, -72], [-72, -72],
+      ];
+      const offset =
+        searchOffsets[guard.userData.searchWaypoint % searchOffsets.length];
+      const searchX = guard.userData.searchOriginX + offset[0];
+      const searchZ = guard.userData.searchOriginZ + offset[1];
+      const searchDx = searchX - guard.position.x;
+      const searchDz = searchZ - guard.position.z;
+      const searchDistance = Math.hypot(searchDx, searchDz);
+      guard.userData.searchWaypointFor += delta;
+      if (
+        searchDistance < 24 ||
+        guard.userData.searchWaypointFor > 1.15
+      ) {
+        guard.userData.searchWaypoint =
+          (guard.userData.searchWaypoint + 1) % searchOffsets.length;
+        guard.userData.searchWaypointFor = 0;
+      } else {
+        const searchStep = Math.min(
+          searchDistance - 12,
+          guard.userData.speed * 0.64 * delta,
+        );
+        moving = tryMoveGuard(
+          guard,
+          searchDx,
+          searchDz,
+          searchDistance,
+          searchStep,
+        );
+        if (moving)
+          guard.rotation.y =
+            Math.atan2(searchDx, searchDz) + guard.userData.facingOffset;
+        else
+          guard.rotation.y += delta * 1.8;
+      }
+      if (guard.userData.searchFor <= 0) beginGuardReturn(guard);
+    }
+  } else if (guard.userData.alerted && distance > 70) {
+    const step = Math.min(distance - 62, guard.userData.speed * delta);
+    if (tryMoveGuard(guard, dx, dz, distance, step)) {
+      moving = true;
+      guard.userData.stuckFor = Math.max(0, guard.userData.stuckFor - delta * 2);
+    } else guard.userData.stuckFor += delta;
+    if (
+      guard.userData.stuckFor > 2.4 ||
+      (!hasSight && guard.userData.sightLostFor > 4.2 && distance < 92)
+    ) {
+      // Look substantially farther left/right before giving up the search.
+      guard.userData.searchFor = 5.2;
+      guard.userData.searchPhase = 0;
+      guard.userData.searchWaypoint = 0;
+      guard.userData.searchWaypointFor = 0;
+      guard.userData.searchOriginX = guard.userData.lastSeenX;
+      guard.userData.searchOriginZ = guard.userData.lastSeenZ;
+      guard.userData.stuckFor = 0;
+    }
+  } else if (
+    guard.userData.alerted &&
+    !gateWaypointActive &&
+    playerDistance <= 70 &&
+    performance.now() >= guard.userData.caughtCooldownUntil
+  ) {
+    showGuardCaught();
+  }
+  if (guard.userData.searchFor <= 0) {
+    if (guard.userData.returningHome || guard.userData.alerted) {
+      guard.rotation.y = Math.atan2(dx, dz) + guard.userData.facingOffset;
+    } else {
+      // Idle surveillance is independent of stale chase/search targets.
+      // Re-evaluate David's live position every frame while he loiters near
+      // the south gate; otherwise face outward (+Z) from the wall.
+      const watchingGateVisitor =
+        ut.respect <= 70 &&
+        playerDistance < 760 &&
+        hasClearNpcSight(guard, player);
+      guard.rotation.y = watchingGateVisitor
+        ? Math.atan2(playerDx, playerDz) + guard.userData.facingOffset
+        : guard.userData.facingOffset;
+    }
+  }
+  const groundedY = te(guard.position.x, guard.position.z);
+  if (Number.isFinite(groundedY)) guard.position.y = groundedY;
+  else if (guard.userData.lastSafePosition)
+    guard.position.copy(guard.userData.lastSafePosition);
+  const model = guard.userData.importedModel;
+  if (model) {
+    if (moving) {
+      guard.userData.runPhase += delta * 11;
+      model.position.y =
+        guard.userData.importedModelBaseY +
+        Math.abs(Math.sin(guard.userData.runPhase)) * 1.2;
+      model.rotation.z = Math.sin(guard.userData.runPhase) * 0.022;
+      // The supplied guard is one fused mesh, so the spear cannot be animated
+      // independently. A restrained forward pursuit lean makes the held spear
+      // read as aimed without deforming or duplicating the character.
+      guard.userData.chasePose = t.MathUtils.lerp(
+        guard.userData.chasePose,
+        0.12,
+        Math.min(1, delta * 7),
+      );
+      model.rotation.x = -guard.userData.chasePose;
+    } else {
+      model.position.y = t.MathUtils.lerp(
+        model.position.y,
+        guard.userData.importedModelBaseY,
+        Math.min(1, delta * 10),
+      );
+      model.rotation.z *= Math.max(0, 1 - delta * 10);
+      guard.userData.chasePose = t.MathUtils.lerp(
+        guard.userData.chasePose,
+        0,
+        Math.min(1, delta * 8),
+      );
+      model.rotation.x = -guard.userData.chasePose;
+    }
+  }
+}
 function loadOliveTreeModel() {
   if (oliveTreeModelTemplate) return Promise.resolve(oliveTreeModelTemplate);
   if (oliveTreeModelPromise) return oliveTreeModelPromise;
@@ -4240,22 +4924,9 @@ function addPurchasedFirstTemple(parent, courtY, worldCenterX, worldCenterZ) {
     if (!child.isLight) parent.remove(child);
   }
   parent.add(model);
-  // Collision follows the purchased outer wall footprint, split into broad
-  // entrances on all four sides. No collider from the former enclosure remains.
-  const wallHalfX = 590;
-  const wallHalfZ = 465;
-  const wallThickness = 22;
-  const gateHalfWidth = 105;
-  const horizontalWing = wallHalfX - gateHalfWidth;
-  const verticalWing = wallHalfZ - gateHalfWidth;
-  for (const z of [-wallHalfZ, wallHalfZ]) {
-    Ot(worldCenterX - ((wallHalfX + gateHalfWidth) / 2), worldCenterZ + z, horizontalWing, wallThickness, 0, "temple-model-wall", courtY + 2, courtY + 205);
-    Ot(worldCenterX + ((wallHalfX + gateHalfWidth) / 2), worldCenterZ + z, horizontalWing, wallThickness, 0, "temple-model-wall", courtY + 2, courtY + 205);
-  }
-  for (const x of [-wallHalfX, wallHalfX]) {
-    Ot(worldCenterX + x, worldCenterZ - ((wallHalfZ + gateHalfWidth) / 2), wallThickness, verticalWing, 0, "temple-model-wall", courtY + 2, courtY + 205);
-    Ot(worldCenterX + x, worldCenterZ + ((wallHalfZ + gateHalfWidth) / 2), wallThickness, verticalWing, 0, "temple-model-wall", courtY + 2, courtY + 205);
-  }
+  // The imported court must not receive an old rectangular collision shell.
+  // Only the sanctuary, altar and real fixtures use the explicit colliders
+  // registered by the authored court code.
   mt.purchasedFirstTemple = model;
   mt.importedTemple = model;
   return true;
@@ -4299,7 +4970,9 @@ function rebuildDatePalmInstances() {
   datePalmPlacements.forEach((palm, index) => {
     dummy.position.set(palm.x, palm.y, palm.z);
     dummy.rotation.set(0, palm.rotation, 0);
-    dummy.scale.setScalar(palm.scale);
+    // Preserve one instanced draw call while lengthening the trunk and crown
+    // vertically.  No extra meshes, materials or shadows are introduced.
+    dummy.scale.set(palm.scale, palm.heightScale || palm.scale * 1.55, palm.scale);
     dummy.updateMatrix();
     instances.setMatrixAt(index, dummy.matrix);
   });
@@ -4682,7 +5355,7 @@ function Pe(o = "lion") {
   );
 }
 function Te() {
-  [mt.player, mt.sheepShop, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
+  [mt.player, mt.sheepShop, mt.southGateGuard, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
     .filter(Boolean)
     .forEach((t) => i.remove(t)),
     (mt.sheep = []),
@@ -4690,6 +5363,7 @@ function Te() {
     (mt.rocks = []),
     (mt.enemies = []),
     (mt.projectiles = []),
+    (mt.southGateGuard = null),
     (mt.effects = []),
     ae(),
     (at = {
@@ -4787,6 +5461,7 @@ function Te() {
     [1820, -1040],
   ].forEach((t, e) => be(s[e % 4], t[0], t[1])),
     createSheepShop(),
+    createSouthGateGuard(),
     $e(),
     e("#thirstHud").classList.add("show"),
     (e("#thirstBar").style.width = ut.thirst + "%"),
@@ -5388,6 +6063,16 @@ document.addEventListener(
                 triggerCombatFeedback("hit"),
                 t.userData.hp <= 0 && Ue(t));
             }
+            const guard = mt.southGateGuard;
+            if (guard) {
+              const offset = guard.position.clone().sub(o.position);
+              offset.y = 0;
+              const guardDistance = offset.length();
+              guardDistance < 155 &&
+                guardDistance > 0 &&
+                offset.normalize().dot(a) > -0.18 &&
+                (hitSouthGateGuard(), (s = !0), triggerCombatFeedback("hit"));
+            }
             const hitEnemy = s;
             o.userData.urgedSheep = !1;
             // The staff has two deliberately separate contexts: close defence
@@ -5789,10 +6474,26 @@ function updateAdaptiveRendering(now) {
   const player = mt.player.position;
   const onOliveMount = player.x > 1050 && player.x < 3300;
   performanceState.onOliveMount = onOliveMount;
-  const targetRatio = Math.min(devicePixelRatio, onOliveMount ? 0.85 : 1.05);
+  const consistentlySlow = performanceState.slowFrameFor > 1.4;
+  const targetRatio = Math.min(
+    devicePixelRatio,
+    consistentlySlow ? (onOliveMount ? 0.66 : 0.74) : onOliveMount ? 0.78 : 0.9,
+  );
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
     c.setPixelRatio(targetRatio);
+  }
+  if (mt.goalSite && mt.campStoneFar && mt.campStoneNear) {
+    const campDistance = Math.hypot(
+      player.x - mt.goalSite.position.x,
+      player.z - mt.goalSite.position.z,
+    );
+    if (!performanceState.campStoneNear && campDistance < 760)
+      performanceState.campStoneNear = true;
+    else if (performanceState.campStoneNear && campDistance > 920)
+      performanceState.campStoneNear = false;
+    mt.campStoneNear.visible = performanceState.campStoneNear;
+    mt.campStoneFar.visible = !performanceState.campStoneNear;
   }
   // Keep the full grove visible, but let fog and eight spatial batches discard
   // expensive tree geometry that is not relevant to the current view.
@@ -5830,6 +6531,14 @@ function Ye(e, o, n) {
 }
 function _e(o, n) {
   const frameNow = n * 1000;
+  const frameMs = Math.min(50, Math.max(4, o * 1000));
+  performanceState.smoothedFrameMs +=
+    (frameMs - performanceState.smoothedFrameMs) * 0.035;
+  performanceState.slowFrameFor = Math.max(
+    0,
+    performanceState.slowFrameFor +
+      (performanceState.smoothedFrameMs > 24 ? o : -o * 1.6),
+  );
   updateAdaptiveRendering(frameNow);
   updateRouteChoice(frameNow);
   (function () {
@@ -5906,11 +6615,15 @@ function _e(o, n) {
         z = t.MathUtils.clamp((0.34 - l) / 0.34, 0, 1);
       const torchUpdateDue = n * 1000 >= lightingPerformance.nextTorchUpdateAt;
       if (torchUpdateDue) {
-        lightingPerformance.nextTorchUpdateAt = n * 1000 + 80;
+        lightingPerformance.nextTorchUpdateAt = n * 1000 + 100;
         const playerPosition = mt.player?.position;
         const torchCandidates = [];
         for (const torch of mt.cityTorches || []) {
           if (!torch?.userData) continue;
+          if (torch.userData.disabledByRoadValidation) {
+            torch.visible = false;
+            continue;
+          }
           torch.getWorldPosition(wt);
           const distanceSq = playerPosition
             ? (wt.x - playerPosition.x) ** 2 + (wt.z - playerPosition.z) ** 2
@@ -5927,6 +6640,10 @@ function _e(o, n) {
         );
         for (const t of mt.cityTorches || []) {
           if (!t?.userData) continue;
+          if (t.userData.disabledByRoadValidation) {
+            t.visible = false;
+            continue;
+          }
         const e =
             0.84 +
             0.16 * Math.sin(13 * n + t.userData.phase) +
@@ -6314,6 +7031,7 @@ function _e(o, n) {
     })(o),
     (function (e, o) {
       updateJerusalemSheepHold(),
+        updateSouthGateGuard(e),
         y && Math.random() < 0.012 * e && kt("sheep");
       const n = mt.player;
       const activePredators = mt.enemies.filter(
@@ -6359,6 +7077,32 @@ function _e(o, n) {
             n.position.x - s.position.x,
             n.position.z - s.position.z,
           );
+          // Resolve flock overlap once per pair. Sheep keep their own physical
+          // footprint instead of oscillating into the same point while idle or
+          // gathering around David.
+          for (let otherIndex = a + 1; otherIndex < mt.sheep.length; otherIndex++) {
+            const other = mt.sheep[otherIndex];
+            if (!other || other.userData.safeHold !== s.userData.safeHold) continue;
+            let separationX = other.position.x - s.position.x;
+            let separationZ = other.position.z - s.position.z;
+            let separationDistance = Math.hypot(separationX, separationZ);
+            const minimumSpacing = 64;
+            if (separationDistance >= minimumSpacing) continue;
+            if (separationDistance < 0.001) {
+              const angle = (a * 2.399963 + otherIndex * 0.71) % (Math.PI * 2);
+              separationX = Math.cos(angle);
+              separationZ = Math.sin(angle);
+              separationDistance = 1;
+            }
+            const correction =
+              Math.min(7, (minimumSpacing - separationDistance) * 0.5);
+            const normalX = separationX / separationDistance;
+            const normalZ = separationZ / separationDistance;
+            s.position.x -= normalX * correction;
+            s.position.z -= normalZ * correction;
+            other.position.x += normalX * correction;
+            other.position.z += normalZ * correction;
+          }
           if (nearestPredator && nearestPredatorDistance < 430) {
             const proximity = 1 - nearestPredatorDistance / 430;
             s.userData.fear = Math.min(
@@ -6614,7 +7358,7 @@ function _e(o, n) {
           const u = p
             ? Math.abs(Math.sin(2 * (s.userData.runPhase || 0))) *
               (d ? 2.1 : 1.15)
-            : 0.35 * Math.sin(2 * o + s.userData.phase);
+            : 0;
           s.position.y = te(s.position.x, s.position.z) + 1 + u;
         }),
         mt.sheep.some(
@@ -6815,6 +7559,21 @@ function _e(o, n) {
                 t.userData.hp <= 0 && Ue(t);
               break;
             }
+        if (!n) {
+          const guard = mt.southGateGuard;
+          if (
+            guard &&
+            o.position.distanceTo(
+              guard.position.clone().add(new t.Vector3(0, 92, 0)),
+            ) < guard.userData.hitRadius
+          ) {
+            o.userData.life = 0;
+            hitSouthGateGuard();
+            Ae(o.position, "enemy");
+            triggerCombatFeedback("hit");
+            n = true;
+          }
+        }
         if (!n) {
           // Sample the whole travelled segment so fast stones cannot tunnel
           // through thin house fronts or walls between two frames.
@@ -7160,10 +7919,11 @@ function _e(o, n) {
           (s.lineWidth = 3),
           (s.lineCap = "round"),
           (s.lineJoin = "round");
-        for (const [e, o] of Xt) {
+        for (const [e, o, roadWidth] of Xt) {
           if (!Je(t, e, o)) continue;
           const n = i({ x: t.x + e[0], z: t.z + e[1] }),
             a = i({ x: t.x + o[0], z: t.z + o[1] });
+          s.lineWidth = Math.max(1.5, Math.min(4.8, (roadWidth / W) * 84));
           s.beginPath(), s.moveTo(n.x, n.z), s.lineTo(a.x, a.z), s.stroke();
         }
         // The residential layer and minimap share these exact lot positions.
