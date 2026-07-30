@@ -134,6 +134,8 @@ let Z = new t.Vector3(-1150, 0, 1050),
   sheepModelTemplate = null,
   banditModelPromise = null,
   banditModelTemplate = null,
+  kohenModelPromise = null,
+  kohenModelTemplate = null,
   guardModelPromise = null,
   guardModelTemplate = null,
   oliveTreeModelPromise = null,
@@ -248,6 +250,7 @@ const pt = 33,
     eastPanorama: null,
     datePalmGrove: null,
     southGateGuard: null,
+    kohen: null,
   },
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
@@ -875,8 +878,8 @@ async function At(e) {
     c ||
       (function () {
         (i = new t.Scene()),
-          (i.background = new t.Color(12175815)),
-          (i.fog = new t.FogExp2(13154717, 34e-5)),
+          (i.background = new t.Color(7846632)),
+          (i.fog = new t.FogExp2(13423565, 34e-5)),
           (r = new t.PerspectiveCamera(
             58,
             innerWidth / innerHeight,
@@ -887,7 +890,7 @@ async function At(e) {
             antialias: !0,
             powerPreference: "high-performance",
           })),
-          c.setPixelRatio(Math.min(devicePixelRatio, 1.05)),
+          c.setPixelRatio(Math.min(devicePixelRatio, 0.92)),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
           (c.shadowMap.type = t.BasicShadowMap),
@@ -914,9 +917,9 @@ async function At(e) {
                 side: t.BackSide,
                 depthWrite: !1,
                 uniforms: {
-                  top: { value: new t.Color(9416376) },
-                  middle: { value: new t.Color(14207406) },
-                  bottom: { value: new t.Color(15258797) },
+                  top: { value: new t.Color(4034513) },
+                  middle: { value: new t.Color(7715304) },
+                  bottom: { value: new t.Color(13032941) },
                 },
                 vertexShader:
                   "varying vec3 vPos; void main(){vPos=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}",
@@ -1009,18 +1012,18 @@ async function At(e) {
             e.rotateX(-Math.PI / 2);
             const o = e.attributes.position,
               n = [],
-              // Pale limestone soil with restrained dry-green undertones.
-              // These light vertex colours tint the Poly Haven surface without
-              // returning to the former dark-brown wilderness.
-              s = new t.Color(12692098),
-              a = new t.Color(14206624),
-              r = new t.Color(12165885),
-              c = new t.Color(10918767),
-              l = new t.Color(10261861),
-              h = new t.Color(14734264),
-              d = new t.Color(8887145),
-              p = new t.Color(14865074),
-              u = new t.Color(9864799);
+              // Warm pale Jerusalem-limestone palette.  The values stay close
+              // to the Western Wall's cream, honey and softly weathered stone
+              // range while retaining enough variation to read the terrain.
+              s = new t.Color(13352351),
+              a = new t.Color(14603193),
+              r = new t.Color(11970441),
+              c = new t.Color(12563087),
+              l = new t.Color(11640713),
+              h = new t.Color(15199431),
+              d = new t.Color(10853515),
+              p = new t.Color(14341809),
+              u = new t.Color(12628878);
             for (let e = 0; e < o.count; e++) {
               const i = o.getX(e),
                 m = o.getZ(e),
@@ -2205,15 +2208,8 @@ async function At(e) {
                   size: 138,
                   yaw: Math.PI / 2,
                 });
-                for (let n = 0; n < 4; n++) {
-                  const s = new t.Mesh(
-                    new t.DodecahedronGeometry(18 - 3 * n, 0),
-                    o,
-                  );
-                  s.position.set(0, 14 + 18 * n, -155),
-                    (s.castShadow = !0),
-                    e.add(s);
-                }
+                // The obsolete four-stone cairn was removed.  It had no
+                // gameplay function and read as an unexplained stone tower.
                 i.add(e), (mt.goalSite = e), ce();
               })(),
               ce();
@@ -3088,7 +3084,6 @@ function oe(e, o, n = 1) {
     z: o,
     y: te(e, o),
     scale: 112 * n,
-    heightScale: 174 * n,
     rotation: (0.73 * datePalmPlacements.length) % (Math.PI * 2),
   });
   Nt(e, o, 8.5 * n, "date-palm");
@@ -4588,7 +4583,7 @@ function loadBanditModel() {
   if (banditModelPromise) return banditModelPromise;
   banditModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/bandit_tripo_static.glb",
+      "./assets/models/bandit_rigged_game.glb",
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         scene.animations = gltf.animations || [];
@@ -4604,6 +4599,70 @@ function loadBanditModel() {
     );
   });
   return banditModelPromise;
+}
+function loadKohenModel() {
+  if (kohenModelTemplate) return Promise.resolve(kohenModelTemplate);
+  if (kohenModelPromise) return kohenModelPromise;
+  kohenModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/kohen_rigged_game.glb",
+      (gltf) => {
+        const scene = gltf.scene;
+        scene.animations = (gltf.animations || []).map((clip) => {
+          const groundedClip = clip.clone();
+          // World translation belongs to the patrol controller, not the clip.
+          // Removing it prevents the imported walk from drifting or hovering.
+          groundedClip.tracks = groundedClip.tracks.filter(
+            (track) =>
+              !/(^|\.)(Root|Armature)\.position$/i.test(track.name),
+          );
+          return groundedClip;
+        });
+        scene.traverse((part) => {
+          if (!part.isMesh) return;
+          part.castShadow = false;
+          part.receiveShadow = false;
+          part.frustumCulled = true;
+          const materials = Array.isArray(part.material)
+            ? part.material
+            : [part.material];
+          materials.forEach((material) => {
+            if (!material) return;
+            material.side = t.FrontSide;
+            material.depthWrite = true;
+            material.roughness = Math.max(0.76, material.roughness ?? 0.76);
+            if (material.normalMap) {
+              material.normalMap.dispose?.();
+              material.normalMap = null;
+            }
+            if (material.roughnessMap) {
+              material.roughnessMap.dispose?.();
+              material.roughnessMap = null;
+            }
+            material.metalnessMap = null;
+            material.metalness = 0;
+            material.needsUpdate = true;
+            if (material.map) {
+              material.map.colorSpace = t.SRGBColorSpace;
+              material.map.anisotropy = Math.min(
+                2,
+                c?.capabilities?.getMaxAnisotropy?.() || 1,
+              );
+            }
+          });
+        });
+        kohenModelTemplate = scene;
+        resolve(scene);
+      },
+      undefined,
+      (error) => {
+        console.warn("코헨 모델을 불러오지 못했습니다.", error);
+        kohenModelPromise = null;
+        reject(error);
+      },
+    );
+  });
+  return kohenModelPromise;
 }
 function loadSouthGateGuardModel() {
   if (guardModelTemplate) return Promise.resolve(guardModelTemplate);
@@ -5121,6 +5180,8 @@ function loadOliveTreeModel() {
       "./assets/models/olive_tree_game.glb",
       (gltf) => {
         const scene = gltf.scene;
+        // Keep the authored olive proportions. Palm-trunk deformation must
+        // never be applied to this separate olive asset.
         scene.traverse((obj) => {
           if (!obj.isMesh) return;
           obj.castShadow = false;
@@ -5156,11 +5217,36 @@ function loadDatePalmModel() {
   if (datePalmModelPromise) return datePalmModelPromise;
   datePalmModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/date_palm_game.glb",
+      "./assets/models/date_palm_tall_game.glb",
       (gltf) => {
         const scene = gltf.scene;
         scene.traverse((obj) => {
           if (!obj.isMesh) return;
+          // The new palm is one mesh. Lengthen only the lower trunk range and
+          // translate the crown upward, preserving the authored frond shape.
+          const position = obj.geometry?.attributes?.position;
+          if (position && !obj.geometry.userData.tallDatePalmApplied) {
+            obj.geometry.computeBoundingBox();
+            const bounds = obj.geometry.boundingBox;
+            const height = Math.max(0.001, bounds.max.y - bounds.min.y);
+            const trunkTop = bounds.min.y + height * 0.57;
+            const trunkStretch = 2.85;
+            for (let vertex = 0; vertex < position.count; vertex++) {
+              const y = position.getY(vertex);
+              const relative = y - bounds.min.y;
+              position.setY(
+                vertex,
+                y <= trunkTop
+                  ? bounds.min.y + relative * trunkStretch
+                  : y + (trunkTop - bounds.min.y) * (trunkStretch - 1),
+              );
+            }
+            position.needsUpdate = true;
+            obj.geometry.computeVertexNormals();
+            obj.geometry.computeBoundingBox();
+            obj.geometry.computeBoundingSphere();
+            obj.geometry.userData.tallDatePalmApplied = true;
+          }
           obj.castShadow = false;
           obj.receiveShadow = true;
           const materials = Array.isArray(obj.material) ? obj.material : [obj.material];
@@ -5203,10 +5289,11 @@ function loadFirstTempleModel() {
         scene.traverse((obj) => {
           if (!obj.isMesh) return;
           // The optimized temple is six material primitives in one mesh.
-          // Receiving shadows keeps it grounded; casting a full-building
-          // shadow would be disproportionately expensive.
+          // The building fills most of the view at the eastern approach.
+          // Dynamic shadow sampling across all of its columns was a major
+          // entrance-frame cost, so both passes stay disabled.
           obj.castShadow = false;
-          obj.receiveShadow = true;
+          obj.receiveShadow = false;
           obj.frustumCulled = true;
           obj.userData.neverOcclude = true;
           const materials = Array.isArray(obj.material)
@@ -5218,6 +5305,16 @@ function loadFirstTempleModel() {
             material.transparent = false;
             material.depthWrite = true;
             material.roughness = Math.max(0.5, material.roughness ?? 0.72);
+            if (material.normalMap) {
+              material.normalMap.dispose?.();
+              material.normalMap = null;
+            }
+            if (material.roughnessMap) {
+              material.roughnessMap.dispose?.();
+              material.roughnessMap = null;
+            }
+            if (material.map) material.map.anisotropy = 1;
+            material.needsUpdate = true;
             // The purchased model's authored metal group contains the laver.
             // Give it a matte copper finish without adding a glow or reflection pass.
             if (material.name === "TempleGold") {
@@ -5328,9 +5425,9 @@ function rebuildDatePalmInstances() {
   datePalmPlacements.forEach((palm, index) => {
     dummy.position.set(palm.x, palm.y, palm.z);
     dummy.rotation.set(0, palm.rotation, 0);
-    // Preserve one instanced draw call while lengthening the trunk and crown
-    // vertically.  No extra meshes, materials or shadows are introduced.
-    dummy.scale.set(palm.scale, palm.heightScale || palm.scale * 1.55, palm.scale);
+    // The source geometry already has a lengthened trunk. Uniform instance
+    // scaling preserves the crown's natural proportions in one draw call.
+    dummy.scale.setScalar(palm.scale);
     dummy.updateMatrix();
     instances.setMatrixAt(index, dummy.matrix);
   });
@@ -5471,8 +5568,8 @@ function applyBanditModel(enemy) {
     .then((template) => {
       if (!enemy.parent || enemy.userData.type !== "bandit") return;
       if (enemy.userData.importedModel) return;
-      const model = template.clone(true);
-      model.name = "BanditTripoStaticModel";
+      const model = cloneSkinnedModel(template);
+      model.name = "BanditRiggedGameModel";
       model.traverse((part) => {
         if (!part.isMesh) return;
         // The scanned model's complex shadow read as a second flattened body.
@@ -5484,8 +5581,7 @@ function applyBanditModel(enemy) {
       model.updateMatrixWorld(true);
       let box = new t.Box3().setFromObject(model);
       const size = box.getSize(new t.Vector3());
-      // Keep bandits visibly larger than David without making their hitbox or
-      // movement behavior feel oversized.
+      // Keep bandits larger than both David and the Kohen.
       const scale = 190 / Math.max(size.y, 0.001);
       model.scale.setScalar(scale);
       model.updateMatrixWorld(true);
@@ -5493,13 +5589,7 @@ function applyBanditModel(enemy) {
       const center = box.getCenter(new t.Vector3());
       model.position.x -= center.x;
       model.position.z -= center.z;
-      // The unified scan contains the weapon tip well below the man's feet.
-      // Using box.min.y therefore plants the weapon on the terrain and leaves
-      // the whole body floating. Measurements of this exact GLB put the real
-      // sole plane 42.5% above the scan's minimum Y. Sink the attached lower
-      // weapon remnant and align the man's soles with the enemy origin.
-      const banditSoleY = box.min.y + box.getSize(new t.Vector3()).y * 0.425;
-      model.position.y -= banditSoleY;
+      model.position.y -= box.min.y;
       enemy.add(model);
       if (fallback?.parent === enemy) {
         enemy.remove(fallback);
@@ -5509,6 +5599,21 @@ function applyBanditModel(enemy) {
       enemy.userData.importedModel = model;
       enemy.userData.importedModelBaseY = model.position.y;
       enemy.userData.importedModelPhase = Math.random() * Math.PI * 2;
+      const rig = {};
+      model.traverse((part) => {
+        if (!part.isBone) return;
+        if (
+          ["L_Thigh", "R_Thigh", "L_Calf", "R_Calf", "L_Upperarm",
+            "R_Upperarm", "L_Forearm", "R_Forearm", "Spine01", "Spine02",
+            "Head"].includes(part.name)
+        ) {
+          rig[part.name] = {
+            bone: part,
+            base: part.rotation.clone(),
+          };
+        }
+      });
+      enemy.userData.banditRig = rig;
     })
     .catch(() => {
       enemy.userData.banditModelAttachStarted = false;
@@ -5692,8 +5797,259 @@ function Pe(o = "lion") {
     n
   );
 }
+function isInsideTempleCourt(x, z, margin = 0) {
+  return !!dt &&
+    x >= dt.courtXMin - margin &&
+    x <= dt.courtXMax + margin &&
+    z >= dt.courtZMin - margin &&
+    z <= dt.courtZMax + margin;
+}
+function isBanditStreetPointClear(x, z, clearance = 34) {
+  if (!Yt(x, z, -74) || isInsideTempleCourt(x, z, 10)) return false;
+  if (jt({ x, z }, clearance)) return false;
+  const ground = te(x, z);
+  // Reject rooftops, walls and abrupt ledges even when their visual mesh does
+  // not have a sufficiently broad collision box at the sampled point.
+  const sample = 12;
+  return Math.max(
+    Math.abs(te(x + sample, z) - ground),
+    Math.abs(te(x - sample, z) - ground),
+    Math.abs(te(x, z + sample) - ground),
+    Math.abs(te(x, z - sample) - ground),
+  ) < 18;
+}
+function moveBanditAlongStreets(bandit, target, delta) {
+  const dx = target.position.x - bandit.position.x;
+  const dz = target.position.z - bandit.position.z;
+  const distance = Math.max(0.001, Math.hypot(dx, dz));
+  const desired = Math.atan2(dx, dz);
+  const travel = Math.min(bandit.userData.speed * delta, 8);
+  const probe = Math.max(54, travel * 8);
+  const offsets = [0, 0.34, -0.34, 0.7, -0.7, 1.08, -1.08, 1.5, -1.5, Math.PI];
+  let best = null;
+  for (const offset of offsets) {
+    const angle = desired + offset;
+    const ux = Math.sin(angle);
+    const uz = Math.cos(angle);
+    let clear = true;
+    // Three probes prevent a valid endpoint from cutting through a house corner.
+    for (const fraction of [0.34, 0.67, 1]) {
+      if (!isBanditStreetPointClear(
+        bandit.position.x + ux * probe * fraction,
+        bandit.position.z + uz * probe * fraction,
+      )) {
+        clear = false;
+        break;
+      }
+    }
+    if (!clear) continue;
+    const nextX = bandit.position.x + ux * travel;
+    const nextZ = bandit.position.z + uz * travel;
+    if (!isBanditStreetPointClear(nextX, nextZ)) continue;
+    const remaining = Math.hypot(target.position.x - nextX, target.position.z - nextZ);
+    const turn = Math.abs(Math.atan2(
+      Math.sin(angle - (bandit.userData.streetHeading ?? desired)),
+      Math.cos(angle - (bandit.userData.streetHeading ?? desired)),
+    ));
+    const score = remaining + Math.abs(offset) * 13 + turn * 7;
+    if (!best || score < best.score) best = { angle, nextX, nextZ, score };
+  }
+  if (!best) {
+    bandit.userData.streetBlockedFor = (bandit.userData.streetBlockedFor || 0) + delta;
+    if (bandit.userData.streetBlockedFor > 0.65) {
+      bandit.userData.streetHeading = desired +
+        (bandit.userData.streetTurnSide || 1) * (Math.PI * 0.5);
+      bandit.userData.streetTurnSide = -(bandit.userData.streetTurnSide || 1);
+      bandit.userData.streetBlockedFor = 0;
+    }
+    return false;
+  }
+  bandit.userData.streetBlockedFor = 0;
+  bandit.userData.streetHeading = best.angle;
+  bandit.position.x = best.nextX;
+  bandit.position.z = best.nextZ;
+  bandit.rotation.y = best.angle;
+  return true;
+}
+function isKohenPatrolPointClear(x, z) {
+  if (!isInsideTempleCourt(x, z, -85)) return false;
+  if (
+    x >= dt.templeStageXMin - 42 &&
+    x <= dt.templeStageXMax + 42 &&
+    z >= dt.templeStageZMin - 42 &&
+    z <= dt.templeStageZMax + 42
+  ) return false;
+  return Math.hypot(x - dt.altarX, z - dt.altarZ) > 105;
+}
+function chooseKohenWaypoint(kohen) {
+  const candidates = [
+    [dt.courtXMin + 155, dt.courtZMin + 155],
+    [(dt.courtXMin + dt.courtXMax) * 0.5, dt.courtZMin + 145],
+    [dt.courtXMax - 155, dt.courtZMin + 155],
+    [dt.courtXMax - 145, (dt.courtZMin + dt.courtZMax) * 0.5],
+    [dt.courtXMax - 155, dt.courtZMax - 155],
+    [(dt.courtXMin + dt.courtXMax) * 0.5, dt.courtZMax - 145],
+    [dt.courtXMin + 155, dt.courtZMax - 155],
+    [dt.courtXMin + 145, (dt.courtZMin + dt.courtZMax) * 0.5],
+  ].filter(([x, z]) => isKohenPatrolPointClear(x, z));
+  // Keep one continuous circuit. Random reversals made the NPC retrace the
+  // segment it had just walked and look trapped in a short repeated loop.
+  if (!candidates.length) return;
+  const lastIndex = Number.isInteger(kohen.userData.waypointIndex)
+    ? kohen.userData.waypointIndex
+    : -1;
+  const nextIndex = lastIndex < 0
+    ? 0
+    : (lastIndex + 1) % candidates.length;
+  kohen.userData.waypointIndex = nextIndex;
+  const point = candidates[nextIndex] ||
+    [dt.courtXMin + 150, dt.courtZMax - 150];
+  kohen.userData.target.set(point[0], 0, point[1]);
+  kohen.userData.waitFor = 0.6 + Math.random() * 1.2;
+  kohen.userData.gesture = Math.floor(Math.random() * 3);
+}
+function captureKohenWalkRig(model) {
+  const wanted = new Set([
+    "L_Thigh", "R_Thigh", "L_Calf", "R_Calf",
+    "L_Upperarm", "R_Upperarm", "Spine01",
+  ]);
+  const rig = {};
+  model.traverse((part) => {
+    if (part.isBone && wanted.has(part.name)) {
+      rig[part.name] = {
+        bone: part,
+        base: part.quaternion.clone(),
+      };
+    }
+  });
+  return rig;
+}
+function updateProceduralKohenWalk(kohen, moving, delta, visible) {
+  const rig = kohen.userData.walkRig;
+  if (!rig || !visible) return;
+  kohen.userData.animationAccumulator += delta;
+  if (kohen.userData.animationAccumulator < 1 / 30) return;
+  const elapsed = kohen.userData.animationAccumulator;
+  kohen.userData.animationAccumulator = 0;
+  if (moving) kohen.userData.walkPhase += elapsed * 7.2;
+  const phase = kohen.userData.walkPhase;
+  const stride = moving ? Math.sin(phase) : 0;
+  const bendL = moving ? Math.max(0, -stride) * 0.34 : 0;
+  const bendR = moving ? Math.max(0, stride) * 0.34 : 0;
+  const setX = (name, angle) => {
+    const entry = rig[name];
+    if (!entry) return;
+    entry.bone.quaternion.copy(entry.base).multiply(
+      new t.Quaternion().setFromAxisAngle(new t.Vector3(1, 0, 0), angle),
+    );
+  };
+  setX("L_Thigh", stride * 0.42);
+  setX("R_Thigh", -stride * 0.42);
+  setX("L_Calf", bendL);
+  setX("R_Calf", bendR);
+  setX("L_Upperarm", -stride * 0.25);
+  setX("R_Upperarm", stride * 0.25);
+  setX("Spine01", moving ? Math.sin(phase * 0.5) * 0.025 : 0);
+}
+function ensureKohen() {
+  if (!i || !dt || mt.kohen?.parent) return;
+  const kohen = new t.Group();
+  kohen.name = "TempleCourtKohen";
+  const startX = dt.courtXMin + 165;
+  const startZ = dt.courtZMax - 165;
+  kohen.position.set(startX, te(startX, startZ), startZ);
+  kohen.userData = {
+    isKohen: true,
+    target: new t.Vector3(),
+    phase: Math.random() * Math.PI * 2,
+    waitFor: 1,
+    gesture: 0,
+    importedModel: null,
+    importedModelBaseY: 0,
+    walkRig: null,
+    walkPhase: Math.random() * Math.PI * 2,
+    waypointIndex: -1,
+    animationAccumulator: 0,
+  };
+  i.add(kohen);
+  mt.kohen = kohen;
+  chooseKohenWaypoint(kohen);
+  loadKohenModel().then((template) => {
+    if (!kohen.parent || mt.kohen !== kohen) return;
+    const model = cloneSkinnedModel(template);
+    model.name = "KohenOptimizedModel";
+    model.updateMatrixWorld(true);
+    let box = new t.Box3().setFromObject(model);
+    const size = box.getSize(new t.Vector3());
+    // Match the intended human scale: only a little taller than David.
+    model.scale.setScalar(106 / Math.max(size.y, 0.001));
+    model.updateMatrixWorld(true);
+    box = new t.Box3().setFromObject(model);
+    const center = box.getCenter(new t.Vector3());
+    model.position.set(-center.x, -box.min.y, -center.z);
+    kohen.add(model);
+    kohen.userData.importedModel = model;
+    kohen.userData.importedModelBaseY = model.position.y;
+    // The supplied clip contains a short repeating body translation that
+    // visibly snaps backwards. Keep the rig but drive a stable in-place gait
+    // ourselves while the parent group performs continuous world movement.
+    kohen.userData.walkRig = captureKohenWalkRig(model);
+  }).catch(() => {});
+}
+function updateKohen(delta) {
+  ensureKohen();
+  const kohen = mt.kohen;
+  if (!kohen?.parent || !dt) return;
+  kohen.userData.phase += delta;
+  const target = kohen.userData.target;
+  const dx = target.x - kohen.position.x;
+  const dz = target.z - kohen.position.z;
+  const distance = Math.hypot(dx, dz);
+  const model = kohen.userData.importedModel;
+  const playerDistance = mt.player
+    ? Math.hypot(
+      mt.player.position.x - kohen.position.x,
+      mt.player.position.z - kohen.position.z,
+    )
+    : 0;
+  const renderKohen = playerDistance < 1250;
+  if (model) model.visible = renderKohen;
+  if (distance > 12) {
+    updateProceduralKohenWalk(kohen, true, delta, renderKohen);
+    const step = Math.min(distance, 35 * delta);
+    const nextX = kohen.position.x + (dx / distance) * step;
+    const nextZ = kohen.position.z + (dz / distance) * step;
+    if (isKohenPatrolPointClear(nextX, nextZ)) {
+      kohen.position.x = nextX;
+      kohen.position.z = nextZ;
+      kohen.rotation.y = Math.atan2(dx, dz);
+    } else {
+      chooseKohenWaypoint(kohen);
+    }
+    if (model) {
+      model.position.y = kohen.userData.importedModelBaseY;
+      model.rotation.z = 0;
+      model.rotation.x = 0;
+    }
+  } else {
+    updateProceduralKohenWalk(kohen, false, delta, renderKohen);
+    kohen.userData.waitFor -= delta;
+    if (model) {
+      const gesture = kohen.userData.gesture;
+      model.position.y = kohen.userData.importedModelBaseY;
+      model.rotation.z = gesture === 2
+        ? Math.sin(kohen.userData.phase * 1.7) * 0.045
+        : 0;
+      model.rotation.x = gesture === 1
+        ? 0.035 + Math.sin(kohen.userData.phase * 1.4) * 0.025
+        : 0;
+    }
+    if (kohen.userData.waitFor <= 0) chooseKohenWaypoint(kohen);
+  }
+  kohen.position.y = te(kohen.position.x, kohen.position.z);
+}
 function Te() {
-  [mt.player, mt.sheepShop, mt.southGateGuard, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
+  [mt.player, mt.sheepShop, mt.southGateGuard, mt.kohen, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
     .filter(Boolean)
     .forEach((t) => i.remove(t)),
     (mt.sheep = []),
@@ -5702,6 +6058,7 @@ function Te() {
     (mt.enemies = []),
     (mt.projectiles = []),
     (mt.southGateGuard = null),
+    (mt.kohen = null),
     (mt.effects = []),
     ae(),
     (at = {
@@ -5809,7 +6166,7 @@ function Le() {
   (r.aspect = innerWidth / innerHeight),
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
-    c.setPixelRatio(Math.min(devicePixelRatio, 1.05));
+    c.setPixelRatio(Math.min(devicePixelRatio, 0.92));
 }
 function Ce(t) {
   return [
@@ -6831,7 +7188,7 @@ function updateAdaptiveRendering(now) {
   const consistentlySlow = performanceState.slowFrameFor > 1.4;
   const targetRatio = Math.min(
     devicePixelRatio,
-    consistentlySlow ? (onOliveMount ? 0.66 : 0.74) : onOliveMount ? 0.78 : 0.9,
+    consistentlySlow ? (onOliveMount ? 0.62 : 0.68) : onOliveMount ? 0.74 : 0.84,
   );
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
@@ -7046,9 +7403,11 @@ function _e(o, n) {
           ? 2.75 * templeDarkness
           : 0;
       }
-      const D = Ye(1516347, 9547706, l).lerp(new t.Color(12026997), 0.32 * v),
-        S = Ye(3687517, 14207406, l).lerp(new t.Color(14787709), 0.42 * v),
-        b = Ye(4936551, 15258797, l).lerp(new t.Color(15775879), 0.46 * v);
+      // Strong blue daylight sky.  The distant mountain meshes use their own
+      // fog-free materials, so their authored colours remain untouched.
+      const D = Ye(1516347, 4034513, l).lerp(new t.Color(4886441), 0.18 * v),
+        S = Ye(3687517, 7715304, l).lerp(new t.Color(9432036), 0.26 * v),
+        b = Ye(4936551, 13032941, l).lerp(new t.Color(14542066), 0.34 * v);
       if (
         (p &&
           (p.uniforms.top.value.copy(D),
@@ -7887,6 +8246,7 @@ function _e(o, n) {
           t.position.distanceTo(n.position) < 420 && (t.userData.lostSince = 0);
       }
     })(o, n),
+    updateKohen(o),
     (function (t) {
       j > 0 && (j -= t);
       const e = Yt(mt.player.position.x, mt.player.position.z, -80);
@@ -7894,11 +8254,22 @@ function _e(o, n) {
         e &&
           "bandit" !== t.userData.type &&
           ((t.userData.hp = 0), Ge(t), i.remove(t));
+      const playerInTempleCourt =
+        e && isInsideTempleCourt(mt.player.position.x, mt.player.position.z);
+      if (playerInTempleCourt && O <= 0) {
+        O = Oe(true);
+        H = false;
+        je("");
+      }
+      if (mt.enemies.some((enemy) => enemy.userData.type === "bandit")) {
+        setGuardAlerted(false);
+      }
       0 === mt.enemies.length &&
         ((O -= t),
         O <= 18 &&
           O > 0 &&
           !H &&
+          !playerInTempleCourt &&
           ((H = !0),
           kt("danger"),
           Ut(118, 0.42, 0.055, "sawtooth", -35),
@@ -7910,6 +8281,7 @@ function _e(o, n) {
           )),
         O <= 0 &&
           j <= 0 &&
+          !(e && isInsideTempleCourt(mt.player.position.x, mt.player.position.z)) &&
           ((function () {
             const t = mt.player.position,
               e = Yt(t.x, t.z, -80),
@@ -7933,19 +8305,29 @@ function _e(o, n) {
                     : 1,
               a = "wolf" === n ? ++it : 0;
             for (let o = 0; o < s; o++) {
-              let s, i;
-              for (let n = 0; n < 40; n++) {
+              let s, i, foundStreet = false;
+              for (let n = 0; n < 80; n++) {
                 const n = Math.random() * Math.PI * 2,
                   a = e
                     ? 360 + 260 * Math.random()
                     : 720 + 420 * Math.random() + 50 * o;
                 (s = t.x + Math.sin(n) * a), (i = t.z + Math.cos(n) * a);
                 const r = Yt(s, i, -90);
-                if ((e && r) || (!e && !r)) break;
+                if (e && r && isBanditStreetPointClear(s, i, 38)) {
+                  foundStreet = true;
+                  break;
+                }
+                if (!e && !r) break;
               }
+              // Do not create a robber inside geometry when no street point
+              // can be resolved around the player in this frame.
+              if (e && !foundStreet) continue;
               const r = Pe(n);
               (r.userData.packId = a), r.position.set(s, te(s, i) + 1, i);
             }
+            // A city robbery cancels the guard's wanted-star state. Robbers
+            // and the guard never share one pursuit state.
+            if (e) setGuardAlerted(false);
             kt("danger"),
               Ut(145, 0.65, 0.1, "sawtooth", -45),
               setTimeout(() => Ut(110, 0.7, 0.045, "sawtooth", -25), 180),
@@ -7968,6 +8350,15 @@ function _e(o, n) {
           (e.userData.hp = 0), Ge(e), i.remove(e);
           continue;
         }
+        if (
+          e.userData.type === "bandit" &&
+          isInsideTempleCourt(e.position.x, e.position.z, 12)
+        ) {
+          e.userData.hp = 0;
+          Ge(e);
+          i.remove(e);
+          continue;
+        }
         const now = frameNow;
         let o = e.userData.targetEntity;
         const isAnimal = e.userData.type !== "bandit";
@@ -7986,10 +8377,15 @@ function _e(o, n) {
           e.userData.nextTargetAt = now + 2500 + Math.random() * 3000;
         }
         if (!o) o = mt.player;
+        const banditBlockedByTemple =
+          e.userData.type === "bandit" &&
+          o === mt.player &&
+          isInsideTempleCourt(mt.player.position.x, mt.player.position.z);
         const s = o.position.x - e.position.x,
           a = o.position.z - e.position.z,
           r = Math.hypot(s, a);
-        if (e.userData.walkAction) e.userData.walkAction.paused = r <= 42;
+        if (e.userData.walkAction)
+          e.userData.walkAction.paused = r <= 42 || banditBlockedByTemple;
         if (isAnimal)
           updateRiggedAnimalAnimation(
             e,
@@ -7997,10 +8393,20 @@ function _e(o, n) {
             r > 42 ? Math.min(1, e.userData.speed / 88) : 0,
             r <= 42,
           );
-        if (r > 42) {
-          e.position.x += (s / r) * e.userData.speed * t;
-          e.position.z += (a / r) * e.userData.speed * t;
-          e.rotation.y = Math.atan2(s, a);
+        if (r > 42 && !banditBlockedByTemple) {
+          if (e.userData.type === "bandit") {
+            moveBanditAlongStreets(e, o, t);
+          } else {
+            const stepX = (s / r) * e.userData.speed * t;
+            const stepZ = (a / r) * e.userData.speed * t;
+            const fullX = e.position.x + stepX;
+            const fullZ = e.position.z + stepZ;
+            if (!jt({ x: fullX, z: fullZ }, 12)) {
+              e.position.x = fullX;
+              e.position.z = fullZ;
+            }
+            e.rotation.y = Math.atan2(s, a);
+          }
         } else if (o === mt.player) {
           if (!ut.invincible) {
             ut.hp -= 8.5 * t;
@@ -8011,6 +8417,37 @@ function _e(o, n) {
           e.userData.nextSheepAttackAt = now + 2000;
         }
         e.position.y = te(e.position.x, e.position.z) + 1;
+        if (e.userData.type === "bandit" && e.userData.banditRig) {
+          const rig = e.userData.banditRig;
+          const moving = r > 42 && !banditBlockedByTemple;
+          const phase = (e.userData.importedModelPhase +=
+            t * (moving ? 8.5 : 2.25));
+          Object.values(rig).forEach((entry) => {
+            entry.bone.rotation.copy(entry.base);
+          });
+          const apply = (name, axis, amount) => {
+            const entry = rig[name];
+            if (entry) entry.bone.rotation[axis] = entry.base[axis] + amount;
+          };
+          if (moving) {
+            const stride = Math.sin(phase) * 0.48;
+            apply("L_Thigh", "x", stride);
+            apply("R_Thigh", "x", -stride);
+            apply("L_Calf", "x", Math.max(0, -stride) * 0.45);
+            apply("R_Calf", "x", Math.max(0, stride) * 0.45);
+            apply("L_Upperarm", "x", -stride * 0.62);
+            apply("R_Upperarm", "x", stride * 0.62);
+            apply("Spine01", "z", Math.sin(phase * 0.5) * 0.035);
+          } else {
+            const threat = Math.sin(phase * 2.1);
+            apply("L_Upperarm", "z", -0.42 - threat * 0.16);
+            apply("R_Upperarm", "z", 0.42 + threat * 0.16);
+            apply("L_Forearm", "x", -0.35 + threat * 0.12);
+            apply("R_Forearm", "x", -0.35 - threat * 0.12);
+            apply("Spine02", "x", 0.08 + Math.abs(threat) * 0.05);
+            apply("Head", "y", threat * 0.08);
+          }
+        }
       }
     })(o),
     (function (e) {
