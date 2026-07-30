@@ -164,7 +164,8 @@ let Z = new t.Vector3(-1150, 0, 1050),
   ht = 0,
   dt = null,
   citySheepWaitingForPickup = !1,
-  playerWasInsideJerusalem = !1;
+  playerWasInsideJerusalem = !1,
+  templeRecoveryArmed = !0;
 const nightWatch = {
   active: !1,
   camp: new t.Vector3(),
@@ -926,15 +927,18 @@ async function At(e) {
             e.rotateX(-Math.PI / 2);
             const o = e.attributes.position,
               n = [],
-              s = new t.Color(11047023),
-              a = new t.Color(13219988),
-              r = new t.Color(10982774),
-              c = new t.Color(9008734),
-              l = new t.Color(9598812),
-              h = new t.Color(14208432),
-              d = new t.Color(7299668),
-              p = new t.Color(14668211),
-              u = new t.Color(9069128);
+              // Pale limestone soil with restrained dry-green undertones.
+              // These light vertex colours tint the Poly Haven surface without
+              // returning to the former dark-brown wilderness.
+              s = new t.Color(12692098),
+              a = new t.Color(14206624),
+              r = new t.Color(12165885),
+              c = new t.Color(10918767),
+              l = new t.Color(10261861),
+              h = new t.Color(14734264),
+              d = new t.Color(8887145),
+              p = new t.Color(14865074),
+              u = new t.Color(9864799);
             for (let e = 0; e < o.count; e++) {
               const i = o.getX(e),
                 m = o.getZ(e),
@@ -2225,7 +2229,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 236,
+  Wt = 237,
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -5426,7 +5430,7 @@ function Te() {
       return _t(qt.x, qt.z);
     })();
   Jt(n.x, n.z), (o.rotation.y = Math.atan2(-o.position.x, -o.position.z));
-  for (let t = 0; t < 12; t++) {
+  for (let t = 0; t < 10; t++) {
     const e = Se(t),
       o = mt.player.position.x - 80 + (t % 4) * 55,
       n = mt.player.position.z - 130 + 62 * Math.floor(t / 4);
@@ -5947,7 +5951,7 @@ document.addEventListener(
         ("ShiftLeft" !== t.code && "ShiftRight" !== t.code) ||
           t.repeat ||
           (N = !0),
-        "KeyZ" === t.code && S && !b)
+        "KeyZ" === t.code && S && !b && !t.repeat)
       ) {
         const t = performance.now();
         mt.sheep.forEach((e, o) => {
@@ -6588,7 +6592,9 @@ function _e(o, n) {
       (e("#charge i").style.width = 100 * T + "%")),
     (function (o, n) {
       Number.isFinite(ut.worldTime) || (ut.worldTime = 0.29),
-        (ut.worldTime = (ut.worldTime + o / 1440) % 1);
+        // One full in-game day now takes 22 real minutes instead of 24.
+        // The 9% increase is noticeable without making dusk or night rush by.
+        (ut.worldTime = (ut.worldTime + o / 1320) % 1);
       const s = ut.worldTime,
         a = Ze(s);
       e("#timePhaseLabel").textContent = a.name;
@@ -6908,6 +6914,28 @@ function _e(o, n) {
       }
       const l = samplePlayerSurface(o.position.x, o.position.z, o.position.y) + pt,
         h = o.userData.bodyRoot || o;
+      // Entering the actual Temple courtyard restores David's energy once per
+      // visit. Leaving the court rearms the blessing for a later damaged visit.
+      if (dt) {
+        const insideTempleCourt =
+          o.position.x >= dt.courtXMin &&
+          o.position.x <= dt.courtXMax &&
+          o.position.z >= dt.courtZMin &&
+          o.position.z <= dt.courtZMax;
+        if (
+          insideTempleCourt &&
+          templeRecoveryArmed &&
+          ut.hp > 0 &&
+          ut.hp < 100
+        ) {
+          ut.hp = 100;
+          templeRecoveryArmed = !1;
+          eo("성전 뜰에서 에너지가 회복되었습니다.");
+          $e();
+        } else if (!insideTempleCourt) {
+          templeRecoveryArmed = !0;
+        }
+      }
       // Altar fail-safe: when crossing the scanned model's rim, never allow the
       // player to drop into its hollow visual shell.  The stair remains the normal
       // approach, while any position still inside the square footprint resolves
@@ -7024,7 +7052,7 @@ function _e(o, n) {
     (function (e, o) {
       updateJerusalemSheepHold(),
         updateSouthGateGuard(e),
-        y && Math.random() < 0.012 * e && kt("sheep");
+        y && !K.KeyZ && Math.random() < 0.012 * e && kt("sheep");
       const n = mt.player;
       const activePredators = mt.enemies.filter(
         (enemy) => enemy.userData.hp > 0 && enemy.userData.type !== "bandit",
@@ -7050,6 +7078,20 @@ function _e(o, n) {
             return;
           } else if (s.userData.nightCampPosition) {
             s.userData.nightCampPosition = null;
+          }
+          // While Z remains held, keep each running slot centred on David.
+          // Updating the target here lets the flock follow a moving/running
+          // player without retriggering either the notice or the bleat.
+          if (K.KeyZ && !s.userData.safeHold) {
+            const recallAngle =
+              (a / Math.max(1, mt.sheep.length)) * Math.PI * 2;
+            s.userData.target.set(
+              n.position.x + 90 * Math.sin(recallAngle),
+              0,
+              n.position.z + 90 * Math.cos(recallAngle),
+            );
+            s.userData.recallUntil = now + 250;
+            s.userData.stuckTime = 0;
           }
           let nearestPredator = null;
           let nearestPredatorDistance = Infinity;
@@ -7264,12 +7306,15 @@ function _e(o, n) {
             h = Math.hypot(c, l),
             d = (s.userData.recallUntil || 0) > performance.now();
           if (h > 18) {
+            const flockRunning = !!K.KeyZ;
             const o =
               (s.userData.fear || 0) > 0.18
                 ? 98 + 52 * s.userData.fear
                 :
               (s.userData.urgeUntil || 0) > performance.now()
                 ? 112
+                : flockRunning
+                  ? 310
                 : d
                   ? 82
                   : 58;
@@ -7393,15 +7438,19 @@ function _e(o, n) {
           const p = h > 18;
           if (p && s.userData.legs) {
             const panicking = (s.userData.fear || 0) > 0.18;
-            s.userData.runPhase += e * (panicking ? 14 : d ? 12 : 8);
-            const o = Math.sin(s.userData.runPhase) * (panicking ? 0.62 : d ? 0.55 : 0.34);
+            const flockRunning = !!K.KeyZ;
+            s.userData.runPhase +=
+              e * (flockRunning ? 17.2 : panicking ? 14 : d ? 12 : 8);
+            const o =
+              Math.sin(s.userData.runPhase) *
+              (flockRunning ? 0.72 : panicking ? 0.62 : d ? 0.55 : 0.34);
             (s.userData.legs[0].rotation.z = o),
               (s.userData.legs[3].rotation.z = o),
               (s.userData.legs[1].rotation.z = -o),
               (s.userData.legs[2].rotation.z = -o),
               (s.rotation.z = t.MathUtils.lerp(
                 s.rotation.z,
-                panicking ? -0.07 : d ? -0.055 : 0,
+                flockRunning ? -0.08 : panicking ? -0.07 : d ? -0.055 : 0,
                 Math.min(1, 7 * e),
               ));
           } else if (s.userData.legs) {
@@ -7411,7 +7460,7 @@ function _e(o, n) {
           }
           const u = p
             ? Math.abs(Math.sin(2 * (s.userData.runPhase || 0))) *
-              (d ? 2.1 : 1.15)
+              (K.KeyZ ? 2.45 : d ? 2.1 : 1.15)
             : 0;
           s.position.y = te(s.position.x, s.position.z) + 1 + u;
         }),
