@@ -714,6 +714,29 @@ function addPreparedTempleAltar(parent, courtY, fallbackAltar, fallbackRamp) {
   return templeAltarPromise;
 }
 
+async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, loadingTimer) {
+  // Scene construction, shader compilation and the first real frame all happen
+  // behind the loading overlay. This prevents the player from entering while
+  // the GPU and browser are still settling the newly-created wilderness.
+  if (c && i && r) {
+    try {
+      if (typeof c.compileAsync === "function") await c.compileAsync(i, r);
+      else c.compile(i, r);
+    } catch (error) {
+      console.warn("Startup shader warmup skipped:", error);
+    }
+    c.render(i, r);
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    );
+  }
+  clearInterval(loadingTimer);
+  if (loadingBar) loadingBar.style.width = "100%";
+  if (loadingPercent) loadingPercent.textContent = "100%";
+  await new Promise((resolve) => setTimeout(resolve, 260));
+  loadingScreen?.classList.add("hidden");
+}
+
 async function At(e) {
   const loadingScreen = document.querySelector("#gameLoading");
   const loadingBar = document.querySelector("#loadingBar");
@@ -765,11 +788,7 @@ async function At(e) {
     Et().then(() => {
       y && Ut(520, 0.12, 0.08, "sine", 160);
     }),
-    clearInterval(loadingTimer),
-    loadingBar && (loadingBar.style.width = "100%"),
-    loadingPercent && (loadingPercent.textContent = "100%"),
     Dt("gameScreen"),
-    setTimeout(() => loadingScreen?.classList.add("hidden"), 220),
     c ||
       (function () {
         (i = new t.Scene()),
@@ -2164,6 +2183,12 @@ async function At(e) {
           addEventListener("resize", Le),
           c.setAnimationLoop(Qe);
       })(),
+    await finishStartupWarmup(
+      loadingScreen,
+      loadingBar,
+      loadingPercent,
+      loadingTimer,
+    ),
     Te(),
     e && no(),
     (S = !0),
@@ -5203,14 +5228,6 @@ function Pe(o = "lion") {
         scale: 1.18,
         label: "사자",
       },
-      bear: {
-        hp: 145,
-        speed: 48,
-        body: 5719095,
-        head: 4141096,
-        scale: 1.38,
-        label: "곰",
-      },
       wolf: {
         hp: 52,
         speed: 78,
@@ -5263,20 +5280,6 @@ function Pe(o = "lion") {
     ze(lionFallback, 3, 4, 58, [-48, 34, 0], a.body, 7).rotation.z = -1.1;
     const o = new t.Mesh(new t.IcosahedronGeometry(8, 1), ge(7030056));
     o.position.set(-72, 53, 0), lionFallback.add(o);
-  } else if ("bear" === o) {
-    const e = new t.Mesh(new t.IcosahedronGeometry(34, 1), ge(a.body));
-    e.scale.set(1.35, 0.95, 0.85), e.position.set(-2, 34, 0), n.add(e);
-    const o = new t.Mesh(new t.IcosahedronGeometry(22, 1), ge(a.head));
-    o.scale.set(1, 0.95, 0.9), o.position.set(43, 43, 0), n.add(o);
-    for (const e of [-12, 12]) {
-      const o = new t.Mesh(new t.SphereGeometry(6, 8, 6), ge(a.head));
-      o.position.set(42, 61, e), n.add(o);
-    }
-    const s = new t.Mesh(new t.BoxGeometry(17, 12, 17), ge(8086864));
-    s.position.set(59, 38, 0), n.add(s);
-    for (const t of [-13, 13])
-      ve(n, [11, 35, 12], [-23, 10, t], a.body),
-        ve(n, [11, 35, 12], [25, 10, t], a.body);
   } else if ("wolf" === o) {
     ve(n, [72, 25, 25], [0, 28, 0], a.body).scale.x = 1.2;
     const e = new t.Mesh(new t.IcosahedronGeometry(18, 1), ge(9079169));
@@ -5676,7 +5679,7 @@ function moveNightFlockToSouthGate() {
 function damageSheep(sheep, attacker) {
   if (!sheep || !mt.sheep.includes(sheep) || sheep.userData.safeHold) return false;
   const type = attacker?.userData?.type || "fox";
-  const damage = { fox: 8, wolf: 11, lion: 15, bear: 18 }[type] || 8;
+  const damage = { fox: 8, wolf: 11, lion: 15 }[type] || 8;
   sheep.userData.hp = Math.max(0, (sheep.userData.hp ?? 100) - damage);
   kt("sheep");
   if (sheep.userData.hp <= 0) return removeSheepFromFlock(sheep, attacker);
@@ -7456,13 +7459,11 @@ function _e(o, n) {
               o = Math.random(),
               n = e
                 ? "bandit"
-                : o < 0.08
-                  ? "bear"
-                  : o < 0.3
-                    ? "lion"
-                    : o < 0.74
-                      ? "wolf"
-                      : "fox",
+                : o < 0.24
+                  ? "lion"
+                  : o < 0.7
+                    ? "wolf"
+                    : "fox",
               s =
                 "밤" === Ze(ut.worldTime).name
                   ? "wolf" === n
