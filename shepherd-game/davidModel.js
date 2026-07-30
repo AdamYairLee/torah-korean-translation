@@ -382,18 +382,17 @@ export function createDavidModel({
   player.add(torch);
   runtime.staffNightLight = torch;
 
-  // Tripo 원본에서 완전한 한 인물만 분리한 단일 정적 메시이므로,
-  // 리깅된 팔다리 애니메이션 대신
-  // 기존 플레이어 루트의 이동·점프·공격 기울기와 최소 보행 흔들림을 사용한다.
+  // 동일한 스킨 메시 하나에서 걷기/달리기 클립만 전환한다.
+  // 모델을 교체하지 않으므로 이동 상태가 바뀌어도 외형과 재질은 유지된다.
   // 로드에 실패하면 위 절차형 캐릭터가 그대로 안전한 대체 모델로 남는다.
   const fallbackChildren = [...bodyRoot.children];
   new GLTFLoader().load(
-    "./assets/models/david_tripo_static.glb",
+    "./assets/models/david_animated_optimized.glb",
     (gltf) => {
       const importedRoot = new T.Group();
-      importedRoot.name = "DavidTripoStaticRoot";
+      importedRoot.name = "DavidAnimatedRoot";
       const importedModel = gltf.scene;
-      importedModel.name = "DavidTripoStaticModel";
+      importedModel.name = "DavidAnimatedModel";
 
       // Tripo 파일은 이미 Y-up이다. 축을 다시 돌리면 캐릭터가 옆으로
       // 눕기 때문에 원본 축을 그대로 유지한다.
@@ -446,12 +445,153 @@ export function createDavidModel({
       bodyRoot.add(importedRoot);
       player.userData.importedAvatar = importedRoot;
       player.userData.importedAvatarBaseY = importedRoot.position.y;
-      player.userData.usesStaticImportedAvatar = true;
+
+      const prepareLoopingClip = (sourceClip, removeForwardMotion = false) => {
+        if (!sourceClip) return null;
+        const clip = sourceClip.clone();
+        clip.name = `${sourceClip.name}_game`;
+        for (const track of clip.tracks) {
+          const valueSize = track.getValueSize();
+          const keyCount = track.times.length;
+          if (keyCount < 2) continue;
+
+          // Tripo's in-place export still leaves accumulated forward travel on
+          // Hip.position. Root is rotated -90 degrees around X, so the local Y
+          // component is forward travel (not character height). Keeping it
+          // makes every repeat snap the whole skeleton back to its first step.
+          if (
+            removeForwardMotion &&
+            /(^|\.)Hip\.position$/.test(track.name) &&
+            valueSize === 3
+          ) {
+            const forward = track.values[1];
+            for (let key = 0; key < keyCount; key++) {
+              track.values[key * 3 + 1] = forward;
+            }
+          }
+
+          // Force a continuous loop boundary. Blend the final two samples
+          // toward the first pose, then make the final sample identical.
+          // Quaternion tracks must use spherical interpolation.
+          const blendStart = Math.max(1, keyCount - 3);
+          if (valueSize === 4 && /\.quaternion$/.test(track.name)) {
+            const first = new T.Quaternion().fromArray(track.values, 0);
+            for (let key = blendStart; key < keyCount; key++) {
+              const amount = (key - blendStart + 1) / (keyCount - blendStart);
+              const current = new T.Quaternion().fromArray(
+                track.values,
+                key * 4,
+              );
+              current.slerp(first, amount).normalize().toArray(
+                track.values,
+                key * 4,
+              );
+            }
+          } else {
+            for (let key = blendStart; key < keyCount; key++) {
+              const amount = (key - blendStart + 1) / (keyCount - blendStart);
+              for (let component = 0; component < valueSize; component++) {
+                const index = key * valueSize + component;
+                track.values[index] = T.MathUtils.lerp(
+                  track.values[index],
+                  track.values[component],
+                  amount,
+                );
+              }
+            }
+          }
+        }
+        clip.resetDuration();
+        return clip;
+      };
+
+      const clips = gltf.animations || [];
+      const walkClip =
+        clips.find((clip) => /walk/i.test(clip.name)) ||
+        clips.reduce(
+          (best, clip) =>
+            !best || clip.duration > best.duration ? clip : best,
+          null,
+        );
+      const runClip =
+        clips.find((clip) => /run/i.test(clip.name)) ||
+        clips.reduce(
+          (best, clip) =>
+            !best || clip.duration < best.duration ? clip : best,
+          null,
+        );
+      const gameWalkClip = prepareLoopingClip(walkClip, true);
+      const gameRunClip = prepareLoopingClip(runClip, true);
+      const mixer = new T.AnimationMixer(importedModel);
+      const walkAction = gameWalkClip ? mixer.clipAction(gameWalkClip) : null;
+      const runAction =
+        gameRunClip && runClip !== walkClip
+          ? mixer.clipAction(gameRunClip)
+          : null;
+      for (const action of [walkAction, runAction]) {
+        if (!action) continue;
+        action.setLoop(T.LoopRepeat, Infinity);
+        // fadeIn() multiplies its fade curve by action.weight. Keeping the
+        // base weight at 0 makes every animation permanently contribute 0,
+        // even while the mixer and clip time are advancing.
+        action.setEffectiveWeight(1);
+        action.play();
+        action.enabled = false;
+      }
+
+      player.userData.animationMixer = mixer;
+      player.userData.walkAction = walkAction;
+      player.userData.runAction = runAction;
+      player.userData.locomotionState = "idle";
+
+      // The staff is equipment, so it must inherit the animated right-hand
+      // bone. Object3D.attach preserves its current world alignment while the
+      // pivot becomes a child of the hand. Attacks rotate this pivot, adding a
+      // swing on top of the hand animation without detaching the staff.
+      const rightHand =
+        importedModel.getObjectByName("R_Hand") ||
+        importedModel.getObjectByName("RightHand");
+      if (rightHand) {
+        const staffSwingPivot = new T.Group();
+        staffSwingPivot.name = "StaffRightHandSwingPivot";
+        rightHand.add(staffSwingPivot);
+        staffSwingPivot.position.set(0, 0, 0);
+        staffSwingPivot.rotation.set(0, 0, 0);
+        staffSwingPivot.scale.set(1, 1, 1);
+        staffSwingPivot.attach(staff);
+        staffSwingPivot.userData.baseQuaternion =
+          staffSwingPivot.quaternion.clone();
+        player.userData.staff = staffSwingPivot;
+        player.userData.staffVisual = staff;
+      }
+
+      player.userData.updateLocomotionAnimation = (
+        delta,
+        moving,
+        running,
+      ) => {
+        const nextState = moving ? (running ? "run" : "walk") : "idle";
+        if (nextState !== player.userData.locomotionState) {
+          player.userData.locomotionState = nextState;
+          const fade = 0.18;
+          if (nextState === "walk") {
+            walkAction?.reset().setEffectiveWeight(1).fadeIn(fade).play();
+            runAction?.fadeOut(fade);
+          } else if (nextState === "run") {
+            runAction?.reset().setEffectiveWeight(1).fadeIn(fade).play();
+            walkAction?.fadeOut(fade);
+          } else {
+            walkAction?.fadeOut(fade);
+            runAction?.fadeOut(fade);
+          }
+        }
+        mixer.update(Math.min(delta, 0.05));
+      };
     },
     undefined,
     (error) => {
       console.warn(
-        "Tripo 다비드 모델을 불러오지 못해 기존 절차형 모델을 사용합니다.",
+        "애니메이션 다비드 모델을 불러오지 못해 기존 절차형 모델을 사용합니다.",
         error,
       );
     },

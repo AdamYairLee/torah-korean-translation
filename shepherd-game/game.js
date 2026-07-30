@@ -140,6 +140,10 @@ let Z = new t.Vector3(-1150, 0, 1050),
   oliveTreeModelTemplate = null,
   datePalmModelPromise = null,
   datePalmModelTemplate = null,
+  houseModelPromise = null,
+  houseModelTemplates = null,
+  palaceModelPromise = null,
+  palaceModelTemplate = null,
   datePalmPlacements = [],
   _ = null,
   J = null,
@@ -197,6 +201,9 @@ const southernJerusalemUpgrade = {
   created: false,
   roads: [],
   houses: [],
+  detailedGroup: null,
+  proceduralGroup: null,
+  detailedVisible: false,
   projectileColliders: new Set(["building", "wall", "temple", "temple-wall", "jerusalem-map"]),
 };
 const pt = 33,
@@ -238,6 +245,7 @@ const pt = 33,
     staffNightLight: null,
     templeNightLight: null,
     stars: null,
+    eastPanorama: null,
     datePalmGrove: null,
     southGateGuard: null,
   },
@@ -736,6 +744,80 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
   if (loadingPercent) loadingPercent.textContent = "100%";
   await new Promise((resolve) => setTimeout(resolve, 260));
   loadingScreen?.classList.add("hidden");
+}
+
+function prepareStaticBuildingTemplate(root, name) {
+  root.updateMatrixWorld(true);
+  const bounds = new t.Box3().setFromObject(root);
+  const size = bounds.getSize(new t.Vector3());
+  const center = bounds.getCenter(new t.Vector3());
+  root.position.x -= center.x;
+  root.position.z -= center.z;
+  root.position.y -= bounds.min.y;
+  const container = new t.Group();
+  container.name = name;
+  container.add(root);
+  root.traverse((part) => {
+    if (!part.isMesh) return;
+    part.castShadow = false;
+    part.receiveShadow = true;
+    part.frustumCulled = true;
+    if (part.material) {
+      const materials = Array.isArray(part.material) ? part.material : [part.material];
+      for (const material of materials) {
+        material.precision = "mediump";
+        material.needsUpdate = true;
+      }
+    }
+  });
+  container.userData.nativeSize = size;
+  return container;
+}
+
+function loadHouseModels() {
+  if (houseModelPromise) return houseModelPromise;
+  const loader = new GLTFLoader();
+  const specs = [
+    ["common", "./assets/models/houses/house_common_game.glb"],
+    ["slope", "./assets/models/houses/house_slope_game.glb"],
+    ["wealthy", "./assets/models/houses/house_wealthy_game.glb"],
+  ];
+  houseModelPromise = Promise.all(
+    specs.map(([key, url]) =>
+      loader.loadAsync(url).then((gltf) => [
+        key,
+        prepareStaticBuildingTemplate(gltf.scene, `HouseTemplate_${key}`),
+      ]),
+    ),
+  ).then((entries) => (houseModelTemplates = Object.fromEntries(entries)));
+  return houseModelPromise;
+}
+
+function loadDavidPalaceModel() {
+  if (palaceModelPromise) return palaceModelPromise;
+  palaceModelPromise = new GLTFLoader()
+    .loadAsync("./assets/models/houses/david_palace_game.glb")
+    .then((gltf) => {
+      palaceModelTemplate = prepareStaticBuildingTemplate(
+        gltf.scene,
+        "DavidPalaceTemplate",
+      );
+      return palaceModelTemplate;
+    });
+  return palaceModelPromise;
+}
+
+function updateJerusalemBuildingLOD() {
+  const detailed = southernJerusalemUpgrade.detailedGroup;
+  const procedural = southernJerusalemUpgrade.proceduralGroup;
+  // Stable rollback: the lightweight instanced city and procedural palace are
+  // the only active building layers at every distance. This prevents an empty
+  // near-LOD group from hiding the city when the player approaches Jerusalem.
+  southernJerusalemUpgrade.detailedVisible = false;
+  if (detailed) detailed.visible = false;
+  if (procedural) procedural.visible = true;
+  if (mt.davidPalaceDetailed) mt.davidPalaceDetailed.visible = false;
+  if (mt.davidPalaceProcedural) mt.davidPalaceProcedural.visible = true;
 }
 
 async function At(e) {
@@ -1460,7 +1542,10 @@ async function At(e) {
                       (o.castShadow = !0),
                       a.add(o);
                   }
-                  e.add(a), Ot(n + i, s + r, 468, 259.2, 0, "palace");
+                  a.name = "DavidPalaceProceduralLOD";
+                  mt.davidPalaceProcedural = a;
+                  e.add(a);
+                  Ot(n + i, s + r, 468, 259.2, 0, "palace");
                 })(r, c, o, n),
                 (function (e, o, n, s) {
                   const a = 70,
@@ -2229,7 +2314,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 237,
+  Wt = 238,
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -3417,6 +3502,13 @@ function createSouthernJerusalemUpgrade() {
   }
   southernJerusalemUpgrade.houseCount = houses.length;
   southernJerusalemUpgrade.houses = houses;
+  // The supplied image-to-3D house meshes are unsuitable for city-wide
+  // replication: even their reduced versions are too dense and contain
+  // reconstruction artifacts. Keep every lot on the stable instanced house
+  // renderer so geometry, collision and roof height remain consistent.
+  houses.forEach((house) => {
+    house.detailed = false;
+  });
 
   // Keep road coordinates for lot spacing, minimap and sheep navigation only.
   // No visible stone-road geometry is generated inside the city.
@@ -3442,7 +3534,9 @@ function createSouthernJerusalemUpgrade() {
     }
   }
   for (let materialIndex = 0; materialIndex < stoneMaterials.length; materialIndex++) {
-    const selected = houses.filter((house) => house.material === materialIndex);
+    const selected = houses.filter(
+      (house) => house.material === materialIndex && !house.detailed,
+    );
     const mesh = new t.InstancedMesh(houseGeometry, stoneMaterials[materialIndex], selected.length);
     const dummy = new t.Object3D();
     selected.forEach((house, index) => {
@@ -3477,10 +3571,10 @@ function createSouthernJerusalemUpgrade() {
     const parapets = new t.InstancedMesh(
       parapetGeometry,
       roofMaterials[edge % roofMaterials.length],
-      houses.length,
+      houses.filter((house) => !house.detailed).length,
     );
     const dummy = new t.Object3D();
-    houses.forEach((house, index) => {
+    houses.filter((house) => !house.detailed).forEach((house, index) => {
       const horizontal = edge < 2;
       const side = edge % 2 === 0 ? -1 : 1;
       const localX = horizontal ? 0 : side * (house.width / 2 + 1);
@@ -3500,9 +3594,10 @@ function createSouthernJerusalemUpgrade() {
     parapets.frustumCulled = false;
     group.add(parapets);
   }
-  const doors = new t.InstancedMesh(doorGeometry, doorMaterial, houses.length);
+  const simpleHouses = houses.filter((house) => !house.detailed);
+  const doors = new t.InstancedMesh(doorGeometry, doorMaterial, simpleHouses.length);
   const doorDummy = new t.Object3D();
-  houses.forEach((house, index) => {
+  simpleHouses.forEach((house, index) => {
     const side = index % 4;
     const direction = house.rotation + side * Math.PI / 2;
     const alongX = Math.sin(direction);
@@ -3532,7 +3627,53 @@ function createSouthernJerusalemUpgrade() {
   doors.castShadow = false;
   doors.computeBoundingSphere();
   doors.frustumCulled = false;
-  group.add(doors);
+    group.add(doors);
+
+  // Detailed lots use their measured model height for the walkable collision
+  // top. This avoids an invisible roof plane floating above a shorter model.
+  houses.filter((house) => house.detailed).forEach((house) => {
+    Ot(
+      house.x,
+      house.z,
+      house.width,
+      house.depth,
+      house.rotation,
+      "building",
+      house.ground,
+      house.ground + house.modelHeight,
+    );
+  });
+
+  // Near LOD: every current lot receives one of the three supplied house
+  // models. Geometry and textures remain shared between clones; only transforms
+  // differ. Uniform scaling prevents the six-view models from being stretched.
+  const detailedGroup = new t.Group();
+  detailedGroup.name = "JerusalemDetailedHouseLOD";
+  detailedGroup.visible = false;
+  if (houseModelTemplates) {
+    houses.filter((house) => house.detailed).forEach((house, index) => {
+      const kind = house.modelKind;
+      const template = houseModelTemplates[kind];
+      const native = template.userData.nativeSize;
+      const quarterTurn = house.rotation + (native.z > native.x ? Math.PI / 2 : 0);
+      const building = template.clone(true);
+      building.name = `JerusalemHouse_${kind}_${index}`;
+      building.scale.set(
+        house.modelScale.x,
+        house.modelScale.y,
+        house.modelScale.z,
+      );
+      building.rotation.y = quarterTurn;
+      building.position.set(house.x, house.ground - 1.5, house.z);
+      building.traverse((part) => {
+        if (part.isMesh) part.frustumCulled = true;
+      });
+      detailedGroup.add(building);
+    });
+  }
+  i.add(detailedGroup);
+  southernJerusalemUpgrade.detailedGroup = detailedGroup;
+  southernJerusalemUpgrade.proceduralGroup = group;
 
   // City torches are created before this residential layer. Revalidate them
   // after all new house colliders exist, place them on an actual mapped lane,
@@ -6731,6 +6872,15 @@ function _e(o, n) {
           t.MathUtils.smoothstep(starAmount, 0.015, 0.24);
         mt.stars.visible = starAmount > 0.006;
       }
+      if (mt.eastPanorama?.material) {
+        const panoramaLight = 0.16 + 0.84 * l;
+        mt.eastPanorama.material.color.setRGB(
+          panoramaLight * (1 - 0.08 * v),
+          panoramaLight * (1 - 0.12 * v),
+          panoramaLight * (1 - 0.18 * v),
+        );
+        mt.eastPanorama.material.opacity = 0.82 + 0.16 * l;
+      }
       if (
         (d &&
           ((d.intensity = 0.66 + 1.56 * l),
@@ -6822,22 +6972,57 @@ function _e(o, n) {
       if (((k = Math.max(0, k - e)), o.userData.staff))
         if (o.userData.staffSwing > 0) {
           o.userData.staffSwing = Math.max(0, o.userData.staffSwing - e);
-          const t = 1 - o.userData.staffSwing / 0.36;
-          (o.userData.staff.rotation.z = 1.45 * Math.sin(t * Math.PI) - 0.45),
-            (o.userData.staff.rotation.x = 0.35 * Math.sin(t * Math.PI));
-        } else
-          (o.userData.staff.rotation.z = t.MathUtils.lerp(
-            o.userData.staff.rotation.z,
-            -0.025,
-            Math.min(1, 10 * e),
-          )),
-            (o.userData.staff.rotation.x *= Math.max(0, 1 - 10 * e));
+          const swingProgress = 1 - o.userData.staffSwing / 0.36;
+          const swingAmount = Math.sin(swingProgress * Math.PI);
+          const staff = o.userData.staff;
+          if (staff.userData.baseQuaternion) {
+            staff.quaternion
+              .copy(staff.userData.baseQuaternion)
+              .multiply(
+                new t.Quaternion().setFromEuler(
+                  new t.Euler(
+                    0.35 * swingAmount,
+                    0,
+                    1.45 * swingAmount,
+                    "XYZ",
+                  ),
+                ),
+              );
+          } else {
+            (staff.rotation.z = 1.45 * swingAmount - 0.45),
+              (staff.rotation.x = 0.35 * swingAmount);
+          }
+        } else {
+          const staff = o.userData.staff;
+          if (staff.userData.baseQuaternion) {
+            staff.quaternion.slerp(
+              staff.userData.baseQuaternion,
+              Math.min(1, 12 * e),
+            );
+          } else {
+            (staff.rotation.z = t.MathUtils.lerp(
+              staff.rotation.z,
+              -0.025,
+              Math.min(1, 10 * e),
+            )),
+              (staff.rotation.x *= Math.max(0, 1 - 10 * e));
+          }
+        }
       const n = (K.KeyW ? 1 : 0) - (K.KeyS ? 1 : 0),
         s = (K.KeyD ? 1 : 0) - (K.KeyA ? 1 : 0),
         a = new t.Vector3(Math.sin(B), 0, Math.cos(B)).normalize(),
         i = new t.Vector3(-Math.cos(B), 0, Math.sin(B)).normalize(),
         c = (o.position.clone(), new t.Vector3());
-      if ((c.addScaledVector(a, n).addScaledVector(i, s), c.lengthSq() > 0)) {
+      const hasMovementInput = c
+        .addScaledVector(a, n)
+        .addScaledVector(i, s)
+        .lengthSq() > 0;
+      o.userData.updateLocomotionAnimation?.(
+        e,
+        hasMovementInput,
+        hasMovementInput && !!K.Space,
+      );
+      if (hasMovementInput) {
         c.normalize();
         const n = (K.Space ? 310 : 145) * (G ? 0.55 : 1),
           s = c.clone().multiplyScalar(n * e);
@@ -6874,7 +7059,7 @@ function _e(o, n) {
             direction * 0.035 * Math.sin(o.userData.walkPhase * 0.72 + index);
         });
         const importedAvatar = o.userData.importedAvatar;
-        if (importedAvatar) {
+        if (importedAvatar && !o.userData.animationMixer) {
           const baseY = o.userData.importedAvatarBaseY || 0;
           importedAvatar.position.y =
             baseY + Math.abs(Math.sin(o.userData.walkPhase)) * (h ? 2.4 : 1.35);
@@ -7050,6 +7235,7 @@ function _e(o, n) {
       }
     })(o),
     (function (e, o) {
+      updateJerusalemBuildingLOD();
       updateJerusalemSheepHold(),
         updateSouthGateGuard(e),
         y && !K.KeyZ && Math.random() < 0.012 * e && kt("sheep");
