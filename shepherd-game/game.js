@@ -5941,6 +5941,22 @@ function moveNightFlockToSouthGate() {
     parkSheepAtJerusalemHold(sheep, index);
   });
 }
+function releaseNightFlockAtCamp() {
+  // Dawn ends only the night-watch lock. The flock must remain at the camp
+  // where the player guarded it; teleporting it to Jerusalem made every sheep
+  // appear to vanish at once.
+  citySheepWaitingForPickup = !1;
+  mt.sheep.forEach((sheep) => {
+    sheep.userData.nightCampPosition = null;
+    sheep.userData.safeHold = !1;
+    sheep.userData.cityGateHold = !1;
+    sheep.userData.jerusalemHoldSlot = null;
+    sheep.userData.target?.set?.(0, 0, 0);
+    sheep.userData.recallUntil = performance.now() + 15000;
+    sheep.userData.urgeUntil = 0;
+    sheep.userData.lastPos?.copy?.(sheep.position);
+  });
+}
 function damageSheep(sheep, attacker) {
   if (!sheep || !mt.sheep.includes(sheep) || sheep.userData.safeHold) return false;
   const type = attacker?.userData?.type || "fox";
@@ -6858,12 +6874,10 @@ function _e(o, n) {
         (ut.worldTime = (ut.worldTime + o / 1320) % 1);
       const s = ut.worldTime,
         a = Ze(s);
-      e("#timePhaseLabel").textContent = a.name;
-      const c = Math.floor(24 * s * 60);
-      e("#timeClock").textContent =
-        String(Math.floor(c / 60)).padStart(2, "0") +
-        ":" +
-        String(c % 60).padStart(2, "0");
+      const phaseLabel = e("#timePhaseLabel");
+      if (phaseLabel)
+        phaseLabel.textContent =
+          window.ShepherdI18n?.tr?.(a.name) || a.name;
       const l = Math.max(
           0,
           Math.sin(Math.PI * t.MathUtils.clamp((s - 0.03) / 0.76, 0, 1)),
@@ -8187,10 +8201,10 @@ function _e(o, n) {
         if (phase !== "밤" && nightWatch.lastPhase === "밤") {
           nightWatch.active = !1;
           nightWatch.sheepLocked = !1;
-          moveNightFlockToSouthGate();
+          releaseNightFlockAtCamp();
           nightWatch.lastPhase = phase;
           ut.missionDone = !0;
-          eo("새벽이 되었습니다. 양 떼가 예루샬라임 남문 대기장에 모였습니다.");
+          eo("새벽이 되었습니다. 양 떼가 야영지에서 다시 이동을 시작합니다.");
           Ke();
         } else {
           nightWatch.lastPhase = phase;

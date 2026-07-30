@@ -93,7 +93,6 @@
   letter-spacing:.08em;opacity:.83;pointer-events:none
 }
 #timePhase strong{font-size:22px;font-weight:800}
-#timePhase span{font-size:12px;font-weight:600;opacity:.78;letter-spacing:.04em}
 #thirstHud{top:62px!important}
 .sound-toggle{
   display:flex!important;align-items:center;gap:9px;margin:12px 0 6px;
