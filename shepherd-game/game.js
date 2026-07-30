@@ -4179,13 +4179,26 @@ function be(e, o, n) {
 function Ge(t) {
   t.userData.healthUI?.wrap?.remove(), (t.userData.healthUI = null);
 }
+// The four Tripo quadrupeds were authored with different local forward axes.
+// Movement rotates the predator container so +Z faces its target, while the
+// legacy sheep container uses +X as its forward direction. Keep the model-axis
+// correction on the imported child only so AI steering, hitboxes, sizes and
+// procedural bone animation remain unchanged.
+const IMPORTED_ANIMAL_FACING_Y = Object.freeze({
+  // Rest-pose heading measured from the rig's tail/spine toward its head.
+  sheep: 2.3749,
+  lion: 0.7378,
+  wolf: 1.5759,
+  fox: 0.0265,
+});
 function loadLionModel() {
   if (lionModelPromise) return lionModelPromise;
   lionModelPromise = new Promise((resolve, reject) => {
-    const loader = new FBXLoader();
+    const loader = new GLTFLoader();
     loader.load(
-      "./assets/models/lion_walk.fbx",
-      (model) => {
+      "./assets/models/animals/lion_rigged_game.glb",
+      (gltf) => {
+        const model = gltf.scene;
         lionModelTemplate = model;
         model.traverse((obj) => {
           if (obj.isMesh || obj.isSkinnedMesh) {
@@ -4208,6 +4221,7 @@ function loadLionModel() {
             }
           }
         });
+        prepareImportedAnimalModel(model);
         resolve(model);
       },
       undefined,
@@ -4238,21 +4252,13 @@ function applyLionModel(enemy, fallbackModel) {
       model.position.x -= center.x;
       model.position.z -= center.z;
       model.position.y -= box.min.y;
-      model.rotation.y = 0;
+      model.rotation.y = IMPORTED_ANIMAL_FACING_Y.lion;
       enemy.add(model);
       fallbackModel.visible = false;
-      const clips = template.animations || [];
-      if (clips.length) {
-        const mixer = new t.AnimationMixer(model);
-        const walkClip = clips.find((clip) => /walk/i.test(clip.name)) || clips[0];
-        const action = mixer.clipAction(walkClip);
-        action.reset();
-        action.setLoop(t.LoopRepeat, Infinity);
-        action.play();
-        enemy.userData.mixer = mixer;
-        enemy.userData.walkAction = action;
-      }
+      enemy.userData.animalRig = createRiggedAnimalAnimation(model, "lion");
       enemy.userData.lion3D = model;
+      enemy.userData.importedModel = model;
+      enemy.userData.importedModelBaseY = model.position.y;
     })
     .catch(() => {
       fallbackModel.visible = true;
@@ -4284,13 +4290,127 @@ function prepareImportedAnimalModel(model) {
   });
   return model;
 }
+
+// Tripo's quadruped export contains a usable skeleton and skin weights, but no
+// animation clips. Keep a copy of every relevant rest quaternion and animate
+// the bones additively so the original rig pose is never lost or accumulated.
+const animalAnimationEuler = new t.Euler();
+const animalAnimationOffset = new t.Quaternion();
+function createRiggedAnimalAnimation(model, type) {
+  const bones = {};
+  model.traverse((part) => {
+    if (!part.isBone) return;
+    bones[part.name] = part;
+    part.userData.animalRestQuaternion = part.quaternion.clone();
+  });
+  const find = (name) => bones[`tripo::${name}`] || null;
+  const rig = {
+    type,
+    phase: Math.random() * Math.PI * 2,
+    idlePhase: Math.random() * Math.PI * 2,
+    nextUpdateAt: 0,
+    bones,
+    spine: [0, 1, 2, 3, 4, 5].map((n) => find(`Spine_${n}`)).filter(Boolean),
+    head: [0, 1, 2, 3, 4].map((n) => find(`Head_${n}`)).filter(Boolean),
+    tail: [0, 1, 2].map((n) => find(`Tail_${n}`)).filter(Boolean),
+    legs: [
+      [0, "Left"],
+      [0, "Right"],
+      [1, "Left"],
+      [1, "Right"],
+    ].map(([pair, side]) =>
+      [0, 1, 2, 3, 4]
+        .map((n) => find(`${pair}_${side}_Limb_${n}`))
+        .filter(Boolean),
+    ),
+  };
+  return rig;
+}
+function setAnimalBoneRotation(bone, x = 0, y = 0, z = 0) {
+  if (!bone?.userData?.animalRestQuaternion) return;
+  animalAnimationEuler.set(x, y, z, "XYZ");
+  animalAnimationOffset.setFromEuler(animalAnimationEuler);
+  bone.quaternion
+    .copy(bone.userData.animalRestQuaternion)
+    .multiply(animalAnimationOffset);
+}
+function updateRiggedAnimalAnimation(owner, moving, intensity, attacking = false) {
+  const rig = owner?.userData?.animalRig;
+  if (!rig || !mt.player) return;
+  // `frameNow` belongs to the main update function's local scope and is not
+  // visible here. Referencing it stopped the render loop as soon as the first
+  // rigged animal finished loading. Use this function's own monotonic clock so
+  // asynchronous model attachment can never break rendering.
+  const now = performance.now();
+  const distance = Math.hypot(
+    owner.position.x - mt.player.position.x,
+    owner.position.z - mt.player.position.z,
+  );
+  // Bone matrices are the expensive part for a flock. Near animals remain
+  // fluid, while distant/off-action animals update at a progressively lower
+  // cadence without changing their AI or travel speed.
+  const interval = distance < 480 ? 30 : distance < 1050 ? 75 : 180;
+  if (now < rig.nextUpdateAt) return;
+  const step = Math.min(0.18, Math.max(0.016, (now - (rig.lastUpdateAt || now - interval)) / 1000));
+  rig.lastUpdateAt = now;
+  rig.nextUpdateAt = now + interval + ((owner.id || 0) % 4) * 4;
+  const gait = moving ? 5.6 + 7.2 * intensity : 0;
+  rig.phase += step * gait;
+  rig.idlePhase += step * 1.35;
+  const wave = Math.sin(rig.phase);
+  const counter = Math.sin(rig.phase + Math.PI);
+  const breathe = Math.sin(rig.idlePhase);
+  const gaitAmount = moving ? 0.22 + 0.48 * intensity : 0;
+  const attackPulse = attacking ? Math.sin(Math.min(Math.PI, (rig.phase % Math.PI))) : 0;
+
+  rig.legs.forEach((chain, index) => {
+    const diagonal = index === 0 || index === 3 ? wave : counter;
+    chain.forEach((bone, joint) => {
+      const bend = joint === 0
+        ? diagonal * gaitAmount
+        : joint === 1
+          ? -diagonal * gaitAmount * 0.72
+          : Math.max(0, -diagonal) * gaitAmount * 0.36;
+      setAnimalBoneRotation(bone, 0, 0, bend);
+    });
+  });
+  rig.spine.forEach((bone, index) => {
+    const bodyWave = moving
+      ? Math.sin(rig.phase * 2 + index * 0.55) * (0.012 + intensity * 0.022)
+      : breathe * 0.009;
+    setAnimalBoneRotation(bone, 0, bodyWave, attacking && index > 1 ? -0.07 * attackPulse : 0);
+  });
+  rig.head.forEach((bone, index) => {
+    let nod = moving ? Math.sin(rig.phase * 2) * 0.025 * intensity : breathe * 0.018;
+    let look = moving ? 0 : Math.sin(rig.idlePhase * 0.47) * 0.035;
+    if (rig.type === "sheep" && !moving) {
+      // A calm sheep periodically lowers its head to graze, then looks up.
+      const graze = Math.max(0, Math.sin(rig.idlePhase * 0.31));
+      nod += graze * (index === 0 ? 0.16 : 0.07);
+      look += Math.sin(rig.idlePhase * 0.23) * 0.025;
+    }
+    if (attacking) nod -= attackPulse * (index === 0 ? 0.2 : 0.08);
+    setAnimalBoneRotation(bone, 0, look, nod);
+  });
+  rig.tail.forEach((bone, index) => {
+    const tailSpeed = rig.type === "sheep" ? 1.4 : moving ? 1.9 : 0.72;
+    const tailAmount = rig.type === "lion" ? 0.12 : rig.type === "fox" ? 0.18 : 0.14;
+    setAnimalBoneRotation(
+      bone,
+      0,
+      Math.sin(rig.phase * tailSpeed + index * 0.5) * tailAmount * (moving ? 1 : 0.65),
+      moving ? -0.025 * intensity : 0,
+    );
+  });
+}
 function loadFoxModel() {
   if (foxModelTemplate) return Promise.resolve(foxModelTemplate);
   if (foxModelPromise) return foxModelPromise;
   foxModelPromise = new Promise((resolve, reject) => {
-    new FBXLoader().load(
-      "./assets/models/fox_rigged.fbx",
-      (model) => {
+    new GLTFLoader().load(
+      "./assets/models/animals/fox_rigged_game.glb",
+      (gltf) => {
+        const model = gltf.scene;
         foxModelTemplate = prepareImportedAnimalModel(model);
         resolve(foxModelTemplate);
       },
@@ -4309,7 +4429,7 @@ function loadWolfModel() {
   if (wolfModelPromise) return wolfModelPromise;
   wolfModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/wolf_lowpoly.glb",
+      "./assets/models/animals/wolf_rigged_game.glb",
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         scene.animations = gltf.animations || [];
@@ -4331,7 +4451,7 @@ function loadSheepModel() {
   if (sheepModelPromise) return sheepModelPromise;
   sheepModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/sheep_tripo_static.glb",
+      "./assets/models/animals/sheep_rigged_game.glb",
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         sheepModelTemplate = scene;
@@ -4354,12 +4474,9 @@ function applySheepModel(sheep) {
   loadSheepModel()
     .then((template) => {
       if (!sheep.parent || !mt.sheep.includes(sheep) || sheep.userData.importedSheepModel) return;
-      const model = template.clone(true);
-      model.name = "SheepTripoStaticModel";
-      // The source sheep faces diagonally (+X/+Z). Align its nose with the
-      // procedural flock's +X forward axis so turning remains correct from
-      // the front, rear, left, and right.
-      model.rotation.set(0, Math.PI / 4, 0);
+      const model = cloneSkinnedModel(template);
+      model.name = "SheepRiggedModel";
+      model.rotation.set(0, IMPORTED_ANIMAL_FACING_Y.sheep, 0);
       model.updateMatrixWorld(true);
       let box = new t.Box3().setFromObject(model);
       const size = box.getSize(new t.Vector3());
@@ -4377,6 +4494,7 @@ function applySheepModel(sheep) {
       });
       sheep.userData.importedSheepModel = model;
       sheep.userData.importedSheepBaseY = model.position.y;
+      sheep.userData.animalRig = createRiggedAnimalAnimation(model, "sheep");
     })
     .catch(() => {
       fallbackChildren.forEach((child) => {
@@ -5319,15 +5437,25 @@ function applyBanditModel(enemy) {
 }
 function applyImportedPredatorModel(enemy, type) {
   const config = {
-    fox: { load: loadFoxModel, targetLength: 138, rotationY: 0, rotationX: -Math.PI / 2, skinned: true },
-    wolf: { load: loadWolfModel, targetLength: 122, rotationY: 0, rotationX: 0, skinned: false },
+    fox: {
+      load: loadFoxModel,
+      targetLength: 138,
+      rotationY: IMPORTED_ANIMAL_FACING_Y.fox,
+      rotationX: 0,
+    },
+    wolf: {
+      load: loadWolfModel,
+      targetLength: 122,
+      rotationY: IMPORTED_ANIMAL_FACING_Y.wolf,
+      rotationX: 0,
+    },
   }[type];
   if (!config) return;
   const fallbackChildren = [...enemy.children];
   config.load()
     .then((template) => {
       if (!enemy.parent || enemy.userData.type !== type) return;
-      const model = config.skinned ? cloneSkinnedModel(template) : template.clone(true);
+      const model = cloneSkinnedModel(template);
       model.name = type === "fox" ? "Fox3DModel" : "Wolf3DModel";
       model.updateMatrixWorld(true);
       const initialBox = new t.Box3().setFromObject(model);
@@ -5336,7 +5464,7 @@ function applyImportedPredatorModel(enemy, type) {
       const scale = config.targetLength / horizontalLength;
       model.scale.setScalar(scale);
       model.rotation.x = config.rotationX || 0;
-      model.rotation.y = config.rotationY || 0;
+      model.rotation.y = config.rotationY;
       model.updateMatrixWorld(true);
       const box = new t.Box3().setFromObject(model);
       const center = box.getCenter(new t.Vector3());
@@ -5345,18 +5473,10 @@ function applyImportedPredatorModel(enemy, type) {
       model.position.y -= box.min.y;
       enemy.add(model);
       fallbackChildren.forEach((child) => { child.visible = false; });
-      const clips = template.animations || [];
-      if (clips.length) {
-        const mixer = new t.AnimationMixer(model);
-        const clip = clips.find((item) => /walk|run|take/i.test(item.name)) || clips[0];
-        const action = mixer.clipAction(clip);
-        action.reset().setLoop(t.LoopRepeat, Infinity).play();
-        enemy.userData.mixer = mixer;
-        enemy.userData.walkAction = action;
-      }
       enemy.userData.importedModel = model;
       enemy.userData.importedModelBaseY = model.position.y;
       enemy.userData.importedModelPhase = Math.random() * Math.PI * 2;
+      enemy.userData.animalRig = createRiggedAnimalAnimation(model, type);
     })
     .catch(() => fallbackChildren.forEach((child) => { child.visible = true; }));
 }
@@ -5852,7 +5972,7 @@ function createSheepShop() {
   loadSheepModel().then((template) => {
     if (!shop.parent) return;
     for (const [index, localX] of [-34, 34].entries()) {
-      const sheepDisplay = template.clone(true);
+      const sheepDisplay = cloneSkinnedModel(template);
       sheepDisplay.name = `SouthGateSheepShopDisplay${index + 1}`;
       sheepDisplay.rotation.y = Math.PI / 4 + (index ? -0.24 : 0.24);
       sheepDisplay.updateMatrixWorld(true);
@@ -7261,6 +7381,7 @@ function _e(o, n) {
             if (s.userData.legs)
               for (const leg of s.userData.legs)
                 leg.rotation.z *= Math.max(0, 1 - 8 * e);
+            updateRiggedAnimalAnimation(s, false, 0, false);
             return;
           } else if (s.userData.nightCampPosition) {
             s.userData.nightCampPosition = null;
@@ -7622,6 +7743,12 @@ function _e(o, n) {
               !s.userData.safeHold &&
               (s.userData.target.set(0, 0, 0), (s.userData.recallUntil = 0));
           const p = h > 18;
+          updateRiggedAnimalAnimation(
+            s,
+            p,
+            K.KeyZ ? 1 : (s.userData.fear || 0) > 0.18 ? 0.82 : d ? 0.62 : 0.32,
+            false,
+          );
           if (p && s.userData.legs) {
             const panicking = (s.userData.fear || 0) > 0.18;
             const flockRunning = !!K.KeyZ;
@@ -7768,18 +7895,13 @@ function _e(o, n) {
           a = o.position.z - e.position.z,
           r = Math.hypot(s, a);
         if (e.userData.walkAction) e.userData.walkAction.paused = r <= 42;
-        if (e.userData.importedModel && !e.userData.mixer) {
-          e.userData.importedModelPhase += t * (r > 42 ? 9 : 2.2);
-          const moving = r > 42;
-          e.userData.importedModel.position.y =
-            e.userData.importedModelBaseY +
-            // Keep both soles planted. A side-to-side lean communicates motion
-            // without lifting the entire static scan off the terrain.
-            (moving ? 0 : Math.sin(e.userData.importedModelPhase) * 0.12);
-          e.userData.importedModel.rotation.z = moving
-            ? Math.sin(e.userData.importedModelPhase) * 0.025
-            : 0;
-        }
+        if (isAnimal)
+          updateRiggedAnimalAnimation(
+            e,
+            r > 42,
+            r > 42 ? Math.min(1, e.userData.speed / 88) : 0,
+            r <= 42,
+          );
         if (r > 42) {
           e.position.x += (s / r) * e.userData.speed * t;
           e.position.z += (a / r) * e.userData.speed * t;
