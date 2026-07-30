@@ -476,66 +476,24 @@ function Ut(t = 440, e = 0.12, o = 0.05, n = "sine", s = 0) {
 }
 
 function createWildernessTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 512;
-  const ctx = canvas.getContext("2d", { alpha: false });
-  const image = ctx.createImageData(512, 512);
-  let seed = 18437;
-  const rnd = () => {
-    seed = (1664525 * seed + 1013904223) >>> 0;
-    return seed / 4294967296;
-  };
-  for (let y = 0; y < 512; y++) {
-    for (let x = 0; x < 512; x++) {
-      const large =
-        0.5 +
-        0.22 * Math.sin(x * 0.032 + y * 0.018) +
-        0.16 * Math.cos(x * 0.014 - y * 0.027);
-      const fine = rnd() - 0.5;
-      const gravel = rnd() > 0.965 ? -34 - 28 * rnd() : 0;
-      const pale = rnd() > 0.982 ? 28 + 22 * rnd() : 0;
-      const shade = 0.56 * large + 0.44 * fine;
-      const i = 4 * (y * 512 + x);
-      image.data[i] = Math.max(
-        68,
-        Math.min(196, 142 + 31 * shade + gravel + pale),
-      );
-      image.data[i + 1] = Math.max(
-        58,
-        Math.min(171, 116 + 24 * shade + gravel * 0.72 + pale * 0.7),
-      );
-      image.data[i + 2] = Math.max(
-        44,
-        Math.min(142, 78 + 18 * shade + gravel * 0.48 + pale * 0.48),
-      );
-      image.data[i + 3] = 255;
-    }
-  }
-  ctx.putImageData(image, 0, 0);
-  ctx.globalAlpha = 0.3;
-  for (let i = 0; i < 1350; i++) {
-    const x = rnd() * 512;
-    const y = rnd() * 512;
-    const r = 0.45 + rnd() * 2.2;
-    const v = 72 + Math.floor(rnd() * 92);
-    ctx.fillStyle = `rgb(${v + 18},${v + 2},${Math.max(42, v - 28)})`;
-    ctx.beginPath();
-    ctx.ellipse(
-      x,
-      y,
-      r * (1.2 + rnd()),
-      r * (0.45 + rnd() * 0.45),
-      rnd() * Math.PI,
-      0,
-      Math.PI * 2,
-    );
-    ctx.fill();
-  }
-  const texture = new t.CanvasTexture(canvas);
+  const texture = new t.TextureLoader().load(
+    "assets/terrain/judean_wilderness_diffuse_2k.jpg",
+  );
   texture.wrapS = texture.wrapT = t.RepeatWrapping;
-  texture.repeat.set(42, 42);
+  texture.repeat.set(18, 18);
   texture.colorSpace = t.SRGBColorSpace;
   texture.anisotropy = Math.min(8, c?.capabilities?.getMaxAnisotropy?.() || 1);
+  return texture;
+}
+
+function createWildernessNormalTexture() {
+  const texture = new t.TextureLoader().load(
+    "assets/terrain/judean_wilderness_normal_1k.jpg",
+  );
+  texture.wrapS = texture.wrapT = t.RepeatWrapping;
+  texture.repeat.set(18, 18);
+  texture.colorSpace = t.NoColorSpace;
+  texture.anisotropy = Math.min(4, c?.capabilities?.getMaxAnisotropy?.() || 1);
   return texture;
 }
 function parseTempleObj(text) {
@@ -991,12 +949,15 @@ async function At(e) {
             e.setAttribute("color", new t.Float32BufferAttribute(n, 3)),
               e.computeVertexNormals();
             const m = createWildernessTexture();
-            const f = new t.MeshToonMaterial({
+            const normalMap = createWildernessNormalTexture();
+            const f = new t.MeshStandardMaterial({
                 vertexColors: !0,
                 flatShading: !0,
                 map: m,
-                gradientMap: xe(),
+                normalMap,
+                normalScale: new t.Vector2(0.42, 0.42),
                 roughness: 1,
+                metalness: 0,
               }),
               w = new t.Mesh(e, f);
             (w.receiveShadow = !0),
@@ -1005,7 +966,7 @@ async function At(e) {
               (function () {
                 const e = ee(210041),
                   o = [ge(9269845), ge(11111269), ge(12624501), ge(7495500)];
-                for (let n = 0; n < 1250; n++) {
+                for (let n = 0; n < 140; n++) {
                   const s = 7180 * (e() - 0.5),
                     a = 7180 * (e() - 0.5);
                   if (Kt(s, a, 110) || he(s, a) > 0.62) continue;
