@@ -2131,12 +2131,19 @@ async function At(e) {
                 mt.campStoneFar = campStoneFar;
                 mt.campStoneNear = campStoneNear;
                 mt.campStonePlacements = campStonePlacements;
-                const s = new t.Mesh(new t.ConeGeometry(72, 68, 4), n);
-                (s.rotation.y = Math.PI / 4),
-                  s.position.set(205, 34, 35),
-                  (s.castShadow = !0),
-                  e.add(s),
-                  ze(e, 2.6, 3.5, 78, [205, 39, 35], 6833192, 6);
+                // Detailed camp furniture is loaded asynchronously so it does
+                // not hold up first play.  Every holder is grounded again when
+                // the travelling camp moves.
+                e.userData.campProps = [];
+                loadCampProp(e, {
+                  name: "CampTent",
+                  url: "./assets/models/camp_tent_game.glb",
+                  position: [205, 35],
+                  size: 260,
+                  // Tripo's open/front end is the model's +Z side. Point it at
+                  // the camp centre in local space, regardless of camp rotation.
+                  faceCampCenter: true,
+                });
                 const a = createDatePalmClone();
                 a &&
                   (a.position.set(292, 0, 18),
@@ -2184,37 +2191,20 @@ async function At(e) {
                   ge(13859388),
                 );
                 w.position.set(160, 11, -35), e.add(w);
-                const M = new t.Group();
-                ve(M, [94, 12, 10], [0, 6, -25], 10324329),
-                  ve(M, [94, 12, 10], [0, 6, 25], 10324329),
-                  ve(M, [10, 12, 50], [-42, 6, 0], 10324329),
-                  ve(M, [10, 12, 50], [42, 6, 0], 10324329);
-                const y = new t.Mesh(
-                  new t.PlaneGeometry(74, 38),
-                  new t.MeshToonMaterial({
-                    color: 7314849,
-                    transparent: !0,
-                    opacity: 0.88,
-                    side: t.DoubleSide,
-                  }),
-                );
-                (y.rotation.x = -Math.PI / 2),
-                  (y.position.y = 9),
-                  M.add(y),
-                  M.position.set(-220, 0, 62),
-                  e.add(M);
-                const x = new t.Group();
-                ve(x, [92, 9, 9], [0, 11, -22], 7491631),
-                  ve(x, [92, 9, 9], [0, 11, 22], 7491631),
-                  ve(x, [8, 24, 8], [-38, 0, -18], 6833192),
-                  ve(x, [8, 24, 8], [38, 0, -18], 6833192),
-                  ve(x, [8, 24, 8], [-38, 0, 18], 6833192),
-                  ve(x, [8, 24, 8], [38, 0, 18], 6833192);
-                const g = new t.Mesh(new t.BoxGeometry(72, 8, 31), ge(7897939));
-                (g.position.y = 12),
-                  x.add(g),
-                  x.position.set(-220, 0, -55),
-                  e.add(x);
+                loadCampProp(e, {
+                  name: "CampHayTrough",
+                  url: "./assets/models/camp_hay_trough_game.glb",
+                  position: [-220, 62],
+                  size: 132,
+                  yaw: Math.PI / 2,
+                });
+                loadCampProp(e, {
+                  name: "CampWaterTrough",
+                  url: "./assets/models/camp_water_trough_game.glb",
+                  position: [-220, -55],
+                  size: 138,
+                  yaw: Math.PI / 2,
+                });
                 for (let n = 0; n < 4; n++) {
                   const s = new t.Mesh(
                     new t.DodecahedronGeometry(18 - 3 * n, 0),
@@ -3179,9 +3169,100 @@ function ce() {
         ((t = Z.z), 90 * Math.sin(8e-4 * t) - 120 - Z.x),
         420,
       )),
-      updateCampStoneGrounding());
+      updateCampStoneGrounding(),
+      updateCampPropGrounding());
   mt.sheep.forEach((sheep) => {
     sheep.userData.campArrivalCycle = -1;
+  });
+}
+
+function loadCampProp(camp, config) {
+  const holder = new t.Group();
+  holder.name = `${config.name}GroundedHolder`;
+  holder.userData.campLocalX = config.position[0];
+  holder.userData.campLocalZ = config.position[1];
+  holder.userData.campYaw = config.faceCampCenter
+    ? Math.atan2(-config.position[0], -config.position[1])
+    : config.yaw || 0;
+  holder.position.set(config.position[0], 0, config.position[1]);
+  holder.visible = false;
+  camp.add(holder);
+  camp.userData.campProps.push(holder);
+
+  new GLTFLoader().load(
+    config.url,
+    (gltf) => {
+      const model = gltf.scene;
+      const sourceBounds = new t.Box3().setFromObject(model);
+      const sourceSize = sourceBounds.getSize(new t.Vector3());
+      const longestSide = Math.max(sourceSize.x, sourceSize.z);
+      const scale = config.size / Math.max(longestSide, 0.0001);
+      model.scale.setScalar(scale);
+      model.updateMatrixWorld(true);
+
+      // Correct the imported origin from measured geometry rather than using
+      // an asset-specific magic Y offset. This guarantees the actual lowest
+      // vertex rests on the holder's ground plane.
+      const scaledBounds = new t.Box3().setFromObject(model);
+      model.position.y -= scaledBounds.min.y;
+      model.traverse((part) => {
+        if (!part.isMesh) return;
+        part.castShadow = false;
+        part.receiveShadow = true;
+        part.frustumCulled = true;
+        if (part.material) {
+          const materials = Array.isArray(part.material)
+            ? part.material
+            : [part.material];
+          materials.forEach((material) => {
+            material.metalness = 0;
+            material.roughness = Math.max(material.roughness ?? 0.8, 0.72);
+          });
+        }
+      });
+      holder.add(model);
+      holder.visible = true;
+      updateCampPropGrounding();
+    },
+    undefined,
+    (error) => console.error(`${config.name} 모델 로딩 실패:`, error),
+  );
+}
+
+function updateCampPropGrounding() {
+  const camp = mt.goalSite;
+  const props = camp?.userData?.campProps;
+  if (!camp || !props?.length) return;
+  const up = new t.Vector3(0, 1, 0);
+  const worldNormal = new t.Vector3();
+  const localNormal = new t.Vector3();
+  const inverseCampYaw = new t.Quaternion().setFromAxisAngle(
+    up,
+    -camp.rotation.y,
+  );
+  const cosYaw = Math.cos(camp.rotation.y);
+  const sinYaw = Math.sin(camp.rotation.y);
+  const worldPoint = (localX, localZ) => ({
+    x: camp.position.x + localX * cosYaw + localZ * sinYaw,
+    z: camp.position.z - localX * sinYaw + localZ * cosYaw,
+  });
+
+  props.forEach((holder) => {
+    const localX = holder.userData.campLocalX;
+    const localZ = holder.userData.campLocalZ;
+    const center = worldPoint(localX, localZ);
+    const plusX = worldPoint(localX + 10, localZ);
+    const minusX = worldPoint(localX - 10, localZ);
+    const plusZ = worldPoint(localX, localZ + 10);
+    const minusZ = worldPoint(localX, localZ - 10);
+    const centerY = te(center.x, center.z);
+    const slopeX = (te(plusX.x, plusX.z) - te(minusX.x, minusX.z)) / 20;
+    const slopeZ = (te(plusZ.x, plusZ.z) - te(minusZ.x, minusZ.z)) / 20;
+    worldNormal.set(-slopeX, 1, -slopeZ).normalize();
+    localNormal.copy(worldNormal).applyQuaternion(inverseCampYaw);
+    holder.position.set(localX, centerY - camp.position.y, localZ);
+    holder.quaternion.setFromUnitVectors(up, localNormal);
+    holder.rotateY(holder.userData.campYaw);
   });
 }
 
