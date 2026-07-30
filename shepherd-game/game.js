@@ -179,6 +179,7 @@ let Z = new t.Vector3(-1150, 0, 1050),
   dt = null,
   citySheepWaitingForPickup = !1,
   playerWasInsideJerusalem = !1,
+  citizensPlayerWasInsideJerusalem = !1,
   templeRecoveryArmed = !0;
 const nightWatch = {
   active: !1,
@@ -6121,7 +6122,7 @@ function loadCityGirlModel() {
   if (cityGirlModelPromise) return cityGirlModelPromise;
   cityGirlModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_girl_game.glb",
+      "./assets/models/city_girl2_game.glb",
       (gltf) => {
         cityGirlModelTemplate = prepareCityCitizenTemplate(gltf.scene);
         resolve(cityGirlModelTemplate);
@@ -6152,18 +6153,18 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
   const graph = buildCitySheepRoadGraph();
   if (!graph.nodes.length) return;
   const current = closestPointOnCityRoad(citizen.position.x, citizen.position.z);
-  let best = null;
+  const candidates = [];
+  const previousDistrict = citizen.userData.currentDistrict ?? -1;
   const bandits = mt.enemies.filter(
     (enemy) =>
       enemy.userData.type === "bandit" &&
       enemy.userData.hp > 0 &&
       Yt(enemy.position.x, enemy.position.z, -70),
   );
-  for (let attempt = 0; attempt < 42; attempt++) {
-    const node = graph.nodes[Math.floor(Math.random() * graph.nodes.length)];
+  for (const node of graph.nodes) {
     if (isInsideTempleCourt(node.x, node.z, 55)) continue;
     const travel = Math.hypot(node.x - citizen.position.x, node.z - citizen.position.z);
-    if (travel < (fleeing ? 420 : 520)) continue;
+    if (travel < (fleeing ? 520 : 700)) continue;
     if (
       citizen.userData.recentTargets.some(
         (target) => Math.hypot(node.x - target.x, node.z - target.z) < 180,
@@ -6178,7 +6179,9 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
         dangerDistance,
         Math.hypot(node.x - bandit.position.x, node.z - bandit.position.z),
       );
-    const score = fleeing ? dangerDistance + travel * 0.18 : travel + Math.random() * 240;
+    const district = node.z < -700 ? 0 : node.z < 350 ? 1 :
+      node.z < 1150 ? 2 : node.x < -220 ? 3 : node.x > 220 ? 4 : 5;
+    if (!fleeing && district === previousDistrict) continue;
     const path = makeCitySheepPath(
       current?.x ?? citizen.position.x,
       current?.z ?? citizen.position.z,
@@ -6186,17 +6189,90 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       node.z,
     );
     if (
-      path.length < 2 ||
+      path.length < 5 ||
       path.some((point) => isInsideTempleCourt(point.x, point.z, 42))
     ) continue;
-    if (!best || score > best.score) best = { node, score, path };
+    let routeLength = 0;
+    for (let index = 1; index < path.length; index++)
+      routeLength += Math.hypot(
+        path[index].x - path[index - 1].x,
+        path[index].z - path[index - 1].z,
+      );
+    if (routeLength < (fleeing ? 650 : 1050)) continue;
+    const edgeKeys = [];
+    let repeatedEdges = 0;
+    for (let index = 1; index < path.length; index++) {
+      const a = path[index - 1];
+      const b = path[index];
+      const first = `${Math.round(a.x)},${Math.round(a.z)}`;
+      const second = `${Math.round(b.x)},${Math.round(b.z)}`;
+      const key = first < second ? `${first}|${second}` : `${second}|${first}`;
+      edgeKeys.push(key);
+      if (citizen.userData.recentRouteEdges.includes(key)) repeatedEdges++;
+    }
+    const novelty = 1 - repeatedEdges / Math.max(edgeKeys.length, 1);
+    if (!fleeing && novelty < 0.38) continue;
+    const score = fleeing
+      ? dangerDistance + routeLength * 0.22 + novelty * 260
+      : routeLength * 0.55 + novelty * 900 + Math.random() * 260;
+    candidates.push({ node, score, path, district, edgeKeys });
+  }
+  candidates.sort((a, b) => b.score - a.score);
+  let best = candidates.length
+    ? candidates[Math.floor(Math.random() * Math.min(6, candidates.length))]
+    : null;
+  if (!best) {
+    citizen.userData.recentTargets.splice(
+      0,
+      Math.ceil(citizen.userData.recentTargets.length / 2),
+    );
+    citizen.userData.recentRouteEdges.splice(
+      0,
+      Math.ceil(citizen.userData.recentRouteEdges.length / 2),
+    );
+    const fallbackNodes = graph.nodes
+      .filter((node) => !isInsideTempleCourt(node.x, node.z, 55))
+      .map((node) => ({
+        node,
+        distance: Math.hypot(
+          node.x - citizen.position.x,
+          node.z - citizen.position.z,
+        ),
+      }))
+      .sort((a, b) => b.distance - a.distance);
+    for (const candidate of fallbackNodes.slice(0, 16)) {
+      const path = makeCitySheepPath(
+        current?.x ?? citizen.position.x,
+        current?.z ?? citizen.position.z,
+        candidate.node.x,
+        candidate.node.z,
+      );
+      if (
+        path.length >= 3 &&
+        !path.some((point) => isInsideTempleCourt(point.x, point.z, 42))
+      ) {
+        const district = candidate.node.z < -700 ? 0 :
+          candidate.node.z < 350 ? 1 :
+          candidate.node.z < 1150 ? 2 :
+          candidate.node.x < -220 ? 3 : candidate.node.x > 220 ? 4 : 5;
+        best = { node: candidate.node, path, district, edgeKeys: [] };
+        break;
+      }
+    }
   }
   if (!best) return;
   citizen.userData.path = best.path;
   citizen.userData.pathIndex = Math.min(1, citizen.userData.path.length - 1);
+  citizen.userData.currentDistrict = best.district;
   citizen.userData.recentTargets.push({ x: best.node.x, z: best.node.z });
-  if (citizen.userData.recentTargets.length > 3)
+  if (citizen.userData.recentTargets.length > 10)
     citizen.userData.recentTargets.shift();
+  citizen.userData.recentRouteEdges.push(...best.edgeKeys);
+  if (citizen.userData.recentRouteEdges.length > 56)
+    citizen.userData.recentRouteEdges.splice(
+      0,
+      citizen.userData.recentRouteEdges.length - 56,
+    );
 }
 function captureCitizenWalkRig(model) {
   const rig = {};
@@ -6213,7 +6289,7 @@ function captureCitizenWalkRig(model) {
 function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
   if (!visible) return;
   citizen.userData.animationAccumulator += delta;
-  if (citizen.userData.animationAccumulator < 1 / 24) return;
+  if (citizen.userData.animationAccumulator < 1 / 20) return;
   const elapsed = citizen.userData.animationAccumulator;
   citizen.userData.animationAccumulator = 0;
   if (moving) citizen.userData.walkPhase += elapsed * (fleeing ? 10.5 : 6.4);
@@ -6244,7 +6320,9 @@ function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
 const cityCitizenProfiles = {
   boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20 },
   boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16 },
-  girl1: { name: "JerusalemBiblicalGirl1", height: 164, radius: 23 },
+  // David's imported mesh is fitted to 164 local units, then the complete
+  // playable group is scaled to 0.54. Match the real world-space height.
+  girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16 },
   girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20 },
 };
 function addCityCitizen(kind, index, template) {
@@ -6276,9 +6354,13 @@ function addCityCitizen(kind, index, template) {
     lastSafePosition: new t.Vector3(x, te(x, z), z),
     attackedFleeFor: 0,
     recentTargets: [],
+    recentRouteEdges: [],
     stuckFor: 0,
     progressPosition: new t.Vector3(x, te(x, z), z),
     progressCheckFor: 1.2,
+    currentDistrict: -1,
+    blockedWaypointFor: 0,
+    updateOffset: index * 0.025,
   };
   const model = (kind === "boy1" || kind === "boy2" || kind === "girl1")
     ? cloneSkinnedModel(template)
@@ -6298,6 +6380,55 @@ function addCityCitizen(kind, index, template) {
   mt.cityCitizens.push(citizen);
   chooseCitizenRoadTarget(citizen, false);
 }
+function removeDuplicateDavidCharacters() {
+  if (!i || !mt.player) return;
+  const stale = [];
+  i.traverse((object) => {
+    if (
+      object !== mt.player &&
+      object.name === "DavidFinalPlayableModel" &&
+      !mt.player.getObjectById(object.id)
+    ) stale.push(object);
+  });
+  stale.forEach((object) => object.parent?.remove(object));
+}
+function resetCityCitizensForEntry() {
+  const graph = buildCitySheepRoadGraph();
+  if (!graph.nodes.length || !mt.cityCitizens.length) return;
+  const available = graph.nodes.filter(
+    (node) =>
+      !isInsideTempleCourt(node.x, node.z, 65) &&
+      !jt(node, 28),
+  );
+  const used = [];
+  for (const citizen of mt.cityCitizens) {
+    const options = available.filter(
+      (node) =>
+        used.every((point) => Math.hypot(node.x - point.x, node.z - point.z) > 420) &&
+        (!mt.player ||
+          Math.hypot(
+            node.x - mt.player.position.x,
+            node.z - mt.player.position.z,
+          ) > 520),
+    );
+    const pool = options.length ? options : available;
+    if (!pool.length) continue;
+    const spawn = pool[Math.floor(Math.random() * pool.length)];
+    used.push(spawn);
+    citizen.position.set(spawn.x, te(spawn.x, spawn.z), spawn.z);
+    citizen.userData.lastSafePosition.copy(citizen.position);
+    citizen.userData.progressPosition.copy(citizen.position);
+    citizen.userData.path = [];
+    citizen.userData.pathIndex = 0;
+    citizen.userData.recentTargets = [];
+    citizen.userData.recentRouteEdges = [];
+    citizen.userData.currentDistrict = -1;
+    citizen.userData.blockedWaypointFor = 0;
+    citizen.userData.stuckFor = 0;
+    citizen.userData.repathFor = 0;
+    chooseCitizenRoadTarget(citizen, false);
+  }
+}
 function ensureCityCitizens() {
   if (!i || !dt || mt.cityCitizens.length) return;
   Promise.all([
@@ -6308,6 +6439,7 @@ function ensureCityCitizens() {
   ])
     .then(([boy1, boy2, girl1, girl2]) => {
       if (!i || mt.cityCitizens.length) return;
+      removeDuplicateDavidCharacters();
       addCityCitizen("boy1", 0, boy1);
       addCityCitizen("boy2", 1, boy2);
       addCityCitizen("girl1", 2, girl1);
@@ -6317,6 +6449,13 @@ function ensureCityCitizens() {
 }
 function updateCityCitizens(delta) {
   ensureCityCitizens();
+  const playerInside = !!mt.player &&
+    Yt(mt.player.position.x, mt.player.position.z, -55);
+  if (playerInside && !citizensPlayerWasInsideJerusalem) {
+    removeDuplicateDavidCharacters();
+    resetCityCitizensForEntry();
+  }
+  citizensPlayerWasInsideJerusalem = playerInside;
   const banditActive = mt.enemies.some(
     (enemy) =>
       enemy.userData.type === "bandit" &&
@@ -6331,7 +6470,7 @@ function updateCityCitizens(delta) {
         mt.player.position.z - citizen.position.z,
       )
       : Infinity;
-    const visible = playerDistance < 1100;
+    const visible = playerDistance < 900;
     if (citizen.userData.importedModel)
       citizen.userData.importedModel.visible = visible;
     citizen.userData.repathFor -= delta;
@@ -6366,10 +6505,29 @@ function updateCityCitizens(delta) {
         if (moveNpcWithSweptCollision(citizen, angle, step)) {
           moving = true;
           citizen.rotation.y = angle;
+          citizen.userData.blockedWaypointFor = 0;
         } else {
-          citizen.userData.path = [];
-          citizen.userData.repathFor = 0;
-          citizen.position.copy(citizen.userData.lastSafePosition);
+          // A temporary corner collision must not discard the whole long route
+          // or teleport the citizen back to the start of the same short lane.
+          // Try small left/right deviations first and keep the waypoint.
+          const side = citizen.userData.blockedWaypointFor % 2 ? 1 : -1;
+          const detours = [0.28 * side, -0.28 * side, 0.55 * side, -0.55 * side];
+          for (const offset of detours) {
+            if (moveNpcWithSweptCollision(citizen, angle + offset, step * 0.72)) {
+              moving = true;
+              citizen.rotation.y = angle + offset;
+              break;
+            }
+          }
+          citizen.userData.blockedWaypointFor += delta;
+          if (!moving && citizen.userData.blockedWaypointFor > 1.1) {
+            citizen.userData.pathIndex++;
+            citizen.userData.blockedWaypointFor = 0;
+            if (citizen.userData.pathIndex >= citizen.userData.path.length) {
+              citizen.userData.path = [];
+              chooseCitizenRoadTarget(citizen, fleeing);
+            }
+          }
         }
       }
     }
@@ -6378,24 +6536,29 @@ function updateCityCitizens(delta) {
       const progress = citizen.position.distanceTo(
         citizen.userData.progressPosition,
       );
-      if (progress < 14 && citizen.userData.path.length) {
+      if (progress < 7 && citizen.userData.path.length) {
         citizen.userData.stuckFor++;
-        const recovery = nearestClearCityRoadPoint(
-          citizen.position.x,
-          citizen.position.z,
-          citizen.userData.collisionRadius + 5,
-        );
-        if (recovery && !isInsideTempleCourt(recovery.x, recovery.z, 42)) {
-          citizen.position.set(recovery.x, te(recovery.x, recovery.z), recovery.z);
-          citizen.userData.lastSafePosition.copy(citizen.position);
+        // Only a persistent obstruction rebuilds the route. Do not snap to the
+        // nearest road every second: that caused visible back-and-forth loops.
+        if (citizen.userData.stuckFor >= 3) {
+          const recovery = nearestClearCityRoadPoint(
+            citizen.position.x,
+            citizen.position.z,
+            citizen.userData.collisionRadius + 3,
+          );
+          if (recovery && !isInsideTempleCourt(recovery.x, recovery.z, 42)) {
+            citizen.position.set(recovery.x, te(recovery.x, recovery.z), recovery.z);
+            citizen.userData.lastSafePosition.copy(citizen.position);
+          }
+          citizen.userData.path = [];
+          citizen.userData.repathFor = 0;
+          citizen.userData.stuckFor = 0;
         }
-        citizen.userData.path = [];
-        citizen.userData.repathFor = 0;
       } else {
         citizen.userData.stuckFor = 0;
       }
       citizen.userData.progressPosition.copy(citizen.position);
-      citizen.userData.progressCheckFor = 1.2;
+      citizen.userData.progressCheckFor = 1.5;
     }
     citizen.position.y = te(citizen.position.x, citizen.position.z);
     animateCityCitizen(citizen, moving, fleeing, delta, visible);
@@ -6446,6 +6609,7 @@ function Te() {
     (st = []),
     (citySheepWaitingForPickup = !1),
     (playerWasInsideJerusalem = !1),
+    (citizensPlayerWasInsideJerusalem = !1),
     (nightWatch.active = !1),
     nightWatch.camp.set(0, 0, 0),
     (nightWatch.startedAt = 0),
