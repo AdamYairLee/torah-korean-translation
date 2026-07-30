@@ -136,6 +136,14 @@ let Z = new t.Vector3(-1150, 0, 1050),
   banditModelTemplate = null,
   kohenModelPromise = null,
   kohenModelTemplate = null,
+  cityBoyModelPromise = null,
+  cityBoyModelTemplate = null,
+  cityBoy1ModelPromise = null,
+  cityBoy1ModelTemplate = null,
+  cityGirlModelPromise = null,
+  cityGirlModelTemplate = null,
+  cityGirl1ModelPromise = null,
+  cityGirl1ModelTemplate = null,
   guardModelPromise = null,
   guardModelTemplate = null,
   oliveTreeModelPromise = null,
@@ -251,6 +259,7 @@ const pt = 33,
     datePalmGrove: null,
     southGateGuard: null,
     kohen: null,
+    cityCitizens: [],
   },
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
@@ -4901,6 +4910,8 @@ function showGuardCaught() {
 function canNpcMoveBetween(npc, from, to) {
   const data = npc.userData;
   const clearance = data.collisionRadius ?? 30;
+  if (data.isCityCitizen && isInsideTempleCourt(to.x, to.z, 34))
+    return false;
   const fromGround = te(from.x, from.z);
   const toGround = te(to.x, to.z);
   const rise = toGround - fromGround;
@@ -6048,8 +6059,368 @@ function updateKohen(delta) {
   }
   kohen.position.y = te(kohen.position.x, kohen.position.z);
 }
+function prepareCityCitizenTemplate(scene) {
+  scene.traverse((part) => {
+    if (!part.isMesh) return;
+    part.castShadow = false;
+    part.receiveShadow = false;
+    part.frustumCulled = true;
+    const materials = Array.isArray(part.material) ? part.material : [part.material];
+    for (const material of materials) {
+      if (!material) continue;
+      material.side = t.FrontSide;
+      material.depthWrite = true;
+      material.roughness = Math.max(0.78, material.roughness ?? 0.78);
+      material.metalness = 0;
+      material.normalMap = null;
+      material.roughnessMap = null;
+      material.metalnessMap = null;
+      if (material.map) {
+        material.map.colorSpace = t.SRGBColorSpace;
+        material.map.anisotropy = 1;
+      }
+      material.needsUpdate = true;
+    }
+  });
+  return scene;
+}
+function loadCityBoyModel() {
+  if (cityBoyModelTemplate) return Promise.resolve(cityBoyModelTemplate);
+  if (cityBoyModelPromise) return cityBoyModelPromise;
+  cityBoyModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/city_boy_rigged_game.glb",
+      (gltf) => {
+        cityBoyModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        resolve(cityBoyModelTemplate);
+      },
+      undefined,
+      reject,
+    );
+  });
+  return cityBoyModelPromise;
+}
+function loadCityBoy1Model() {
+  if (cityBoy1ModelTemplate) return Promise.resolve(cityBoy1ModelTemplate);
+  if (cityBoy1ModelPromise) return cityBoy1ModelPromise;
+  cityBoy1ModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/city_boy1_rigged_game.glb",
+      (gltf) => {
+        cityBoy1ModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        resolve(cityBoy1ModelTemplate);
+      },
+      undefined,
+      reject,
+    );
+  });
+  return cityBoy1ModelPromise;
+}
+function loadCityGirlModel() {
+  if (cityGirlModelTemplate) return Promise.resolve(cityGirlModelTemplate);
+  if (cityGirlModelPromise) return cityGirlModelPromise;
+  cityGirlModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/city_girl_game.glb",
+      (gltf) => {
+        cityGirlModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        resolve(cityGirlModelTemplate);
+      },
+      undefined,
+      reject,
+    );
+  });
+  return cityGirlModelPromise;
+}
+function loadCityGirl1Model() {
+  if (cityGirl1ModelTemplate) return Promise.resolve(cityGirl1ModelTemplate);
+  if (cityGirl1ModelPromise) return cityGirl1ModelPromise;
+  cityGirl1ModelPromise = new Promise((resolve, reject) => {
+    new GLTFLoader().load(
+      "./assets/models/city_girl1_rigged_game.glb",
+      (gltf) => {
+        cityGirl1ModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        resolve(cityGirl1ModelTemplate);
+      },
+      undefined,
+      reject,
+    );
+  });
+  return cityGirl1ModelPromise;
+}
+function chooseCitizenRoadTarget(citizen, fleeing = false) {
+  const graph = buildCitySheepRoadGraph();
+  if (!graph.nodes.length) return;
+  const current = closestPointOnCityRoad(citizen.position.x, citizen.position.z);
+  let best = null;
+  const bandits = mt.enemies.filter(
+    (enemy) =>
+      enemy.userData.type === "bandit" &&
+      enemy.userData.hp > 0 &&
+      Yt(enemy.position.x, enemy.position.z, -70),
+  );
+  for (let attempt = 0; attempt < 42; attempt++) {
+    const node = graph.nodes[Math.floor(Math.random() * graph.nodes.length)];
+    if (isInsideTempleCourt(node.x, node.z, 55)) continue;
+    const travel = Math.hypot(node.x - citizen.position.x, node.z - citizen.position.z);
+    if (travel < (fleeing ? 420 : 520)) continue;
+    if (
+      citizen.userData.recentTargets.some(
+        (target) => Math.hypot(node.x - target.x, node.z - target.z) < 180,
+      )
+    ) continue;
+    let dangerDistance = bandits.length ? Infinity : Math.hypot(
+      node.x - (mt.player?.position.x ?? citizen.position.x),
+      node.z - (mt.player?.position.z ?? citizen.position.z),
+    );
+    for (const bandit of bandits)
+      dangerDistance = Math.min(
+        dangerDistance,
+        Math.hypot(node.x - bandit.position.x, node.z - bandit.position.z),
+      );
+    const score = fleeing ? dangerDistance + travel * 0.18 : travel + Math.random() * 240;
+    const path = makeCitySheepPath(
+      current?.x ?? citizen.position.x,
+      current?.z ?? citizen.position.z,
+      node.x,
+      node.z,
+    );
+    if (
+      path.length < 2 ||
+      path.some((point) => isInsideTempleCourt(point.x, point.z, 42))
+    ) continue;
+    if (!best || score > best.score) best = { node, score, path };
+  }
+  if (!best) return;
+  citizen.userData.path = best.path;
+  citizen.userData.pathIndex = Math.min(1, citizen.userData.path.length - 1);
+  citizen.userData.recentTargets.push({ x: best.node.x, z: best.node.z });
+  if (citizen.userData.recentTargets.length > 3)
+    citizen.userData.recentTargets.shift();
+}
+function captureCitizenWalkRig(model) {
+  const rig = {};
+  const aliases = [
+    "L_Thigh", "R_Thigh", "L_Calf", "R_Calf",
+    "L_Upperarm", "R_Upperarm", "Spine01",
+  ];
+  model.traverse((part) => {
+    if (!part.isBone || !aliases.includes(part.name)) return;
+    rig[part.name] = { bone: part, base: part.quaternion.clone() };
+  });
+  return Object.keys(rig).length ? rig : null;
+}
+function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
+  if (!visible) return;
+  citizen.userData.animationAccumulator += delta;
+  if (citizen.userData.animationAccumulator < 1 / 24) return;
+  const elapsed = citizen.userData.animationAccumulator;
+  citizen.userData.animationAccumulator = 0;
+  if (moving) citizen.userData.walkPhase += elapsed * (fleeing ? 10.5 : 6.4);
+  const stride = moving ? Math.sin(citizen.userData.walkPhase) : 0;
+  const rig = citizen.userData.walkRig;
+  if (rig) {
+    const setX = (name, angle) => {
+      const entry = rig[name];
+      if (!entry) return;
+      entry.bone.quaternion.copy(entry.base).multiply(
+        new t.Quaternion().setFromAxisAngle(new t.Vector3(1, 0, 0), angle),
+      );
+    };
+    setX("L_Thigh", stride * (fleeing ? 0.52 : 0.36));
+    setX("R_Thigh", -stride * (fleeing ? 0.52 : 0.36));
+    setX("L_Calf", Math.max(0, -stride) * 0.35);
+    setX("R_Calf", Math.max(0, stride) * 0.35);
+    setX("L_Upperarm", -stride * 0.24);
+    setX("R_Upperarm", stride * 0.24);
+    setX("Spine01", fleeing ? -0.08 : 0);
+  } else if (citizen.userData.importedModel) {
+    citizen.userData.importedModel.rotation.z = moving
+      ? Math.sin(citizen.userData.walkPhase) * 0.018
+      : 0;
+    citizen.userData.importedModel.rotation.x = fleeing ? -0.055 : 0;
+  }
+}
+const cityCitizenProfiles = {
+  boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20 },
+  boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16 },
+  girl1: { name: "JerusalemBiblicalGirl1", height: 164, radius: 23 },
+  girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20 },
+};
+function addCityCitizen(kind, index, template) {
+  if (!i || !dt) return;
+  const profile = cityCitizenProfiles[kind];
+  const road = Xt[(index * 11 + 7) % Xt.length];
+  const amount = 0.2 + 0.6 * ((index * 0.37 + 0.21) % 1);
+  const x = t.MathUtils.lerp(road[0][0], road[1][0], amount);
+  const z = t.MathUtils.lerp(road[0][1], road[1][1], amount);
+  const citizen = new t.Group();
+  citizen.name = profile.name;
+  citizen.position.set(x, te(x, z), z);
+  citizen.userData = {
+    isCityCitizen: true,
+    citizenKind: kind,
+    hitRadius: Math.max(25, profile.radius + 9),
+    bodyHeight: profile.height,
+    collisionRadius: profile.radius,
+    maxStepUp: 11,
+    maxDrop: 13,
+    maxSlope: 0.7,
+    path: [],
+    pathIndex: 0,
+    repathFor: Math.random() * 0.4,
+    walkPhase: Math.random() * Math.PI * 2,
+    animationAccumulator: 0,
+    importedModel: null,
+    walkRig: null,
+    lastSafePosition: new t.Vector3(x, te(x, z), z),
+    attackedFleeFor: 0,
+    recentTargets: [],
+    stuckFor: 0,
+    progressPosition: new t.Vector3(x, te(x, z), z),
+    progressCheckFor: 1.2,
+  };
+  const model = (kind === "boy1" || kind === "boy2" || kind === "girl1")
+    ? cloneSkinnedModel(template)
+    : template.clone(true);
+  model.updateMatrixWorld(true);
+  let box = new t.Box3().setFromObject(model);
+  const targetHeight = profile.height;
+  model.scale.setScalar(targetHeight / Math.max(box.getSize(new t.Vector3()).y, 0.001));
+  model.updateMatrixWorld(true);
+  box = new t.Box3().setFromObject(model);
+  const center = box.getCenter(new t.Vector3());
+  model.position.set(-center.x, -box.min.y, -center.z);
+  citizen.add(model);
+  citizen.userData.importedModel = model;
+  citizen.userData.walkRig = captureCitizenWalkRig(model);
+  i.add(citizen);
+  mt.cityCitizens.push(citizen);
+  chooseCitizenRoadTarget(citizen, false);
+}
+function ensureCityCitizens() {
+  if (!i || !dt || mt.cityCitizens.length) return;
+  Promise.all([
+    loadCityBoy1Model(),
+    loadCityBoyModel(),
+    loadCityGirl1Model(),
+    loadCityGirlModel(),
+  ])
+    .then(([boy1, boy2, girl1, girl2]) => {
+      if (!i || mt.cityCitizens.length) return;
+      addCityCitizen("boy1", 0, boy1);
+      addCityCitizen("boy2", 1, boy2);
+      addCityCitizen("girl1", 2, girl1);
+      addCityCitizen("girl2", 3, girl2);
+    })
+    .catch((error) => console.warn("성 안 시민 모델을 불러오지 못했습니다.", error));
+}
+function updateCityCitizens(delta) {
+  ensureCityCitizens();
+  const banditActive = mt.enemies.some(
+    (enemy) =>
+      enemy.userData.type === "bandit" &&
+      enemy.userData.hp > 0 &&
+      Yt(enemy.position.x, enemy.position.z, -70),
+  );
+  for (const citizen of mt.cityCitizens) {
+    if (!citizen.parent) continue;
+    const playerDistance = mt.player
+      ? Math.hypot(
+        mt.player.position.x - citizen.position.x,
+        mt.player.position.z - citizen.position.z,
+      )
+      : Infinity;
+    const visible = playerDistance < 1100;
+    if (citizen.userData.importedModel)
+      citizen.userData.importedModel.visible = visible;
+    citizen.userData.repathFor -= delta;
+    citizen.userData.attackedFleeFor = Math.max(
+      0,
+      (citizen.userData.attackedFleeFor || 0) - delta,
+    );
+    const fleeing = banditActive || citizen.userData.attackedFleeFor > 0;
+    if (
+      citizen.userData.repathFor <= 0 &&
+      (citizen.userData.fleeing !== fleeing || !citizen.userData.path.length)
+    ) {
+      citizen.userData.fleeing = fleeing;
+      chooseCitizenRoadTarget(citizen, fleeing);
+      citizen.userData.repathFor = fleeing ? 0.7 : 2.5;
+    }
+    const waypoint = citizen.userData.path[citizen.userData.pathIndex];
+    let moving = false;
+    if (waypoint) {
+      const dx = waypoint.x - citizen.position.x;
+      const dz = waypoint.z - citizen.position.z;
+      const distance = Math.hypot(dx, dz);
+      if (distance < 10) {
+        citizen.userData.pathIndex++;
+        if (citizen.userData.pathIndex >= citizen.userData.path.length) {
+          citizen.userData.path = [];
+          chooseCitizenRoadTarget(citizen, fleeing);
+        }
+      } else {
+        const angle = Math.atan2(dx, dz);
+        const step = Math.min(distance, (fleeing ? 84 : 34) * delta);
+        if (moveNpcWithSweptCollision(citizen, angle, step)) {
+          moving = true;
+          citizen.rotation.y = angle;
+        } else {
+          citizen.userData.path = [];
+          citizen.userData.repathFor = 0;
+          citizen.position.copy(citizen.userData.lastSafePosition);
+        }
+      }
+    }
+    citizen.userData.progressCheckFor -= delta;
+    if (citizen.userData.progressCheckFor <= 0) {
+      const progress = citizen.position.distanceTo(
+        citizen.userData.progressPosition,
+      );
+      if (progress < 14 && citizen.userData.path.length) {
+        citizen.userData.stuckFor++;
+        const recovery = nearestClearCityRoadPoint(
+          citizen.position.x,
+          citizen.position.z,
+          citizen.userData.collisionRadius + 5,
+        );
+        if (recovery && !isInsideTempleCourt(recovery.x, recovery.z, 42)) {
+          citizen.position.set(recovery.x, te(recovery.x, recovery.z), recovery.z);
+          citizen.userData.lastSafePosition.copy(citizen.position);
+        }
+        citizen.userData.path = [];
+        citizen.userData.repathFor = 0;
+      } else {
+        citizen.userData.stuckFor = 0;
+      }
+      citizen.userData.progressPosition.copy(citizen.position);
+      citizen.userData.progressCheckFor = 1.2;
+    }
+    citizen.position.y = te(citizen.position.x, citizen.position.z);
+    animateCityCitizen(citizen, moving, fleeing, delta, visible);
+  }
+}
+function hitCityCitizen(citizen) {
+  if (!citizen?.parent) return false;
+  setGuardAlerted(true);
+  const guard = mt.southGateGuard;
+  if (guard) {
+    guard.userData.returningHome = false;
+    guard.userData.searchFor = 0;
+    guard.userData.lastSeenX = mt.player.position.x;
+    guard.userData.lastSeenZ = mt.player.position.z;
+    guard.userData.chaseActivated = Yt(mt.player.position.x, mt.player.position.z, -55);
+  }
+  citizen.userData.fleeing = true;
+  citizen.userData.attackedFleeFor = 6;
+  citizen.userData.path = [];
+  citizen.userData.repathFor = 0;
+  eo("성 안의 사람을 공격해 경비병이 추격합니다.");
+  return true;
+}
 function Te() {
-  [mt.player, mt.sheepShop, mt.southGateGuard, mt.kohen, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
+  [mt.player, mt.sheepShop, mt.southGateGuard, mt.kohen, ...mt.cityCitizens, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
     .filter(Boolean)
     .forEach((t) => i.remove(t)),
     (mt.sheep = []),
@@ -6059,6 +6430,7 @@ function Te() {
     (mt.projectiles = []),
     (mt.southGateGuard = null),
     (mt.kohen = null),
+    (mt.cityCitizens = []),
     (mt.effects = []),
     ae(),
     (at = {
@@ -6783,6 +7155,21 @@ document.addEventListener(
                 guardDistance > 0 &&
                 offset.normalize().dot(a) > -0.18 &&
                 (hitSouthGateGuard(), (s = !0), triggerCombatFeedback("hit"));
+            }
+            for (const citizen of mt.cityCitizens) {
+              const offset = citizen.position.clone().sub(o.position);
+              offset.y = 0;
+              const citizenDistance = offset.length();
+              if (
+                citizenDistance < 145 &&
+                citizenDistance > 0 &&
+                offset.normalize().dot(a) > -0.05
+              ) {
+                hitCityCitizen(citizen);
+                s = true;
+                triggerCombatFeedback("hit");
+                break;
+              }
             }
             const hitEnemy = s;
             o.userData.urgedSheep = !1;
@@ -8247,6 +8634,7 @@ function _e(o, n) {
       }
     })(o, n),
     updateKohen(o),
+    updateCityCitizens(o),
     (function (t) {
       j > 0 && (j -= t);
       const e = Yt(mt.player.position.x, mt.player.position.z, -80);
@@ -8260,9 +8648,6 @@ function _e(o, n) {
         O = Oe(true);
         H = false;
         je("");
-      }
-      if (mt.enemies.some((enemy) => enemy.userData.type === "bandit")) {
-        setGuardAlerted(false);
       }
       0 === mt.enemies.length &&
         ((O -= t),
@@ -8513,6 +8898,21 @@ function _e(o, n) {
             Ae(o.position, "enemy");
             triggerCombatFeedback("hit");
             n = true;
+          }
+        }
+        if (!n) {
+          for (const citizen of mt.cityCitizens) {
+            const target = citizen.position.clone().add(
+              new t.Vector3(0, citizen.userData.bodyHeight * 0.52, 0),
+            );
+            if (o.position.distanceTo(target) < citizen.userData.hitRadius) {
+              o.userData.life = 0;
+              hitCityCitizen(citizen);
+              Ae(o.position, "enemy");
+              triggerCombatFeedback("hit");
+              n = true;
+              break;
+            }
           }
         }
         if (!n) {
