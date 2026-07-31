@@ -188,6 +188,7 @@ let Z = new t.Vector3(-1150, 0, 1050),
   citySheepWaitingForPickup = !1,
   playerWasInsideJerusalem = !1,
   citizensPlayerWasInsideJerusalem = !1,
+  cityBanditEmergencyActive = !1,
   templeRecoveryArmed = !0;
 const nightWatch = {
   active: !1,
@@ -2883,8 +2884,31 @@ function buildCitySheepRoadGraph() {
   citySheepRoadGraph = { nodes };
   return citySheepRoadGraph;
 }
-function shortestCityRoadNodePath(startIndex, goalIndex) {
+function cityRoadPointKey(point) {
+  return `${Math.round(point.x)},${Math.round(point.z)}`;
+}
+function cityRoadEdgeKey(first, second) {
+  const a = cityRoadPointKey(first);
+  const b = cityRoadPointKey(second);
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+function shortestCityRoadNodePath(startIndex, goalIndex, options = null) {
   const { nodes } = buildCitySheepRoadGraph();
+  const blockedEdges = options?.blockedEdges;
+  const discouragedEdges = options?.discouragedEdges;
+  const cachedTree = options?.pathTreeCache?.get(startIndex);
+  if (cachedTree) {
+    if (!Number.isFinite(cachedTree.distances[goalIndex])) return null;
+    const path = [];
+    for (let at = goalIndex; at >= 0; at = cachedTree.previous[at]) {
+      path.push(at);
+      if (at === startIndex) break;
+    }
+    return {
+      indices: path.reverse(),
+      distance: cachedTree.distances[goalIndex],
+    };
+  }
   const distances = nodes.map(() => Infinity);
   const previous = nodes.map(() => -1);
   const visited = nodes.map(() => false);
@@ -2899,16 +2923,26 @@ function shortestCityRoadNodePath(startIndex, goalIndex) {
         current = index;
     }
     if (current < 0 || !Number.isFinite(distances[current])) break;
-    if (current === goalIndex) break;
+    // Citizen route selection evaluates many destinations from the same two
+    // road exits. Build the complete tree once when a cache is supplied;
+    // otherwise a normal sheep query can still stop at its requested goal.
+    if (current === goalIndex && !options?.pathTreeCache) break;
     visited[current] = true;
     for (const edge of nodes[current].edges) {
-      const nextDistance = distances[current] + edge.distance;
+      const edgeKey = cityRoadEdgeKey(nodes[current], nodes[edge.to]);
+      if (blockedEdges?.has(edgeKey)) continue;
+      const repeatPenalty = discouragedEdges?.has(edgeKey)
+        ? 180 + edge.distance * 1.4
+        : 0;
+      const nextDistance = distances[current] + edge.distance + repeatPenalty;
       if (nextDistance < distances[edge.to]) {
         distances[edge.to] = nextDistance;
         previous[edge.to] = current;
       }
     }
   }
+  if (options?.pathTreeCache)
+    options.pathTreeCache.set(startIndex, { distances, previous });
   if (!Number.isFinite(distances[goalIndex])) return null;
   const path = [];
   for (let at = goalIndex; at >= 0; at = previous[at]) {
@@ -2917,11 +2951,11 @@ function shortestCityRoadNodePath(startIndex, goalIndex) {
   }
   return { indices: path.reverse(), distance: distances[goalIndex] };
 }
-function makeCitySheepPath(startX, startZ, goalX, goalZ) {
+function makeCitySheepPath(startX, startZ, goalX, goalZ, options = null) {
   const startRoad = closestPointOnCityRoad(startX, startZ);
   const goalRoad = closestPointOnCityRoad(goalX, goalZ);
   if (!startRoad || !goalRoad) return [];
-  if (startRoad.index === goalRoad.index) {
+  if (startRoad.index === goalRoad.index && !options?.forceGraphRoute) {
     return [
       { x: startRoad.x, z: startRoad.z },
       { x: goalRoad.x, z: goalRoad.z },
@@ -2938,10 +2972,12 @@ function makeCitySheepPath(startX, startZ, goalX, goalZ) {
   const goalCandidates = [goalSegment[0], goalSegment[1]];
   let best = null;
   for (const startPoint of startCandidates) {
+    if (options?.blockedWaypoints?.has(cityRoadPointKey({ x: startPoint[0], z: startPoint[1] })))
+      continue;
     for (const goalPoint of goalCandidates) {
       const startIndex = nodeFor(startPoint);
       const goalIndex = nodeFor(goalPoint);
-      const route = shortestCityRoadNodePath(startIndex, goalIndex);
+      const route = shortestCityRoadNodePath(startIndex, goalIndex, options);
       if (!route) continue;
       const total =
         Math.hypot(startRoad.x - startPoint[0], startRoad.z - startPoint[1]) +
@@ -2950,7 +2986,10 @@ function makeCitySheepPath(startX, startZ, goalX, goalZ) {
       if (!best || total < best.total) best = { total, route };
     }
   }
-  if (!best) return [{ x: goalRoad.x, z: goalRoad.z }];
+  if (!best)
+    return options?.requireConnectedRoute
+      ? []
+      : [{ x: goalRoad.x, z: goalRoad.z }];
   return [
     { x: startRoad.x, z: startRoad.z },
     ...best.route.indices.map((index) => ({
@@ -6644,6 +6683,70 @@ function loadCityGirl1Model() {
   });
   return cityGirl1ModelPromise;
 }
+function getCitizenNavigationOptions(citizen) {
+  const now = performance.now();
+  const blockedEdges = new Set();
+  const blockedWaypoints = new Set();
+  citizen.userData.temporarilyBlockedEdges = (
+    citizen.userData.temporarilyBlockedEdges || []
+  ).filter((entry) => {
+    if (entry.until <= now) return false;
+    blockedEdges.add(entry.key);
+    return true;
+  });
+  citizen.userData.temporarilyBlockedWaypoints = (
+    citizen.userData.temporarilyBlockedWaypoints || []
+  ).filter((entry) => {
+    if (entry.until <= now) return false;
+    blockedWaypoints.add(entry.key);
+    return true;
+  });
+  return {
+    blockedEdges,
+    blockedWaypoints,
+    discouragedEdges: new Set(citizen.userData.recentRouteEdges || []),
+    forceGraphRoute: blockedEdges.size > 0 || blockedWaypoints.size > 0,
+    requireConnectedRoute: true,
+    pathTreeCache: new Map(),
+  };
+}
+function rememberCitizenBlockedPath(citizen, duration = 9000) {
+  const path = citizen.userData.path || [];
+  const index = citizen.userData.pathIndex || 0;
+  const waypoint = path[index];
+  if (!waypoint) return;
+  const until = performance.now() + duration;
+  const addOrExtend = (entries, key) => {
+    const existing = entries.find((entry) => entry.key === key);
+    if (existing) existing.until = Math.max(existing.until, until);
+    else entries.push({ key, until });
+  };
+  const blockedWaypoints = citizen.userData.temporarilyBlockedWaypoints ||
+    (citizen.userData.temporarilyBlockedWaypoints = []);
+  addOrExtend(blockedWaypoints, cityRoadPointKey(waypoint));
+  const previous = index > 0
+    ? path[index - 1]
+    : { x: citizen.position.x, z: citizen.position.z };
+  if (previous) {
+    const blockedEdges = citizen.userData.temporarilyBlockedEdges ||
+      (citizen.userData.temporarilyBlockedEdges = []);
+    addOrExtend(blockedEdges, cityRoadEdgeKey(previous, waypoint));
+  }
+  // If route selection ever has to fall back to the simple main loop, begin
+  // from its opposite direction instead of reversing over the same short leg.
+  citizen.userData.mainRoadDirection = -(citizen.userData.mainRoadDirection || 1);
+  citizen.userData.keepRoadDirection = true;
+}
+function citizenThreatDistance(x, z, bandits) {
+  if (!bandits.length) return Infinity;
+  let distance = Infinity;
+  for (const bandit of bandits)
+    distance = Math.min(
+      distance,
+      Math.hypot(x - bandit.position.x, z - bandit.position.z),
+    );
+  return distance;
+}
 function chooseCitizenRoadTarget(citizen, fleeing = false) {
   const graph = buildCitySheepRoadGraph();
   if (!graph.nodes.length) return;
@@ -6651,11 +6754,18 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
   const candidates = [];
   const previousDistrict = citizen.userData.currentDistrict ?? -1;
   const bandits = getActiveCityBandits();
+  const navigationOptions = getCitizenNavigationOptions(citizen);
+  const initialDangerDistance = citizenThreatDistance(
+    citizen.position.x,
+    citizen.position.z,
+    bandits,
+  );
   for (const node of graph.nodes) {
     if (isInsideTempleCourt(node.x, node.z, 55)) continue;
     const travel = Math.hypot(node.x - citizen.position.x, node.z - citizen.position.z);
-    if (travel < (fleeing ? 520 : 700)) continue;
+    if (travel < (fleeing ? 320 : 700)) continue;
     if (
+      !fleeing &&
       citizen.userData.recentTargets.some(
         (target) => Math.hypot(node.x - target.x, node.z - target.z) < 180,
       )
@@ -6677,6 +6787,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       current?.z ?? citizen.position.z,
       node.x,
       node.z,
+      navigationOptions,
     );
     if (
       path.length < 5 ||
@@ -6688,7 +6799,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
         path[index].x - path[index - 1].x,
         path[index].z - path[index - 1].z,
       );
-    if (routeLength < (fleeing ? 650 : 1050)) continue;
+    if (routeLength < (fleeing ? 360 : 1050)) continue;
     const edgeKeys = [];
     let repeatedEdges = 0;
     for (let index = 1; index < path.length; index++) {
@@ -6702,14 +6813,40 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
     }
     const novelty = 1 - repeatedEdges / Math.max(edgeKeys.length, 1);
     if (!fleeing && novelty < 0.38) continue;
+    let minimumPathDanger = Infinity;
+    for (const point of path)
+      minimumPathDanger = Math.min(
+        minimumPathDanger,
+        citizenThreatDistance(point.x, point.z, bandits),
+      );
+    const firstEscapePoint = path.find(
+      (point) => Math.hypot(
+        point.x - citizen.position.x,
+        point.z - citizen.position.z,
+      ) > 45,
+    );
+    const firstEscapeGain = firstEscapePoint && bandits.length
+      ? citizenThreatDistance(firstEscapePoint.x, firstEscapePoint.z, bandits) -
+        initialDangerDistance
+      : 0;
+    // An escape route must visibly lead away from the nearest robber from its
+    // first useful road node. A remote safe destination is not enough if the
+    // shortest path initially runs back toward the threat.
+    if (fleeing && bandits.length && firstEscapeGain < -22) continue;
     const score = fleeing
-      ? dangerDistance + routeLength * 0.22 + novelty * 260
+      ? dangerDistance * 1.4 +
+        minimumPathDanger * 0.75 +
+        firstEscapeGain * 5.5 +
+        novelty * 160 -
+        routeLength * 0.08
       : routeLength * 0.55 + novelty * 900 + Math.random() * 260;
     candidates.push({ node, score, path, district, edgeKeys });
   }
   candidates.sort((a, b) => b.score - a.score);
   let best = candidates.length
-    ? candidates[Math.floor(Math.random() * Math.min(6, candidates.length))]
+    ? fleeing
+      ? candidates[0]
+      : candidates[Math.floor(Math.random() * Math.min(6, candidates.length))]
     : null;
   if (!best) {
     citizen.userData.recentTargets.splice(
@@ -6728,14 +6865,24 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
           node.x - citizen.position.x,
           node.z - citizen.position.z,
         ),
+        safety: citizenThreatDistance(node.x, node.z, bandits),
       }))
-      .sort((a, b) => b.distance - a.distance);
-    for (const candidate of fallbackNodes.slice(0, 16)) {
+      .sort((a, b) =>
+        fleeing && bandits.length
+          ? b.safety - a.safety || b.distance - a.distance
+          : b.distance - a.distance,
+      );
+    // Search the whole reachable component. Limiting this to a handful of
+    // farthest nodes failed when a remembered blocked edge temporarily split
+    // off a small lane: every sampled goal was unreachable, so the NPC fell
+    // back to the same simple loop again.
+    for (const candidate of fallbackNodes) {
       const path = makeCitySheepPath(
         current?.x ?? citizen.position.x,
         current?.z ?? citizen.position.z,
         candidate.node.x,
         candidate.node.z,
+        navigationOptions,
       );
       if (
         path.length >= 3 &&
@@ -6779,12 +6926,14 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
         current?.z ?? citizen.position.z,
         via.x,
         via.z,
+        navigationOptions,
       );
       const secondLeg = makeCitySheepPath(
         via.x,
         via.z,
         best.node.x,
         best.node.z,
+        navigationOptions,
       );
       const combined = [...firstLeg, ...secondLeg.slice(1)];
       if (
@@ -6816,8 +6965,7 @@ function getActiveCityBandits() {
     (enemy) =>
       enemy?.parent &&
       enemy.userData.type === "bandit" &&
-      enemy.userData.hp > 0 &&
-      Yt(enemy.position.x, enemy.position.z, 120),
+      enemy.userData.hp > 0,
   );
 }
 function suspendGuardForCityBandits() {
@@ -6895,12 +7043,12 @@ function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
   }
 }
 const cityCitizenProfiles = {
-  boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20, walkSpeed: 32, fleeSpeed: 86 },
-  boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16, walkSpeed: 34, fleeSpeed: 89 },
+  boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20, walkSpeed: 32, fleeSpeed: 108 },
+  boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16, walkSpeed: 34, fleeSpeed: 112 },
   // David's imported mesh is fitted to 164 local units, then the complete
   // playable group is scaled to 0.54. Match the real world-space height.
-  girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16, walkSpeed: 31, fleeSpeed: 84 },
-  girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20, walkSpeed: 33, fleeSpeed: 87 },
+  girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16, walkSpeed: 31, fleeSpeed: 106 },
+  girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20, walkSpeed: 33, fleeSpeed: 110 },
 };
 // Citizens use only the broad public streets. The loop covers the eastern
 // gate/Gihon side, David's palace forecourt, the central avenue and the large
@@ -7030,12 +7178,16 @@ function addCityCitizen(kind, index, template) {
     fleeing: false,
     recentTargets: [],
     recentRouteEdges: [],
+    temporarilyBlockedEdges: [],
+    temporarilyBlockedWaypoints: [],
     keepRoadDirection: false,
     stuckFor: 0,
     progressPosition: new t.Vector3(x, te(x, z), z),
     progressCheckFor: 1.2,
     currentDistrict: -1,
     blockedWaypointFor: 0,
+    panicFor: 0,
+    dangerRepathFor: 0,
     updateOffset: index * 0.025,
   };
   const model = (kind === "boy1" || kind === "boy2" || kind === "girl1" || kind === "girl2")
@@ -7101,10 +7253,14 @@ function resetCityCitizensForEntry() {
     citizen.userData.pathIndex = 0;
     citizen.userData.recentTargets = [];
     citizen.userData.recentRouteEdges = [];
+    citizen.userData.temporarilyBlockedEdges = [];
+    citizen.userData.temporarilyBlockedWaypoints = [];
     citizen.userData.currentDistrict = -1;
     citizen.userData.blockedWaypointFor = 0;
     citizen.userData.stuckFor = 0;
     citizen.userData.repathFor = 0;
+    citizen.userData.panicFor = 0;
+    citizen.userData.dangerRepathFor = 0;
     citizen.userData.mainRoadDirection = citizenIndex % 2 ? -1 : 1;
     chooseCitizenRoadTarget(citizen, false);
     if (!citizen.userData.path.length)
@@ -7181,7 +7337,8 @@ function isCityCitizenCrowdedAt(citizen, x, z) {
 }
 function tryMoveCityCitizen(citizen, desiredAngle, distance) {
   const offsets = citizen.userData.fleeing
-    ? [0, 0.2, -0.2, 0.42, -0.42, 0.7, -0.7, 1.02, -1.02]
+    ? [0, 0.2, -0.2, 0.42, -0.42, 0.7, -0.7, 1.02, -1.02,
+      1.38, -1.38, 1.72, -1.72, Math.PI]
     : [0, 0.18, -0.18, 0.38, -0.38, 0.62, -0.62];
   for (const offset of offsets) {
     const angle = desiredAngle + offset;
@@ -7209,13 +7366,28 @@ function tryMoveCityCitizen(citizen, desiredAngle, distance) {
   return false;
 }
 function beginCityBanditEmergency() {
-  if (!getActiveCityBandits().length) return;
+  const bandits = getActiveCityBandits();
+  if (!bandits.length) return;
+  cityBanditEmergencyActive = true;
   suspendGuardForCityBandits();
   for (const citizen of mt.cityCitizens) {
     if (!citizen?.parent) continue;
     citizen.userData.fleeing = true;
+    citizen.userData.panicFor = 1.35;
+    citizen.userData.dangerRepathFor = 0.7;
     citizen.userData.blockedWaypointFor = 0;
     planCityCitizenRoute(citizen, true);
+  }
+}
+function endCityBanditEmergency() {
+  cityBanditEmergencyActive = false;
+  for (const citizen of mt.cityCitizens) {
+    if (!citizen?.parent || citizen.userData.attackedFleeFor > 0) continue;
+    citizen.userData.fleeing = false;
+    citizen.userData.panicFor = 0;
+    citizen.userData.path = [];
+    citizen.userData.pathIndex = 0;
+    planCityCitizenRoute(citizen, false);
   }
 }
 function updateCityCitizens(delta) {
@@ -7228,7 +7400,12 @@ function updateCityCitizens(delta) {
   citizensPlayerWasInsideJerusalem = playerInside;
   const activeBandits = getActiveCityBandits();
   const banditActive = activeBandits.length > 0;
-  if (banditActive) suspendGuardForCityBandits();
+  if (banditActive && !cityBanditEmergencyActive)
+    beginCityBanditEmergency();
+  else if (banditActive)
+    suspendGuardForCityBandits();
+  else if (cityBanditEmergencyActive)
+    endCityBanditEmergency();
   // Four collision/path agents do not need to query the dense city collider
   // grid at monitor refresh rate. 30 Hz is smooth nearby; 8 Hz is sufficient
   // while David is outside, with actual elapsed time preserved for movement.
@@ -7251,6 +7428,10 @@ function updateCityCitizens(delta) {
     if (citizen.userData.importedModel)
       citizen.userData.importedModel.visible = visible;
     citizen.userData.repathFor -= stepDelta;
+    citizen.userData.dangerRepathFor = Math.max(
+      0,
+      (citizen.userData.dangerRepathFor || 0) - stepDelta,
+    );
     citizen.userData.attackedFleeFor = Math.max(
       0,
       (citizen.userData.attackedFleeFor || 0) - stepDelta,
@@ -7259,10 +7440,51 @@ function updateCityCitizens(delta) {
     const fleeStateChanged = citizen.userData.fleeing !== fleeing;
     if (fleeStateChanged || !citizen.userData.path.length) {
       citizen.userData.fleeing = fleeing;
+      if (fleeing) citizen.userData.panicFor = Math.max(citizen.userData.panicFor || 0, 0.8);
       planCityCitizenRoute(citizen, fleeing);
+    }
+    if (fleeing && banditActive && citizen.userData.dangerRepathFor <= 0) {
+      const nextWaypoint = citizen.userData.path[citizen.userData.pathIndex];
+      const currentThreat = citizenThreatDistance(
+        citizen.position.x,
+        citizen.position.z,
+        activeBandits,
+      );
+      const nextThreat = nextWaypoint
+        ? citizenThreatDistance(nextWaypoint.x, nextWaypoint.z, activeBandits)
+        : -Infinity;
+      if (!nextWaypoint || nextThreat < currentThreat - 18)
+        planCityCitizenRoute(citizen, true);
+      citizen.userData.dangerRepathFor = 0.85;
     }
     let waypoint = citizen.userData.path[citizen.userData.pathIndex];
     let moving = false;
+    if (fleeing && banditActive && citizen.userData.panicFor > 0) {
+      let nearestBandit = null;
+      let nearestDistance = Infinity;
+      for (const bandit of activeBandits) {
+        const distance = Math.hypot(
+          citizen.position.x - bandit.position.x,
+          citizen.position.z - bandit.position.z,
+        );
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestBandit = bandit;
+        }
+      }
+      citizen.userData.panicFor = Math.max(0, citizen.userData.panicFor - stepDelta);
+      if (nearestBandit) {
+        const awayAngle = Math.atan2(
+          citizen.position.x - nearestBandit.position.x,
+          citizen.position.z - nearestBandit.position.z,
+        );
+        moving = tryMoveCityCitizen(
+          citizen,
+          awayAngle,
+          citizen.userData.fleeSpeed * stepDelta,
+        );
+      }
+    }
     for (let advance = 0; waypoint && advance < 3; advance++) {
       const distance = Math.hypot(
         waypoint.x - citizen.position.x,
@@ -7275,7 +7497,7 @@ function updateCityCitizens(delta) {
       }
       waypoint = citizen.userData.path[citizen.userData.pathIndex];
     }
-    if (waypoint) {
+    if (waypoint && !moving) {
       const dx = waypoint.x - citizen.position.x;
       const dz = waypoint.z - citizen.position.z;
       const distance = Math.hypot(dx, dz);
@@ -7290,7 +7512,8 @@ function updateCityCitizens(delta) {
           citizen.userData.blockedWaypointFor = 0;
         } else {
           citizen.userData.blockedWaypointFor += stepDelta;
-          if (citizen.userData.blockedWaypointFor > 0.62) {
+          if (citizen.userData.blockedWaypointFor > (fleeing ? 0.34 : 0.58)) {
+            rememberCitizenBlockedPath(citizen, fleeing ? 6500 : 10500);
             citizen.userData.blockedWaypointFor = 0;
             planCityCitizenRoute(citizen, fleeing);
           }
@@ -7306,26 +7529,10 @@ function updateCityCitizens(delta) {
       if (progress < 4 && citizen.userData.path.length) {
         citizen.userData.stuckFor++;
         if (citizen.userData.stuckFor >= 2) {
-          const recovery = nearestClearCityRoadPoint(
-            citizen.position.x,
-            citizen.position.z,
-            citizen.userData.collisionRadius + 3,
-          );
-          if (
-            recovery &&
-            !isInsideTempleCourt(recovery.x, recovery.z, 42) &&
-            Math.hypot(
-              recovery.x - citizen.position.x,
-              recovery.z - citizen.position.z,
-            ) > 5
-          ) {
-            // Walk back to the lane; never teleport. The previous snap was the
-            // visible repeated-position flicker reported for all four NPCs.
-            citizen.userData.path = [{ x: recovery.x, z: recovery.z }];
-            citizen.userData.pathIndex = 0;
-          } else {
-            planCityCitizenRoute(citizen, fleeing);
-          }
+          // Remember the failed exit/edge. Replanning without this memory chose
+          // the identical shortest path and created an endless two-point loop.
+          rememberCitizenBlockedPath(citizen, fleeing ? 7500 : 12000);
+          planCityCitizenRoute(citizen, fleeing);
           citizen.userData.stuckFor = 0;
         }
       } else {
@@ -7390,6 +7597,7 @@ function Te() {
     (citySheepWaitingForPickup = !1),
     (playerWasInsideJerusalem = !1),
     (citizensPlayerWasInsideJerusalem = !1),
+    (cityBanditEmergencyActive = !1),
     (nightWatch.active = !1),
     nightWatch.camp.set(0, 0, 0),
     (nightWatch.startedAt = 0),
