@@ -86,6 +86,7 @@ const performanceState = {
   smoothedFrameMs: 16.7,
   slowFrameFor: 0,
   campStoneNear: false,
+  distantFogDensity: 0.00046,
 };
 let D = "",
   S = !1,
@@ -924,19 +925,23 @@ async function runGameStartup(e) {
       (function () {
         (i = new t.Scene()),
           (i.background = new t.Color(7846632)),
-          (i.fog = new t.FogExp2(13423565, 34e-5)),
+          // GTA-era low-detail distance treatment: nearby actors stay readable,
+          // while terrain and flock members lose contrast progressively in a
+          // cheap exponential haze instead of an expensive depth-blur pass.
+          (i.fog = new t.FogExp2(13423565, performanceState.distantFogDensity)),
           (r = new t.PerspectiveCamera(
             58,
             innerWidth / innerHeight,
             0.1,
-            15e3,
+            9e3,
           )),
           (c = new t.WebGLRenderer({
-            antialias: !0,
+            antialias: !1,
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
           })),
-          c.setPixelRatio(Math.min(devicePixelRatio, 0.85)),
+          (performanceState.currentPixelRatio = Math.min(devicePixelRatio, 0.76)),
+          c.setPixelRatio(performanceState.currentPixelRatio),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
           (c.shadowMap.type = t.BasicShadowMap),
@@ -951,14 +956,14 @@ async function runGameStartup(e) {
         (h = e),
           e.position.set(-700, 1200, 500),
           (e.castShadow = !0),
-          e.shadow.mapSize.set(1024, 1024),
+          e.shadow.mapSize.set(512, 512),
           (e.shadow.camera.left = -1300),
           (e.shadow.camera.right = 1300),
           (e.shadow.camera.top = 1300),
           (e.shadow.camera.bottom = -1300),
           i.add(e),
           (function () {
-            const e = new t.SphereGeometry(5200, 32, 18),
+            const e = new t.SphereGeometry(5200, 24, 12),
               o = new t.ShaderMaterial({
                 side: t.BackSide,
                 depthWrite: !1,
@@ -978,7 +983,7 @@ async function runGameStartup(e) {
             // A single GPU draw call supplies the whole star field.  Per-star
             // reveal thresholds let dusk uncover stars gradually without
             // creating lights, meshes, shadows or per-frame object loops.
-            const starCount = 520,
+            const starCount = 280,
               starPositions = new Float32Array(3 * starCount),
               starColors = new Float32Array(3 * starCount),
               starReveal = new Float32Array(starCount),
@@ -2262,39 +2267,150 @@ async function runGameStartup(e) {
           })(),
           (function () {
             mt.aimRig && r.remove(mt.aimRig);
-            const e = new t.Group(),
-              o = ge(10983027),
-              n = ge(12089427),
-              s = ge(5914409),
-              a = new t.LineBasicMaterial({ color: 7754293 }),
-              i = new t.Mesh(new t.CylinderGeometry(4.2, 5.2, 34, 7), o);
-            (i.rotation.z = Math.PI / 2),
-              i.position.set(11, -16, -43),
-              (i.visible = !1),
-              e.add(i);
-            const c = new t.Mesh(new t.SphereGeometry(5.3, 7, 5), n);
-            c.position.set(29, -16, -43), (c.visible = !1), e.add(c);
-            const l = new t.Group();
-            l.position.set(31, -15, -45);
-            const h = new t.Line(
-                new t.BufferGeometry().setFromPoints([
-                  new t.Vector3(0, 0, 0),
-                  new t.Vector3(20, 0, -22),
-                ]),
-                a,
-              ),
-              d = new t.Mesh(new t.BoxGeometry(14, 5, 8), s);
-            d.position.set(24, 0, -27);
-            const p = new t.Line(
-              new t.BufferGeometry().setFromPoints([
-                new t.Vector3(28, 0, -31),
-                new t.Vector3(8, 0, -48),
-              ]),
-              a,
+            const e = new t.Group();
+            e.name = "DavidFirstPersonSlingRig";
+
+            // The first-person limbs repeat David's established tunic, skin
+            // and hand palette instead of the old anonymous rectangular arm.
+            const tunicMaterial = ge(0xc8a06c);
+            const skinMaterial = ge(0xc9895a);
+            const handMaterial = ge(0xe3a06a);
+            const rightShoulder = new t.Group();
+            rightShoulder.name = "DavidFirstPersonRightShoulder";
+            // Corner-entry first-person framing: only the hand and a clipped
+            // strip of wrist rise from the lower-right edge.  The hidden
+            // shoulder remains outside the camera frustum.
+            rightShoulder.position.set(65, -34, -50);
+            rightShoulder.rotation.set(-0.05, -0.06, -0.1);
+            const upperArm = new t.Mesh(
+              new t.CylinderGeometry(5.4, 4.8, 6, 7),
+              tunicMaterial,
             );
-            l.add(h, d, p),
-              e.add(l),
-              (e.userData.sling = l),
+            upperArm.position.y = -3;
+            upperArm.visible = false;
+            const elbow = new t.Group();
+            elbow.position.y = 0;
+            elbow.rotation.z = -0.04;
+            const forearm = new t.Mesh(
+              new t.CylinderGeometry(4.3, 3.7, 12, 7),
+              skinMaterial,
+            );
+            forearm.position.set(-3, 2, 0);
+            forearm.rotation.z = 0.45;
+            const hand = new t.Mesh(
+              new t.DodecahedronGeometry(5.1, 1),
+              handMaterial,
+            );
+            hand.name = "DavidFirstPersonRightHand";
+            hand.position.set(-7, 8, 0);
+            hand.scale.set(0.78, 1.05, 0.72);
+            const grip = new t.Group();
+            grip.name = "SlingGripPivot";
+            grip.position.set(-11, 8, -0.5);
+            elbow.add(forearm, hand, grip);
+            rightShoulder.add(upperArm, elbow);
+            e.add(rightShoulder);
+
+            const slingSpin = new t.Group();
+            slingSpin.name = "HistoricalRotatingSlingSpinPivot";
+            grip.add(slingSpin);
+            // The source asset is authored vertically (grip at Y=0, pouch at
+            // negative Y).  Its resting direction now hangs down-left under
+            // gravity and also points slightly forward into the scene rather
+            // than lying perfectly horizontal across the screen.
+            const slingDisplay = new t.Group();
+            slingDisplay.name = "HistoricalRotatingSlingDownLeftForwardDisplay";
+            const slingReadyDirection = new t.Vector3(-0.92, -0.4, -0.32).normalize();
+            slingDisplay.quaternion.setFromUnitVectors(
+              new t.Vector3(0, -1, 0),
+              slingReadyDirection,
+            );
+            slingSpin.add(slingDisplay);
+            const stone = new t.Mesh(
+              new t.DodecahedronGeometry(3.9, 1),
+              ge(0x6b6254),
+            );
+            stone.name = "LoadedSlingStone";
+            stone.position.set(0, -41, 0);
+            stone.scale.set(1.18, 0.82, 0.92);
+            stone.castShadow = true;
+            slingDisplay.add(stone);
+
+            // Keep a lightweight sling visible while the supplied GLB is
+            // decoded; it is replaced, not duplicated, when loading finishes.
+            const fallbackSling = new t.Group();
+            const cordMaterial = new t.LineBasicMaterial({ color: 0xc9ad78 });
+            const fallbackCord = new t.Line(
+              new t.BufferGeometry().setFromPoints([
+                new t.Vector3(-2.2, 0, 0),
+                new t.Vector3(-4.2, -36, 0),
+                new t.Vector3(0, -42, 0),
+                new t.Vector3(4.2, -36, 0),
+                new t.Vector3(2.2, 0, 0),
+              ]),
+              cordMaterial,
+            );
+            fallbackSling.add(fallbackCord);
+            slingDisplay.add(fallbackSling);
+
+            new GLTFLoader().load(
+              "./assets/models/david_rotating_sling.glb",
+              (gltf) => {
+                const slingModel = gltf.scene;
+                slingModel.name = "DavidHistoricalRotatingSlingModel";
+                slingModel.traverse((object) => {
+                  if (!object.isMesh) return;
+                  object.castShadow = true;
+                  object.frustumCulled = false;
+                  const materials = Array.isArray(object.material)
+                    ? object.material
+                    : [object.material];
+                  for (const material of materials) {
+                    if (!material) continue;
+                    material.roughness = Math.max(0.7, material.roughness ?? 0.7);
+                    material.metalness = 0;
+                    material.side = t.DoubleSide;
+                    if (material.map) {
+                      material.map.colorSpace = t.SRGBColorSpace;
+                      material.map.anisotropy = 2;
+                    }
+                  }
+                });
+                slingModel.updateMatrixWorld(true);
+                let box = new t.Box3().setFromObject(slingModel);
+                const size = box.getSize(new t.Vector3());
+                const scale = 42 / Math.max(size.y, size.x, size.z, 0.001);
+                slingModel.scale.setScalar(scale);
+                slingModel.updateMatrixWorld(true);
+                box = new t.Box3().setFromObject(slingModel);
+                const center = box.getCenter(new t.Vector3());
+                // Highest end is the hand grip; the low central recess is the
+                // pouch. This removes the source model's arbitrary origin.
+                slingModel.position.set(-center.x, -box.max.y, -center.z);
+                slingModel.updateMatrixWorld(true);
+                const fittedBox = new t.Box3().setFromObject(slingModel);
+                const pouchCenter = fittedBox.getCenter(new t.Vector3());
+                stone.position.set(
+                  pouchCenter.x,
+                  fittedBox.min.y + Math.min(4.2, fittedBox.getSize(new t.Vector3()).y * 0.07),
+                  pouchCenter.z + 1.2,
+                );
+                slingDisplay.add(slingModel);
+                fallbackSling.visible = false;
+              },
+              undefined,
+              (error) => console.warn("돌팔매 모델 로딩 실패; 대체 모델 유지:", error),
+            );
+
+            e.userData.sling = slingSpin;
+            e.userData.slingDisplay = slingDisplay;
+            // This near-camera-facing axis is also perpendicular to the new
+            // down-left/forward resting vector.  That preserves a large,
+            // readable orbit instead of shrinking the sling into a cone.
+            e.userData.slingSpinAxis = new t.Vector3(-0.3, -0.06, 1).normalize();
+            e.userData.slingStone = stone;
+            e.userData.rightShoulder = rightShoulder;
+            e.userData.rightElbow = elbow;
               e.position.set(0, 0, -10),
               (e.visible = !1),
               r.add(e),
@@ -4505,7 +4621,7 @@ function updateRiggedAnimalAnimation(owner, moving, intensity, attacking = false
   // Bone matrices are the expensive part for a flock. Near animals remain
   // fluid, while distant/off-action animals update at a progressively lower
   // cadence without changing their AI or travel speed.
-  const interval = distance < 480 ? 30 : distance < 1050 ? 75 : 180;
+  const interval = distance < 360 ? 34 : distance < 780 ? 105 : 260;
   if (now < rig.nextUpdateAt) return;
   const step = Math.min(0.18, Math.max(0.016, (now - (rig.lastUpdateAt || now - interval)) / 1000));
   rig.lastUpdateAt = now;
@@ -4800,6 +4916,7 @@ function ensureGuardAlertIndicator() {
 function setGuardAlerted(alerted) {
   const guard = mt.southGateGuard;
   if (!guard) return;
+  if (alerted && getActiveCityBandits().length) alerted = false;
   guard.userData.alerted = !!alerted;
   ensureGuardAlertIndicator().classList.toggle("show", !!alerted);
 }
@@ -6308,7 +6425,10 @@ function loadCityBoyModel() {
         resolve(cityBoyModelTemplate);
       },
       undefined,
-      reject,
+      (error) => {
+        cityBoyModelPromise = null;
+        reject(error);
+      },
     );
   });
   return cityBoyModelPromise;
@@ -6325,7 +6445,10 @@ function loadCityBoy1Model() {
         resolve(cityBoy1ModelTemplate);
       },
       undefined,
-      reject,
+      (error) => {
+        cityBoy1ModelPromise = null;
+        reject(error);
+      },
     );
   });
   return cityBoy1ModelPromise;
@@ -6342,7 +6465,10 @@ function loadCityGirlModel() {
         resolve(cityGirlModelTemplate);
       },
       undefined,
-      reject,
+      (error) => {
+        cityGirlModelPromise = null;
+        reject(error);
+      },
     );
   });
   return cityGirlModelPromise;
@@ -6358,7 +6484,10 @@ function loadCityGirl1Model() {
         resolve(cityGirl1ModelTemplate);
       },
       undefined,
-      reject,
+      (error) => {
+        cityGirl1ModelPromise = null;
+        reject(error);
+      },
     );
   });
   return cityGirl1ModelPromise;
@@ -6369,12 +6498,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
   const current = closestPointOnCityRoad(citizen.position.x, citizen.position.z);
   const candidates = [];
   const previousDistrict = citizen.userData.currentDistrict ?? -1;
-  const bandits = mt.enemies.filter(
-    (enemy) =>
-      enemy.userData.type === "bandit" &&
-      enemy.userData.hp > 0 &&
-      Yt(enemy.position.x, enemy.position.z, -70),
-  );
+  const bandits = getActiveCityBandits();
   for (const node of graph.nodes) {
     if (isInsideTempleCourt(node.x, node.z, 55)) continue;
     const travel = Math.hypot(node.x - citizen.position.x, node.z - citizen.position.z);
@@ -6534,6 +6658,37 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       0,
       citizen.userData.recentRouteEdges.length - 56,
     );
+}
+function getActiveCityBandits() {
+  return mt.enemies.filter(
+    (enemy) =>
+      enemy?.parent &&
+      enemy.userData.type === "bandit" &&
+      enemy.userData.hp > 0 &&
+      Yt(enemy.position.x, enemy.position.z, 120),
+  );
+}
+function suspendGuardForCityBandits() {
+  const guard = mt.southGateGuard;
+  ensureGuardAlertIndicator().classList.remove("show");
+  if (!guard) return;
+  guard.userData.alerted = false;
+  guard.userData.chaseActivated = false;
+  guard.userData.searchFor = 0;
+  guard.userData.searchWaypoint = 0;
+  guard.userData.searchWaypointFor = 0;
+  guard.userData.sightLostFor = 0;
+  // If the guard had already started pursuing David, he disengages and walks
+  // back to his post. A robber event and a wanted-star event never overlap.
+  if (
+    Math.hypot(
+      guard.position.x - guard.userData.homeX,
+      guard.position.z - guard.userData.homeZ,
+    ) > 18
+  ) {
+    guard.userData.returningHome = true;
+    guard.userData.returnStuckFor = 0;
+  }
 }
 function captureCitizenWalkRig(model) {
   const rig = {};
@@ -6728,6 +6883,10 @@ function addCityCitizen(kind, index, template) {
   const model = (kind === "boy1" || kind === "boy2" || kind === "girl1" || kind === "girl2")
     ? cloneSkinnedModel(template)
     : template.clone(true);
+  model.visible = true;
+  model.traverse((part) => {
+    part.visible = true;
+  });
   model.updateMatrixWorld(true);
   let box = new t.Box3().setFromObject(model);
   const targetHeight = profile.height;
@@ -6801,7 +6960,10 @@ function ensureCityCitizens() {
     ["girl2", 3, loadCityGirlModel()],
   ];
   Promise.allSettled(requests.map((entry) => entry[2])).then((results) => {
-    if (!i) return;
+    if (!i) {
+      mt.cityCitizensLoading = false;
+      return;
+    }
     removeDuplicateDavidCharacters();
     results.forEach((result, index) => {
       const [kind, citizenIndex] = requests[index];
@@ -6826,12 +6988,9 @@ function updateCityCitizens(delta) {
     resetCityCitizensForEntry();
   }
   citizensPlayerWasInsideJerusalem = playerInside;
-  const banditActive = mt.enemies.some(
-    (enemy) =>
-      enemy.userData.type === "bandit" &&
-      enemy.userData.hp > 0 &&
-      Yt(enemy.position.x, enemy.position.z, -70),
-  );
+  const activeBandits = getActiveCityBandits();
+  const banditActive = activeBandits.length > 0;
+  if (banditActive) suspendGuardForCityBandits();
   for (const citizen of mt.cityCitizens) {
     if (!citizen.parent) continue;
     const playerDistance = mt.player
@@ -6851,12 +7010,16 @@ function updateCityCitizens(delta) {
       (citizen.userData.attackedFleeFor || 0) - delta,
     );
     const fleeing = banditActive || citizen.userData.attackedFleeFor > 0;
+    const fleeStateChanged = citizen.userData.fleeing !== fleeing;
     if (
-      citizen.userData.repathFor <= 0 &&
-      (citizen.userData.fleeing !== fleeing || !citizen.userData.path.length)
+      (fleeStateChanged || citizen.userData.repathFor <= 0) &&
+      (fleeStateChanged || !citizen.userData.path.length)
     ) {
       citizen.userData.fleeing = fleeing;
-      chooseCitizenMainRoadRoute(citizen, fleeing);
+      citizen.userData.path = [];
+      if (fleeing) chooseCitizenRoadTarget(citizen, true);
+      if (!citizen.userData.path.length)
+        chooseCitizenMainRoadRoute(citizen, fleeing);
       citizen.userData.repathFor = fleeing ? 0.7 : 2.5;
     }
     const waypoint = citizen.userData.path[citizen.userData.pathIndex];
@@ -6869,7 +7032,9 @@ function updateCityCitizens(delta) {
         citizen.userData.pathIndex++;
         if (citizen.userData.pathIndex >= citizen.userData.path.length) {
           citizen.userData.path = [];
-          chooseCitizenMainRoadRoute(citizen, fleeing);
+          if (fleeing) chooseCitizenRoadTarget(citizen, true);
+          if (!citizen.userData.path.length)
+            chooseCitizenMainRoadRoute(citizen, fleeing);
         }
       } else {
         const angle = Math.atan2(dx, dz);
@@ -6889,7 +7054,9 @@ function updateCityCitizens(delta) {
               -(citizen.userData.mainRoadDirection || 1);
             citizen.userData.keepRoadDirection = true;
             citizen.userData.path = [];
-            chooseCitizenMainRoadRoute(citizen, fleeing);
+            if (fleeing) chooseCitizenRoadTarget(citizen, true);
+            if (!citizen.userData.path.length)
+              chooseCitizenMainRoadRoute(citizen, fleeing);
           }
         }
       }
@@ -7077,7 +7244,9 @@ function Le() {
   (r.aspect = innerWidth / innerHeight),
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
-    c.setPixelRatio(Math.min(devicePixelRatio, 0.92));
+    c.setPixelRatio(
+      performanceState.currentPixelRatio || Math.min(devicePixelRatio, 0.76),
+    );
 }
 function Ce(t) {
   return [
@@ -7770,7 +7939,10 @@ document.addEventListener(
       (e("#charge").style.display = "none")),
       0 === o.button &&
         P &&
-        ((function () {
+        ((mt.aimRig &&
+          ((mt.aimRig.userData.slingReleaseStartedAt = performance.now()),
+          (mt.aimRig.userData.slingReleaseCharge = T))),
+        (function () {
           if (ut.stones <= 0)
             return (
               (L = "staff"),
@@ -8114,11 +8286,27 @@ function updateAdaptiveRendering(now) {
   const consistentlySlow = performanceState.slowFrameFor > 1.4;
   const targetRatio = Math.min(
     devicePixelRatio,
-    consistentlySlow ? (onOliveMount ? 0.62 : 0.68) : onOliveMount ? 0.74 : 0.84,
+    consistentlySlow ? (onOliveMount ? 0.54 : 0.6) : onOliveMount ? 0.66 : 0.76,
   );
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
     c.setPixelRatio(targetRatio);
+  }
+  // More haze is used only when the frame rate remains low. This masks the
+  // shorter detail range and softens distant flock/background silhouettes at
+  // almost no GPU cost.
+  const targetFogDensity = consistentlySlow
+    ? onOliveMount
+      ? 0.00059
+      : 0.00054
+    : onOliveMount
+      ? 0.00051
+      : performanceState.distantFogDensity;
+  if (i.fog)
+    i.fog.density = t.MathUtils.lerp(i.fog.density, targetFogDensity, 0.45);
+  if (r.far !== (consistentlySlow ? 7600 : 9000)) {
+    r.far = consistentlySlow ? 7600 : 9000;
+    r.updateProjectionMatrix();
   }
   if (mt.goalSite && mt.campStoneFar && mt.campStoneNear) {
     const campDistance = Math.hypot(
@@ -8161,6 +8349,23 @@ function updateAdaptiveRendering(now) {
         dx * dx + dz * dz <
         Math.pow(1750 + Math.min(500, sphere.radius || 0), 2);
     });
+  }
+  // Loose pickup stones are useful only near David. Ninety separate meshes no
+  // longer remain in the draw list across the whole map.
+  for (const rock of mt.rocks) {
+    if (!rock?.parent) continue;
+    const dx = player.x - rock.position.x;
+    const dz = player.z - rock.position.z;
+    rock.visible = dx * dx + dz * dz < 1650 * 1650;
+  }
+  // Flock AI remains active at every distance, but sheep too deep in the haze
+  // no longer submit their skinned mesh until David approaches again.
+  for (const sheep of mt.sheep) {
+    const dx = player.x - sheep.position.x;
+    const dz = player.z - sheep.position.z;
+    const distanceSq = dx * dx + dz * dz;
+    if (sheep.userData.importedSheepModel)
+      sheep.userData.importedSheepModel.visible = distanceSq < 1750 * 1750;
   }
 }
 function Ye(e, o, n) {
@@ -8353,7 +8558,8 @@ function _e(o, n) {
           h.color.copy(
             Ye(10200776, 16769187, l).lerp(new t.Color(16756088), 0.5 * v),
           );
-        const needsSunShadow = l > 0.16;
+        const needsSunShadow =
+          l > 0.16 && performanceState.slowFrameFor <= 1.4;
         if (lightingPerformance.sunShadowEnabled !== needsSunShadow) {
           lightingPerformance.sunShadowEnabled = needsSunShadow;
           h.castShadow = needsSunShadow;
@@ -8728,9 +8934,50 @@ function _e(o, n) {
       ) {
         mt.aimRig.visible = G;
         const t = mt.aimRig.userData.sling;
-        t &&
-          ((t.rotation.z = P ? 0.018 * performance.now() : 0),
-          (t.rotation.x = P ? 0.18 : 0)),
+        const shoulder = mt.aimRig.userData.rightShoulder;
+        const elbow = mt.aimRig.userData.rightElbow;
+        const spinAxis = mt.aimRig.userData.slingSpinAxis;
+        const spinning = G && P;
+        const phase = performance.now() * 0.014;
+        const releaseStartedAt = mt.aimRig.userData.slingReleaseStartedAt || 0;
+        const releaseAge = performance.now() - releaseStartedAt;
+        const releasing = G && releaseAge >= 0 && releaseAge < 300;
+        const releaseT = releasing
+          ? Math.max(0, Math.min(1, releaseAge / 300))
+          : 0;
+        // Fast forward cast for the first half, then a softer return.  This is
+        // deliberately separate from the backward preparation orbit: the hand
+        // does not continuously circle with the sling.
+        const castEnvelope = releasing
+          ? releaseT < 0.46
+            ? Math.sin((releaseT / 0.46) * Math.PI * 0.5)
+            : Math.cos(((releaseT - 0.46) / 0.54) * Math.PI * 0.5)
+          : 0;
+        if (t) {
+          // Clockwise on-screen motion (left side rising, top moving right)
+          // is the player's backward preparation rotation in this right-hand
+          // first-person view.  The slightly tilted, mostly camera-facing
+          // axis makes the full pouch orbit legible instead of collapsing to
+          // a thin depth-line.  Release remains a separate forward cast.
+          const orbitAngle = spinning
+            ? -phase
+            : releasing
+              ? -castEnvelope * 0.92
+              : 0;
+          if (spinAxis) t.quaternion.setFromAxisAngle(spinAxis, orbitAngle);
+        }
+        if (shoulder) {
+          shoulder.rotation.z = -0.1 - castEnvelope * 0.05;
+          shoulder.rotation.x = -0.05 + castEnvelope * 0.2;
+          shoulder.rotation.y = -0.06 - castEnvelope * 0.07;
+        }
+        if (elbow) {
+          elbow.rotation.z = -0.04 + castEnvelope * 0.06;
+          elbow.rotation.x = castEnvelope * 0.2;
+        }
+        const loadedStone = mt.aimRig.userData.slingStone;
+        if (loadedStone)
+          loadedStone.visible = G && ut.stones > 0 && !(releasing && releaseAge < 175);
           (mt.aimRig.rotation.z = 0);
       }
     })(o),
@@ -9251,7 +9498,8 @@ function _e(o, n) {
             }
             // A city robbery cancels the guard's wanted-star state. Robbers
             // and the guard never share one pursuit state.
-            if (e) setGuardAlerted(false);
+            if (e && getActiveCityBandits().length)
+              suspendGuardForCityBandits();
             kt("danger"),
               Ut(145, 0.65, 0.1, "sawtooth", -45),
               setTimeout(() => Ut(110, 0.7, 0.045, "sawtooth", -25), 180),
