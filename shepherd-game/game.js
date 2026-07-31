@@ -2,6 +2,7 @@ import * as t from "./three.module.js";
 import { FBXLoader } from "./FBXLoader.js";
 import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 import { GLTFLoader } from "./GLTFLoader.js";
+import { mergeGeometries } from "./BufferGeometryUtils.js";
 import { JERUSALEM_DATA } from "./jerusalemData.js";
 import { createDavidModel } from "./davidModel.js";
 let jerusalemMapReady = false;
@@ -87,6 +88,10 @@ const performanceState = {
   slowFrameFor: 0,
   campStoneNear: false,
   distantFogDensity: 0.00046,
+  cityStaticBatches: [],
+  cityCitizenAccumulator: 0,
+  minimapRoadCacheRevision: -1,
+  minimapVisibleRoads: [],
 };
 let D = "",
   S = !1,
@@ -193,6 +198,7 @@ const nightWatch = {
 };
 const lightingPerformance = {
   nextTorchUpdateAt: 0,
+  nextSunShadowUpdateAt: 0,
   maxLocalPointLights: 2,
   torchLightDistance: 680,
   torchVisualDistance: 1800,
@@ -910,6 +916,12 @@ async function runGameStartup(e) {
     loadOliveTreeModel().catch(() => null),
     loadDatePalmModel().catch(() => null),
     loadSouthGateGuardModel().catch(() => null),
+    // Load the four citizens as one startup set so Boy 2 and Girl 2 cannot
+    // appear in alternating late-load waves after play has already begun.
+    loadCityBoy1Model().catch(() => null),
+    loadCityBoyModel().catch(() => null),
+    loadCityGirl1Model().catch(() => null),
+    loadCityGirlModel().catch(() => null),
   ]),
     (async function () {
       if ((Ct(), y))
@@ -945,6 +957,11 @@ async function runGameStartup(e) {
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
           (c.shadowMap.type = t.BasicShadowMap),
+          // The sun completes a cycle over many real minutes. Re-rendering the
+          // entire city shadow map every display frame wastes a second city
+          // draw with no visible benefit, so refresh it on a measured cadence.
+          (c.shadowMap.autoUpdate = !1),
+          (c.shadowMap.needsUpdate = !0),
           (c.outputColorSpace = t.SRGBColorSpace),
           (c.toneMapping = t.ACESFilmicToneMapping),
           (c.toneMappingExposure = 1.13),
@@ -1939,6 +1956,7 @@ async function runGameStartup(e) {
                   fe(e, o, n, a, i);
                 }
               })(r, o, n),
+                batchJerusalemStaticGeometry(r),
                 i.add(r),
                 (mt.jerusalem = r);
             })(Ft[0]),
@@ -4129,6 +4147,123 @@ function ge(e) {
     gradientMap: xe(),
   });
 }
+
+// Jerusalem was authored from many small boxes, cylinders and road pieces.
+// Submitting each immutable piece as a separate draw call was the main city
+// slowdown. Merge only opaque, untextured toon meshes into spatial cells:
+// silhouettes, colours and collision data stay unchanged, while the renderer
+// can cull whole neighbourhood cells and draw them in a small number of calls.
+function batchJerusalemStaticGeometry(root) {
+  if (!root || root.userData.staticGeometryBatched) return;
+  root.userData.staticGeometryBatched = true;
+  root.updateMatrixWorld(true);
+  const rootInverse = root.matrixWorld.clone().invert();
+  const worldPosition = new t.Vector3();
+  const relativeMatrix = new t.Matrix4();
+  const buckets = new Map();
+  const candidates = [];
+  const isDynamicOrProtected = (mesh) => {
+    for (let node = mesh; node && node !== root; node = node.parent) {
+      if (
+        node.userData?.neverOcclude ||
+        node.userData?.flame ||
+        node.userData?.glow ||
+        node.userData?.isDynamicCityAsset ||
+        /Temple|Altar|Laver|Fire|Torch|Kohen|Guard/i.test(node.name || "")
+      ) return true;
+    }
+    return false;
+  };
+  root.traverse((mesh) => {
+    if (
+      !mesh.isMesh ||
+      mesh.isSkinnedMesh ||
+      mesh.isInstancedMesh ||
+      isDynamicOrProtected(mesh)
+    ) return;
+    const material = mesh.material;
+    const geometry = mesh.geometry;
+    if (
+      Array.isArray(material) ||
+      !material?.isMeshToonMaterial ||
+      material.transparent ||
+      material.opacity < 0.999 ||
+      material.map ||
+      material.alphaMap ||
+      material.aoMap ||
+      material.lightMap ||
+      material.normalMap ||
+      !geometry?.attributes?.position
+    ) return;
+    mesh.getWorldPosition(worldPosition);
+    const cellX = Math.floor(worldPosition.x / 620);
+    const cellZ = Math.floor(worldPosition.z / 620);
+    const attributes = Object.entries(geometry.attributes)
+      .map(([name, attribute]) => `${name}:${attribute.itemSize}:${attribute.normalized ? 1 : 0}`)
+      .sort()
+      .join(",");
+    const key = [
+      cellX,
+      cellZ,
+      material.color?.getHexString?.() || "none",
+      material.gradientMap?.uuid || "no-gradient",
+      material.side,
+      material.vertexColors ? 1 : 0,
+      material.fog ? 1 : 0,
+      material.depthTest ? 1 : 0,
+      material.depthWrite ? 1 : 0,
+      mesh.castShadow ? 1 : 0,
+      mesh.receiveShadow ? 1 : 0,
+      geometry.index ? 1 : 0,
+      attributes,
+    ].join("|");
+    if (!buckets.has(key))
+      buckets.set(key, {
+        geometries: [],
+        material,
+        castShadow: mesh.castShadow,
+        receiveShadow: mesh.receiveShadow,
+      });
+    relativeMatrix.multiplyMatrices(rootInverse, mesh.matrixWorld);
+    const transformed = geometry.clone();
+    transformed.applyMatrix4(relativeMatrix);
+    buckets.get(key).geometries.push(transformed);
+    candidates.push(mesh);
+  });
+  if (!candidates.length) return;
+  candidates.forEach((mesh) => mesh.parent?.remove(mesh));
+  const batches = [];
+  let sourceMeshCount = 0;
+  for (const bucket of buckets.values()) {
+    for (let start = 0; start < bucket.geometries.length; start += 72) {
+      const geometries = bucket.geometries.slice(start, start + 72);
+      const merged = mergeGeometries(geometries, false);
+      if (!merged) continue;
+      sourceMeshCount += geometries.length;
+      merged.computeBoundingSphere();
+      merged.computeBoundingBox();
+      // Camera obstruction code uses this lightweight height hint.
+      merged.parameters = { height: 220 };
+      const batch = new t.Mesh(merged, bucket.material);
+      batch.name = `JerusalemStaticBatch_${batches.length}`;
+      batch.castShadow = bucket.castShadow;
+      batch.receiveShadow = bucket.receiveShadow;
+      batch.frustumCulled = true;
+      batch.userData.cityStaticBatch = true;
+      batch.userData.distanceHidden = false;
+      const sphere = merged.boundingSphere;
+      batch.userData.batchCenterX = sphere?.center.x || 0;
+      batch.userData.batchCenterZ = sphere?.center.z || 0;
+      batch.userData.batchRadius = sphere?.radius || 0;
+      root.add(batch);
+      batches.push(batch);
+    }
+  }
+  performanceState.cityStaticBatches = batches;
+  console.info(
+    `[Jerusalem] ${sourceMeshCount} static meshes merged into ${batches.length} spatial batches`,
+  );
+}
 function ve(e, o, n, s) {
   const a = new t.Mesh(new t.BoxGeometry(...o), ge(s));
   return (
@@ -4918,7 +5053,10 @@ function setGuardAlerted(alerted) {
   if (!guard) return;
   if (alerted && getActiveCityBandits().length) alerted = false;
   guard.userData.alerted = !!alerted;
-  ensureGuardAlertIndicator().classList.toggle("show", !!alerted);
+  const marker = ensureGuardAlertIndicator();
+  marker.classList.toggle("show", !!alerted);
+  marker.style.display = alerted ? "" : "none";
+  marker.setAttribute("aria-hidden", alerted ? "false" : "true");
 }
 function createSouthGateGuard() {
   if (!i) return;
@@ -4983,7 +5121,7 @@ function createSouthGateGuard() {
   };
   i.add(guard);
   mt.southGateGuard = guard;
-  ensureGuardAlertIndicator().classList.remove("show");
+  setGuardAlerted(false);
   loadSouthGateGuardModel()
     .then((template) => {
       if (!guard.parent || mt.southGateGuard !== guard) return;
@@ -5015,6 +5153,10 @@ function createSouthGateGuard() {
 function hitSouthGateGuard() {
   const guard = mt.southGateGuard;
   if (!guard?.parent) return false;
+  if (getActiveCityBandits().length) {
+    suspendGuardForCityBandits();
+    return false;
+  }
   setGuardAlerted(true);
   guard.userData.returningHome = false;
   guard.userData.searchFor = 0;
@@ -5103,8 +5245,14 @@ function canNpcMoveBetween(npc, from, to) {
     // Citizens are not free-roaming agents.  Keep every prospective footstep
     // inside the authored broad-road corridor so a collision detour can never
     // lead them between houses or alongside a wall.
-    const road = closestCitizenMainRoadPoint(to.x, to.z);
-    if (!road || road.distance > (data.roadCorridorRadius ?? 72)) return false;
+    const road = closestPointOnCityRoad(to.x, to.z);
+    const corridor = road
+      ? Math.max(
+        18,
+        Math.min(data.roadCorridorRadius ?? 48, road.width * 0.5 + 8),
+      )
+      : 0;
+    if (!road || road.distance > corridor) return false;
   }
   const fromGround = te(from.x, from.z);
   const toGround = te(to.x, to.z);
@@ -5130,7 +5278,7 @@ function canNpcMoveBetween(npc, from, to) {
   // visible body therefore turns before touching a facade instead of relying
   // on penetration recovery after they have already reached it.
   const preventativeClearance = data.isCityCitizen
-    ? clearance + (data.buildingAvoidancePadding ?? 16)
+    ? clearance + (data.buildingAvoidancePadding ?? 4)
     : clearance;
   if (
     !npcPositionBlocked(
@@ -5268,6 +5416,7 @@ function updateSouthGateGuard(delta) {
   const guard = mt.southGateGuard;
   const player = mt.player;
   if (!guard?.parent || !player) return;
+  if (getActiveCityBandits().length) suspendGuardForCityBandits();
   const playerInside = Yt(player.position.x, player.position.z, -55);
   if (guard.userData.alerted && playerInside)
     guard.userData.chaseActivated = true;
@@ -6394,7 +6543,10 @@ function prepareCityCitizenTemplate(scene) {
     if (!part.isMesh) return;
     part.castShadow = false;
     part.receiveShadow = false;
-    part.frustumCulled = true;
+    // These are animated skinned meshes. Their exported rest-pose bounds do
+    // not follow every bone, which caused the four citizens to flicker and
+    // made Boy 2 / Girl 2 appear to alternate near the camera edge.
+    part.frustumCulled = false;
     const materials = Array.isArray(part.material) ? part.material : [part.material];
     for (const material of materials) {
       if (!material) continue;
@@ -6670,7 +6822,10 @@ function getActiveCityBandits() {
 }
 function suspendGuardForCityBandits() {
   const guard = mt.southGateGuard;
-  ensureGuardAlertIndicator().classList.remove("show");
+  const marker = ensureGuardAlertIndicator();
+  marker.classList.remove("show");
+  marker.style.display = "none";
+  marker.setAttribute("aria-hidden", "true");
   if (!guard) return;
   guard.userData.alerted = false;
   guard.userData.chaseActivated = false;
@@ -6740,12 +6895,12 @@ function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
   }
 }
 const cityCitizenProfiles = {
-  boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20 },
-  boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16 },
+  boy1: { name: "JerusalemBiblicalBoy1", height: 106, radius: 20, walkSpeed: 32, fleeSpeed: 86 },
+  boy2: { name: "JerusalemBiblicalBoy2", height: 92, radius: 16, walkSpeed: 34, fleeSpeed: 89 },
   // David's imported mesh is fitted to 164 local units, then the complete
   // playable group is scaled to 0.54. Match the real world-space height.
-  girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16 },
-  girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20 },
+  girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16, walkSpeed: 31, fleeSpeed: 84 },
+  girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20, walkSpeed: 33, fleeSpeed: 87 },
 };
 // Citizens use only the broad public streets. The loop covers the eastern
 // gate/Gihon side, David's palace forecourt, the central avenue and the large
@@ -6853,9 +7008,11 @@ function addCityCitizen(kind, index, template) {
     citizenKind: kind,
     hitRadius: Math.max(25, profile.radius + 9),
     bodyHeight: profile.height,
-    collisionRadius: profile.radius,
-    roadCorridorRadius: 72,
-    buildingAvoidancePadding: 16,
+    collisionRadius: Math.max(11, profile.radius * 0.72),
+    roadCorridorRadius: 48,
+    buildingAvoidancePadding: 4,
+    walkSpeed: profile.walkSpeed,
+    fleeSpeed: profile.fleeSpeed,
     maxStepUp: 11,
     maxDrop: 13,
     maxSlope: 0.7,
@@ -6870,6 +7027,7 @@ function addCityCitizen(kind, index, template) {
     walkAction: null,
     lastSafePosition: new t.Vector3(x, te(x, z), z),
     attackedFleeFor: 0,
+    fleeing: false,
     recentTargets: [],
     recentRouteEdges: [],
     keepRoadDirection: false,
@@ -6886,6 +7044,7 @@ function addCityCitizen(kind, index, template) {
   model.visible = true;
   model.traverse((part) => {
     part.visible = true;
+    if (part.isMesh || part.isSkinnedMesh) part.frustumCulled = false;
   });
   model.updateMatrixWorld(true);
   let box = new t.Box3().setFromObject(model);
@@ -6911,7 +7070,9 @@ function addCityCitizen(kind, index, template) {
   }
   i.add(citizen);
   mt.cityCitizens.push(citizen);
-  chooseCitizenMainRoadRoute(citizen, false);
+  chooseCitizenRoadTarget(citizen, false);
+  if (!citizen.userData.path.length)
+    chooseCitizenMainRoadRoute(citizen, false);
 }
 function removeDuplicateDavidCharacters() {
   if (!i || !mt.player) return;
@@ -6927,7 +7088,7 @@ function removeDuplicateDavidCharacters() {
 }
 function resetCityCitizensForEntry() {
   if (!mt.cityCitizens.length) return;
-  const offset = Math.floor(Math.random() * CITY_CITIZEN_MAIN_LOOP.length);
+  const offset = 0;
   for (let citizenIndex = 0; citizenIndex < mt.cityCitizens.length; citizenIndex++) {
     const citizen = mt.cityCitizens[citizenIndex];
     const spawn = CITY_CITIZEN_MAIN_LOOP[
@@ -6945,8 +7106,23 @@ function resetCityCitizensForEntry() {
     citizen.userData.stuckFor = 0;
     citizen.userData.repathFor = 0;
     citizen.userData.mainRoadDirection = citizenIndex % 2 ? -1 : 1;
-    chooseCitizenMainRoadRoute(citizen, false);
+    chooseCitizenRoadTarget(citizen, false);
+    if (!citizen.userData.path.length)
+      chooseCitizenMainRoadRoute(citizen, false);
   }
+}
+async function loadCityCitizenWithRetry(loader, attempts = 3) {
+  let lastError = null;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      return await loader();
+    } catch (error) {
+      lastError = error;
+      if (attempt + 1 < attempts)
+        await new Promise((resolve) => setTimeout(resolve, 120 * (attempt + 1)));
+    }
+  }
+  throw lastError;
 }
 function ensureCityCitizens() {
   if (!i || !dt || mt.cityCitizens.length >= 4 || mt.cityCitizensLoading) return;
@@ -6954,10 +7130,10 @@ function ensureCityCitizens() {
   // model must never cancel the other three citizens.
   mt.cityCitizensLoading = true;
   const requests = [
-    ["boy1", 0, loadCityBoy1Model()],
-    ["boy2", 1, loadCityBoyModel()],
-    ["girl1", 2, loadCityGirl1Model()],
-    ["girl2", 3, loadCityGirlModel()],
+    ["boy1", 0, loadCityCitizenWithRetry(loadCityBoy1Model)],
+    ["boy2", 1, loadCityCitizenWithRetry(loadCityBoyModel)],
+    ["girl1", 2, loadCityCitizenWithRetry(loadCityGirl1Model)],
+    ["girl2", 3, loadCityCitizenWithRetry(loadCityGirlModel)],
   ];
   Promise.allSettled(requests.map((entry) => entry[2])).then((results) => {
     if (!i) {
@@ -6965,6 +7141,7 @@ function ensureCityCitizens() {
       return;
     }
     removeDuplicateDavidCharacters();
+    const hadCitizens = mt.cityCitizens.length > 0;
     results.forEach((result, index) => {
       const [kind, citizenIndex] = requests[index];
       if (
@@ -6976,8 +7153,70 @@ function ensureCityCitizens() {
         console.warn(`성 안 시민 ${kind} 모델을 불러오지 못했습니다.`, result.reason);
     });
     mt.cityCitizensLoading = false;
-    resetCityCitizensForEntry();
+    // Do not relocate already-visible citizens when one independently retried
+    // asset finishes loading. That late whole-group reset was perceived as a
+    // blink/alternation. Only the first complete creation receives start slots.
+    if (!hadCitizens) resetCityCitizensForEntry();
   });
+}
+function planCityCitizenRoute(citizen, fleeing) {
+  citizen.userData.path = [];
+  citizen.userData.pathIndex = 0;
+  chooseCitizenRoadTarget(citizen, fleeing);
+  if (!citizen.userData.path.length)
+    chooseCitizenMainRoadRoute(citizen, fleeing);
+  citizen.userData.repathFor = fleeing ? 1.25 : 4.2;
+}
+function isCityCitizenCrowdedAt(citizen, x, z) {
+  for (const other of mt.cityCitizens) {
+    if (other === citizen || !other?.parent) continue;
+    const minimum =
+      (citizen.userData.collisionRadius || 12) +
+      (other.userData.collisionRadius || 12) +
+      (citizen.userData.fleeing ? 3 : 8);
+    if (Math.hypot(other.position.x - x, other.position.z - z) < minimum)
+      return true;
+  }
+  return false;
+}
+function tryMoveCityCitizen(citizen, desiredAngle, distance) {
+  const offsets = citizen.userData.fleeing
+    ? [0, 0.2, -0.2, 0.42, -0.42, 0.7, -0.7, 1.02, -1.02]
+    : [0, 0.18, -0.18, 0.38, -0.38, 0.62, -0.62];
+  for (const offset of offsets) {
+    const angle = desiredAngle + offset;
+    const probeDistance = Math.max(16, distance * 5);
+    const probeX = citizen.position.x + Math.sin(angle) * probeDistance;
+    const probeZ = citizen.position.z + Math.cos(angle) * probeDistance;
+    const road = closestPointOnCityRoad(probeX, probeZ);
+    const corridor = road
+      ? Math.max(
+        18,
+        Math.min(
+          citizen.userData.roadCorridorRadius || 48,
+          road.width * 0.5 + 8,
+        ),
+      )
+      : 0;
+    if (!road || road.distance > corridor) continue;
+    const nextX = citizen.position.x + Math.sin(angle) * distance;
+    const nextZ = citizen.position.z + Math.cos(angle) * distance;
+    if (isCityCitizenCrowdedAt(citizen, nextX, nextZ)) continue;
+    if (!moveNpcWithSweptCollision(citizen, angle, distance)) continue;
+    citizen.rotation.y = angle;
+    return true;
+  }
+  return false;
+}
+function beginCityBanditEmergency() {
+  if (!getActiveCityBandits().length) return;
+  suspendGuardForCityBandits();
+  for (const citizen of mt.cityCitizens) {
+    if (!citizen?.parent) continue;
+    citizen.userData.fleeing = true;
+    citizen.userData.blockedWaypointFor = 0;
+    planCityCitizenRoute(citizen, true);
+  }
 }
 function updateCityCitizens(delta) {
   if (mt.cityCitizens.length < 4 && !mt.cityCitizensLoading) ensureCityCitizens();
@@ -6985,12 +7224,19 @@ function updateCityCitizens(delta) {
     Yt(mt.player.position.x, mt.player.position.z, -55);
   if (playerInside && !citizensPlayerWasInsideJerusalem) {
     removeDuplicateDavidCharacters();
-    resetCityCitizensForEntry();
   }
   citizensPlayerWasInsideJerusalem = playerInside;
   const activeBandits = getActiveCityBandits();
   const banditActive = activeBandits.length > 0;
   if (banditActive) suspendGuardForCityBandits();
+  // Four collision/path agents do not need to query the dense city collider
+  // grid at monitor refresh rate. 30 Hz is smooth nearby; 8 Hz is sufficient
+  // while David is outside, with actual elapsed time preserved for movement.
+  performanceState.cityCitizenAccumulator += delta;
+  const citizenInterval = playerInside ? 1 / 30 : 1 / 8;
+  if (performanceState.cityCitizenAccumulator < citizenInterval) return;
+  const stepDelta = Math.min(0.13, performanceState.cityCitizenAccumulator);
+  performanceState.cityCitizenAccumulator = 0;
   for (const citizen of mt.cityCitizens) {
     if (!citizen.parent) continue;
     const playerDistance = mt.player
@@ -6999,100 +7245,87 @@ function updateCityCitizens(delta) {
         mt.player.position.z - citizen.position.z,
       )
       : Infinity;
-    // Only four optimized citizens exist. Keep them visible throughout the
-    // inhabited city so distance culling cannot look like missing NPCs.
-    const visible = playerInside ? playerDistance < 1900 : playerDistance < 900;
+    // When David is inside, all four named citizens remain instantiated and
+    // visible together. Fog/frustum handles distance without deleting one.
+    const visible = playerInside || playerDistance < 1100;
     if (citizen.userData.importedModel)
       citizen.userData.importedModel.visible = visible;
-    citizen.userData.repathFor -= delta;
+    citizen.userData.repathFor -= stepDelta;
     citizen.userData.attackedFleeFor = Math.max(
       0,
-      (citizen.userData.attackedFleeFor || 0) - delta,
+      (citizen.userData.attackedFleeFor || 0) - stepDelta,
     );
     const fleeing = banditActive || citizen.userData.attackedFleeFor > 0;
     const fleeStateChanged = citizen.userData.fleeing !== fleeing;
-    if (
-      (fleeStateChanged || citizen.userData.repathFor <= 0) &&
-      (fleeStateChanged || !citizen.userData.path.length)
-    ) {
+    if (fleeStateChanged || !citizen.userData.path.length) {
       citizen.userData.fleeing = fleeing;
-      citizen.userData.path = [];
-      if (fleeing) chooseCitizenRoadTarget(citizen, true);
-      if (!citizen.userData.path.length)
-        chooseCitizenMainRoadRoute(citizen, fleeing);
-      citizen.userData.repathFor = fleeing ? 0.7 : 2.5;
+      planCityCitizenRoute(citizen, fleeing);
     }
-    const waypoint = citizen.userData.path[citizen.userData.pathIndex];
+    let waypoint = citizen.userData.path[citizen.userData.pathIndex];
     let moving = false;
+    for (let advance = 0; waypoint && advance < 3; advance++) {
+      const distance = Math.hypot(
+        waypoint.x - citizen.position.x,
+        waypoint.z - citizen.position.z,
+      );
+      if (distance >= 10) break;
+      citizen.userData.pathIndex++;
+      if (citizen.userData.pathIndex >= citizen.userData.path.length) {
+        planCityCitizenRoute(citizen, fleeing);
+      }
+      waypoint = citizen.userData.path[citizen.userData.pathIndex];
+    }
     if (waypoint) {
       const dx = waypoint.x - citizen.position.x;
       const dz = waypoint.z - citizen.position.z;
       const distance = Math.hypot(dx, dz);
-      if (distance < 10) {
-        citizen.userData.pathIndex++;
-        if (citizen.userData.pathIndex >= citizen.userData.path.length) {
-          citizen.userData.path = [];
-          if (fleeing) chooseCitizenRoadTarget(citizen, true);
-          if (!citizen.userData.path.length)
-            chooseCitizenMainRoadRoute(citizen, fleeing);
-        }
-      } else {
+      if (distance >= 10) {
         const angle = Math.atan2(dx, dz);
-        const step = Math.min(distance, (fleeing ? 84 : 34) * delta);
-        if (moveNpcWithSweptCollision(citizen, angle, step)) {
+        const speed = fleeing
+          ? citizen.userData.fleeSpeed
+          : citizen.userData.walkSpeed;
+        const step = Math.min(distance, speed * stepDelta);
+        if (tryMoveCityCitizen(citizen, angle, step)) {
           moving = true;
-          citizen.rotation.y = angle;
           citizen.userData.blockedWaypointFor = 0;
         } else {
-          // Do not steer around the obstruction: that old behaviour was able
-          // to leave the avenue and funnel a citizen into gaps between houses.
-          // Hold briefly, then reverse the broad-road itinerary.
-          citizen.userData.blockedWaypointFor += delta;
-          if (citizen.userData.blockedWaypointFor > 0.28) {
+          citizen.userData.blockedWaypointFor += stepDelta;
+          if (citizen.userData.blockedWaypointFor > 0.62) {
             citizen.userData.blockedWaypointFor = 0;
-            citizen.userData.mainRoadDirection =
-              -(citizen.userData.mainRoadDirection || 1);
-            citizen.userData.keepRoadDirection = true;
-            citizen.userData.path = [];
-            if (fleeing) chooseCitizenRoadTarget(citizen, true);
-            if (!citizen.userData.path.length)
-              chooseCitizenMainRoadRoute(citizen, fleeing);
+            planCityCitizenRoute(citizen, fleeing);
           }
         }
       }
     }
-    citizen.userData.progressCheckFor -= delta;
+    citizen.userData.progressCheckFor -= stepDelta;
     if (citizen.userData.progressCheckFor <= 0) {
-      const progress = citizen.position.distanceTo(
-        citizen.userData.progressPosition,
+      const progress = Math.hypot(
+        citizen.position.x - citizen.userData.progressPosition.x,
+        citizen.position.z - citizen.userData.progressPosition.z,
       );
-      if (progress < 7 && citizen.userData.path.length) {
+      if (progress < 4 && citizen.userData.path.length) {
         citizen.userData.stuckFor++;
-        // Only a persistent obstruction rebuilds the route. Do not snap to the
-        // nearest road every second: that caused visible back-and-forth loops.
         if (citizen.userData.stuckFor >= 2) {
-          const recovery = closestCitizenMainRoadPoint(
+          const recovery = nearestClearCityRoadPoint(
             citizen.position.x,
             citizen.position.z,
+            citizen.userData.collisionRadius + 3,
           );
           if (
             recovery &&
             !isInsideTempleCourt(recovery.x, recovery.z, 42) &&
-            !npcPositionBlocked(
-              recovery.x,
-              recovery.z,
-              te(recovery.x, recovery.z),
-              citizen.userData.collisionRadius +
-                citizen.userData.buildingAvoidancePadding,
-              [4, 30, 58],
-            )
+            Math.hypot(
+              recovery.x - citizen.position.x,
+              recovery.z - citizen.position.z,
+            ) > 5
           ) {
-            citizen.position.set(recovery.x, te(recovery.x, recovery.z), recovery.z);
-            citizen.userData.lastSafePosition.copy(citizen.position);
+            // Walk back to the lane; never teleport. The previous snap was the
+            // visible repeated-position flicker reported for all four NPCs.
+            citizen.userData.path = [{ x: recovery.x, z: recovery.z }];
+            citizen.userData.pathIndex = 0;
+          } else {
+            planCityCitizenRoute(citizen, fleeing);
           }
-          citizen.userData.path = [];
-          citizen.userData.repathFor = 0;
-          citizen.userData.keepRoadDirection = true;
           citizen.userData.stuckFor = 0;
         }
       } else {
@@ -7102,25 +7335,29 @@ function updateCityCitizens(delta) {
       citizen.userData.progressCheckFor = 1.5;
     }
     citizen.position.y = te(citizen.position.x, citizen.position.z);
-    animateCityCitizen(citizen, moving, fleeing, delta, visible);
+    animateCityCitizen(citizen, moving, fleeing, stepDelta, visible);
   }
 }
 function hitCityCitizen(citizen) {
   if (!citizen?.parent) return false;
-  setGuardAlerted(true);
+  const banditEmergency = getActiveCityBandits().length > 0;
+  setGuardAlerted(!banditEmergency);
   const guard = mt.southGateGuard;
-  if (guard) {
+  if (guard && !banditEmergency) {
     guard.userData.returningHome = false;
     guard.userData.searchFor = 0;
     guard.userData.lastSeenX = mt.player.position.x;
     guard.userData.lastSeenZ = mt.player.position.z;
     guard.userData.chaseActivated = Yt(mt.player.position.x, mt.player.position.z, -55);
+  } else if (banditEmergency) {
+    suspendGuardForCityBandits();
   }
   citizen.userData.fleeing = true;
   citizen.userData.attackedFleeFor = 6;
   citizen.userData.path = [];
   citizen.userData.repathFor = 0;
-  eo("성 안의 사람을 공격해 경비병이 추격합니다.");
+  if (!banditEmergency)
+    eo("성 안의 사람을 공격해 경비병이 추격합니다.");
   return true;
 }
 function Te() {
@@ -7136,6 +7373,7 @@ function Te() {
     (mt.kohen = null),
     (mt.cityCitizens = []),
     (mt.cityCitizensLoading = false),
+    (performanceState.cityCitizenAccumulator = 0),
     (mt.effects = []),
     ae(),
     (at = {
@@ -8153,11 +8391,12 @@ function Oe(t = !1) {
 }
 function je(t, o = 4200) {
   const n = e("#dangerNotice");
-  (n.textContent = t),
+  const localized = window.ShepherdI18n?.tr?.(t) || t;
+  (n.textContent = localized),
     clearTimeout(je.timer),
     t &&
       (je.timer = setTimeout(() => {
-        n.textContent === t && (n.textContent = "");
+        n.textContent === localized && (n.textContent = "");
       }, o));
 }
 let He = !1;
@@ -8282,11 +8521,22 @@ function updateAdaptiveRendering(now) {
   performanceState.nextAdaptiveQualityAt = now + 900;
   const player = mt.player.position;
   const onOliveMount = player.x > 1050 && player.x < 3300;
+  const insideCity = Yt(player.x, player.z, -70);
   performanceState.onOliveMount = onOliveMount;
   const consistentlySlow = performanceState.slowFrameFor > 1.4;
   const targetRatio = Math.min(
     devicePixelRatio,
-    consistentlySlow ? (onOliveMount ? 0.54 : 0.6) : onOliveMount ? 0.66 : 0.76,
+    consistentlySlow
+      ? onOliveMount
+        ? 0.54
+        : insideCity
+          ? 0.58
+          : 0.6
+      : onOliveMount
+        ? 0.66
+        : insideCity
+          ? 0.72
+          : 0.76,
   );
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
@@ -8298,7 +8548,9 @@ function updateAdaptiveRendering(now) {
   const targetFogDensity = consistentlySlow
     ? onOliveMount
       ? 0.00059
-      : 0.00054
+      : insideCity
+        ? 0.00056
+        : 0.00054
     : onOliveMount
       ? 0.00051
       : performanceState.distantFogDensity;
@@ -8307,6 +8559,26 @@ function updateAdaptiveRendering(now) {
   if (r.far !== (consistentlySlow ? 7600 : 9000)) {
     r.far = consistentlySlow ? 7600 : 9000;
     r.updateProjectionMatrix();
+  }
+  // Spatially merged city cells disappear only after they are already deep in
+  // the distance haze. Nearby streets keep the exact same geometry/materials.
+  // This is real draw-call culling, not a post-processing blur.
+  const cityBatchRange = insideCity
+    ? consistentlySlow
+      ? 2350
+      : 2900
+    : consistentlySlow
+      ? 3600
+      : 4300;
+  for (const batch of performanceState.cityStaticBatches) {
+    if (!batch?.parent) continue;
+    const dx = player.x - batch.userData.batchCenterX;
+    const dz = player.z - batch.userData.batchCenterZ;
+    const radius = Math.min(520, batch.userData.batchRadius || 0);
+    const distanceHidden =
+      dx * dx + dz * dz > (cityBatchRange + radius) ** 2;
+    batch.userData.distanceHidden = distanceHidden;
+    if (!batch.userData.cameraHidden) batch.visible = !distanceHidden;
   }
   if (mt.goalSite && mt.campStoneFar && mt.campStoneNear) {
     const campDistance = Math.hypot(
@@ -8563,7 +8835,18 @@ function _e(o, n) {
         if (lightingPerformance.sunShadowEnabled !== needsSunShadow) {
           lightingPerformance.sunShadowEnabled = needsSunShadow;
           h.castShadow = needsSunShadow;
-          h.shadow.needsUpdate = needsSunShadow;
+          c.shadowMap.needsUpdate = needsSunShadow;
+          lightingPerformance.nextSunShadowUpdateAt = 0;
+        }
+        if (
+          needsSunShadow &&
+          n * 1000 >= lightingPerformance.nextSunShadowUpdateAt
+        ) {
+          const playerInsideCity = !!mt.player &&
+            Yt(mt.player.position.x, mt.player.position.z, -70);
+          lightingPerformance.nextSunShadowUpdateAt =
+            n * 1000 + (playerInsideCity ? 520 : 360);
+          c.shadowMap.needsUpdate = true;
         }
       }
       if (mt.stars?.material?.uniforms) {
@@ -8644,12 +8927,15 @@ function _e(o, n) {
         !e ||
         !mt.jerusalem ||
         !mt.jerusalem.visible ||
+        A === 2 ||
         frameNow < performanceState.nextOcclusionAt
       )
         return;
-      performanceState.nextOcclusionAt = frameNow + 100;
+      const playerInsideCity = Yt(e.position.x, e.position.z, -70);
+      performanceState.nextOcclusionAt =
+        frameNow + (playerInsideCity ? (performanceState.slowFrameFor > 1.4 ? 260 : 180) : 120);
       for (const mesh of performanceState.hiddenCameraMeshes) {
-        mesh.visible = !0;
+        mesh.visible = !mesh.userData.distanceHidden;
         mesh.userData.cameraHidden = !1;
       }
       performanceState.hiddenCameraMeshes.length = 0;
@@ -8663,6 +8949,7 @@ function _e(o, n) {
       for (const t of s) {
         const e = t.object;
         e?.isMesh &&
+          !e.userData.distanceHidden &&
           !e.userData.neverOcclude &&
           t.distance > 45 &&
           t.distance < n - 25 &&
@@ -9499,7 +9786,7 @@ function _e(o, n) {
             // A city robbery cancels the guard's wanted-star state. Robbers
             // and the guard never share one pursuit state.
             if (e && getActiveCityBandits().length)
-              suspendGuardForCityBandits();
+              beginCityBanditEmergency();
             kt("danger"),
               Ut(145, 0.65, 0.1, "sawtooth", -45),
               setTimeout(() => Ut(110, 0.7, 0.045, "sawtooth", -25), 180),
@@ -10070,8 +10357,7 @@ function _e(o, n) {
           (s.lineWidth = 3),
           (s.lineCap = "round"),
           (s.lineJoin = "round");
-        for (const [e, o, roadWidth] of Xt) {
-          if (!Je(t, e, o)) continue;
+        for (const [e, o, roadWidth] of getCachedMinimapRoads(t)) {
           const n = i({ x: t.x + e[0], z: t.z + e[1] }),
             a = i({ x: t.x + o[0], z: t.z + o[1] });
           s.lineWidth = Math.max(1.5, Math.min(4.8, (roadWidth / W) * 84));
@@ -10172,6 +10458,15 @@ function Je(e, o, n) {
   }
   return !0;
 }
+function getCachedMinimapRoads(city) {
+  if (performanceState.minimapRoadCacheRevision !== collisionRevision) {
+    performanceState.minimapVisibleRoads = Xt.filter(([start, end]) =>
+      Je(city, start, end),
+    );
+    performanceState.minimapRoadCacheRevision = collisionRevision;
+  }
+  return performanceState.minimapVisibleRoads;
+}
 function Qe() {
   S &&
     !b &&
@@ -10216,7 +10511,8 @@ function $e() {
 }
 let to;
 function eo(t) {
-  (e("#notice").innerText = t),
+  const localized = window.ShepherdI18n?.tr?.(t) || t;
+  (e("#notice").innerText = localized),
     clearTimeout(to),
     (to = setTimeout(() => (e("#notice").innerText = ""), 2800));
 }
