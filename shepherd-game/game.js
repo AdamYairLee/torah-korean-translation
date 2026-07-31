@@ -103,6 +103,8 @@ let D = "",
   V = 135,
   U = 58,
   A = 0;
+let startupPromise = null;
+let startupComplete = false;
 const F = [
     { name: "기본 시점", distance: 190, height: 135, fov: 58 },
     { name: "사람 확대 시점", distance: 95, height: 105, fov: 52 },
@@ -261,6 +263,7 @@ const pt = 33,
     southGateGuard: null,
     kohen: null,
     cityCitizens: [],
+    cityCitizensLoading: false,
   },
   ft = { x: 1065, z: 300, r: 145 },
   wt = new t.Vector3(),
@@ -369,10 +372,6 @@ const Lt = {
     new Audio("./assets/audio/sheep2.mp3"),
     new Audio("./assets/audio/sheep3.mp3"),
     new Audio("./assets/audio/sheep4.mp3"),
-    new Audio("./assets/audio/sheep5.mp3"),
-    new Audio("./assets/audio/sheep6.mp3"),
-    new Audio("./assets/audio/sheep7.mp3"),
-    new Audio("./assets/audio/sheep8.mp3"),
   ],
 };
 Lt.sheep.forEach((audio) => {
@@ -747,7 +746,11 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
     } catch (error) {
       console.warn("Startup shader warmup skipped:", error);
     }
-    c.render(i, r);
+    try {
+      c.render(i, r);
+    } catch (error) {
+      console.warn("First frame render skipped:", error);
+    }
     await new Promise((resolve) =>
       requestAnimationFrame(() => requestAnimationFrame(resolve)),
     );
@@ -833,7 +836,38 @@ function updateJerusalemBuildingLOD() {
   if (mt.davidPalaceProcedural) mt.davidPalaceProcedural.visible = true;
 }
 
-async function At(e) {
+function At(e) {
+  if (startupComplete) {
+    Dt("gameScreen");
+    c?.domElement.requestPointerLock?.();
+    return Promise.resolve();
+  }
+  if (startupPromise) return startupPromise;
+  b = true;
+  const playButton = document.querySelector("#playBtn");
+  const davidCard = document.querySelector("#davidCard");
+  if (playButton) playButton.disabled = true;
+  if (davidCard) davidCard.disabled = true;
+  startupPromise = runGameStartup(e)
+    .then(() => {
+      startupComplete = true;
+    })
+    .catch((error) => {
+      console.error("게임 시작 실패:", error);
+      document.querySelector("#gameLoading")?.classList.add("hidden");
+      Dt("characterScreen");
+      eo("게임을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    })
+    .finally(() => {
+      b = false;
+      startupPromise = null;
+      if (playButton) playButton.disabled = false;
+      if (davidCard) davidCard.disabled = false;
+    });
+  return startupPromise;
+}
+
+async function runGameStartup(e) {
   const loadingScreen = document.querySelector("#gameLoading");
   const loadingBar = document.querySelector("#loadingBar");
   const loadingPercent = document.querySelector("#loadingPercent");
@@ -862,10 +896,11 @@ async function At(e) {
               console.error("다비드 OBJ 로드 실패:", t), (Y = "");
             })),
         _),
+    // Finish every shared model decode before scene construction. A timed-out
+    // loader keeps running because browser fetch/decode work is not cancelled;
+    // allowing those jobs to overlap terrain/material creation can leave the
+    // visible terrain without a completed GPU program.
     loadFirstTempleModel().catch(() => null),
-    // Decode the larger predator assets on the loading screen. Loading and
-    // parsing them only when an enemy first appears causes a noticeable
-    // one-time hitch during active play.
     loadLionModel().catch(() => null),
     loadFoxModel().catch(() => null),
     loadWolfModel().catch(() => null),
@@ -899,8 +934,9 @@ async function At(e) {
           (c = new t.WebGLRenderer({
             antialias: !0,
             powerPreference: "high-performance",
+            failIfMajorPerformanceCaveat: false,
           })),
-          c.setPixelRatio(Math.min(devicePixelRatio, 0.92)),
+          c.setPixelRatio(Math.min(devicePixelRatio, 0.85)),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !0),
           (c.shadowMap.type = t.BasicShadowMap),
@@ -2207,15 +2243,15 @@ async function At(e) {
                 loadCampProp(e, {
                   name: "CampHayTrough",
                   url: "./assets/models/camp_hay_trough_game.glb",
-                  position: [-220, 62],
-                  size: 132,
+                  position: [-236, 78],
+                  size: 122,
                   yaw: Math.PI / 2,
                 });
                 loadCampProp(e, {
                   name: "CampWaterTrough",
                   url: "./assets/models/camp_water_trough_game.glb",
-                  position: [-220, -55],
-                  size: 138,
+                  position: [-204, -76],
+                  size: 127,
                   yaw: Math.PI / 2,
                 });
                 // The obsolete four-stone cairn was removed.  It had no
@@ -2386,6 +2422,22 @@ function colliderBlocksPoint(collider, point, clearance, verticalPadding = 0) {
     collider.r + clearance
   );
 }
+function colliderBlocksHorizontal(collider, x, zValue, clearance) {
+  if ("rect" === collider.shape) {
+    const dx = x - collider.x,
+      dz = zValue - collider.z,
+      cos = Math.cos(-(collider.rotation || 0)),
+      sin = Math.sin(-(collider.rotation || 0)),
+      localX = dx * cos - dz * sin,
+      localZ = dx * sin + dz * cos;
+    return (
+      Math.abs(localX) < collider.w / 2 + clearance &&
+      Math.abs(localZ) < collider.d / 2 + clearance
+    );
+  }
+  return Math.hypot(x - collider.x, zValue - collider.z) <
+    collider.r + clearance;
+}
 function jt(t, e = 18) {
   if (Math.abs(t.x) > 4050 || Math.abs(t.z) > 4050) return !0;
   indexedCollisionRevision !== collisionRevision && rebuildCollisionIndex();
@@ -2425,7 +2477,25 @@ function collisionPenetrationScore(point, clearance = 18) {
   // step, including the step that would leave the collider.  Measure overlap so
   // movement that strictly reduces it can be allowed without permitting entry.
   let score = 0;
-  for (const collider of z) {
+  indexedCollisionRevision !== collisionRevision && rebuildCollisionIndex();
+  collisionQueryStamp++;
+  const nearby = [];
+  const collect = (collider) => {
+    if (collider._collisionQueryStamp === collisionQueryStamp) return;
+    collider._collisionQueryStamp = collisionQueryStamp;
+    nearby.push(collider);
+  };
+  for (const collider of globalCollisionObjects) collect(collider);
+  const minX = Math.floor((point.x - clearance) / COLLISION_CELL_SIZE);
+  const maxX = Math.floor((point.x + clearance) / COLLISION_CELL_SIZE);
+  const minZ = Math.floor((point.z - clearance) / COLLISION_CELL_SIZE);
+  const maxZ = Math.floor((point.z + clearance) / COLLISION_CELL_SIZE);
+  for (let cellX = minX; cellX <= maxX; cellX++)
+    for (let cellZ = minZ; cellZ <= maxZ; cellZ++) {
+      const bucket = collisionGrid.get(collisionCellKey(cellX, cellZ));
+      if (bucket) for (const collider of bucket) collect(collider);
+    }
+  for (const collider of nearby) {
     if (
       Number.isFinite(collider.yMin) &&
       Number.isFinite(collider.yMax) &&
@@ -4911,8 +4981,14 @@ function showGuardCaught() {
 function canNpcMoveBetween(npc, from, to) {
   const data = npc.userData;
   const clearance = data.collisionRadius ?? 30;
-  if (data.isCityCitizen && isInsideTempleCourt(to.x, to.z, 34))
-    return false;
+  if (data.isCityCitizen) {
+    if (isInsideTempleCourt(to.x, to.z, 34)) return false;
+    // Citizens are not free-roaming agents.  Keep every prospective footstep
+    // inside the authored broad-road corridor so a collision detour can never
+    // lead them between houses or alongside a wall.
+    const road = closestCitizenMainRoadPoint(to.x, to.z);
+    if (!road || road.distance > (data.roadCorridorRadius ?? 72)) return false;
+  }
   const fromGround = te(from.x, from.z);
   const toGround = te(to.x, to.z);
   const rise = toGround - fromGround;
@@ -4924,23 +5000,108 @@ function canNpcMoveBetween(npc, from, to) {
     Math.abs(rise) / horizontal > (data.maxSlope ?? 0.75)
   )
     return false;
-  const probe = new t.Vector3(to.x, toGround + (data.bodyHeight ?? 150) * 0.45, to.z);
-  if (!jt(probe, clearance)) return true;
+  // Check both the feet and torso. A single mid-body probe could sit above a
+  // low house collider and incorrectly let citizens, guards or enemies pass
+  // through the wall below it.
+  const bodyHeight = data.bodyHeight ?? 150;
+  const probeHeights = [
+    4,
+    Math.min(bodyHeight * 0.28, 36),
+    Math.min(bodyHeight * 0.55, 72),
+  ];
+  // Give citizens an additional preventative buffer around buildings.  Their
+  // visible body therefore turns before touching a facade instead of relying
+  // on penetration recovery after they have already reached it.
+  const preventativeClearance = data.isCityCitizen
+    ? clearance + (data.buildingAvoidancePadding ?? 16)
+    : clearance;
+  if (
+    !npcPositionBlocked(
+      to.x,
+      to.z,
+      toGround,
+      preventativeClearance,
+      probeHeights,
+    )
+  )
+    return true;
   // If an NPC spawned or was pushed slightly into a collider, permit only a
   // movement that strictly reduces penetration. This is essential for guards
   // returning from a gate threshold instead of becoming permanently wedged.
-  const fromProbe = new t.Vector3(
-    from.x,
-    fromGround + (data.bodyHeight ?? 150) * 0.45,
-    from.z,
+  const toProbes = probeHeights.map(
+    (height) => new t.Vector3(to.x, toGround + height, to.z),
+  );
+  const fromProbes = probeHeights.map(
+    (height) => new t.Vector3(from.x, fromGround + height, from.z),
   );
   return (
-    collisionPenetrationScore(probe, clearance) + 0.001 <
-    collisionPenetrationScore(fromProbe, clearance)
+    toProbes.reduce(
+      (sum, probe) =>
+        sum + collisionPenetrationScore(probe, preventativeClearance),
+      0,
+    ) + 0.001 <
+    fromProbes.reduce(
+      (sum, probe) =>
+        sum + collisionPenetrationScore(probe, preventativeClearance),
+      0,
+    )
   );
 }
+const npcCollisionNearby = [],
+  npcCollisionProbe = new t.Vector3();
+function npcPositionBlocked(x, zValue, ground, clearance, probeHeights) {
+  // Gather the nearby collider bucket once for all body probes. Previously
+  // each height ran a complete spatial lookup, tripling the busiest city-NPC
+  // collision work.
+  indexedCollisionRevision !== collisionRevision && rebuildCollisionIndex();
+  collisionQueryStamp++;
+  const stamp = collisionQueryStamp;
+  npcCollisionNearby.length = 0;
+  const collect = (collider) => {
+    if (collider._npcCollisionQueryStamp === stamp) return;
+    collider._npcCollisionQueryStamp = stamp;
+    npcCollisionNearby.push(collider);
+  };
+  for (const collider of globalCollisionObjects) collect(collider);
+  const minX = Math.floor((x - clearance) / COLLISION_CELL_SIZE);
+  const maxX = Math.floor((x + clearance) / COLLISION_CELL_SIZE);
+  const minZ = Math.floor((zValue - clearance) / COLLISION_CELL_SIZE);
+  const maxZ = Math.floor((zValue + clearance) / COLLISION_CELL_SIZE);
+  for (let cellX = minX; cellX <= maxX; cellX++)
+    for (let cellZ = minZ; cellZ <= maxZ; cellZ++) {
+      const bucket = collisionGrid.get(collisionCellKey(cellX, cellZ));
+      if (bucket) for (const collider of bucket) collect(collider);
+    }
+  const insideCity = Yt(x, zValue, -80);
+  npcCollisionProbe.set(x, ground + 4, zValue);
+  for (const collider of npcCollisionNearby) {
+    // City buildings and walls are full-height navigation obstacles for ground
+    // NPCs. This closes the old loophole where a low yMax let a torso probe
+    // cross a house footprint or climb onto a roof.
+    const fullHeightCityObstacle =
+      insideCity &&
+      (collider.type === "building" ||
+        collider.type === "wall" ||
+        collider.type === "cityWall" ||
+        collider.type === "government" ||
+        collider.type === "palace" ||
+        collider.type === "temple" ||
+        collider.type === "temple-wall");
+    if (fullHeightCityObstacle) {
+      if (colliderBlocksHorizontal(collider, x, zValue, clearance)) return true;
+      continue;
+    }
+    for (const height of probeHeights) {
+      npcCollisionProbe.y = ground + height;
+      if (colliderBlocksPoint(collider, npcCollisionProbe, clearance, 2))
+        return true;
+    }
+  }
+  return false;
+}
 function moveNpcWithSweptCollision(npc, angle, distance) {
-  const substeps = Math.max(1, Math.min(12, Math.ceil(distance / 5)));
+  // A 2.5-unit sweep cannot jump across the thinnest authored city wall.
+  const substeps = Math.max(1, Math.min(16, Math.ceil(distance / 2.5)));
   const step = distance / substeps;
   let moved = false;
   for (let index = 0; index < substeps; index++) {
@@ -4966,6 +5127,25 @@ function tryMoveGuard(guard, dx, dz, distance, step) {
     if (moveNpcWithSweptCollision(guard, angle, step)) return true;
   }
   return false;
+}
+function chooseGuardRoadWaypoint(guard, targetX, targetZ) {
+  const candidates = [...CITY_CITIZEN_MAIN_LOOP, ...CITY_CITIZEN_SOUTH_SPUR];
+  let best = null;
+  for (const point of candidates) {
+    const fromDistance = Math.hypot(
+      point.x - guard.position.x,
+      point.z - guard.position.z,
+    );
+    const targetDistance = Math.hypot(point.x - targetX, point.z - targetZ);
+    if (fromDistance < 35 || isInsideTempleCourt(point.x, point.z, 40)) continue;
+    const score = fromDistance * 0.38 + targetDistance;
+    if (!best || score < best.score) best = { ...point, score };
+  }
+  if (best) {
+    guard.userData.roadWaypointX = best.x;
+    guard.userData.roadWaypointZ = best.z;
+    guard.userData.roadWaypointFor = 1.1;
+  }
 }
 function updateSouthGateGuard(delta) {
   const guard = mt.southGateGuard;
@@ -5015,6 +5195,24 @@ function updateSouthGateGuard(delta) {
     : hasSight
       ? player.position.z
       : guard.userData.lastSeenZ;
+  if (
+    guard.userData.alerted &&
+    playerInside &&
+    !gateWaypointActive &&
+    (guard.userData.roadWaypointFor || 0) > 0
+  ) {
+    const waypointDistance = Math.hypot(
+      guard.userData.roadWaypointX - guard.position.x,
+      guard.userData.roadWaypointZ - guard.position.z,
+    );
+    guard.userData.roadWaypointFor -= delta;
+    if (waypointDistance > 28) {
+      targetX = guard.userData.roadWaypointX;
+      targetZ = guard.userData.roadWaypointZ;
+    } else {
+      guard.userData.roadWaypointFor = 0;
+    }
+  }
   if (guard.userData.returningHome) {
     // An interior guard first walks through the actual south-gate opening,
     // then turns toward his outside post. He is never teleported home.
@@ -5109,7 +5307,15 @@ function updateSouthGateGuard(delta) {
     if (tryMoveGuard(guard, dx, dz, distance, step)) {
       moving = true;
       guard.userData.stuckFor = Math.max(0, guard.userData.stuckFor - delta * 2);
-    } else guard.userData.stuckFor += delta;
+    } else {
+      guard.userData.stuckFor += delta;
+      if (guard.userData.stuckFor > 0.22)
+        chooseGuardRoadWaypoint(
+          guard,
+          hasSight ? player.position.x : guard.userData.lastSeenX,
+          hasSight ? player.position.z : guard.userData.lastSeenZ,
+        );
+    }
     if (
       guard.userData.stuckFor > 2.4 ||
       (!hasSight && guard.userData.sightLostFor > 4.2 && distance < 92)
@@ -5878,8 +6084,7 @@ function moveBanditAlongStreets(bandit, target, delta) {
   }
   bandit.userData.streetBlockedFor = 0;
   bandit.userData.streetHeading = best.angle;
-  bandit.position.x = best.nextX;
-  bandit.position.z = best.nextZ;
+  if (!moveNpcWithSweptCollision(bandit, best.angle, travel)) return false;
   bandit.rotation.y = best.angle;
   return true;
 }
@@ -5972,6 +6177,12 @@ function ensureKohen() {
   kohen.position.set(startX, te(startX, startZ), startZ);
   kohen.userData = {
     isKohen: true,
+    bodyHeight: 106,
+    collisionRadius: 20,
+    maxStepUp: 10,
+    maxDrop: 12,
+    maxSlope: 0.62,
+    lastSafePosition: new t.Vector3(startX, te(startX, startZ), startZ),
     target: new t.Vector3(),
     phase: Math.random() * Math.PI * 2,
     waitFor: 1,
@@ -6031,9 +6242,10 @@ function updateKohen(delta) {
     const step = Math.min(distance, 35 * delta);
     const nextX = kohen.position.x + (dx / distance) * step;
     const nextZ = kohen.position.z + (dz / distance) * step;
-    if (isKohenPatrolPointClear(nextX, nextZ)) {
-      kohen.position.x = nextX;
-      kohen.position.z = nextZ;
+    if (
+      isKohenPatrolPointClear(nextX, nextZ) &&
+      moveNpcWithSweptCollision(kohen, Math.atan2(dx, dz), step)
+    ) {
       kohen.rotation.y = Math.atan2(dx, dz);
     } else {
       chooseKohenWaypoint(kohen);
@@ -6106,9 +6318,10 @@ function loadCityBoy1Model() {
   if (cityBoy1ModelPromise) return cityBoy1ModelPromise;
   cityBoy1ModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_boy1_rigged_game.glb",
+      "./assets/models/city_boy1_walk_game.glb",
       (gltf) => {
         cityBoy1ModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        cityBoy1ModelTemplate.animations = gltf.animations || [];
         resolve(cityBoy1ModelTemplate);
       },
       undefined,
@@ -6122,9 +6335,10 @@ function loadCityGirlModel() {
   if (cityGirlModelPromise) return cityGirlModelPromise;
   cityGirlModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_girl2_game.glb",
+      "./assets/models/city_girl2_walk_game.glb",
       (gltf) => {
         cityGirlModelTemplate = prepareCityCitizenTemplate(gltf.scene);
+        cityGirlModelTemplate.animations = gltf.animations || [];
         resolve(cityGirlModelTemplate);
       },
       undefined,
@@ -6261,6 +6475,53 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
     }
   }
   if (!best) return;
+  if (!fleeing) {
+    // A single shortest path makes every citizen converge on the same central
+    // lane. Insert a safe, randomly selected cross-town waypoint so successive
+    // trips use different alleys and cover the whole city rather than shuttling
+    // along one repeated segment.
+    const viaCandidates = graph.nodes.filter((node) => {
+      if (isInsideTempleCourt(node.x, node.z, 55)) return false;
+      const fromCitizen = Math.hypot(
+        node.x - citizen.position.x,
+        node.z - citizen.position.z,
+      );
+      const fromGoal = Math.hypot(node.x - best.node.x, node.z - best.node.z);
+      return (
+        fromCitizen > 420 &&
+        fromGoal > 420 &&
+        !citizen.userData.recentTargets.some(
+          (target) => Math.hypot(node.x - target.x, node.z - target.z) < 160,
+        )
+      );
+    });
+    for (let attempt = 0; attempt < Math.min(10, viaCandidates.length); attempt++) {
+      const pick = Math.floor(Math.random() * viaCandidates.length);
+      const via = viaCandidates.splice(pick, 1)[0];
+      const firstLeg = makeCitySheepPath(
+        current?.x ?? citizen.position.x,
+        current?.z ?? citizen.position.z,
+        via.x,
+        via.z,
+      );
+      const secondLeg = makeCitySheepPath(
+        via.x,
+        via.z,
+        best.node.x,
+        best.node.z,
+      );
+      const combined = [...firstLeg, ...secondLeg.slice(1)];
+      if (
+        firstLeg.length >= 3 &&
+        secondLeg.length >= 3 &&
+        !combined.some((point) => isInsideTempleCourt(point.x, point.z, 42))
+      ) {
+        best.path = combined;
+        citizen.userData.recentTargets.push({ x: via.x, z: via.z });
+        break;
+      }
+    }
+  }
   citizen.userData.path = best.path;
   citizen.userData.pathIndex = Math.min(1, citizen.userData.path.length - 1);
   citizen.userData.currentDistrict = best.district;
@@ -6292,6 +6553,12 @@ function animateCityCitizen(citizen, moving, fleeing, delta, visible) {
   if (citizen.userData.animationAccumulator < 1 / 20) return;
   const elapsed = citizen.userData.animationAccumulator;
   citizen.userData.animationAccumulator = 0;
+  if (citizen.userData.walkMixer && citizen.userData.walkAction) {
+    citizen.userData.walkAction.paused = !moving;
+    citizen.userData.walkAction.timeScale = fleeing ? 1.55 : 1;
+    if (moving) citizen.userData.walkMixer.update(Math.min(elapsed, 0.1));
+    return;
+  }
   if (moving) citizen.userData.walkPhase += elapsed * (fleeing ? 10.5 : 6.4);
   const stride = moving ? Math.sin(citizen.userData.walkPhase) : 0;
   const rig = citizen.userData.walkRig;
@@ -6325,6 +6592,97 @@ const cityCitizenProfiles = {
   girl1: { name: "JerusalemBiblicalGirl1", height: 88.56, radius: 16 },
   girl2: { name: "JerusalemBiblicalGirl2", height: 106, radius: 20 },
 };
+// Citizens use only the broad public streets. The loop covers the eastern
+// gate/Gihon side, David's palace forecourt, the central avenue and the large
+// southern square. The south-gate excursion is an optional spur.
+const CITY_CITIZEN_MAIN_LOOP = [
+  { x: 610, z: 900, zone: "gihon" },
+  { x: 430, z: 360, zone: "east-road" },
+  { x: 350, z: -260, zone: "east-road" },
+  { x: 0, z: -340, zone: "palace" },
+  { x: -390, z: -260, zone: "palace" },
+  { x: -350, z: 620, zone: "central" },
+  { x: 0, z: 980, zone: "central" },
+  { x: 0, z: 1260, zone: "south-square" },
+  { x: 420, z: 1180, zone: "south-square" },
+  { x: 500, z: 680, zone: "east-road" },
+];
+const CITY_CITIZEN_SOUTH_SPUR = [
+  { x: 0, z: 1510, zone: "south-road" },
+  { x: 0, z: 1900, zone: "south-gate" },
+  { x: 0, z: 2220, zone: "south-gate" },
+  { x: 0, z: 2350, zone: "outside-south" },
+];
+function closestPointOnCitizenRoadSegment(x, z, a, b) {
+  const dx = b.x - a.x;
+  const dz = b.z - a.z;
+  const lengthSquared = dx * dx + dz * dz;
+  const amount = lengthSquared
+    ? t.MathUtils.clamp(((x - a.x) * dx + (z - a.z) * dz) / lengthSquared, 0, 1)
+    : 0;
+  const roadX = a.x + dx * amount;
+  const roadZ = a.z + dz * amount;
+  return {
+    x: roadX,
+    z: roadZ,
+    distance: Math.hypot(x - roadX, z - roadZ),
+  };
+}
+function closestCitizenMainRoadPoint(x, z) {
+  let best = null;
+  const consider = (a, b) => {
+    const candidate = closestPointOnCitizenRoadSegment(x, z, a, b);
+    if (!best || candidate.distance < best.distance) best = candidate;
+  };
+  for (let index = 0; index < CITY_CITIZEN_MAIN_LOOP.length; index++)
+    consider(
+      CITY_CITIZEN_MAIN_LOOP[index],
+      CITY_CITIZEN_MAIN_LOOP[(index + 1) % CITY_CITIZEN_MAIN_LOOP.length],
+    );
+  consider(CITY_CITIZEN_MAIN_LOOP[7], CITY_CITIZEN_SOUTH_SPUR[0]);
+  for (let index = 1; index < CITY_CITIZEN_SOUTH_SPUR.length; index++)
+    consider(CITY_CITIZEN_SOUTH_SPUR[index - 1], CITY_CITIZEN_SOUTH_SPUR[index]);
+  return best;
+}
+function chooseCitizenMainRoadRoute(citizen, fleeing = false) {
+  const loop = CITY_CITIZEN_MAIN_LOOP;
+  let nearest = 0;
+  let nearestDistance = Infinity;
+  for (let index = 0; index < loop.length; index++) {
+    const distance = Math.hypot(
+      loop[index].x - citizen.position.x,
+      loop[index].z - citizen.position.z,
+    );
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearest = index;
+    }
+  }
+  let direction = citizen.userData.mainRoadDirection || (Math.random() < 0.5 ? 1 : -1);
+  // Direction changes only after a completed broad journey. Preserve it while
+  // recovering from a blocked corner so an NPC never shuttles on one segment.
+  if (!citizen.userData.keepRoadDirection && Math.random() < 0.18) direction *= -1;
+  citizen.userData.keepRoadDirection = false;
+  citizen.userData.mainRoadDirection = direction;
+  const path = [];
+  const count = fleeing ? 4 : loop.length + 2 + Math.floor(Math.random() * 4);
+  for (let step = 1; step <= count; step++) {
+    const index = (nearest + direction * step + loop.length * 4) % loop.length;
+    path.push({ x: loop[index].x, z: loop[index].z });
+    if (
+      !fleeing &&
+      loop[index].zone === "south-square" &&
+      Math.random() < 0.28
+    ) {
+      path.push(...CITY_CITIZEN_SOUTH_SPUR);
+      path.push(...CITY_CITIZEN_SOUTH_SPUR.slice(0, -1).reverse());
+    }
+  }
+  citizen.userData.path = path.filter(
+    (point) => !isInsideTempleCourt(point.x, point.z, 55),
+  );
+  citizen.userData.pathIndex = 0;
+}
 function addCityCitizen(kind, index, template) {
   if (!i || !dt) return;
   const profile = cityCitizenProfiles[kind];
@@ -6341,6 +6699,8 @@ function addCityCitizen(kind, index, template) {
     hitRadius: Math.max(25, profile.radius + 9),
     bodyHeight: profile.height,
     collisionRadius: profile.radius,
+    roadCorridorRadius: 72,
+    buildingAvoidancePadding: 16,
     maxStepUp: 11,
     maxDrop: 13,
     maxSlope: 0.7,
@@ -6351,10 +6711,13 @@ function addCityCitizen(kind, index, template) {
     animationAccumulator: 0,
     importedModel: null,
     walkRig: null,
+    walkMixer: null,
+    walkAction: null,
     lastSafePosition: new t.Vector3(x, te(x, z), z),
     attackedFleeFor: 0,
     recentTargets: [],
     recentRouteEdges: [],
+    keepRoadDirection: false,
     stuckFor: 0,
     progressPosition: new t.Vector3(x, te(x, z), z),
     progressCheckFor: 1.2,
@@ -6362,7 +6725,7 @@ function addCityCitizen(kind, index, template) {
     blockedWaypointFor: 0,
     updateOffset: index * 0.025,
   };
-  const model = (kind === "boy1" || kind === "boy2" || kind === "girl1")
+  const model = (kind === "boy1" || kind === "boy2" || kind === "girl1" || kind === "girl2")
     ? cloneSkinnedModel(template)
     : template.clone(true);
   model.updateMatrixWorld(true);
@@ -6375,10 +6738,21 @@ function addCityCitizen(kind, index, template) {
   model.position.set(-center.x, -box.min.y, -center.z);
   citizen.add(model);
   citizen.userData.importedModel = model;
-  citizen.userData.walkRig = captureCitizenWalkRig(model);
+  const clip = (template.animations || [])[0];
+  if ((kind === "boy1" || kind === "girl2") && clip) {
+    const mixer = new t.AnimationMixer(model);
+    const action = mixer.clipAction(clip);
+    action.setLoop(t.LoopRepeat, Infinity);
+    action.clampWhenFinished = false;
+    action.play();
+    citizen.userData.walkMixer = mixer;
+    citizen.userData.walkAction = action;
+  } else {
+    citizen.userData.walkRig = captureCitizenWalkRig(model);
+  }
   i.add(citizen);
   mt.cityCitizens.push(citizen);
-  chooseCitizenRoadTarget(citizen, false);
+  chooseCitizenMainRoadRoute(citizen, false);
 }
 function removeDuplicateDavidCharacters() {
   if (!i || !mt.player) return;
@@ -6393,28 +6767,13 @@ function removeDuplicateDavidCharacters() {
   stale.forEach((object) => object.parent?.remove(object));
 }
 function resetCityCitizensForEntry() {
-  const graph = buildCitySheepRoadGraph();
-  if (!graph.nodes.length || !mt.cityCitizens.length) return;
-  const available = graph.nodes.filter(
-    (node) =>
-      !isInsideTempleCourt(node.x, node.z, 65) &&
-      !jt(node, 28),
-  );
-  const used = [];
-  for (const citizen of mt.cityCitizens) {
-    const options = available.filter(
-      (node) =>
-        used.every((point) => Math.hypot(node.x - point.x, node.z - point.z) > 420) &&
-        (!mt.player ||
-          Math.hypot(
-            node.x - mt.player.position.x,
-            node.z - mt.player.position.z,
-          ) > 520),
-    );
-    const pool = options.length ? options : available;
-    if (!pool.length) continue;
-    const spawn = pool[Math.floor(Math.random() * pool.length)];
-    used.push(spawn);
+  if (!mt.cityCitizens.length) return;
+  const offset = Math.floor(Math.random() * CITY_CITIZEN_MAIN_LOOP.length);
+  for (let citizenIndex = 0; citizenIndex < mt.cityCitizens.length; citizenIndex++) {
+    const citizen = mt.cityCitizens[citizenIndex];
+    const spawn = CITY_CITIZEN_MAIN_LOOP[
+      (offset + citizenIndex * 2) % CITY_CITIZEN_MAIN_LOOP.length
+    ];
     citizen.position.set(spawn.x, te(spawn.x, spawn.z), spawn.z);
     citizen.userData.lastSafePosition.copy(citizen.position);
     citizen.userData.progressPosition.copy(citizen.position);
@@ -6426,29 +6785,40 @@ function resetCityCitizensForEntry() {
     citizen.userData.blockedWaypointFor = 0;
     citizen.userData.stuckFor = 0;
     citizen.userData.repathFor = 0;
-    chooseCitizenRoadTarget(citizen, false);
+    citizen.userData.mainRoadDirection = citizenIndex % 2 ? -1 : 1;
+    chooseCitizenMainRoadRoute(citizen, false);
   }
 }
 function ensureCityCitizens() {
-  if (!i || !dt || mt.cityCitizens.length) return;
-  Promise.all([
-    loadCityBoy1Model(),
-    loadCityBoyModel(),
-    loadCityGirl1Model(),
-    loadCityGirlModel(),
-  ])
-    .then(([boy1, boy2, girl1, girl2]) => {
-      if (!i || mt.cityCitizens.length) return;
-      removeDuplicateDavidCharacters();
-      addCityCitizen("boy1", 0, boy1);
-      addCityCitizen("boy2", 1, boy2);
-      addCityCitizen("girl1", 2, girl1);
-      addCityCitizen("girl2", 3, girl2);
-    })
-    .catch((error) => console.warn("성 안 시민 모델을 불러오지 못했습니다.", error));
+  if (!i || !dt || mt.cityCitizens.length >= 4 || mt.cityCitizensLoading) return;
+  // Reserve creation once, but let every asset succeed independently. One bad
+  // model must never cancel the other three citizens.
+  mt.cityCitizensLoading = true;
+  const requests = [
+    ["boy1", 0, loadCityBoy1Model()],
+    ["boy2", 1, loadCityBoyModel()],
+    ["girl1", 2, loadCityGirl1Model()],
+    ["girl2", 3, loadCityGirlModel()],
+  ];
+  Promise.allSettled(requests.map((entry) => entry[2])).then((results) => {
+    if (!i) return;
+    removeDuplicateDavidCharacters();
+    results.forEach((result, index) => {
+      const [kind, citizenIndex] = requests[index];
+      if (
+        result.status === "fulfilled" &&
+        !mt.cityCitizens.some((citizen) => citizen.userData.citizenKind === kind)
+      )
+        addCityCitizen(kind, citizenIndex, result.value);
+      else if (result.status === "rejected")
+        console.warn(`성 안 시민 ${kind} 모델을 불러오지 못했습니다.`, result.reason);
+    });
+    mt.cityCitizensLoading = false;
+    resetCityCitizensForEntry();
+  });
 }
 function updateCityCitizens(delta) {
-  ensureCityCitizens();
+  if (mt.cityCitizens.length < 4 && !mt.cityCitizensLoading) ensureCityCitizens();
   const playerInside = !!mt.player &&
     Yt(mt.player.position.x, mt.player.position.z, -55);
   if (playerInside && !citizensPlayerWasInsideJerusalem) {
@@ -6470,7 +6840,9 @@ function updateCityCitizens(delta) {
         mt.player.position.z - citizen.position.z,
       )
       : Infinity;
-    const visible = playerDistance < 900;
+    // Only four optimized citizens exist. Keep them visible throughout the
+    // inhabited city so distance culling cannot look like missing NPCs.
+    const visible = playerInside ? playerDistance < 1900 : playerDistance < 900;
     if (citizen.userData.importedModel)
       citizen.userData.importedModel.visible = visible;
     citizen.userData.repathFor -= delta;
@@ -6484,7 +6856,7 @@ function updateCityCitizens(delta) {
       (citizen.userData.fleeing !== fleeing || !citizen.userData.path.length)
     ) {
       citizen.userData.fleeing = fleeing;
-      chooseCitizenRoadTarget(citizen, fleeing);
+      chooseCitizenMainRoadRoute(citizen, fleeing);
       citizen.userData.repathFor = fleeing ? 0.7 : 2.5;
     }
     const waypoint = citizen.userData.path[citizen.userData.pathIndex];
@@ -6497,7 +6869,7 @@ function updateCityCitizens(delta) {
         citizen.userData.pathIndex++;
         if (citizen.userData.pathIndex >= citizen.userData.path.length) {
           citizen.userData.path = [];
-          chooseCitizenRoadTarget(citizen, fleeing);
+          chooseCitizenMainRoadRoute(citizen, fleeing);
         }
       } else {
         const angle = Math.atan2(dx, dz);
@@ -6507,26 +6879,17 @@ function updateCityCitizens(delta) {
           citizen.rotation.y = angle;
           citizen.userData.blockedWaypointFor = 0;
         } else {
-          // A temporary corner collision must not discard the whole long route
-          // or teleport the citizen back to the start of the same short lane.
-          // Try small left/right deviations first and keep the waypoint.
-          const side = citizen.userData.blockedWaypointFor % 2 ? 1 : -1;
-          const detours = [0.28 * side, -0.28 * side, 0.55 * side, -0.55 * side];
-          for (const offset of detours) {
-            if (moveNpcWithSweptCollision(citizen, angle + offset, step * 0.72)) {
-              moving = true;
-              citizen.rotation.y = angle + offset;
-              break;
-            }
-          }
+          // Do not steer around the obstruction: that old behaviour was able
+          // to leave the avenue and funnel a citizen into gaps between houses.
+          // Hold briefly, then reverse the broad-road itinerary.
           citizen.userData.blockedWaypointFor += delta;
-          if (!moving && citizen.userData.blockedWaypointFor > 1.1) {
-            citizen.userData.pathIndex++;
+          if (citizen.userData.blockedWaypointFor > 0.28) {
             citizen.userData.blockedWaypointFor = 0;
-            if (citizen.userData.pathIndex >= citizen.userData.path.length) {
-              citizen.userData.path = [];
-              chooseCitizenRoadTarget(citizen, fleeing);
-            }
+            citizen.userData.mainRoadDirection =
+              -(citizen.userData.mainRoadDirection || 1);
+            citizen.userData.keepRoadDirection = true;
+            citizen.userData.path = [];
+            chooseCitizenMainRoadRoute(citizen, fleeing);
           }
         }
       }
@@ -6540,18 +6903,29 @@ function updateCityCitizens(delta) {
         citizen.userData.stuckFor++;
         // Only a persistent obstruction rebuilds the route. Do not snap to the
         // nearest road every second: that caused visible back-and-forth loops.
-        if (citizen.userData.stuckFor >= 3) {
-          const recovery = nearestClearCityRoadPoint(
+        if (citizen.userData.stuckFor >= 2) {
+          const recovery = closestCitizenMainRoadPoint(
             citizen.position.x,
             citizen.position.z,
-            citizen.userData.collisionRadius + 3,
           );
-          if (recovery && !isInsideTempleCourt(recovery.x, recovery.z, 42)) {
+          if (
+            recovery &&
+            !isInsideTempleCourt(recovery.x, recovery.z, 42) &&
+            !npcPositionBlocked(
+              recovery.x,
+              recovery.z,
+              te(recovery.x, recovery.z),
+              citizen.userData.collisionRadius +
+                citizen.userData.buildingAvoidancePadding,
+              [4, 30, 58],
+            )
+          ) {
             citizen.position.set(recovery.x, te(recovery.x, recovery.z), recovery.z);
             citizen.userData.lastSafePosition.copy(citizen.position);
           }
           citizen.userData.path = [];
           citizen.userData.repathFor = 0;
+          citizen.userData.keepRoadDirection = true;
           citizen.userData.stuckFor = 0;
         }
       } else {
@@ -6594,6 +6968,7 @@ function Te() {
     (mt.southGateGuard = null),
     (mt.kohen = null),
     (mt.cityCitizens = []),
+    (mt.cityCitizensLoading = false),
     (mt.effects = []),
     ae(),
     (at = {
@@ -9426,7 +9801,11 @@ function _e(o, n) {
       for (const t of Ft) {
         const e = i(t),
           o = Math.hypot(e.dx, e.dz);
-        if (o > W) continue;
+        // Jerusalem is a permanent landmark: draw its correctly georeferenced
+        // wall as soon as any part of the city can enter the minimap radius,
+        // even before David crosses a gate.
+        const cityReach = Math.max(t.wallRX || t.wallR, t.wallRZ || t.wallR);
+        if (o > W + cityReach) continue;
         (s.strokeStyle = "#6a5137"), (s.lineWidth = 2.4), s.beginPath();
         for (let e = 0; e <= 64; e++) {
           const o = (e / 64) * Math.PI * 2,
