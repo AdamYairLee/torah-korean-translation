@@ -330,35 +330,55 @@ export function createDavidModel({
     ring.name = `HeadWrapBand${band + 1}`;
   }
 
-  // 지팡이와 물매 주머니
-  const staff = addMesh(
-    bodyRoot,
-    new T.CylinderGeometry(4.6, 3.1, 164, 8),
+  // 다비드가 항상 들고 다니는 장비는 각각 하나의 장착 그룹만 사용한다.
+  // 지팡이는 다비드(로컬 높이 164)보다 짧은 152로 제한하고, 아랫끝을
+  // 발바닥선(-58)에 맞춰 땅 밑으로 내려가지 않게 한다.
+  const staffLocalLength = 152;
+  const staffEquipment = new T.Group();
+  staffEquipment.name = "DavidStaffEquipment";
+  staffEquipment.position.set(-29, -58, 8);
+  bodyRoot.add(staffEquipment);
+  const staffFallback = addMesh(
+    staffEquipment,
+    new T.CylinderGeometry(4.6, 3.1, staffLocalLength, 8),
     wood,
-    [-29, 8, 8],
+    [0, staffLocalLength / 2, 0],
     null,
     [0, 0, -0.025],
   );
-  staff.name = "ShepherdStaff";
-  player.userData.staff = staff;
+  staffFallback.name = "ShepherdStaffFallback";
+  player.userData.staff = staffEquipment;
+  player.userData.staffVisual = staffEquipment;
   player.userData.staffSwing = 0;
-  addMesh(
-    bodyRoot,
-    new T.CylinderGeometry(4.1, 5.4, 30, 7),
+
+  // 사용 아이템이 아닌 고정 장비. 애니메이션 모델이 준비되면 Waist
+  // 뼈에 붙여 몸과 함께 움직이되, 별도의 사용/공격 상태는 만들지 않는다.
+  const clubLocalLength = 46;
+  const clubEquipment = new T.Group();
+  clubEquipment.name = "DavidLeftWaistClubEquipment";
+  clubEquipment.position.set(25, 4, -9);
+  bodyRoot.add(clubEquipment);
+  const clubFallback = addMesh(
+    clubEquipment,
+    new T.CylinderGeometry(4.1, 5.4, clubLocalLength, 7),
     sandal,
-    [25, -2, -8],
+    [0, 0, 0],
     null,
-    [0, 0, 0.12],
-  ).name = "SlingPouch";
+    [0, 0, 0],
+  );
+  clubFallback.name = "DavidLeftWaistClubFallback";
+  player.userData.waistClub = clubEquipment;
 
   player.scale.setScalar(0.54);
   player.userData.groundOffset = groundOffset;
   scene.add(player);
   runtime.player = player;
 
-  // 밤의 지팡이 불빛은 기존 게임 규칙과 동일하게 유지한다.
+  // 불꽃은 플레이어가 아니라 지팡이 끝의 자식이다. 따라서 손뼈의
+  // 걷기/달리기 모션과 직접 타격 피벗을 모두 동일하게 상속한다.
   const torch = new T.Group();
-  torch.position.set(-35, 70, -6);
+  torch.name = "DavidStaffTopFlame";
+  torch.position.set(0, staffLocalLength + 0.5, 0);
   const flameMaterial = new T.MeshBasicMaterial({
     color: 0xff6a22,
     transparent: true,
@@ -379,8 +399,94 @@ export function createDavidModel({
     glow,
     phase: Math.PI * 2 * Math.random(),
   };
-  player.add(torch);
+  staffEquipment.add(torch);
   runtime.staffNightLight = torch;
+
+  const prepareStaticEquipment = (
+    path,
+    equipment,
+    fallback,
+    targetLength,
+    rotationZ,
+    alignBottom,
+  ) => {
+    new GLTFLoader().load(
+      path,
+      (equipmentGltf) => {
+        const equipmentModel = equipmentGltf.scene;
+        equipmentModel.rotation.set(0, 0, rotationZ);
+        equipmentModel.updateMatrixWorld(true);
+
+        let equipmentBox = new T.Box3().setFromObject(equipmentModel);
+        const equipmentSize = equipmentBox.getSize(new T.Vector3());
+        const equipmentScale = targetLength / Math.max(equipmentSize.y, 0.001);
+        equipmentModel.scale.multiplyScalar(equipmentScale);
+        equipmentModel.updateMatrixWorld(true);
+
+        equipmentBox = new T.Box3().setFromObject(equipmentModel);
+        const equipmentCenter = equipmentBox.getCenter(new T.Vector3());
+        equipmentModel.position.x -= equipmentCenter.x;
+        equipmentModel.position.z -= equipmentCenter.z;
+        equipmentModel.position.y -= alignBottom
+          ? equipmentBox.min.y
+          : equipmentCenter.y;
+        equipmentModel.updateMatrixWorld(true);
+
+        equipmentModel.traverse((object) => {
+          if (!object.isMesh) return;
+          // 작은 상시 장비의 그림자 패스를 생략해 주인공 렌더 부담을
+          // 줄이되, 장면 조명과 텍스처 표현은 그대로 유지한다.
+          object.castShadow = false;
+          object.receiveShadow = false;
+          const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+          for (const equipmentMaterial of materials) {
+            if (!equipmentMaterial) continue;
+            equipmentMaterial.side = T.FrontSide;
+            equipmentMaterial.transparent = false;
+            equipmentMaterial.depthWrite = true;
+            equipmentMaterial.roughness = Math.max(
+              0.7,
+              equipmentMaterial.roughness ?? 0.7,
+            );
+            if (equipmentMaterial.map) {
+              equipmentMaterial.map.colorSpace = T.SRGBColorSpace;
+              equipmentMaterial.map.anisotropy = 1;
+            }
+            equipmentMaterial.needsUpdate = true;
+          }
+        });
+
+        equipment.add(equipmentModel);
+        fallback.visible = false;
+        fallback.geometry?.dispose?.();
+        fallback.removeFromParent();
+        equipment.userData.optimizedModel = equipmentModel;
+      },
+      undefined,
+      (error) => {
+        console.warn(`장비 모델을 불러오지 못해 대체 모델을 유지합니다: ${path}`, error);
+      },
+    );
+  };
+
+  prepareStaticEquipment(
+    "./assets/models/david_staff_game.glb",
+    staffEquipment,
+    staffFallback,
+    staffLocalLength,
+    0,
+    true,
+  );
+  prepareStaticEquipment(
+    "./assets/models/david_waist_club_game.glb",
+    clubEquipment,
+    clubFallback,
+    clubLocalLength,
+    Math.PI / 2,
+    false,
+  );
 
   // 동일한 스킨 메시 하나에서 걷기/달리기 클립만 전환한다.
   // 모델을 교체하지 않으므로 이동 상태가 바뀌어도 외형과 재질은 유지된다.
@@ -438,9 +544,10 @@ export function createDavidModel({
         }
       });
 
-      // 공격에 쓰는 기존 지팡이만 유지하고 절차형 몸체는 새 모델로 교체한다.
+      // 공격 지팡이와 고정 몽둥이는 유지하고 절차형 몸체만 교체한다.
       fallbackChildren.forEach((child) => {
-        child.visible = child === staff;
+        child.visible =
+          child === staffEquipment || child === clubEquipment;
       });
       bodyRoot.add(importedRoot);
       player.userData.importedAvatar = importedRoot;
@@ -558,11 +665,21 @@ export function createDavidModel({
         staffSwingPivot.position.set(0, 0, 0);
         staffSwingPivot.rotation.set(0, 0, 0);
         staffSwingPivot.scale.set(1, 1, 1);
-        staffSwingPivot.attach(staff);
+        staffSwingPivot.attach(staffEquipment);
         staffSwingPivot.userData.baseQuaternion =
           staffSwingPivot.quaternion.clone();
         player.userData.staff = staffSwingPivot;
-        player.userData.staffVisual = staff;
+        player.userData.staffVisual = staffEquipment;
+      }
+
+      const waistBone =
+        importedModel.getObjectByName("Waist") ||
+        importedModel.getObjectByName("Pelvis") ||
+        importedModel.getObjectByName("Hip");
+      if (waistBone) {
+        // 현재의 세로 정렬과 왼쪽 허리 위치를 보존한 채 허리뼈에 붙인다.
+        // 이후에는 걷기/달리기 애니메이션만 상속하고 무기 입력은 받지 않는다.
+        waistBone.attach(clubEquipment);
       }
 
       player.userData.updateLocomotionAnimation = (

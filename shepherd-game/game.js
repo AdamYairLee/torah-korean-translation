@@ -4,7 +4,7 @@ import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 import { GLTFLoader } from "./GLTFLoader.js";
 import { mergeGeometries } from "./BufferGeometryUtils.js";
 import { JERUSALEM_DATA } from "./jerusalemData.js";
-import { createDavidModel } from "./davidModel.js";
+import { createDavidModel } from "./davidModel.js?v=2.1.38";
 let jerusalemMapReady = false;
 let jerusalemMapBaseY = 0;
 let jerusalemMapDeformedMinY = JERUSALEM_DATA.minY;
