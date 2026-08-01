@@ -650,6 +650,9 @@ export function createDavidModel({
       player.userData.walkAction = walkAction;
       player.userData.runAction = runAction;
       player.userData.locomotionState = "idle";
+      player.userData.specialSlingReady = false;
+      player.userData.specialSlingPlaying = false;
+      player.userData.specialSlingAction = null;
 
       // The staff is equipment, so it must inherit the animated right-hand
       // bone. Object3D.attach preserves its current world alignment while the
@@ -687,6 +690,10 @@ export function createDavidModel({
         moving,
         running,
       ) => {
+        if (player.userData.specialSlingPlaying) {
+          mixer.update(Math.min(delta, 0.05));
+          return;
+        }
         const nextState = moving ? (running ? "run" : "walk") : "idle";
         if (nextState !== player.userData.locomotionState) {
           player.userData.locomotionState = nextState;
@@ -704,6 +711,61 @@ export function createDavidModel({
         }
         mixer.update(Math.min(delta, 0.05));
       };
+
+      // The supplied finisher GLB shares David's exact bone names. Only its
+      // animation channels are loaded; the million-vertex duplicate mesh and
+      // textures were removed from the game asset. This keeps the cinematic
+      // pose compatible with the established David model at negligible cost.
+      new GLTFLoader().load(
+        "./assets/models/david_special_sling_animation.glb",
+        (specialGltf) => {
+          const sourceClip = specialGltf.animations?.[0];
+          if (!sourceClip) return;
+          const specialClip = sourceClip.clone();
+          specialClip.name = "DavidSpecialSlingFinisher";
+          // Never allow source root motion to move the playable collision body.
+          for (const track of specialClip.tracks) {
+            if (!/(^|\.)(Root|Hip)\.position$/.test(track.name)) continue;
+            const valueSize = track.getValueSize();
+            for (let key = 1; key < track.times.length; key++) {
+              for (let component = 0; component < valueSize; component++) {
+                track.values[key * valueSize + component] =
+                  track.values[component];
+              }
+            }
+          }
+          specialClip.resetDuration();
+          const specialAction = mixer.clipAction(specialClip, importedModel);
+          specialAction.setLoop(T.LoopOnce, 1);
+          specialAction.clampWhenFinished = true;
+          specialAction.enabled = false;
+          player.userData.specialSlingAction = specialAction;
+          player.userData.specialSlingReady = true;
+          player.userData.playSpecialSlingAnimation = () => {
+            walkAction?.fadeOut(0.08);
+            runAction?.fadeOut(0.08);
+            player.userData.locomotionState = "special";
+            player.userData.specialSlingPlaying = true;
+            specialAction.enabled = true;
+            specialAction
+              .reset()
+              .setEffectiveTimeScale(1)
+              .setEffectiveWeight(1)
+              .fadeIn(0.08)
+              .play();
+          };
+          player.userData.stopSpecialSlingAnimation = () => {
+            specialAction.fadeOut(0.12);
+            specialAction.stop();
+            specialAction.enabled = false;
+            player.userData.specialSlingPlaying = false;
+            player.userData.locomotionState = "idle";
+          };
+        },
+        undefined,
+        (error) =>
+          console.warn("다비드 돌팔매 필살기 애니메이션 로딩 실패:", error),
+      );
     },
     undefined,
     (error) => {

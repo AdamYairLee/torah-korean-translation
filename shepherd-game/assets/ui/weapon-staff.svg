@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3f2413"/>
+      <stop offset=".22" stop-color="#89562f"/>
+      <stop offset=".5" stop-color="#c08345"/>
+      <stop offset=".72" stop-color="#744324"/>
+      <stop offset="1" stop-color="#2c190e"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f1b86d" stop-opacity=".9"/>
+      <stop offset=".45" stop-color="#8c522b" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#241209" stop-opacity=".75"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-20%" width="170%" height="160%">
+      <feDropShadow dx="4" dy="6" stdDeviation="4" flood-color="#080401" flood-opacity=".72"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" transform="rotate(13 96 96)">
+    <path d="M105 177 C99 165 99 151 100 137 C101 119 98 101 101 84 C104 67 103 50 107 34 C109 25 116 15 126 12 C136 9 143 14 140 22 C138 29 130 34 125 39 C120 45 117 55 116 65 C114 86 118 107 115 127 C113 145 116 162 114 177 C113 183 108 184 105 177Z" fill="url(#wood)" stroke="#2a160b" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M112 176 C107 156 110 137 108 118 C106 99 110 81 110 64 C110 46 116 28 130 19" fill="none" stroke="url(#edge)" stroke-width="4.4" stroke-linecap="round" opacity=".82"/>
+    <path d="M104 151 C109 147 112 143 114 138 M101 111 C106 108 111 107 116 109 M105 78 C110 74 113 72 116 67 M112 43 C117 42 121 44 124 47" fill="none" stroke="#3a1e0e" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+    <path d="M108 128 C111 124 115 125 116 130 C115 136 109 137 107 133 C106 131 106 130 108 128Z" fill="#3a1d0c" stroke="#d5944f" stroke-width="1.2"/>
+    <path d="M112 88 C114 84 118 84 119 88 C120 92 117 95 113 93 C111 92 111 90 112 88Z" fill="#42210e" stroke="#e0a35b" stroke-width="1.1"/>
+    <path d="M123 18 C128 16 135 16 137 21 C135 25 130 29 126 31 C122 28 120 23 123 18Z" fill="#9e6637" stroke="#3a1c0c" stroke-width="2"/>
+  </g>
+</svg>

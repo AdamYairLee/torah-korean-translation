@@ -4,7 +4,7 @@ import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 import { GLTFLoader } from "./GLTFLoader.js";
 import { mergeGeometries } from "./BufferGeometryUtils.js";
 import { JERUSALEM_DATA } from "./jerusalemData.js";
-import { createDavidModel } from "./davidModel.js?v=2.1.38";
+import { createDavidModel } from "./davidModel.js?v=2.1.39";
 let jerusalemMapReady = false;
 let jerusalemMapBaseY = 0;
 let jerusalemMapDeformedMinY = JERUSALEM_DATA.minY;
@@ -210,6 +210,20 @@ const combatFeedback = {
   shakeDuration: 0,
   shakeStrength: 0,
   lastDamagePulseAt: 0,
+};
+const specialSlingAttack = {
+  active: false,
+  target: null,
+  startedAt: 0,
+  charge: 0,
+  released: false,
+  projectile: null,
+  energyGroup: null,
+  heldStone: null,
+  cameraStart: new t.Vector3(),
+  previousFov: 58,
+  releaseAt: 1520,
+  endAt: 2850,
 };
 const routeChoice = {
   id: "",
@@ -7568,6 +7582,7 @@ function hitCityCitizen(citizen) {
   return true;
 }
 function Te() {
+  specialSlingAttack.active && finishSpecialSlingAttack();
   [mt.player, mt.sheepShop, mt.southGateGuard, mt.kohen, ...mt.cityCitizens, ...mt.sheep, ...mt.rocks, ...mt.enemies, ...mt.projectiles]
     .filter(Boolean)
     .forEach((t) => i.remove(t)),
@@ -8090,6 +8105,382 @@ function Ae(e, o = "ground") {
     mt.effects.push(n),
     kt("target" === o ? "pickup" : "staff");
 }
+function findSpecialSlingAnimalTarget() {
+  const player = mt.player;
+  if (
+    !player ||
+    at.active ||
+    !player.userData.specialSlingReady ||
+    Yt(player.position.x, player.position.z, -70)
+  )
+    return null;
+  const cameraDirection = new t.Vector3();
+  r.getWorldDirection(cameraDirection).normalize();
+  let best = null;
+  let bestScore = -Infinity;
+  for (const enemy of mt.enemies) {
+    if (enemy.userData.hp <= 0 || enemy.userData.type === "bandit") continue;
+    const aimPoint = enemy.position.clone().add(new t.Vector3(0, 28, 0));
+    const offset = aimPoint.sub(r.position);
+    const distance = offset.length();
+    if (distance < 70 || distance > 1200) continue;
+    const alignment = offset.normalize().dot(cameraDirection);
+    if (alignment < 0.48) continue;
+    const score = alignment * 2.2 - distance / 1500;
+    if (score > bestScore) {
+      bestScore = score;
+      best = enemy;
+    }
+  }
+  return best;
+}
+function playSpecialSlingChargeAudio() {
+  if (!y) return;
+  Rt();
+  if (!m || !M) return;
+  const now = m.currentTime;
+  const voiceGain = m.createGain();
+  const voiceFilter = m.createBiquadFilter();
+  voiceFilter.type = "lowpass";
+  voiceFilter.frequency.setValueAtTime(1250, now);
+  voiceGain.gain.setValueAtTime(0.0001, now);
+  voiceGain.gain.exponentialRampToValueAtTime(0.12 * v, now + 0.18);
+  voiceGain.gain.setValueAtTime(0.105 * v, now + 1.05);
+  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.48);
+  voiceGain.connect(voiceFilter).connect(M);
+  for (const [frequency, volume] of [
+    [118, 0.8],
+    [236, 0.31],
+    [354, 0.12],
+  ]) {
+    const oscillator = m.createOscillator();
+    const gain = m.createGain();
+    oscillator.type = frequency === 118 ? "sawtooth" : "triangle";
+    oscillator.frequency.setValueAtTime(frequency, now);
+    oscillator.frequency.linearRampToValueAtTime(frequency * 1.16, now + 1.36);
+    gain.gain.value = volume;
+    oscillator.connect(gain).connect(voiceGain);
+    oscillator.start(now);
+    oscillator.stop(now + 1.5);
+  }
+  const energyOscillator = m.createOscillator();
+  const energyGain = m.createGain();
+  const energyFilter = m.createBiquadFilter();
+  energyOscillator.type = "sine";
+  energyOscillator.frequency.setValueAtTime(72, now);
+  energyOscillator.frequency.exponentialRampToValueAtTime(690, now + 1.48);
+  energyFilter.type = "bandpass";
+  energyFilter.frequency.setValueAtTime(620, now);
+  energyFilter.frequency.exponentialRampToValueAtTime(2100, now + 1.48);
+  energyFilter.Q.value = 5;
+  energyGain.gain.setValueAtTime(0.0001, now);
+  energyGain.gain.exponentialRampToValueAtTime(0.105 * v, now + 0.22);
+  energyGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.52);
+  energyOscillator.connect(energyFilter).connect(energyGain).connect(M);
+  energyOscillator.start(now);
+  energyOscillator.stop(now + 1.55);
+}
+function createSpecialSlingEnergy() {
+  const player = mt.player;
+  if (!player) return;
+  const group = new t.Group();
+  group.name = "DavidSpecialSlingBlueEnergy";
+  group.position.y = 68;
+  const shell = new t.Mesh(
+    new t.SphereGeometry(76, 16, 11),
+    new t.MeshBasicMaterial({
+      color: 0x218fff,
+      transparent: true,
+      opacity: 0.12,
+      wireframe: true,
+      depthWrite: false,
+      blending: t.AdditiveBlending,
+    }),
+  );
+  shell.name = "SpecialEnergyShell";
+  group.add(shell);
+  const ringMaterial = new t.MeshBasicMaterial({
+    color: 0x51b9ff,
+    transparent: true,
+    opacity: 0.62,
+    side: t.DoubleSide,
+    depthWrite: false,
+    blending: t.AdditiveBlending,
+  });
+  const ringA = new t.Mesh(new t.RingGeometry(57, 61, 36), ringMaterial);
+  ringA.rotation.x = Math.PI / 2;
+  ringA.name = "SpecialEnergyRingA";
+  const ringB = new t.Mesh(new t.RingGeometry(70, 73, 36), ringMaterial.clone());
+  ringB.rotation.set(Math.PI / 2, 0.45, 0.7);
+  ringB.name = "SpecialEnergyRingB";
+  group.add(ringA, ringB);
+  const particlePositions = new Float32Array(42 * 3);
+  for (let index = 0; index < 42; index++) {
+    const angle = index * 2.399963229728653;
+    const radius = 42 + (index % 8) * 5.2;
+    particlePositions[index * 3] = Math.cos(angle) * radius;
+    particlePositions[index * 3 + 1] = -58 + ((index * 31) % 117);
+    particlePositions[index * 3 + 2] = Math.sin(angle) * radius;
+  }
+  const particleGeometry = new t.BufferGeometry();
+  particleGeometry.setAttribute(
+    "position",
+    new t.BufferAttribute(particlePositions, 3),
+  );
+  const particles = new t.Points(
+    particleGeometry,
+    new t.PointsMaterial({
+      color: 0x7dd7ff,
+      size: 7,
+      transparent: true,
+      opacity: 0.88,
+      depthWrite: false,
+      blending: t.AdditiveBlending,
+    }),
+  );
+  particles.name = "SpecialEnergyParticles";
+  group.add(particles);
+  const glow = new t.PointLight(0x258dff, 5.4, 390, 1.6);
+  glow.name = "SpecialEnergyGlow";
+  group.add(glow);
+  player.add(group);
+  specialSlingAttack.energyGroup = group;
+
+  const rightHand = player.userData.importedAvatar?.getObjectByName("R_Hand");
+  if (rightHand) {
+    const heldStone = new t.Mesh(
+      new t.DodecahedronGeometry(0.034, 1),
+      new t.MeshStandardMaterial({
+        color: 0x746c5d,
+        roughness: 0.9,
+        metalness: 0,
+      }),
+    );
+    heldStone.name = "SpecialSlingHeldStone";
+    heldStone.position.set(0.012, 0.065, 0.018);
+    heldStone.scale.set(1.1, 0.86, 0.94);
+    rightHand.add(heldStone);
+    specialSlingAttack.heldStone = heldStone;
+  }
+}
+function disposeSpecialSlingVisuals() {
+  const group = specialSlingAttack.energyGroup;
+  if (group) {
+    group.parent?.remove(group);
+    group.traverse((object) => {
+      object.geometry?.dispose?.();
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+      materials.forEach((material) => material?.dispose?.());
+    });
+  }
+  specialSlingAttack.energyGroup = null;
+  const heldStone = specialSlingAttack.heldStone;
+  if (heldStone) {
+    heldStone.parent?.remove(heldStone);
+    heldStone.geometry?.dispose?.();
+    heldStone.material?.dispose?.();
+  }
+  specialSlingAttack.heldStone = null;
+}
+function launchSpecialSlingStone() {
+  const target = specialSlingAttack.target;
+  const player = mt.player;
+  if (!target || target.userData.hp <= 0 || !player) return;
+  const origin = new t.Vector3();
+  if (specialSlingAttack.heldStone)
+    specialSlingAttack.heldStone.getWorldPosition(origin);
+  else origin.copy(player.position).add(new t.Vector3(0, 78, 0));
+  const targetPoint = target.position.clone().add(new t.Vector3(0, 28, 0));
+  const direction = targetPoint.sub(origin).normalize();
+  const stone = new t.Mesh(
+    new t.DodecahedronGeometry("큰 돌" === ut.quality ? 7 : 5.5, 1),
+    new t.MeshStandardMaterial({
+      color: 0x7c7362,
+      emissive: 0x0d55b8,
+      emissiveIntensity: 1.25,
+      roughness: 0.75,
+    }),
+  );
+  stone.position.copy(origin);
+  stone.castShadow = true;
+  stone.userData = {
+    velocity: direction.multiplyScalar(1580),
+    life: 2.6,
+    damage: Math.max(180, (target.userData.maxHp || target.userData.hp) * 2),
+    previous: origin.clone(),
+    special: true,
+    specialTarget: target,
+  };
+  const trailGeometry = new t.BufferGeometry();
+  const trailPositions = new Float32Array(30);
+  for (let index = 0; index < 10; index++) {
+    trailPositions[index * 3] = origin.x;
+    trailPositions[index * 3 + 1] = origin.y;
+    trailPositions[index * 3 + 2] = origin.z;
+  }
+  trailGeometry.setAttribute(
+    "position",
+    new t.BufferAttribute(trailPositions, 3),
+  );
+  const trail = new t.Line(
+    trailGeometry,
+    new t.LineBasicMaterial({
+      color: 0x58c4ff,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      blending: t.AdditiveBlending,
+    }),
+  );
+  stone.userData.trail = trail;
+  i.add(trail, stone);
+  mt.projectiles.push(stone);
+  specialSlingAttack.projectile = stone;
+  specialSlingAttack.released = true;
+  if (specialSlingAttack.heldStone)
+    specialSlingAttack.heldStone.visible = false;
+  const overlay = e("#specialAttackOverlay");
+  overlay?.classList.add("release");
+  Ut(92, 0.24, 0.12, "sawtooth", -45);
+  setTimeout(() => Ut(310, 0.22, 0.08, "sine", 720), 45);
+}
+function applySpecialSlingImpact(stone, target) {
+  if (
+    !stone?.userData.special ||
+    stone.userData.specialImpactApplied ||
+    !target ||
+    target.userData.hp <= 0
+  )
+    return false;
+  stone.userData.specialImpactApplied = true;
+  stone.userData.life = 0;
+  target.userData.hp -= stone.userData.damage;
+  ut.skill = Math.min(50, ut.skill + 2);
+  Ae(stone.position, "enemy");
+  triggerCombatFeedback("hit");
+  const now = performance.now();
+  combatFeedback.shakeUntil = now + 390;
+  combatFeedback.shakeDuration = 390;
+  combatFeedback.shakeStrength = 7.2;
+  eo(target.userData.label + "에게 필살기 명중!");
+  Ut(58, 0.32, 0.13, "triangle", -24);
+  target.userData.hp <= 0 && Ue(target);
+  return true;
+}
+function finishSpecialSlingAttack() {
+  if (!specialSlingAttack.active) return;
+  specialSlingAttack.active = false;
+  specialSlingAttack.target = null;
+  specialSlingAttack.released = false;
+  specialSlingAttack.projectile = null;
+  mt.player?.userData.stopSpecialSlingAnimation?.();
+  disposeSpecialSlingVisuals();
+  const overlay = e("#specialAttackOverlay");
+  overlay?.classList.remove("active", "release");
+  if (r) {
+    r.fov = specialSlingAttack.previousFov || F[A].fov;
+    r.updateProjectionMatrix();
+  }
+}
+function startSpecialSlingAttack(target, charge) {
+  const player = mt.player;
+  if (!player?.userData.specialSlingReady || !target) return false;
+  specialSlingAttack.active = true;
+  specialSlingAttack.target = target;
+  specialSlingAttack.startedAt = performance.now();
+  specialSlingAttack.charge = charge;
+  specialSlingAttack.released = false;
+  specialSlingAttack.projectile = null;
+  specialSlingAttack.cameraStart.copy(r.position);
+  specialSlingAttack.previousFov = r.fov;
+  G = false;
+  P = false;
+  N = false;
+  for (const code of ["KeyW", "KeyA", "KeyS", "KeyD", "Space"])
+    K[code] = false;
+  e("#crosshair").style.display = "none";
+  e("#charge").style.display = "none";
+  const direction = target.position.clone().sub(player.position);
+  direction.y = 0;
+  if (direction.lengthSq() > 0.001)
+    player.rotation.y = Math.atan2(direction.x, direction.z);
+  player.userData.playSpecialSlingAnimation?.();
+  createSpecialSlingEnergy();
+  e("#specialAttackOverlay")?.classList.add("active");
+  playSpecialSlingChargeAudio();
+  return true;
+}
+function updateSpecialSlingAttack(delta, now) {
+  if (!specialSlingAttack.active) return;
+  const player = mt.player;
+  let target = specialSlingAttack.target;
+  if (!player) return finishSpecialSlingAttack();
+  if (!target || target.userData.hp <= 0 || !mt.enemies.includes(target)) {
+    target = findSpecialSlingAnimalTarget();
+    specialSlingAttack.target = target;
+    if (!target) return finishSpecialSlingAttack();
+  }
+  const elapsed = now - specialSlingAttack.startedAt;
+  const targetPoint = target.position.clone().add(new t.Vector3(0, 30, 0));
+  const forward = target.position.clone().sub(player.position);
+  forward.y = 0;
+  if (forward.lengthSq() < 0.001) forward.set(0, 0, 1);
+  forward.normalize();
+  const right = new t.Vector3(forward.z, 0, -forward.x);
+  player.rotation.y = Math.atan2(forward.x, forward.z);
+  player.visible = true;
+  if (mt.aimRig) mt.aimRig.visible = false;
+
+  const energy = specialSlingAttack.energyGroup;
+  if (energy) {
+    const pulse = 1 + 0.08 * Math.sin(elapsed * 0.021);
+    const fade = elapsed > specialSlingAttack.releaseAt
+      ? Math.max(0.22, 1 - (elapsed - specialSlingAttack.releaseAt) / 1250)
+      : 1;
+    energy.scale.setScalar(pulse * fade);
+    const shell = energy.getObjectByName("SpecialEnergyShell");
+    const ringA = energy.getObjectByName("SpecialEnergyRingA");
+    const ringB = energy.getObjectByName("SpecialEnergyRingB");
+    const particles = energy.getObjectByName("SpecialEnergyParticles");
+    if (shell) shell.rotation.y += delta * 2.6;
+    if (ringA) ringA.rotation.z += delta * 4.8;
+    if (ringB) ringB.rotation.y -= delta * 3.6;
+    if (particles) particles.rotation.y += delta * 2.1;
+  }
+
+  const frontCamera = player.position
+    .clone()
+    .addScaledVector(forward, 168)
+    .addScaledVector(right, -12)
+    .add(new t.Vector3(0, 98, 0));
+  const backCamera = player.position
+    .clone()
+    .addScaledVector(forward, -184)
+    .addScaledVector(right, 26)
+    .add(new t.Vector3(0, 116, 0));
+  if (elapsed < 1240) {
+    const fadeIn = t.MathUtils.smoothstep(elapsed, 0, 360);
+    r.position.lerpVectors(
+      specialSlingAttack.cameraStart,
+      frontCamera,
+      fadeIn,
+    );
+    r.lookAt(player.position.clone().add(new t.Vector3(0, 73, 0)));
+    r.fov = t.MathUtils.lerp(specialSlingAttack.previousFov, 43, fadeIn);
+  } else {
+    const switchAmount = t.MathUtils.smoothstep(elapsed, 1240, 1500);
+    r.position.lerpVectors(frontCamera, backCamera, switchAmount);
+    r.lookAt(targetPoint);
+    r.fov = t.MathUtils.lerp(43, 53, switchAmount);
+  }
+  r.updateProjectionMatrix();
+  r.updateMatrixWorld();
+  if (!specialSlingAttack.released && elapsed >= specialSlingAttack.releaseAt)
+    launchSpecialSlingStone();
+  if (elapsed >= specialSlingAttack.endAt) finishSpecialSlingAttack();
+}
 document.addEventListener(
   "pointerdown",
   () => {
@@ -8163,7 +8554,7 @@ document.addEventListener(
       })(t))
     ) {
       if (
-        ((K[t.code] = !0),
+        ((K[t.code] = !specialSlingAttack.active),
         S &&
           !b &&
           document.pointerLockElement !== c?.domElement &&
@@ -8172,11 +8563,13 @@ document.addEventListener(
         "KeyV" !== t.code ||
           !S ||
           b ||
+          specialSlingAttack.active ||
           t.repeat ||
           ((A = (A + 1) % F.length), Be(F[A].name)),
         "Tab" === t.code &&
           S &&
           !b &&
+          !specialSlingAttack.active &&
           (t.preventDefault(),
           (L = "sling" === L ? "staff" : "sling"),
           (G = !1),
@@ -8241,6 +8634,7 @@ document.addEventListener(
   document.addEventListener("mousemove", (e) => {
     document.pointerLockElement !== c?.domElement ||
       b ||
+      specialSlingAttack.active ||
       ((B -= e.movementX * E),
       (I -= e.movementY * E * 0.42),
       (I = t.MathUtils.clamp(I, -1.3, 1.1)));
@@ -8270,6 +8664,7 @@ document.addEventListener(
   document.addEventListener("mousedown", (o) => {
     S &&
       !b &&
+      !specialSlingAttack.active &&
       (2 === o.button &&
         "sling" === L &&
         ((G = !0), (e("#crosshair").style.display = "block")),
@@ -8397,6 +8792,15 @@ document.addEventListener(
             );
           ut.stones--,
             at.active && (at.shotsLeft = Math.max(0, at.shotsLeft - 1));
+          const specialTarget = findSpecialSlingAnimalTarget();
+          if (
+            specialTarget &&
+            Math.random() < 0.05 &&
+            startSpecialSlingAttack(specialTarget, T)
+          ) {
+            $e();
+            return;
+          }
           const e = new t.Vector3();
           r.getWorldPosition(e);
           const o = new t.Vector3();
@@ -9214,10 +9618,9 @@ function _e(o, n) {
         a = new t.Vector3(Math.sin(B), 0, Math.cos(B)).normalize(),
         i = new t.Vector3(-Math.cos(B), 0, Math.sin(B)).normalize(),
         c = (o.position.clone(), new t.Vector3());
-      const hasMovementInput = c
-        .addScaledVector(a, n)
-        .addScaledVector(i, s)
-        .lengthSq() > 0;
+      const hasMovementInput =
+        !specialSlingAttack.active &&
+        c.addScaledVector(a, n).addScaledVector(i, s).lengthSq() > 0;
       o.userData.updateLocomotionAnimation?.(
         e,
         hasMovementInput,
@@ -9341,7 +9744,8 @@ function _e(o, n) {
           o.userData.grounded = true;
         }
       }
-      N &&
+      !specialSlingAttack.active &&
+        N &&
         o.userData.grounded &&
         ((o.userData.verticalVelocity = 245), (o.userData.grounded = !1)),
         (N = !1),
@@ -9475,6 +9879,7 @@ function _e(o, n) {
           loadedStone.visible = G && ut.stones > 0 && !(releasing && releaseAge < 175);
           (mt.aimRig.rotation.z = 0);
       }
+      updateSpecialSlingAttack(e, performance.now());
     })(o),
     (function (e, o) {
       updateJerusalemBuildingLOD();
@@ -10121,8 +10526,22 @@ function _e(o, n) {
       for (const o of mt.projectiles) {
         const previousProjectilePosition = o.position.clone();
         if (
-          ((o.userData.velocity.y -= 120 * e),
-          o.position.addScaledVector(o.userData.velocity, e),
+          o.userData.special &&
+          o.userData.specialTarget?.userData.hp > 0
+        ) {
+          const targetPoint = o.userData.specialTarget.position
+            .clone()
+            .add(new t.Vector3(0, 28, 0));
+          const homingVelocity = targetPoint
+            .sub(o.position)
+            .normalize()
+            .multiplyScalar(1580);
+          o.userData.velocity.lerp(homingVelocity, Math.min(1, 18 * e));
+        } else {
+          o.userData.velocity.y -= 120 * e;
+        }
+        if (
+          (o.position.addScaledVector(o.userData.velocity, e),
           (o.userData.life -= e),
           o.userData.trail)
         ) {
@@ -10141,8 +10560,21 @@ function _e(o, n) {
             ));
         }
         let n = !1;
+        if (o.userData.special) {
+          const specialTarget = o.userData.specialTarget;
+          if (specialTarget?.userData.hp > 0) {
+            const targetPoint = specialTarget.position
+              .clone()
+              .add(new t.Vector3(0, 28, 0));
+            if (o.position.distanceTo(targetPoint) < 65 || o.userData.life <= 0) {
+              o.position.copy(targetPoint);
+              n = applySpecialSlingImpact(o, specialTarget);
+            }
+          }
+        }
         if (
-          (at.active &&
+          (!o.userData.special &&
+            at.active &&
             mt.practiceTarget &&
             o.position.distanceTo(
               mt.practiceTarget.position.clone().add(new t.Vector3(0, 108, 0)),
@@ -10153,7 +10585,7 @@ function _e(o, n) {
             eo("과녁 명중!"),
             (n = !0),
             setTimeout(() => re(!0), 240)),
-          !n)
+          !n && !o.userData.special)
         )
           for (const t of mt.enemies)
             if (t.userData.hp > 0 && o.position.distanceTo(t.position) < 35) {
@@ -10167,7 +10599,7 @@ function _e(o, n) {
                 t.userData.hp <= 0 && Ue(t);
               break;
             }
-        if (!n) {
+        if (!n && !o.userData.special) {
           const guard = mt.southGateGuard;
           if (
             guard &&
@@ -10182,7 +10614,7 @@ function _e(o, n) {
             n = true;
           }
         }
-        if (!n) {
+        if (!n && !o.userData.special) {
           for (const citizen of mt.cityCitizens) {
             const target = citizen.position.clone().add(
               new t.Vector3(0, citizen.userData.bodyHeight * 0.52, 0),
@@ -10197,7 +10629,7 @@ function _e(o, n) {
             }
           }
         }
-        if (!n) {
+        if (!n && !o.userData.special) {
           // Sample the whole travelled segment so fast stones cannot tunnel
           // through thin house fronts or walls between two frames.
           const segmentDistance = previousProjectilePosition.distanceTo(o.position);
@@ -10220,6 +10652,7 @@ function _e(o, n) {
         }
         const s = te(o.position.x, o.position.z);
         !n &&
+          !o.userData.special &&
           o.position.y < s &&
           ((o.position.y = s + 2),
           (o.userData.life = 0),
@@ -10504,15 +10937,45 @@ function _e(o, n) {
     (function () {
       if (frameNow < performanceState.nextMinimapAt) return;
       performanceState.nextMinimapAt = frameNow + 150;
-      const t = 190,
-        e = 95;
-      s.clearRect(0, 0, t, t),
+      const mapWidth = 180,
+        mapHeight = 232,
+        e = 90,
+        mapCenterY = 116,
+        mapHalfX = 76,
+        mapHalfY = 103;
+      s.clearRect(0, 0, mapWidth, mapHeight),
         s.save(),
         s.beginPath(),
-        s.arc(e, e, 92, 0, 2 * Math.PI),
+        typeof s.roundRect === "function"
+          ? s.roundRect(3, 2, mapWidth - 6, mapHeight - 4, 8)
+          : s.rect(3, 2, mapWidth - 6, mapHeight - 4),
         s.clip(),
-        (s.fillStyle = "#bca271"),
-        s.fillRect(0, 0, t, t);
+        (s.fillStyle = (() => {
+          const parchment = s.createLinearGradient(0, 0, mapWidth, mapHeight);
+          parchment.addColorStop(0, "#ead7a5");
+          parchment.addColorStop(0.48, "#c6a46b");
+          parchment.addColorStop(1, "#e0c58d");
+          return parchment;
+        })()),
+        s.fillRect(0, 0, mapWidth, mapHeight);
+      s.save();
+      s.globalAlpha = 0.13;
+      s.strokeStyle = "#6e4c26";
+      s.lineWidth = 0.7;
+      for (let fiber = 12; fiber < mapHeight; fiber += 17) {
+        s.beginPath();
+        s.moveTo(8, fiber + 1.4 * Math.sin(fiber));
+        s.bezierCurveTo(
+          48,
+          fiber - 2,
+          124,
+          fiber + 2,
+          mapWidth - 8,
+          fiber - 1,
+        );
+        s.stroke();
+      }
+      s.restore();
       const o = mt.player.position,
         n = Math.cos(B),
         a = Math.sin(B),
@@ -10522,8 +10985,8 @@ function _e(o, n) {
             r = s * -n + i * a,
             c = -(s * a + i * n);
           return {
-            x: e + (r / W) * 84,
-            z: e + (c / W) * 84,
+            x: e + (r / W) * mapHalfX,
+            z: mapCenterY + (c / W) * mapHalfY,
             dx: s,
             dz: i,
             rx: r,
@@ -10623,10 +11086,10 @@ function _e(o, n) {
       }
       const c = i(Z),
         l = Math.max(1, Math.hypot(c.dx, c.dz)),
-        h = Math.min(76, (l / W) * 84),
-        d = Math.atan2(c.rz, c.rx),
-        p = e + Math.cos(d) * h,
-        u = e + Math.sin(d) * h;
+        edgeScale = Math.max(1, Math.abs(c.rx) / W, Math.abs(c.rz) / W),
+        p = e + (c.rx / W / edgeScale) * mapHalfX,
+        u = mapCenterY + (c.rz / W / edgeScale) * mapHalfY,
+        d = Math.atan2(u - mapCenterY, p - e);
       (s.strokeStyle = "#f2d35b"),
         (s.lineWidth = 3),
         s.beginPath(),
@@ -10642,9 +11105,9 @@ function _e(o, n) {
           s.fill()),
         (s.fillStyle = "#203b67"),
         s.beginPath(),
-        s.moveTo(e, 79),
-        s.lineTo(88, 103),
-        s.lineTo(102, 103),
+        s.moveTo(e, mapCenterY - 17),
+        s.lineTo(e - 7, mapCenterY + 8),
+        s.lineTo(e + 7, mapCenterY + 8),
         s.closePath(),
         s.fill();
       const m = i({ x: o.x, z: o.z - 100 }),
@@ -10653,7 +11116,11 @@ function _e(o, n) {
         M = m.rz / f;
       (s.fillStyle = "#2d241b"),
         (s.font = "bold 12px sans-serif"),
-        s.fillText(window.ShepherdI18n?.tr("N") || "N", e + 75 * w - 4, e + 75 * M + 4),
+        s.fillText(
+          window.ShepherdI18n?.tr("N") || "N",
+          e + (mapHalfX - 9) * w - 4,
+          mapCenterY + (mapHalfY - 11) * M + 4,
+        ),
         s.restore();
     })();
 }
