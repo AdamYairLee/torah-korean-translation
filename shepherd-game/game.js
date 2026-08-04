@@ -59,6 +59,35 @@ const e = (t) => document.querySelector(t),
     );
   })();
 document.body.classList.toggle("mobile-device", n);
+const MOBILE_MODEL_ASSETS = new Set([
+  "animals/sheep_rigged_game.glb",
+  "animals/lion_rigged_game.glb",
+  "animals/fox_rigged_game.glb",
+  "animals/wolf_rigged_game.glb",
+  "bandit_rigged_game.glb",
+  "kohen_rigged_game.glb",
+  "south_gate_guard.glb",
+  "city_boy_rigged_game.glb",
+  "city_boy1_walk_game.glb",
+  "city_girl2_walk_game.glb",
+  "city_girl1_rigged_game.glb",
+  "olive_tree_game.glb",
+  "date_palm_tall_game.glb",
+  "first_temple_game.glb",
+  "camp_tent_game.glb",
+  "camp_hay_trough_game.glb",
+  "camp_water_trough_game.glb",
+  "david_rotating_sling.glb",
+]);
+function modelAssetPath(path) {
+  if (!n || typeof path !== "string") return path;
+  const prefix = "./assets/models/";
+  if (!path.startsWith(prefix)) return path;
+  const relativePath = path.slice(prefix.length);
+  return MOBILE_MODEL_ASSETS.has(relativePath)
+    ? `${prefix}mobile/${relativePath}`
+    : path;
+}
 function getVisibleViewportSize() {
   const viewport = window.visualViewport;
   return {
@@ -161,6 +190,8 @@ const performanceState = {
   targetCenter: new t.Vector2(0, 0),
   onOliveMount: false,
   smoothedFrameMs: 16.7,
+  lastObservedFrameMs: 16.7,
+  lastMobileRenderAt: 0,
   slowFrameFor: 0,
   campStoneNear: false,
   distantFogDensity: 0.00046,
@@ -169,6 +200,29 @@ const performanceState = {
   minimapRoadCacheRevision: -1,
   minimapVisibleRoads: [],
 };
+function targetPixelRatio(slow = false, onOliveMount = false, insideCity = false) {
+  const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
+  if (!n) {
+    const target = slow
+      ? onOliveMount
+        ? 0.68
+        : insideCity
+          ? 0.72
+          : 0.76
+      : onOliveMount
+        ? 0.84
+        : insideCity
+          ? 0.9
+          : 0.96;
+    return Math.min(dpr, target);
+  }
+  const viewport = getVisibleViewportSize();
+  const cssPixels = viewport.width * viewport.height;
+  const clearBase = cssPixels > 620000 ? 1.02 : cssPixels > 410000 ? 1.1 : 1.18;
+  const scenePenalty = onOliveMount ? 0.08 : insideCity ? 0.05 : 0;
+  const slowPenalty = slow ? 0.24 : 0;
+  return Math.min(dpr, Math.max(0.82, clearBase - scenePenalty - slowPenalty));
+}
 let D = "",
   S = !1,
   b = !1,
@@ -1053,7 +1107,7 @@ async function runGameStartup(e) {
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
           })),
-          (performanceState.currentPixelRatio = Math.min(devicePixelRatio, n ? 0.58 : 0.76)),
+          (performanceState.currentPixelRatio = targetPixelRatio(false, false, false)),
           c.setPixelRatio(performanceState.currentPixelRatio),
           c.setSize(innerWidth, innerHeight),
           (c.shadowMap.enabled = !n),
@@ -2496,7 +2550,7 @@ async function runGameStartup(e) {
             slingDisplay.add(fallbackSling);
 
             new GLTFLoader().load(
-              "./assets/models/david_rotating_sling.glb",
+              modelAssetPath("./assets/models/david_rotating_sling.glb"),
               (gltf) => {
                 const slingModel = gltf.scene;
                 slingModel.name = "DavidHistoricalRotatingSlingModel";
@@ -2606,7 +2660,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.3",
+  Wt = "2.3.4",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -3571,7 +3625,7 @@ function loadCampProp(camp, config) {
   camp.userData.campProps.push(holder);
 
   new GLTFLoader().load(
-    config.url,
+    modelAssetPath(config.url),
     (gltf) => {
       const model = gltf.scene;
       const sourceBounds = new t.Box3().setFromObject(model);
@@ -4775,7 +4829,7 @@ function loadLionModel() {
   lionModelPromise = new Promise((resolve, reject) => {
     const loader = new GLTFLoader();
     loader.load(
-      "./assets/models/animals/lion_rigged_game.glb",
+      modelAssetPath("./assets/models/animals/lion_rigged_game.glb"),
       (gltf) => {
         const model = gltf.scene;
         lionModelTemplate = model;
@@ -4928,7 +4982,17 @@ function updateRiggedAnimalAnimation(owner, moving, intensity, attacking = false
   // Bone matrices are the expensive part for a flock. Near animals remain
   // fluid, while distant/off-action animals update at a progressively lower
   // cadence without changing their AI or travel speed.
-  const interval = distance < 360 ? 34 : distance < 780 ? 105 : 260;
+  const interval = n
+    ? distance < 320
+      ? 50
+      : distance < 700
+        ? 145
+        : 340
+    : distance < 360
+      ? 34
+      : distance < 780
+        ? 105
+        : 260;
   if (now < rig.nextUpdateAt) return;
   const step = Math.min(0.18, Math.max(0.016, (now - (rig.lastUpdateAt || now - interval)) / 1000));
   rig.lastUpdateAt = now;
@@ -4987,7 +5051,7 @@ function loadFoxModel() {
   if (foxModelPromise) return foxModelPromise;
   foxModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/animals/fox_rigged_game.glb",
+      modelAssetPath("./assets/models/animals/fox_rigged_game.glb"),
       (gltf) => {
         const model = gltf.scene;
         foxModelTemplate = prepareImportedAnimalModel(model);
@@ -5008,7 +5072,7 @@ function loadWolfModel() {
   if (wolfModelPromise) return wolfModelPromise;
   wolfModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/animals/wolf_rigged_game.glb",
+      modelAssetPath("./assets/models/animals/wolf_rigged_game.glb"),
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         scene.animations = gltf.animations || [];
@@ -5030,7 +5094,7 @@ function loadSheepModel() {
   if (sheepModelPromise) return sheepModelPromise;
   sheepModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/animals/sheep_rigged_game.glb",
+      modelAssetPath("./assets/models/animals/sheep_rigged_game.glb"),
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         sheepModelTemplate = scene;
@@ -5086,7 +5150,7 @@ function loadBanditModel() {
   if (banditModelPromise) return banditModelPromise;
   banditModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/bandit_rigged_game.glb",
+      modelAssetPath("./assets/models/bandit_rigged_game.glb"),
       (gltf) => {
         const scene = prepareImportedAnimalModel(gltf.scene);
         scene.animations = gltf.animations || [];
@@ -5108,7 +5172,7 @@ function loadKohenModel() {
   if (kohenModelPromise) return kohenModelPromise;
   kohenModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/kohen_rigged_game.glb",
+      modelAssetPath("./assets/models/kohen_rigged_game.glb"),
       (gltf) => {
         const scene = gltf.scene;
         scene.animations = (gltf.animations || []).map((clip) => {
@@ -5172,7 +5236,7 @@ function loadSouthGateGuardModel() {
   if (guardModelPromise) return guardModelPromise;
   guardModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/south_gate_guard.glb",
+      modelAssetPath("./assets/models/south_gate_guard.glb"),
       (gltf) => {
         const scene = gltf.scene;
         scene.traverse((part) => {
@@ -5833,7 +5897,7 @@ function loadOliveTreeModel() {
   if (oliveTreeModelPromise) return oliveTreeModelPromise;
   oliveTreeModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/olive_tree_game.glb",
+      modelAssetPath("./assets/models/olive_tree_game.glb"),
       (gltf) => {
         const scene = gltf.scene;
         // Keep the authored olive proportions. Palm-trunk deformation must
@@ -5873,7 +5937,7 @@ function loadDatePalmModel() {
   if (datePalmModelPromise) return datePalmModelPromise;
   datePalmModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/date_palm_tall_game.glb",
+      modelAssetPath("./assets/models/date_palm_tall_game.glb"),
       (gltf) => {
         const scene = gltf.scene;
         scene.traverse((obj) => {
@@ -5939,7 +6003,7 @@ function loadFirstTempleModel() {
   if (firstTempleModelPromise) return firstTempleModelPromise;
   firstTempleModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/first_temple_game.glb",
+      modelAssetPath("./assets/models/first_temple_game.glb"),
       (gltf) => {
         const scene = gltf.scene;
         scene.traverse((obj) => {
@@ -6129,7 +6193,8 @@ function createMountOfOlivesGrove() {
       // or beyond the fog to be culled, instead of drawing all 88 detailed trees.
       const zones = Array.from({ length: 8 }, () => []);
       let attempts = 0;
-      while (zones.reduce((sum, zone) => sum + zone.length, 0) < 88 && attempts++ < 1800) {
+      const treeTarget = n ? 64 : 88;
+      while (zones.reduce((sum, zone) => sum + zone.length, 0) < treeTarget && attempts++ < 1800) {
         // Bias the distribution toward the western and central slopes rather
         // than stacking rows on the far-eastern summit.
         const westBiased = random() < 0.62;
@@ -6764,7 +6829,7 @@ function loadCityBoyModel() {
   if (cityBoyModelPromise) return cityBoyModelPromise;
   cityBoyModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_boy_rigged_game.glb",
+      modelAssetPath("./assets/models/city_boy_rigged_game.glb"),
       (gltf) => {
         cityBoyModelTemplate = prepareCityCitizenTemplate(gltf.scene);
         resolve(cityBoyModelTemplate);
@@ -6783,7 +6848,7 @@ function loadCityBoy1Model() {
   if (cityBoy1ModelPromise) return cityBoy1ModelPromise;
   cityBoy1ModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_boy1_walk_game.glb",
+      modelAssetPath("./assets/models/city_boy1_walk_game.glb"),
       (gltf) => {
         cityBoy1ModelTemplate = prepareCityCitizenTemplate(gltf.scene);
         cityBoy1ModelTemplate.animations = gltf.animations || [];
@@ -6803,7 +6868,7 @@ function loadCityGirlModel() {
   if (cityGirlModelPromise) return cityGirlModelPromise;
   cityGirlModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_girl2_walk_game.glb",
+      modelAssetPath("./assets/models/city_girl2_walk_game.glb"),
       (gltf) => {
         cityGirlModelTemplate = prepareCityCitizenTemplate(gltf.scene);
         cityGirlModelTemplate.animations = gltf.animations || [];
@@ -6823,7 +6888,7 @@ function loadCityGirl1Model() {
   if (cityGirl1ModelPromise) return cityGirl1ModelPromise;
   cityGirl1ModelPromise = new Promise((resolve, reject) => {
     new GLTFLoader().load(
-      "./assets/models/city_girl1_rigged_game.glb",
+      modelAssetPath("./assets/models/city_girl1_rigged_game.glb"),
       (gltf) => {
         cityGirl1ModelTemplate = prepareCityCitizenTemplate(gltf.scene);
         resolve(cityGirl1ModelTemplate);
@@ -7846,7 +7911,7 @@ function Le() {
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
     c.setPixelRatio(
-      performanceState.currentPixelRatio || Math.min(devicePixelRatio, n ? 0.58 : 0.76),
+      performanceState.currentPixelRatio || targetPixelRatio(false, false, false),
     );
 }
 function Ce(t) {
@@ -9609,32 +9674,7 @@ function updateAdaptiveRendering(now) {
   const insideCity = Yt(player.x, player.z, -70);
   performanceState.onOliveMount = onOliveMount;
   const consistentlySlow = performanceState.slowFrameFor > 1.4;
-  const targetRatio = Math.min(
-    devicePixelRatio,
-    n
-      ? consistentlySlow
-        ? onOliveMount
-          ? 0.4
-          : insideCity
-            ? 0.43
-            : 0.46
-        : onOliveMount
-          ? 0.48
-          : insideCity
-            ? 0.53
-            : 0.58
-      : consistentlySlow
-        ? onOliveMount
-          ? 0.54
-          : insideCity
-            ? 0.58
-            : 0.6
-        : onOliveMount
-          ? 0.66
-          : insideCity
-            ? 0.72
-            : 0.76,
-  );
+  const targetRatio = targetPixelRatio(consistentlySlow, onOliveMount, insideCity);
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
     c.setPixelRatio(targetRatio);
@@ -9653,20 +9693,35 @@ function updateAdaptiveRendering(now) {
       : performanceState.distantFogDensity;
   if (i.fog)
     i.fog.density = t.MathUtils.lerp(i.fog.density, targetFogDensity, 0.45);
-  if (r.far !== (consistentlySlow ? 7600 : 9000)) {
-    r.far = consistentlySlow ? 7600 : 9000;
+  const targetFar = n
+    ? consistentlySlow
+      ? 6300
+      : 7700
+    : consistentlySlow
+      ? 7600
+      : 9000;
+  if (r.far !== targetFar) {
+    r.far = targetFar;
     r.updateProjectionMatrix();
   }
   // Spatially merged city cells disappear only after they are already deep in
   // the distance haze. Nearby streets keep the exact same geometry/materials.
   // This is real draw-call culling, not a post-processing blur.
-  const cityBatchRange = insideCity
-    ? consistentlySlow
-      ? 2350
-      : 2900
-    : consistentlySlow
-      ? 3600
-      : 4300;
+  const cityBatchRange = n
+    ? insideCity
+      ? consistentlySlow
+        ? 1900
+        : 2400
+      : consistentlySlow
+        ? 2900
+        : 3500
+    : insideCity
+      ? consistentlySlow
+        ? 2350
+        : 2900
+      : consistentlySlow
+        ? 3600
+        : 4300;
   for (const batch of performanceState.cityStaticBatches) {
     if (!batch?.parent) continue;
     const dx = player.x - batch.userData.batchCenterX;
@@ -9702,7 +9757,7 @@ function updateAdaptiveRendering(now) {
         batch.visible =
           !onOliveMount ||
           dx * dx + dz * dz <
-            Math.pow(1850 + Math.min(650, sphere.radius || 0), 2);
+            Math.pow((n ? 1550 : 1850) + Math.min(n ? 480 : 650, sphere.radius || 0), 2);
       }
     });
   }
@@ -9716,7 +9771,7 @@ function updateAdaptiveRendering(now) {
       const dz = player.z - sphere.center.z;
       batch.visible =
         dx * dx + dz * dz <
-        Math.pow(1750 + Math.min(500, sphere.radius || 0), 2);
+        Math.pow((n ? 1450 : 1750) + Math.min(n ? 380 : 500, sphere.radius || 0), 2);
     });
   }
   // Loose pickup stones are useful only near David. Ninety separate meshes no
@@ -9725,7 +9780,8 @@ function updateAdaptiveRendering(now) {
     if (!rock?.parent) continue;
     const dx = player.x - rock.position.x;
     const dz = player.z - rock.position.z;
-    rock.visible = dx * dx + dz * dz < 1650 * 1650;
+    const rockRange = n ? 1250 : 1650;
+    rock.visible = dx * dx + dz * dz < rockRange * rockRange;
   }
   // Flock AI remains active at every distance, but sheep too deep in the haze
   // no longer submit their skinned mesh until David approaches again.
@@ -9734,7 +9790,7 @@ function updateAdaptiveRendering(now) {
     const dz = player.z - sheep.position.z;
     const distanceSq = dx * dx + dz * dz;
     if (sheep.userData.importedSheepModel)
-      sheep.userData.importedSheepModel.visible = distanceSq < 1750 * 1750;
+      sheep.userData.importedSheepModel.visible = distanceSq < (n ? 1250 * 1250 : 1750 * 1750);
   }
 }
 function Ye(e, o, n) {
@@ -9742,13 +9798,18 @@ function Ye(e, o, n) {
 }
 function _e(o, n) {
   const frameNow = n * 1000;
-  const frameMs = Math.min(50, Math.max(4, o * 1000));
+  const frameMs = Math.min(
+    80,
+    Math.max(4, performanceState.lastObservedFrameMs || o * 1000),
+  );
   performanceState.smoothedFrameMs +=
     (frameMs - performanceState.smoothedFrameMs) * 0.035;
   performanceState.slowFrameFor = Math.max(
     0,
     performanceState.slowFrameFor +
-      (performanceState.smoothedFrameMs > 24 ? o : -o * 1.6),
+      (performanceState.smoothedFrameMs > (window.document.body.classList.contains("mobile-device") ? 41 : 24)
+        ? o
+        : -o * 1.6),
   );
   updateAdaptiveRendering(frameNow);
   updateRouteChoice(frameNow);
@@ -9831,7 +9892,7 @@ function _e(o, n) {
         z = t.MathUtils.clamp((0.34 - l) / 0.34, 0, 1);
       const torchUpdateDue = n * 1000 >= lightingPerformance.nextTorchUpdateAt;
       if (torchUpdateDue) {
-        lightingPerformance.nextTorchUpdateAt = n * 1000 + 100;
+        lightingPerformance.nextTorchUpdateAt = n * 1000 + (window.document.body.classList.contains("mobile-device") ? 180 : 100);
         const playerPosition = mt.player?.position;
         const torchCandidates = [];
         for (const torch of mt.cityTorches || []) {
@@ -10035,7 +10096,17 @@ function _e(o, n) {
         return;
       const playerInsideCity = Yt(e.position.x, e.position.z, -70);
       performanceState.nextOcclusionAt =
-        frameNow + (playerInsideCity ? (performanceState.slowFrameFor > 1.4 ? 260 : 180) : 120);
+        frameNow + (window.document.body.classList.contains("mobile-device")
+          ? playerInsideCity
+            ? performanceState.slowFrameFor > 1.4
+              ? 380
+              : 280
+            : 220
+          : playerInsideCity
+            ? performanceState.slowFrameFor > 1.4
+              ? 260
+              : 180
+            : 120);
       for (const mesh of performanceState.hiddenCameraMeshes) {
         mesh.visible = !mesh.userData.distanceHidden;
         mesh.userData.cameraHidden = !1;
@@ -11463,11 +11534,11 @@ function _e(o, n) {
       document.exitPointerLock?.(),
       setTimeout(() => ke(e("#gameOver"), 0), 0)),
     frameNow >= performanceState.nextHudAt &&
-      ((performanceState.nextHudAt = frameNow + 100), $e()),
+      ((performanceState.nextHudAt = frameNow + (window.document.body.classList.contains("mobile-device") ? 160 : 100)), $e()),
     (function () {
       const o = e("#crosshair");
       if (!o || frameNow < performanceState.nextTargetLockAt) return;
-      performanceState.nextTargetLockAt = frameNow + 66;
+      performanceState.nextTargetLockAt = frameNow + (window.document.body.classList.contains("mobile-device") ? 110 : 66);
       let n = !1;
       if (G && ut.skill >= 50 && mt.enemies.some((t) => t.userData.hp > 0)) {
         const raycaster = performanceState.targetRaycaster;
@@ -11480,7 +11551,7 @@ function _e(o, n) {
     })(),
     (function () {
       if (frameNow < performanceState.nextMinimapAt) return;
-      performanceState.nextMinimapAt = frameNow + 150;
+      performanceState.nextMinimapAt = frameNow + (window.document.body.classList.contains("mobile-device") ? 240 : 150);
       const mapWidth = 180,
         mapHeight = 232,
         e = 90,
@@ -11687,10 +11758,14 @@ function getCachedMinimapRoads(city) {
   return performanceState.minimapVisibleRoads;
 }
 function Qe() {
-  S &&
-    !b &&
-    (_e(Math.min(0.033, l.getDelta()), performance.now() / 1e3),
-    c.render(i, r));
+  if (!S || b) return;
+  const now = performance.now();
+  if (n && now - performanceState.lastMobileRenderAt < 30) return;
+  performanceState.lastMobileRenderAt = now;
+  const rawDelta = l.getDelta();
+  performanceState.lastObservedFrameMs = rawDelta * 1000;
+  _e(Math.min(0.045, rawDelta), now / 1e3);
+  c.render(i, r);
 }
 function $e() {
   (ut.stones = t.MathUtils.clamp(ut.stones, 0, 25)),

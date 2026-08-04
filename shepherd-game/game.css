@@ -787,3 +787,45 @@ body.title-settings-open #keyGuidePanel{pointer-events:auto}
   body.mobile-device #pause .pause-sound-settings{margin:3px auto;padding:4px 7px}
   body.mobile-device #pause>.stone-panel>button{min-width:105px;margin:3px;padding:6px 9px}
 }
+
+/* v2.3.4 — compact links back to the two parent learning sites. */
+.title-site-links{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  width:100%;
+  max-width:460px;
+  margin:3px auto 0;
+}
+.title-site-links a{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:34px;
+  padding:7px 10px;
+  border:1px solid #8b795e;
+  border-radius:6px;
+  background:#17140fcc;
+  color:#eadfc9;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.15;
+}
+.title-site-links a:hover,.title-site-links a:focus-visible{
+  border-color:#d4b979;
+  background:#30281d;
+  color:#fff3d4;
+  outline:none;
+}
+@media (orientation:landscape) and (max-height:560px){
+  body.mobile-device .title-site-links{gap:4px;margin-top:2px;max-width:none}
+  body.mobile-device .title-site-links a{
+    min-height:27px;
+    padding:4px 5px;
+    font-size:clamp(8px,2.5vh,10.5px);
+  }
+}
+@media (orientation:landscape) and (max-height:330px){
+  body.mobile-device .title-site-links a{min-height:23px;padding:3px 4px;font-size:8px}
+}

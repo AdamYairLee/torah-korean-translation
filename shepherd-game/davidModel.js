@@ -1,5 +1,18 @@
 import { GLTFLoader } from "./GLTFLoader.js";
 
+const MOBILE_DAVID_MODELS = new Set([
+  "david_staff_game.glb",
+  "david_waist_club_game.glb",
+  "david_animated_optimized.glb",
+]);
+function davidAssetPath(path) {
+  const fileName = path.split("/").pop();
+  return document.body?.classList.contains("mobile-device") &&
+    MOBILE_DAVID_MODELS.has(fileName)
+    ? `./assets/models/mobile/${fileName}`
+    : path;
+}
+
 // 다비드 확정 디자인 기반 절차형 저폴리곤 플레이어 모델.
 // 정면/후면 천을 분리하고, 양옆은 허리띠까지 열어 네 귀퉁이를 유지한다.
 export function createDavidModel({
@@ -411,7 +424,7 @@ export function createDavidModel({
     alignBottom,
   ) => {
     new GLTFLoader().load(
-      path,
+      davidAssetPath(path),
       (equipmentGltf) => {
         const equipmentModel = equipmentGltf.scene;
         equipmentModel.rotation.set(0, 0, rotationZ);
@@ -493,7 +506,7 @@ export function createDavidModel({
   // 로드에 실패하면 위 절차형 캐릭터가 그대로 안전한 대체 모델로 남는다.
   const fallbackChildren = [...bodyRoot.children];
   new GLTFLoader().load(
-    "./assets/models/david_animated_optimized.glb",
+    davidAssetPath("./assets/models/david_animated_optimized.glb"),
     (gltf) => {
       const importedRoot = new T.Group();
       importedRoot.name = "DavidAnimatedRoot";
