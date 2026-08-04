@@ -109,6 +109,8 @@ const mobileInput = {
   active: false,
   forward: 0,
   strafe: 0,
+  targetForward: 0,
+  targetStrafe: 0,
   magnitude: 0,
   running: false,
   joystickPointerId: null,
@@ -225,6 +227,7 @@ const performanceState = {
   nextRegionUiAt: 0,
   minimapRoadCacheRevision: -1,
   minimapVisibleRoads: [],
+  sheepUpdatePhase: 0,
 };
 function targetPixelRatio(slow = false, onOliveMount = false, insideCity = false) {
   const dpr = Math.max(1, Number(window.devicePixelRatio) || 1);
@@ -956,13 +959,16 @@ async function loadStartupAssets(setLoadingStage) {
 
   setLoadingStage(18, "essential");
   if (n) {
-    // Mobile enters with only the tiny procedural-David source and the shared
-    // flock model prepared. Large temple, citizens, enemies and vegetation are
-    // decoded one at a time after the first playable frame instead of all at
-    // once behind the loading overlay.
+    // Everything visible in the opening world is decoded behind the loading
+    // overlay. The optimized Temple and vegetation assets are small enough to
+    // prepare here, and doing so prevents the obsolete fallback Temple or an
+    // empty grove from appearing during play.
     await Promise.allSettled([
       settleWithin(davidObjTask, 10000, "David OBJ"),
       settleWithin(loadSheepModel(), 16000, "Sheep model"),
+      settleWithin(loadFirstTempleModel(), 30000, "First Temple"),
+      settleWithin(loadOliveTreeModel(), 20000, "Olive tree"),
+      settleWithin(loadDatePalmModel(), 20000, "Date palm"),
     ]);
     return;
   }
@@ -992,29 +998,10 @@ let deferredMobileAssetWarmupStarted = false;
 function scheduleDeferredMobileAssetWarmup() {
   if (!n || deferredMobileAssetWarmupStarted) return;
   deferredMobileAssetWarmupStarted = true;
-  const queue = [
-    [loadFirstTempleModel, "First Temple"],
-    [loadOliveTreeModel, "Olive tree"],
-    [loadDatePalmModel, "Date palm"],
-    [loadWolfModel, "Wolf"],
-    [loadFoxModel, "Fox"],
-    [loadLionModel, "Lion"],
-    [loadBanditModel, "Bandit"],
-    [loadSouthGateGuardModel, "South gate guard"],
-    [loadCityBoy1Model, "City boy 1"],
-    [loadCityBoyModel, "City boy 2"],
-    [loadCityGirl1Model, "City girl 1"],
-    [loadCityGirlModel, "City girl 2"],
-  ];
-  const runQueue = async () => {
-    for (const [loader, label] of queue) {
-      await settleWithin(Promise.resolve().then(() => loader()), 30000, label);
-      await new Promise((resolve) => setTimeout(resolve, 180));
-    }
-  };
-  if (typeof requestIdleCallback === "function")
-    requestIdleCallback(runQueue, { timeout: 2400 });
-  else setTimeout(runQueue, 1800);
+  // Do not decode every possible enemy and citizen immediately after play
+  // begins. That background queue competed with rendering for several minutes
+  // and was a major source of heat and stutter. Each optional model already
+  // loads safely when its actor is actually created or Jerusalem is approached.
 }
 
 async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, loadingStatus) {
@@ -1158,7 +1145,7 @@ async function runGameStartup(e) {
           )),
           (c = new t.WebGLRenderer({
             antialias: !1,
-            powerPreference: "high-performance",
+            powerPreference: n ? "low-power" : "high-performance",
             failIfMajorPerformanceCaveat: false,
           })),
           (performanceState.currentPixelRatio = targetPixelRatio(false, false, false)),
@@ -2715,7 +2702,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.5",
+  Wt = "2.3.6",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -6197,13 +6184,56 @@ function createDatePalmClone() {
   });
   return palm;
 }
+function getBakedInstancingSource(template) {
+  if (!template) return null;
+  if (template.userData?.bakedInstancingSource)
+    return template.userData.bakedInstancingSource;
+  template.updateMatrixWorld(true);
+  let sourceMesh = null;
+  template.traverse((object) => {
+    if (!sourceMesh && object.isMesh) sourceMesh = object;
+  });
+  if (!sourceMesh?.geometry) return null;
+  // Mobile GLBs keep quantization scale and translation on their mesh node.
+  // InstancedMesh only receives geometry, so those transforms must be baked or
+  // the trees become thousands of times too large and vanish through culling.
+  const geometry = sourceMesh.geometry.clone();
+  const convertAttributeToFloat = (name) => {
+    const attribute = geometry.getAttribute(name);
+    if (!attribute) return;
+    if (!attribute.isInterleavedBufferAttribute && attribute.array instanceof Float32Array)
+      return;
+    const values = new Float32Array(attribute.count * attribute.itemSize);
+    const getters = ["getX", "getY", "getZ", "getW"];
+    for (let index = 0; index < attribute.count; index++) {
+      for (let component = 0; component < attribute.itemSize; component++) {
+        const getter = attribute[getters[component]];
+        values[index * attribute.itemSize + component] =
+          typeof getter === "function" ? getter.call(attribute, index) : 0;
+      }
+    }
+    geometry.setAttribute(
+      name,
+      new t.BufferAttribute(values, attribute.itemSize, false),
+    );
+  };
+  // Applying decimal node transforms directly to quantized Uint16/Int8
+  // attributes truncates them to zero. Convert only transform-sensitive data
+  // to floats first; UVs, colours and indices remain compact.
+  convertAttributeToFloat("position");
+  convertAttributeToFloat("normal");
+  convertAttributeToFloat("tangent");
+  geometry.applyMatrix4(sourceMesh.matrixWorld);
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  const source = { geometry, material: sourceMesh.material };
+  template.userData.bakedInstancingSource = source;
+  return source;
+}
 function rebuildDatePalmInstances() {
   if (!i || !datePalmModelTemplate || !datePalmPlacements.length) return;
-  let sourceMesh = null;
-  datePalmModelTemplate.traverse((obj) => {
-    if (!sourceMesh && obj.isMesh) sourceMesh = obj;
-  });
-  if (!sourceMesh) return;
+  const source = getBakedInstancingSource(datePalmModelTemplate);
+  if (!source) return;
   if (mt.datePalmGrove) {
     i.remove(mt.datePalmGrove);
     mt.datePalmGrove.traverse((obj) => {
@@ -6214,8 +6244,8 @@ function rebuildDatePalmInstances() {
   grove.name = "AllFormerAcaciasAsDatePalms";
   const dummy = new t.Object3D();
   const instances = new t.InstancedMesh(
-    sourceMesh.geometry,
-    sourceMesh.material,
+    source.geometry,
+    source.material,
     datePalmPlacements.length,
   );
   instances.castShadow = false;
@@ -6241,11 +6271,8 @@ function createMountOfOlivesGrove() {
   loadOliveTreeModel()
     .then((template) => {
       if (!i || mt.oliveGrove) return;
-      let sourceMesh = null;
-      template.traverse((obj) => {
-        if (!sourceMesh && obj.isMesh) sourceMesh = obj;
-      });
-      if (!sourceMesh) return;
+      const source = getBakedInstancingSource(template);
+      if (!source) return;
       const random = ee(118611);
       // Eight smaller instance batches allow whole sections behind the camera
       // or beyond the fog to be culled, instead of drawing all 88 detailed trees.
@@ -6276,27 +6303,90 @@ function createMountOfOlivesGrove() {
       const grove = new t.Group();
       grove.name = "MountOfOlivesGrove";
       const dummy = new t.Object3D();
+      const farTrunkGeometry = new t.CylinderGeometry(1, 1.2, 1, 6);
+      const farCanopyGeometry = new t.IcosahedronGeometry(1, 1);
+      const farTrunkMaterial = new t.MeshToonMaterial({
+        color: 0x6c5133,
+        flatShading: true,
+      });
+      const farCanopyMaterial = new t.MeshToonMaterial({
+        color: 0x73784d,
+        flatShading: true,
+      });
       for (const zone of zones) {
         if (!zone.length) continue;
-        const instances = new t.InstancedMesh(
-          sourceMesh.geometry,
-          sourceMesh.material,
+        const batch = new t.Group();
+        batch.name = "OliveGroveSpatialBatch";
+        const detailedInstances = new t.InstancedMesh(
+          source.geometry,
+          source.material,
           zone.length,
         );
-        instances.castShadow = false;
-        instances.receiveShadow = true;
-        instances.frustumCulled = true;
+        detailedInstances.castShadow = false;
+        detailedInstances.receiveShadow = true;
+        detailedInstances.frustumCulled = true;
+        const farTrunks = new t.InstancedMesh(
+          farTrunkGeometry,
+          farTrunkMaterial,
+          zone.length,
+        );
+        const farCanopies = new t.InstancedMesh(
+          farCanopyGeometry,
+          farCanopyMaterial,
+          zone.length,
+        );
+        farTrunks.castShadow = false;
+        farTrunks.receiveShadow = true;
+        farCanopies.castShadow = false;
+        farCanopies.receiveShadow = true;
+        let centerX = 0;
+        let centerZ = 0;
         zone.forEach((tree, index) => {
-          dummy.position.set(tree.x, te(tree.x, tree.z), tree.z);
+          const groundY = te(tree.x, tree.z);
+          centerX += tree.x;
+          centerZ += tree.z;
+          dummy.position.set(tree.x, groundY, tree.z);
           dummy.rotation.set(0, tree.rotation, 0);
           dummy.scale.setScalar(tree.scale);
           dummy.updateMatrix();
-          instances.setMatrixAt(index, dummy.matrix);
+          detailedInstances.setMatrixAt(index, dummy.matrix);
+
+          dummy.position.set(tree.x, groundY + tree.scale * 0.28, tree.z);
+          dummy.rotation.set(0, tree.rotation, 0);
+          dummy.scale.set(
+            tree.scale * 0.065,
+            tree.scale * 0.56,
+            tree.scale * 0.065,
+          );
+          dummy.updateMatrix();
+          farTrunks.setMatrixAt(index, dummy.matrix);
+
+          dummy.position.set(tree.x, groundY + tree.scale * 0.72, tree.z);
+          dummy.rotation.set(0, tree.rotation, 0);
+          dummy.scale.set(
+            tree.scale * 0.38,
+            tree.scale * 0.31,
+            tree.scale * 0.4,
+          );
+          dummy.updateMatrix();
+          farCanopies.setMatrixAt(index, dummy.matrix);
         });
-        instances.instanceMatrix.needsUpdate = true;
-        instances.computeBoundingSphere();
-        instances.userData.groveBatch = true;
-        grove.add(instances);
+        detailedInstances.instanceMatrix.needsUpdate = true;
+        farTrunks.instanceMatrix.needsUpdate = true;
+        farCanopies.instanceMatrix.needsUpdate = true;
+        detailedInstances.computeBoundingSphere();
+        farTrunks.computeBoundingSphere();
+        farCanopies.computeBoundingSphere();
+        const farGroup = new t.Group();
+        farGroup.name = "OliveGroveDistantSilhouette";
+        farGroup.add(farTrunks, farCanopies);
+        farGroup.visible = false;
+        batch.userData.centerX = centerX / zone.length;
+        batch.userData.centerZ = centerZ / zone.length;
+        batch.userData.detailedInstances = detailedInstances;
+        batch.userData.farGroup = farGroup;
+        batch.add(detailedInstances, farGroup);
+        grove.add(batch);
       }
       i.add(grove);
       mt.oliveGrove = grove;
@@ -9523,6 +9613,8 @@ function resetMobileMovement() {
   mobileInput.active = false;
   mobileInput.forward = 0;
   mobileInput.strafe = 0;
+  mobileInput.targetForward = 0;
+  mobileInput.targetStrafe = 0;
   mobileInput.magnitude = 0;
   mobileInput.joystickPointerId = null;
   const knob = e("#mobileJoystickKnob");
@@ -9554,15 +9646,15 @@ function setupMobileControls() {
     const normalizedX = dx / radius;
     const normalizedY = dy / radius;
     const magnitude = Math.min(1, Math.hypot(normalizedX, normalizedY));
-    const deadZone = 0.1;
+    const deadZone = 0.16;
     mobileInput.active = magnitude > deadZone;
     mobileInput.magnitude = mobileInput.active
-      ? (magnitude - deadZone) / (1 - deadZone)
+      ? Math.pow((magnitude - deadZone) / (1 - deadZone), 1.28)
       : 0;
-    mobileInput.forward = mobileInput.active
+    mobileInput.targetForward = mobileInput.active
       ? -normalizedY * mobileInput.magnitude / Math.max(magnitude, 0.001)
       : 0;
-    mobileInput.strafe = mobileInput.active
+    mobileInput.targetStrafe = mobileInput.active
       ? normalizedX * mobileInput.magnitude / Math.max(magnitude, 0.001)
       : 0;
     knob.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
@@ -9864,15 +9956,29 @@ function updateAdaptiveRendering(now) {
   // More haze is used only when the frame rate remains low. This masks the
   // shorter detail range and softens distant flock/background silhouettes at
   // almost no GPU cost.
+  // A cheap photographic-focus effect: David and the nearby road remain
+  // crisp, while distant scenery loses contrast before it reaches the culling
+  // range. This avoids the large heat cost of a depth-of-field post-process.
+  const focusedBaseFog = n
+    ? insideCity
+      ? 0.00052
+      : onOliveMount
+        ? 0.0005
+        : 0.00048
+    : performanceState.distantFogDensity;
   const targetFogDensity = consistentlySlow
-    ? onOliveMount
-      ? 0.00059
-      : insideCity
-        ? 0.00056
-        : 0.00054
-    : onOliveMount
-      ? 0.00051
-      : performanceState.distantFogDensity;
+    ? n
+      ? onOliveMount
+        ? 0.00062
+        : insideCity
+          ? 0.0006
+          : 0.00057
+      : onOliveMount
+        ? 0.00059
+        : insideCity
+          ? 0.00056
+          : 0.00054
+    : focusedBaseFog;
   if (i.fog)
     i.fog.density = t.MathUtils.lerp(i.fog.density, targetFogDensity, 0.45);
   const targetFar = n
@@ -9926,21 +10032,33 @@ function updateAdaptiveRendering(now) {
     mt.campStoneNear.visible = performanceState.campStoneNear;
     mt.campStoneFar.visible = !performanceState.campStoneNear;
   }
-  // Keep the full grove visible, but let fog and eight spatial batches discard
-  // expensive tree geometry that is not relevant to the current view.
+  // Nearby olive batches retain the optimized authored tree. Distant batches
+  // switch to a tiny two-draw silhouette and are softened by fog, so the grove
+  // remains visible from Jerusalem without submitting every detailed leaf.
   if (mt.oliveGrove) {
     mt.oliveGrove.children.forEach((batch) => {
-      if (!batch.boundingSphere) batch.computeBoundingSphere?.();
-      batch.frustumCulled = true;
-      const sphere = batch.boundingSphere;
-      if (sphere) {
-        const dx = player.x - sphere.center.x;
-        const dz = player.z - sphere.center.z;
-        batch.visible =
-          !onOliveMount ||
-          dx * dx + dz * dz <
-            Math.pow((n ? 1550 : 1850) + Math.min(n ? 480 : 650, sphere.radius || 0), 2);
+      const detailed = batch.userData?.detailedInstances;
+      const farGroup = batch.userData?.farGroup;
+      if (!detailed || !farGroup) {
+        batch.visible = true;
+        return;
       }
+      const dx = player.x - (batch.userData.centerX || 0);
+      const dz = player.z - (batch.userData.centerZ || 0);
+      const distanceSq = dx * dx + dz * dz;
+      if (!n) {
+        detailed.visible = true;
+        farGroup.visible = false;
+        batch.visible = true;
+        return;
+      }
+      const nearRange = consistentlySlow ? 1000 : onOliveMount ? 1300 : 1150;
+      const farRange = consistentlySlow ? 3150 : 3900;
+      const showDetailed = distanceSq < nearRange * nearRange;
+      const showFar = !showDetailed && distanceSq < farRange * farRange;
+      detailed.visible = showDetailed;
+      farGroup.visible = showFar;
+      batch.visible = showDetailed || showFar;
     });
   }
   if (mt.datePalmGrove) {
@@ -9973,6 +10091,15 @@ function updateAdaptiveRendering(now) {
     const distanceSq = dx * dx + dz * dz;
     if (sheep.userData.importedSheepModel)
       sheep.userData.importedSheepModel.visible = distanceSq < (n ? 1250 * 1250 : 1750 * 1750);
+  }
+  // Enemies continue their gameplay logic, but actors deep in the haze do not
+  // submit rigged meshes. Spawns already occur inside this range, so danger is
+  // always visible before it can reach David or the flock.
+  for (const enemy of mt.enemies) {
+    if (!enemy?.parent || enemy.userData.hp <= 0) continue;
+    const dx = player.x - enemy.position.x;
+    const dz = player.z - enemy.position.z;
+    enemy.visible = !n || dx * dx + dz * dz < 1750 * 1750;
   }
 }
 function Ye(e, o, n) {
@@ -10369,6 +10496,22 @@ function _e(o, n) {
               (staff.rotation.x *= Math.max(0, 1 - 10 * e));
           }
         }
+      if (IS_MOBILE_DEVICE) {
+        // Low-pass the stick vector itself. Tiny finger movements no longer
+        // become instant ninety/one-eighty degree commands, while a deliberate
+        // full deflection still reaches full speed quickly.
+        const stickResponse = 1 - Math.exp(-7.2 * e);
+        mobileInput.forward = t.MathUtils.lerp(
+          mobileInput.forward,
+          mobileInput.targetForward,
+          stickResponse,
+        );
+        mobileInput.strafe = t.MathUtils.lerp(
+          mobileInput.strafe,
+          mobileInput.targetStrafe,
+          stickResponse,
+        );
+      }
       const forwardInput = t.MathUtils.clamp(
           (K.KeyW ? 1 : 0) - (K.KeyS ? 1 : 0) + mobileInput.forward,
           -1,
@@ -10410,7 +10553,13 @@ function _e(o, n) {
         let l =
           t.MathUtils.euclideanModulo(r - o.rotation.y + Math.PI, 2 * Math.PI) -
           Math.PI;
-        (o.rotation.y += l * Math.min(1, 12 * e)),
+        (o.rotation.y += IS_MOBILE_DEVICE
+          ? t.MathUtils.clamp(
+              l * Math.min(1, 7.5 * e),
+              -(2.15 + 1.35 * movementMagnitude) * e,
+              (2.15 + 1.35 * movementMagnitude) * e,
+            )
+          : l * Math.min(1, 12 * e)),
           (o.userData.walkPhase += e * (running ? 17.2 : 9));
         const h = running,
           d = Math.sin(o.userData.walkPhase) * (h ? 0.8 : 0.38),
@@ -10560,7 +10709,15 @@ function _e(o, n) {
           const cameraTurn =
             t.MathUtils.euclideanModulo(o.rotation.y - B + Math.PI, 2 * Math.PI) -
             Math.PI;
-          B += cameraTurn * Math.min(1, 6.5 * e);
+          const insideCitySteering = Yt(o.position.x, o.position.z, -55);
+          const maximumCameraTurn = (insideCitySteering ? 1.55 : 1.9) * e;
+          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-3.4 * e));
+          B += t.MathUtils.clamp(
+            weightedCameraTurn,
+            -maximumCameraTurn,
+            maximumCameraTurn,
+          );
+          B = t.MathUtils.euclideanModulo(B + Math.PI, Math.PI * 2) - Math.PI;
         }
       }
       const d = F[A],
@@ -10687,6 +10844,16 @@ function _e(o, n) {
       updateJerusalemSheepHold(),
         updateSouthGateGuard(e),
         y && !K.KeyZ && Math.random() < 0.012 * e && kt("sheep");
+      if (IS_MOBILE_DEVICE) {
+        // Flock navigation performs collision sweeps and pair separation. Run
+        // it on two of every three 30 FPS frames and compensate the elapsed
+        // time, reducing its CPU/heat cost by roughly one third without
+        // changing travel speed or the visible animation rate.
+        performanceState.sheepUpdatePhase =
+          (performanceState.sheepUpdatePhase + 1) % 3;
+        if (performanceState.sheepUpdatePhase === 0) return;
+        e *= 1.5;
+      }
       const n = mt.player;
       const activePredators = mt.enemies.filter(
         (enemy) => enemy.userData.hp > 0 && enemy.userData.type !== "bandit",
