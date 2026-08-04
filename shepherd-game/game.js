@@ -112,6 +112,10 @@ const mobileInput = {
   targetForward: 0,
   targetStrafe: 0,
   magnitude: 0,
+  targetMagnitude: 0,
+  steeringAngle: 0,
+  targetSteeringAngle: 0,
+  steeringInitialized: false,
   running: false,
   joystickPointerId: null,
   lookPointerId: null,
@@ -217,7 +221,16 @@ const performanceState = {
   smoothedFrameMs: 16.7,
   lastObservedFrameMs: 16.7,
   lastMobileRenderAt: 0,
+  lastMobileFrameCompletedAt: 0,
   slowFrameFor: 0,
+  mobileFrameInterval: 1000 / 30,
+  mobileTargetFps: 30,
+  mobileRenderCostMs: 0,
+  mobileThermalPressure: 0,
+  mobileThermalTier: 0,
+  mobileRenderCalls: 0,
+  mobileTriangles: 0,
+  nextThermalEvaluationAt: 0,
   campStoneNear: false,
   distantFogDensity: 0.00046,
   cityStaticBatches: [],
@@ -249,8 +262,21 @@ function targetPixelRatio(slow = false, onOliveMount = false, insideCity = false
   const cssPixels = viewport.width * viewport.height;
   const clearBase = cssPixels > 620000 ? 1.02 : cssPixels > 410000 ? 1.1 : 1.18;
   const scenePenalty = onOliveMount ? 0.08 : insideCity ? 0.05 : 0;
-  const slowPenalty = slow ? 0.24 : 0;
-  return Math.min(dpr, Math.max(0.82, clearBase - scenePenalty - slowPenalty));
+  // Web games cannot read Android's native thermal headroom API. Use the
+  // sustained render budget instead: tier 1 trims only distant work, while
+  // tier 2 also lowers the internal resolution enough to stop heat build-up.
+  // The floor stays above the former blurry 0.58/0.40 mobile ratios.
+  const thermalPenalty =
+    performanceState.mobileThermalTier >= 2
+      ? 0.2
+      : performanceState.mobileThermalTier === 1
+        ? 0.1
+        : 0;
+  const slowPenalty = slow ? 0.12 : 0;
+  return Math.min(
+    dpr,
+    Math.max(0.86, clearBase - scenePenalty - thermalPenalty - slowPenalty),
+  );
 }
 let D = "",
   S = !1,
@@ -2702,7 +2728,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.6",
+  Wt = "2.3.7",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -8265,6 +8291,7 @@ function Re() {
     t.classList.toggle("staff", "staff" === L),
     t.setAttribute("aria-label", "sling" === L ? "회전식 돌팔매" : "지팡이"));
   const mobileAttack = e("#mobileAttackBtn");
+  const mobileWeaponButton = e("#mobileWeaponBtn");
   const mobileWeaponIcon = e("#mobileWeaponIcon");
   if (mobileAttack) {
     mobileAttack.classList.toggle("sling", "sling" === L);
@@ -8275,8 +8302,16 @@ function Re() {
     );
   }
   if (mobileWeaponIcon) {
-    mobileWeaponIcon.classList.toggle("sling", "sling" === L);
-    mobileWeaponIcon.classList.toggle("staff", "staff" === L);
+    // The large edge button always shows the weapon that will attack. The
+    // smaller switch button shows the other weapon, so two identical icons can
+    // never be mistaken for overlapping attack controls.
+    const nextWeapon = "sling" === L ? "staff" : "sling";
+    mobileWeaponIcon.classList.toggle("sling", "sling" === nextWeapon);
+    mobileWeaponIcon.classList.toggle("staff", "staff" === nextWeapon);
+    mobileWeaponButton?.setAttribute(
+      "aria-label",
+      nextWeapon === "sling" ? "돌팔매로 변경" : "지팡이로 변경",
+    );
   }
 }
 function triggerCombatFeedback(kind) {
@@ -9616,6 +9651,10 @@ function resetMobileMovement() {
   mobileInput.targetForward = 0;
   mobileInput.targetStrafe = 0;
   mobileInput.magnitude = 0;
+  mobileInput.targetMagnitude = 0;
+  mobileInput.steeringAngle = 0;
+  mobileInput.targetSteeringAngle = 0;
+  mobileInput.steeringInitialized = false;
   mobileInput.joystickPointerId = null;
   const knob = e("#mobileJoystickKnob");
   if (knob) knob.style.transform = "translate(-50%,-50%)";
@@ -9635,7 +9674,9 @@ function setupMobileControls() {
   const updateJoystick = (event) => {
     if (mobileInput.joystickPointerId !== event.pointerId) return;
     const rect = joystick.getBoundingClientRect();
-    const radius = Math.max(34, rect.width * 0.34);
+    // Use more of the physical pad so a small thumb movement cannot become a
+    // full-speed turn. This also reduces the pressure needed to steer.
+    const radius = Math.max(38, rect.width * 0.42);
     let dx = event.clientX - (rect.left + rect.width / 2);
     let dy = event.clientY - (rect.top + rect.height / 2);
     const rawLength = Math.hypot(dx, dy);
@@ -9646,17 +9687,27 @@ function setupMobileControls() {
     const normalizedX = dx / radius;
     const normalizedY = dy / radius;
     const magnitude = Math.min(1, Math.hypot(normalizedX, normalizedY));
-    const deadZone = 0.16;
+    const deadZone = 0.21;
     mobileInput.active = magnitude > deadZone;
-    mobileInput.magnitude = mobileInput.active
-      ? Math.pow((magnitude - deadZone) / (1 - deadZone), 1.28)
+    mobileInput.targetMagnitude = mobileInput.active
+      ? Math.pow((magnitude - deadZone) / (1 - deadZone), 1.55)
       : 0;
     mobileInput.targetForward = mobileInput.active
-      ? -normalizedY * mobileInput.magnitude / Math.max(magnitude, 0.001)
+      ? -normalizedY / Math.max(magnitude, 0.001)
       : 0;
     mobileInput.targetStrafe = mobileInput.active
-      ? normalizedX * mobileInput.magnitude / Math.max(magnitude, 0.001)
+      ? normalizedX / Math.max(magnitude, 0.001)
       : 0;
+    if (mobileInput.active) {
+      mobileInput.targetSteeringAngle = Math.atan2(
+        mobileInput.targetStrafe,
+        mobileInput.targetForward,
+      );
+      if (!mobileInput.steeringInitialized) {
+        mobileInput.steeringAngle = mobileInput.targetSteeringAngle;
+        mobileInput.steeringInitialized = true;
+      }
+    }
     knob.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
   };
   joystick.addEventListener("pointerdown", (event) => {
@@ -9664,6 +9715,7 @@ function setupMobileControls() {
     event.stopPropagation();
     mobileInput.joystickPointerId = event.pointerId;
     mobileInput.movementYaw = B;
+    mobileInput.steeringInitialized = false;
     joystick.setPointerCapture?.(event.pointerId);
     updateJoystick(event);
   });
@@ -9947,7 +9999,9 @@ function updateAdaptiveRendering(now) {
   const onOliveMount = player.x > 1050 && player.x < 3300;
   const insideCity = Yt(player.x, player.z, -70);
   performanceState.onOliveMount = onOliveMount;
-  const consistentlySlow = performanceState.slowFrameFor > 1.4;
+  const consistentlySlow =
+    performanceState.slowFrameFor > 1.4 ||
+    performanceState.mobileThermalTier > 0;
   const targetRatio = targetPixelRatio(consistentlySlow, onOliveMount, insideCity);
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
@@ -9982,9 +10036,11 @@ function updateAdaptiveRendering(now) {
   if (i.fog)
     i.fog.density = t.MathUtils.lerp(i.fog.density, targetFogDensity, 0.45);
   const targetFar = n
-    ? consistentlySlow
-      ? 6300
-      : 7700
+    ? performanceState.mobileThermalTier >= 2
+      ? 5400
+      : consistentlySlow
+        ? 6300
+        : 7700
     : consistentlySlow
       ? 7600
       : 9000;
@@ -9997,12 +10053,16 @@ function updateAdaptiveRendering(now) {
   // This is real draw-call culling, not a post-processing blur.
   const cityBatchRange = n
     ? insideCity
-      ? consistentlySlow
-        ? 1900
-        : 2400
-      : consistentlySlow
-        ? 2900
-        : 3500
+      ? performanceState.mobileThermalTier >= 2
+        ? 1600
+        : consistentlySlow
+          ? 1900
+          : 2400
+      : performanceState.mobileThermalTier >= 2
+        ? 2450
+        : consistentlySlow
+          ? 2900
+          : 3500
     : insideCity
       ? consistentlySlow
         ? 2350
@@ -10052,8 +10112,20 @@ function updateAdaptiveRendering(now) {
         batch.visible = true;
         return;
       }
-      const nearRange = consistentlySlow ? 1000 : onOliveMount ? 1300 : 1150;
-      const farRange = consistentlySlow ? 3150 : 3900;
+      const nearRange =
+        performanceState.mobileThermalTier >= 2
+          ? 850
+          : consistentlySlow
+            ? 1000
+            : onOliveMount
+              ? 1300
+              : 1150;
+      const farRange =
+        performanceState.mobileThermalTier >= 2
+          ? 2750
+          : consistentlySlow
+            ? 3150
+            : 3900;
       const showDetailed = distanceSq < nearRange * nearRange;
       const showFar = !showDetailed && distanceSq < farRange * farRange;
       detailed.visible = showDetailed;
@@ -10071,7 +10143,14 @@ function updateAdaptiveRendering(now) {
       const dz = player.z - sphere.center.z;
       batch.visible =
         dx * dx + dz * dz <
-        Math.pow((n ? 1450 : 1750) + Math.min(n ? 380 : 500, sphere.radius || 0), 2);
+        Math.pow(
+          (n
+            ? performanceState.mobileThermalTier >= 2
+              ? 1150
+              : 1450
+            : 1750) + Math.min(n ? 380 : 500, sphere.radius || 0),
+          2,
+        );
     });
   }
   // Loose pickup stones are useful only near David. Ninety separate meshes no
@@ -10080,7 +10159,11 @@ function updateAdaptiveRendering(now) {
     if (!rock?.parent) continue;
     const dx = player.x - rock.position.x;
     const dz = player.z - rock.position.z;
-    const rockRange = n ? 1250 : 1650;
+    const rockRange = n
+      ? performanceState.mobileThermalTier >= 2
+        ? 950
+        : 1250
+      : 1650;
     rock.visible = dx * dx + dz * dz < rockRange * rockRange;
   }
   // Flock AI remains active at every distance, but sheep too deep in the haze
@@ -10089,8 +10172,15 @@ function updateAdaptiveRendering(now) {
     const dx = player.x - sheep.position.x;
     const dz = player.z - sheep.position.z;
     const distanceSq = dx * dx + dz * dz;
-    if (sheep.userData.importedSheepModel)
-      sheep.userData.importedSheepModel.visible = distanceSq < (n ? 1250 * 1250 : 1750 * 1750);
+    if (sheep.userData.importedSheepModel) {
+      const sheepDetailRange = n
+        ? performanceState.mobileThermalTier >= 2
+          ? 1050
+          : 1250
+        : 1750;
+      sheep.userData.importedSheepModel.visible =
+        distanceSq < sheepDetailRange * sheepDetailRange;
+    }
   }
   // Enemies continue their gameplay logic, but actors deep in the haze do not
   // submit rigged meshes. Spawns already occur inside this range, so danger is
@@ -10099,7 +10189,9 @@ function updateAdaptiveRendering(now) {
     if (!enemy?.parent || enemy.userData.hp <= 0) continue;
     const dx = player.x - enemy.position.x;
     const dz = player.z - enemy.position.z;
-    enemy.visible = !n || dx * dx + dz * dz < 1750 * 1750;
+    const enemyDetailRange =
+      n && performanceState.mobileThermalTier >= 2 ? 1450 : 1750;
+    enemy.visible = !n || dx * dx + dz * dz < enemyDetailRange * enemyDetailRange;
   }
 }
 function Ye(e, o, n) {
@@ -10113,10 +10205,15 @@ function _e(o, n) {
   );
   performanceState.smoothedFrameMs +=
     (frameMs - performanceState.smoothedFrameMs) * 0.035;
+  const slowFrameThreshold = window.document.body.classList.contains(
+    "mobile-device",
+  )
+    ? performanceState.mobileFrameInterval * 1.28
+    : 24;
   performanceState.slowFrameFor = Math.max(
     0,
     performanceState.slowFrameFor +
-      (performanceState.smoothedFrameMs > (window.document.body.classList.contains("mobile-device") ? 41 : 24)
+      (performanceState.smoothedFrameMs > slowFrameThreshold
         ? o
         : -o * 1.6),
   );
@@ -10497,20 +10594,36 @@ function _e(o, n) {
           }
         }
       if (IS_MOBILE_DEVICE) {
-        // Low-pass the stick vector itself. Tiny finger movements no longer
-        // become instant ninety/one-eighty degree commands, while a deliberate
-        // full deflection still reaches full speed quickly.
-        const stickResponse = 1 - Math.exp(-7.2 * e);
-        mobileInput.forward = t.MathUtils.lerp(
-          mobileInput.forward,
-          mobileInput.targetForward,
-          stickResponse,
+        // Treat direction and speed separately. Interpolating X/Y directly can
+        // cross the centre when a thumb moves around the rim and suddenly
+        // resolve to the opposite direction. A capped angular turn makes the
+        // pad feel weighty and keeps Jerusalem alley steering deterministic.
+        const insideCityStick = Yt(o.position.x, o.position.z, -55);
+        const magnitudeResponse = 1 - Math.exp(-4.1 * e);
+        mobileInput.magnitude = t.MathUtils.lerp(
+          mobileInput.magnitude,
+          mobileInput.targetMagnitude,
+          magnitudeResponse,
         );
-        mobileInput.strafe = t.MathUtils.lerp(
-          mobileInput.strafe,
-          mobileInput.targetStrafe,
-          stickResponse,
-        );
+        if (mobileInput.active && mobileInput.steeringInitialized) {
+          const steeringDelta =
+            t.MathUtils.euclideanModulo(
+              mobileInput.targetSteeringAngle -
+                mobileInput.steeringAngle +
+                Math.PI,
+              Math.PI * 2,
+            ) - Math.PI;
+          const maximumStickTurn = (insideCityStick ? 1.0 : 1.28) * e;
+          mobileInput.steeringAngle += t.MathUtils.clamp(
+            steeringDelta,
+            -maximumStickTurn,
+            maximumStickTurn,
+          );
+        }
+        mobileInput.forward =
+          Math.cos(mobileInput.steeringAngle) * mobileInput.magnitude;
+        mobileInput.strafe =
+          Math.sin(mobileInput.steeringAngle) * mobileInput.magnitude;
       }
       const forwardInput = t.MathUtils.clamp(
           (K.KeyW ? 1 : 0) - (K.KeyS ? 1 : 0) + mobileInput.forward,
@@ -10554,11 +10667,16 @@ function _e(o, n) {
           t.MathUtils.euclideanModulo(r - o.rotation.y + Math.PI, 2 * Math.PI) -
           Math.PI;
         (o.rotation.y += IS_MOBILE_DEVICE
-          ? t.MathUtils.clamp(
-              l * Math.min(1, 7.5 * e),
-              -(2.15 + 1.35 * movementMagnitude) * e,
-              (2.15 + 1.35 * movementMagnitude) * e,
-            )
+          ? (() => {
+              const insideCityTurn = Yt(o.position.x, o.position.z, -55);
+              const maximumPlayerTurn =
+                (insideCityTurn ? 1.35 : 1.68) + 0.42 * movementMagnitude;
+              return t.MathUtils.clamp(
+                l * Math.min(1, 4.5 * e),
+                -maximumPlayerTurn * e,
+                maximumPlayerTurn * e,
+              );
+            })()
           : l * Math.min(1, 12 * e)),
           (o.userData.walkPhase += e * (running ? 17.2 : 9));
         const h = running,
@@ -10704,14 +10822,15 @@ function _e(o, n) {
         o.position.x > 3300 && (o.position.x = 3300);
       if (IS_MOBILE_DEVICE) {
         A = 3;
-        I = t.MathUtils.lerp(I, -Math.PI / 4, Math.min(1, 7 * e));
+        const mobileAimPitch = G ? -0.56 : -Math.PI / 4;
+        I = t.MathUtils.lerp(I, mobileAimPitch, Math.min(1, 5.2 * e));
         if (hasMovementInput) {
           const cameraTurn =
             t.MathUtils.euclideanModulo(o.rotation.y - B + Math.PI, 2 * Math.PI) -
             Math.PI;
           const insideCitySteering = Yt(o.position.x, o.position.z, -55);
-          const maximumCameraTurn = (insideCitySteering ? 1.55 : 1.9) * e;
-          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-3.4 * e));
+          const maximumCameraTurn = (insideCitySteering ? 0.72 : 0.96) * e;
+          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-2.05 * e));
           B += t.MathUtils.clamp(
             weightedCameraTurn,
             -maximumCameraTurn,
@@ -10721,9 +10840,28 @@ function _e(o, n) {
         }
       }
       const d = F[A],
-        p = G && !IS_MOBILE_DEVICE ? 92 : IS_MOBILE_DEVICE ? 340 : d.distance,
-        u = G && !IS_MOBILE_DEVICE ? 78 : IS_MOBILE_DEVICE ? 340 : d.height,
-        m = G && !IS_MOBILE_DEVICE ? 43 : IS_MOBILE_DEVICE ? 59 : d.fov,
+        mobileFocusedAim = IS_MOBILE_DEVICE && G,
+        p = G && !IS_MOBILE_DEVICE
+          ? 92
+          : mobileFocusedAim
+            ? 154
+            : IS_MOBILE_DEVICE
+              ? 340
+              : d.distance,
+        u = G && !IS_MOBILE_DEVICE
+          ? 78
+          : mobileFocusedAim
+            ? 116
+            : IS_MOBILE_DEVICE
+              ? 340
+              : d.height,
+        m = G && !IS_MOBILE_DEVICE
+          ? 43
+          : mobileFocusedAim
+            ? 44
+            : IS_MOBILE_DEVICE
+              ? 59
+              : d.fov,
         f = 1 - Math.pow(0.0015, e);
       (R = t.MathUtils.lerp(R, p, f)),
         (V = t.MathUtils.lerp(V, u, f)),
@@ -10768,9 +10906,9 @@ function _e(o, n) {
         r.position.lerp(D, f);
       const b = mobileFollowView
         ? new t.Vector3(
-            o.position.x + Math.sin(B) * 150,
-            o.position.y + 58,
-            o.position.z + Math.cos(B) * 150,
+            o.position.x + Math.sin(B) * (mobileFocusedAim ? 330 : 150),
+            o.position.y + (mobileFocusedAim ? 76 : 58),
+            o.position.z + Math.cos(B) * (mobileFocusedAim ? 330 : 150),
           )
         : z.clone().addScaledVector(y, 520);
       if (
@@ -12147,15 +12285,84 @@ function getCachedMinimapRoads(city) {
   }
   return performanceState.minimapVisibleRoads;
 }
+function updateMobileThermalBudget(renderCostMs, frameDeltaMs, now) {
+  if (!IS_MOBILE_DEVICE || !c) return;
+  const renderInfo = c.info?.render;
+  const calls = Number(renderInfo?.calls) || 0;
+  const triangles = Number(renderInfo?.triangles) || 0;
+  performanceState.mobileRenderCalls = calls;
+  performanceState.mobileTriangles = triangles;
+  performanceState.mobileRenderCostMs = t.MathUtils.lerp(
+    performanceState.mobileRenderCostMs,
+    Math.max(0, renderCostMs),
+    0.08,
+  );
+
+  // Native Android titles can query ADPF thermal headroom; a browser game
+  // cannot. Draw calls, submitted triangles, CPU render cost and missed frame
+  // deadlines form a conservative local proxy for sustained power demand.
+  const interval = performanceState.mobileFrameInterval;
+  const pressureRatio = Math.max(
+    performanceState.mobileRenderCostMs / Math.max(7.5, interval * 0.42),
+    calls / 285,
+    triangles / 950000,
+    frameDeltaMs / Math.max(1, interval * 1.18),
+  );
+  const elapsedSeconds = Math.min(0.08, Math.max(0.012, frameDeltaMs / 1000));
+  if (pressureRatio > 1) {
+    performanceState.mobileThermalPressure +=
+      elapsedSeconds * Math.min(2.4, pressureRatio);
+  } else {
+    performanceState.mobileThermalPressure -= elapsedSeconds * 0.28;
+  }
+  performanceState.mobileThermalPressure = t.MathUtils.clamp(
+    performanceState.mobileThermalPressure,
+    0,
+    32,
+  );
+  if (now < performanceState.nextThermalEvaluationAt) return;
+  performanceState.nextThermalEvaluationAt = now + 1000;
+
+  const pressure = performanceState.mobileThermalPressure;
+  const previousTier = performanceState.mobileThermalTier;
+  if (pressure >= 18) performanceState.mobileThermalTier = 2;
+  else if (pressure >= 6) performanceState.mobileThermalTier = 1;
+  else if (previousTier === 2 && pressure < 11)
+    performanceState.mobileThermalTier = 1;
+  else if (previousTier === 1 && pressure < 2)
+    performanceState.mobileThermalTier = 0;
+
+  // 30 and 20 FPS divide evenly into common 60/120 Hz displays. This avoids
+  // the uneven 24/27 FPS cadence that feels slower while still consuming GPU.
+  performanceState.mobileTargetFps =
+    performanceState.mobileThermalTier >= 2 ? 20 : 30;
+  performanceState.mobileFrameInterval =
+    1000 / performanceState.mobileTargetFps;
+  if (previousTier !== performanceState.mobileThermalTier)
+    performanceState.nextAdaptiveQualityAt = 0;
+}
 function Qe() {
   if (!S || b) return;
   const now = performance.now();
-  if (n && now - performanceState.lastMobileRenderAt < 30) return;
+  if (
+    n &&
+    now - performanceState.lastMobileRenderAt <
+      performanceState.mobileFrameInterval - 1
+  )
+    return;
   performanceState.lastMobileRenderAt = now;
+  const frameWorkStartedAt = performance.now();
   const rawDelta = l.getDelta();
   performanceState.lastObservedFrameMs = rawDelta * 1000;
   _e(Math.min(0.045, rawDelta), now / 1e3);
   c.render(i, r);
+  const frameCompletedAt = performance.now();
+  performanceState.lastMobileFrameCompletedAt = frameCompletedAt;
+  updateMobileThermalBudget(
+    frameCompletedAt - frameWorkStartedAt,
+    rawDelta * 1000,
+    frameCompletedAt,
+  );
 }
 function $e() {
   (ut.stones = t.MathUtils.clamp(ut.stones, 0, 25)),
