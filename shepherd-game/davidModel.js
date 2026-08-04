@@ -749,10 +749,17 @@ export function createDavidModel({
             specialAction.enabled = true;
             specialAction
               .reset()
-              .setEffectiveTimeScale(1)
+              // 1.48 seconds of source animation now fills the 2.96-second
+              // charge shot. The throw phase is accelerated separately when
+              // the cinematic cuts behind David.
+              .setEffectiveTimeScale(0.5)
               .setEffectiveWeight(1)
               .fadeIn(0.08)
               .play();
+          };
+          player.userData.releaseSpecialSlingAnimation = () => {
+            if (!player.userData.specialSlingPlaying) return;
+            specialAction.setEffectiveTimeScale(1.35);
           };
           player.userData.stopSpecialSlingAnimation = () => {
             specialAction.fadeOut(0.12);

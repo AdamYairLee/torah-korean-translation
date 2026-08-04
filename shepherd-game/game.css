@@ -230,11 +230,15 @@ html[dir="rtl"] #mission,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconn
 #specialAttackOverlay{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;overflow:hidden;background:radial-gradient(circle at 50% 54%,transparent 0 18%,rgba(31,137,255,.12) 34%,rgba(13,68,171,.28) 65%,rgba(1,13,50,.58) 100%);transition:opacity .18s ease}
 #specialAttackOverlay:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 52%,transparent 0 13%,rgba(0,8,26,.14) 35%,rgba(0,3,15,.72) 100%);opacity:0}
 #specialAttackOverlay.active{opacity:1;animation:specialEnergyPulse .48s ease-in-out infinite alternate}
-#specialAttackOverlay.active:before{animation:specialFrontReveal 1.24s ease-out both}
+#specialAttackOverlay.active:before{animation:specialFrontReveal 2.75s ease-out both}
 #specialAttackOverlay.release{opacity:.56}
 #specialAttackOverlay.release:before{animation:none;opacity:0}
 @keyframes specialEnergyPulse{from{filter:saturate(1.05) brightness(.88)}to{filter:saturate(1.45) brightness(1.32)}}
 @keyframes specialFrontReveal{0%{opacity:1}32%{opacity:.92}100%{opacity:.28}}
+#specialAttackAnnouncement{position:absolute;left:50%;bottom:54px;z-index:9;width:max-content;max-width:min(90vw,760px);padding:10px 24px;transform:translate(-50%,18px) scale(.96);opacity:0;color:#f4f0e8;font-size:clamp(22px,2.4vw,36px);font-weight:900;line-height:1.25;text-align:center;letter-spacing:-.02em;white-space:nowrap;pointer-events:none;text-shadow:0 2px 3px #000,0 0 9px #0b52b9,0 0 18px #218fff}
+#specialAttackAnnouncement.show{animation:specialAttackAnnouncement 2.72s ease-out both}
+html[dir="rtl"] #specialAttackAnnouncement{direction:rtl;letter-spacing:0}
+@keyframes specialAttackAnnouncement{0%{opacity:0;transform:translate(-50%,18px) scale(.96)}10%{opacity:1;transform:translate(-50%,0) scale(1)}76%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-7px) scale(1.015)}}
 
 /* v2.1.40 — Siloam-inscription stone HUD and pause-only language selector. */
 .hud-top-right{

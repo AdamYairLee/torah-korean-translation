@@ -215,6 +215,8 @@ const combatFeedback = {
 const specialSlingAttack = {
   active: false,
   target: null,
+  targetLocked: false,
+  aimDirection: new t.Vector3(0, 0, 1),
   startedAt: 0,
   charge: 0,
   released: false,
@@ -223,9 +225,14 @@ const specialSlingAttack = {
   heldStone: null,
   cameraStart: new t.Vector3(),
   previousFov: 58,
-  releaseAt: 1520,
-  endAt: 2850,
+  // The source animation reaches its throwing pose at roughly 1.48 seconds.
+  // The charging half is deliberately played at 0.5x speed, holding the
+  // front-facing cinematic for nearly three seconds before the rear cut.
+  cameraSwitchAt: 2750,
+  releaseAt: 2960,
+  endAt: 4380,
 };
+const SPECIAL_SLING_CHANCE = 0.07;
 const routeChoice = {
   id: "",
   name: "",
@@ -2496,7 +2503,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 238,
+  Wt = 239,
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -8109,15 +8116,17 @@ function Ae(e, o = "ground") {
     mt.effects.push(n),
     kt("target" === o ? "pickup" : "staff");
 }
-function findSpecialSlingAnimalTarget() {
+function canTriggerSpecialSlingAttack() {
   const player = mt.player;
-  if (
-    !player ||
-    at.active ||
-    !player.userData.specialSlingReady ||
-    Yt(player.position.x, player.position.z, -70)
-  )
-    return null;
+  return !!(
+    player &&
+    !at.active &&
+    player.userData.specialSlingReady &&
+    !Yt(player.position.x, player.position.z, 0)
+  );
+}
+function findSpecialSlingAnimalTarget() {
+  if (!canTriggerSpecialSlingAttack()) return null;
   const cameraDirection = new t.Vector3();
   r.getWorldDirection(cameraDirection).normalize();
   let best = null;
@@ -8149,8 +8158,8 @@ function playSpecialSlingChargeAudio() {
   voiceFilter.frequency.setValueAtTime(1250, now);
   voiceGain.gain.setValueAtTime(0.0001, now);
   voiceGain.gain.exponentialRampToValueAtTime(0.12 * v, now + 0.18);
-  voiceGain.gain.setValueAtTime(0.105 * v, now + 1.05);
-  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.48);
+  voiceGain.gain.setValueAtTime(0.105 * v, now + 2.18);
+  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.82);
   voiceGain.connect(voiceFilter).connect(M);
   for (const [frequency, volume] of [
     [118, 0.8],
@@ -8161,28 +8170,41 @@ function playSpecialSlingChargeAudio() {
     const gain = m.createGain();
     oscillator.type = frequency === 118 ? "sawtooth" : "triangle";
     oscillator.frequency.setValueAtTime(frequency, now);
-    oscillator.frequency.linearRampToValueAtTime(frequency * 1.16, now + 1.36);
+    oscillator.frequency.linearRampToValueAtTime(frequency * 1.22, now + 2.72);
     gain.gain.value = volume;
     oscillator.connect(gain).connect(voiceGain);
     oscillator.start(now);
-    oscillator.stop(now + 1.5);
+    oscillator.stop(now + 2.86);
   }
   const energyOscillator = m.createOscillator();
   const energyGain = m.createGain();
   const energyFilter = m.createBiquadFilter();
   energyOscillator.type = "sine";
   energyOscillator.frequency.setValueAtTime(72, now);
-  energyOscillator.frequency.exponentialRampToValueAtTime(690, now + 1.48);
+  energyOscillator.frequency.exponentialRampToValueAtTime(690, now + 2.8);
   energyFilter.type = "bandpass";
   energyFilter.frequency.setValueAtTime(620, now);
-  energyFilter.frequency.exponentialRampToValueAtTime(2100, now + 1.48);
+  energyFilter.frequency.exponentialRampToValueAtTime(2100, now + 2.8);
   energyFilter.Q.value = 5;
   energyGain.gain.setValueAtTime(0.0001, now);
   energyGain.gain.exponentialRampToValueAtTime(0.105 * v, now + 0.22);
-  energyGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.52);
+  energyGain.gain.setValueAtTime(0.09 * v, now + 2.18);
+  energyGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.86);
   energyOscillator.connect(energyFilter).connect(energyGain).connect(M);
   energyOscillator.start(now);
-  energyOscillator.stop(now + 1.55);
+  energyOscillator.stop(now + 2.9);
+}
+function showSpecialAttackAnnouncement() {
+  const announcement = e("#specialAttackAnnouncement");
+  if (!announcement) return;
+  announcement.textContent =
+    window.ShepherdI18n?.tr?.("필살기가 발동되었습니다!") ||
+    "필살기가 발동되었습니다!";
+  announcement.classList.remove("show");
+  // Restart the entrance animation even when two activations happen close
+  // together without adding another timer to the combat loop.
+  void announcement.offsetWidth;
+  announcement.classList.add("show");
 }
 function createSpecialSlingEnergy() {
   const player = mt.player;
@@ -8291,13 +8313,27 @@ function disposeSpecialSlingVisuals() {
 function launchSpecialSlingStone() {
   const target = specialSlingAttack.target;
   const player = mt.player;
-  if (!target || target.userData.hp <= 0 || !player) return;
+  if (!player) return;
+  const hasTarget = !!(
+    specialSlingAttack.targetLocked &&
+    target?.userData.hp > 0 &&
+    target.userData.type !== "bandit" &&
+    mt.enemies.includes(target)
+  );
+  player.userData.releaseSpecialSlingAnimation?.();
   const origin = new t.Vector3();
   if (specialSlingAttack.heldStone)
     specialSlingAttack.heldStone.getWorldPosition(origin);
   else origin.copy(player.position).add(new t.Vector3(0, 78, 0));
-  const targetPoint = target.position.clone().add(new t.Vector3(0, 28, 0));
-  const direction = targetPoint.sub(origin).normalize();
+  const direction = hasTarget
+    ? target.position
+        .clone()
+        .add(new t.Vector3(0, 28, 0))
+        .sub(origin)
+        .normalize()
+    : specialSlingAttack.aimDirection.clone().normalize();
+  if (direction.lengthSq() < 0.001)
+    direction.set(Math.sin(player.rotation.y), 0, Math.cos(player.rotation.y));
   const stone = new t.Mesh(
     new t.DodecahedronGeometry("큰 돌" === ut.quality ? 7 : 5.5, 1),
     new t.MeshStandardMaterial({
@@ -8311,11 +8347,13 @@ function launchSpecialSlingStone() {
   stone.castShadow = true;
   stone.userData = {
     velocity: direction.multiplyScalar(1580),
-    life: 2.6,
-    damage: Math.max(180, (target.userData.maxHp || target.userData.hp) * 2),
+    life: hasTarget ? 2.6 : 4,
+    damage: hasTarget
+      ? Math.max(180, (target.userData.maxHp || target.userData.hp) * 2)
+      : 180,
     previous: origin.clone(),
     special: true,
-    specialTarget: target,
+    specialTarget: hasTarget ? target : null,
   };
   const trailGeometry = new t.BufferGeometry();
   const trailPositions = new Float32Array(30);
@@ -8377,22 +8415,44 @@ function finishSpecialSlingAttack() {
   if (!specialSlingAttack.active) return;
   specialSlingAttack.active = false;
   specialSlingAttack.target = null;
+  specialSlingAttack.targetLocked = false;
   specialSlingAttack.released = false;
   specialSlingAttack.projectile = null;
   mt.player?.userData.stopSpecialSlingAnimation?.();
   disposeSpecialSlingVisuals();
   const overlay = e("#specialAttackOverlay");
   overlay?.classList.remove("active", "release");
+  e("#specialAttackAnnouncement")?.classList.remove("show");
   if (r) {
     r.fov = specialSlingAttack.previousFov || F[A].fov;
     r.updateProjectionMatrix();
   }
 }
-function startSpecialSlingAttack(target, charge) {
+function startSpecialSlingAttack(target, charge, aimDirection) {
   const player = mt.player;
-  if (!player?.userData.specialSlingReady || !target) return false;
+  if (!player || !canTriggerSpecialSlingAttack()) return false;
+  const validTarget = !!(
+    target?.userData.hp > 0 &&
+    target.userData.type !== "bandit" &&
+    mt.enemies.includes(target)
+  );
+  const shotDirection = validTarget
+    ? target.position
+        .clone()
+        .add(new t.Vector3(0, 28, 0))
+        .sub(player.position)
+        .normalize()
+    : aimDirection?.clone?.().normalize() || new t.Vector3(0, 0, 1);
+  if (shotDirection.lengthSq() < 0.001)
+    shotDirection.set(
+      Math.sin(player.rotation.y),
+      0,
+      Math.cos(player.rotation.y),
+    );
   specialSlingAttack.active = true;
-  specialSlingAttack.target = target;
+  specialSlingAttack.target = validTarget ? target : null;
+  specialSlingAttack.targetLocked = validTarget;
+  specialSlingAttack.aimDirection.copy(shotDirection).normalize();
   specialSlingAttack.startedAt = performance.now();
   specialSlingAttack.charge = charge;
   specialSlingAttack.released = false;
@@ -8406,13 +8466,16 @@ function startSpecialSlingAttack(target, charge) {
     K[code] = false;
   e("#crosshair").style.display = "none";
   e("#charge").style.display = "none";
-  const direction = target.position.clone().sub(player.position);
+  const direction = validTarget
+    ? target.position.clone().sub(player.position)
+    : specialSlingAttack.aimDirection.clone();
   direction.y = 0;
   if (direction.lengthSq() > 0.001)
     player.rotation.y = Math.atan2(direction.x, direction.z);
   player.userData.playSpecialSlingAnimation?.();
   createSpecialSlingEnergy();
   e("#specialAttackOverlay")?.classList.add("active");
+  showSpecialAttackAnnouncement();
   playSpecialSlingChargeAudio();
   return true;
 }
@@ -8421,14 +8484,24 @@ function updateSpecialSlingAttack(delta, now) {
   const player = mt.player;
   let target = specialSlingAttack.target;
   if (!player) return finishSpecialSlingAttack();
-  if (!target || target.userData.hp <= 0 || !mt.enemies.includes(target)) {
+  if (
+    specialSlingAttack.targetLocked &&
+    (!target || target.userData.hp <= 0 || !mt.enemies.includes(target))
+  ) {
     target = findSpecialSlingAnimalTarget();
     specialSlingAttack.target = target;
-    if (!target) return finishSpecialSlingAttack();
+    specialSlingAttack.targetLocked = !!target;
   }
   const elapsed = now - specialSlingAttack.startedAt;
-  const targetPoint = target.position.clone().add(new t.Vector3(0, 30, 0));
-  const forward = target.position.clone().sub(player.position);
+  const targetPoint = target
+    ? target.position.clone().add(new t.Vector3(0, 30, 0))
+    : player.position
+        .clone()
+        .add(new t.Vector3(0, 78, 0))
+        .addScaledVector(specialSlingAttack.aimDirection, 900);
+  const forward = target
+    ? target.position.clone().sub(player.position)
+    : specialSlingAttack.aimDirection.clone();
   forward.y = 0;
   if (forward.lengthSq() < 0.001) forward.set(0, 0, 1);
   forward.normalize();
@@ -8454,30 +8527,56 @@ function updateSpecialSlingAttack(delta, now) {
     if (particles) particles.rotation.y += delta * 2.1;
   }
 
-  const frontCamera = player.position
+  const frontWideCamera = player.position
     .clone()
-    .addScaledVector(forward, 168)
-    .addScaledVector(right, -12)
-    .add(new t.Vector3(0, 98, 0));
+    .addScaledVector(forward, 222)
+    .addScaledVector(right, -16)
+    .add(new t.Vector3(0, 105, 0));
+  const frontCloseCamera = player.position
+    .clone()
+    .addScaledVector(forward, 118)
+    .addScaledVector(right, -8)
+    .add(new t.Vector3(0, 92, 0));
   const backCamera = player.position
     .clone()
-    .addScaledVector(forward, -184)
-    .addScaledVector(right, 26)
+    .addScaledVector(forward, -196)
+    .addScaledVector(right, 24)
     .add(new t.Vector3(0, 116, 0));
-  if (elapsed < 1240) {
-    const fadeIn = t.MathUtils.smoothstep(elapsed, 0, 360);
+  const chargeZoom = t.MathUtils.smoothstep(
+    elapsed,
+    340,
+    specialSlingAttack.cameraSwitchAt,
+  );
+  const chargingCamera = frontWideCamera
+    .clone()
+    .lerp(frontCloseCamera, chargeZoom);
+  if (elapsed < specialSlingAttack.cameraSwitchAt) {
+    const fadeIn = t.MathUtils.smoothstep(elapsed, 0, 430);
     r.position.lerpVectors(
       specialSlingAttack.cameraStart,
-      frontCamera,
+      chargingCamera,
       fadeIn,
     );
     r.lookAt(player.position.clone().add(new t.Vector3(0, 73, 0)));
-    r.fov = t.MathUtils.lerp(specialSlingAttack.previousFov, 43, fadeIn);
+    const chargingFov = t.MathUtils.lerp(49, 36, chargeZoom);
+    r.fov = t.MathUtils.lerp(
+      specialSlingAttack.previousFov,
+      chargingFov,
+      fadeIn,
+    );
   } else {
-    const switchAmount = t.MathUtils.smoothstep(elapsed, 1240, 1500);
-    r.position.lerpVectors(frontCamera, backCamera, switchAmount);
-    r.lookAt(targetPoint);
-    r.fov = t.MathUtils.lerp(43, 53, switchAmount);
+    const switchAmount = t.MathUtils.smoothstep(
+      elapsed,
+      specialSlingAttack.cameraSwitchAt,
+      specialSlingAttack.releaseAt,
+    );
+    r.position.lerpVectors(frontCloseCamera, backCamera, switchAmount);
+    const lookPoint = player.position
+      .clone()
+      .add(new t.Vector3(0, 73, 0))
+      .lerp(targetPoint, switchAmount);
+    r.lookAt(lookPoint);
+    r.fov = t.MathUtils.lerp(36, 53, switchAmount);
   }
   r.updateProjectionMatrix();
   r.updateMatrixWorld();
@@ -8796,19 +8895,19 @@ document.addEventListener(
             );
           ut.stones--,
             at.active && (at.shotsLeft = Math.max(0, at.shotsLeft - 1));
+          const e = new t.Vector3();
+          r.getWorldPosition(e);
+          const o = new t.Vector3();
+          r.getWorldDirection(o).normalize();
           const specialTarget = findSpecialSlingAnimalTarget();
           if (
-            specialTarget &&
-            Math.random() < 0.05 &&
-            startSpecialSlingAttack(specialTarget, T)
+            canTriggerSpecialSlingAttack() &&
+            Math.random() < SPECIAL_SLING_CHANCE &&
+            startSpecialSlingAttack(specialTarget, T, o)
           ) {
             $e();
             return;
           }
-          const e = new t.Vector3();
-          r.getWorldPosition(e);
-          const o = new t.Vector3();
-          r.getWorldDirection(o);
           const n = (0.024 + 0.035 * T) * (1 - 0.008 * ut.skill);
           (o.x += (Math.random() - 0.5) * n),
             (o.y += (Math.random() - 0.5) * n),
@@ -10537,6 +10636,12 @@ function _e(o, n) {
       for (const o of mt.projectiles) {
         const previousProjectilePosition = o.position.clone();
         if (
+          o.userData.specialTarget &&
+          (o.userData.specialTarget.userData.hp <= 0 ||
+            !mt.enemies.includes(o.userData.specialTarget))
+        )
+          o.userData.specialTarget = null;
+        if (
           o.userData.special &&
           o.userData.specialTarget?.userData.hp > 0
         ) {
@@ -10580,6 +10685,36 @@ function _e(o, n) {
             if (o.position.distanceTo(targetPoint) < 65 || o.userData.life <= 0) {
               o.position.copy(targetPoint);
               n = applySpecialSlingImpact(o, specialTarget);
+            }
+          }
+        }
+        if (o.userData.special && !o.userData.specialTarget) {
+          const travelled = o.position.clone().sub(previousProjectilePosition);
+          const travelledLengthSq = travelled.lengthSq();
+          for (const animal of mt.enemies) {
+            const animalPoint = animal.position
+              .clone()
+              .add(new t.Vector3(0, 28, 0));
+            const closestAmount = travelledLengthSq
+              ? t.MathUtils.clamp(
+                  animalPoint
+                    .clone()
+                    .sub(previousProjectilePosition)
+                    .dot(travelled) / travelledLengthSq,
+                  0,
+                  1,
+                )
+              : 0;
+            const closestPoint = previousProjectilePosition
+              .clone()
+              .addScaledVector(travelled, closestAmount);
+            if (
+              animal.userData.hp > 0 &&
+              animal.userData.type !== "bandit" &&
+              closestPoint.distanceTo(animalPoint) < 48
+            ) {
+              n = applySpecialSlingImpact(o, animal);
+              break;
             }
           }
         }
@@ -10640,7 +10775,7 @@ function _e(o, n) {
             }
           }
         }
-        if (!n && !o.userData.special) {
+        if (!n && (!o.userData.special || !o.userData.specialTarget)) {
           // Sample the whole travelled segment so fast stones cannot tunnel
           // through thin house fronts or walls between two frames.
           const segmentDistance = previousProjectilePosition.distanceTo(o.position);
@@ -10663,7 +10798,7 @@ function _e(o, n) {
         }
         const s = te(o.position.x, o.position.z);
         !n &&
-          !o.userData.special &&
+          (!o.userData.special || !o.userData.specialTarget) &&
           o.position.y < s &&
           ((o.position.y = s + 2),
           (o.userData.life = 0),
