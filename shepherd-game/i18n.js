@@ -261,13 +261,13 @@
     if (document.body) document.body.classList.toggle('lang-he', lang === 'he');
     const description = document.querySelector('meta[name="description"]');
     if (lang === 'he') {
-      document.title = 'שמור על הצאן · v2.3.4';
+      document.title = 'שמור על הצאן · v2.3.5';
       if (description) description.content = 'הרפתקת רועים תלת־ממדית למחשבים ולמכשירים ניידים, בירושלים העתיקה ובמדבר יהודה.';
     } else if (lang === 'ko') {
-      document.title = '양떼를 지켜라 · v2.3.4';
+      document.title = '양떼를 지켜라 · v2.3.5';
       if (description) description.content = '고대 예루샬라임과 유대 광야를 배경으로 양 떼를 지키는 데스크톱·모바일 3D 양치기 모험입니다.';
     } else {
-      document.title = 'Protect the Flock · v2.3.4';
+      document.title = 'Protect the Flock · v2.3.5';
       if (description) description.content = 'A cross-device 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness.';
     }
   }

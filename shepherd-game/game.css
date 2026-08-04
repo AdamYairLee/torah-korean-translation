@@ -487,19 +487,19 @@ body.mobile-device #mobileControls button,body.mobile-device #mobileJoystick{poi
   background:radial-gradient(circle at 35% 28%,rgba(230,230,224,.76),rgba(104,104,100,.86) 64%,rgba(56,56,54,.88));
   border:1px solid rgba(235,235,228,.35);box-shadow:inset 0 2px 3px rgba(255,255,255,.28),0 4px 7px rgba(0,0,0,.38);will-change:transform
 }
-.mobile-action-cluster{position:absolute;right:0;bottom:0;width:270px;height:235px;pointer-events:none}
+.mobile-action-cluster{position:absolute;right:0;bottom:0;width:270px;height:244px;pointer-events:none;isolation:isolate}
 .mobile-action-cluster .mobile-stone-button{pointer-events:auto}
-.mobile-attack-button{right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:clamp(86px,18vh,112px);height:clamp(86px,18vh,112px);opacity:.78;overflow:hidden}
+.mobile-attack-button{right:calc(env(safe-area-inset-right,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:2;width:clamp(84px,17vh,104px);height:clamp(84px,17vh,104px);opacity:.78;overflow:hidden}
 .mobile-attack-button .mobile-attack-icon{position:absolute;inset:15%;background-position:center;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 3px 2px #0009);pointer-events:none}
 .mobile-attack-button.sling .mobile-attack-icon{background-image:url("assets/ui/weapon-sling.svg")}
 .mobile-attack-button.staff .mobile-attack-icon{background-image:url("assets/ui/weapon-staff.svg")}
 #mobileChargeRing{position:absolute;inset:3px;border-radius:50%;background:conic-gradient(#efd074 calc(var(--charge,0)*1turn),rgba(29,28,26,.42) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 0);opacity:0;pointer-events:none}
 .mobile-attack-button.charging #mobileChargeRing{opacity:1}
-.mobile-weapon-button{right:calc(env(safe-area-inset-right,0px) + 26px);bottom:calc(env(safe-area-inset-bottom,0px) + 126px);width:74px;height:74px;flex-direction:column;gap:0}
+.mobile-weapon-button{right:calc(env(safe-area-inset-right,0px) + 20px);bottom:calc(env(safe-area-inset-bottom,0px) + 124px);z-index:4;width:68px;height:68px;flex-direction:column;gap:0}
 .mobile-weapon-icon{width:35px;height:35px;background-position:center;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 2px 2px #0009);pointer-events:none}
 .mobile-weapon-icon.sling{background-image:url("assets/ui/weapon-sling.svg")}.mobile-weapon-icon.staff{background-image:url("assets/ui/weapon-staff.svg")}
 .mobile-weapon-label{max-width:64px;font-size:10px;font-weight:900;line-height:1.05;text-align:center;pointer-events:none}
-.mobile-camera-button{right:calc(env(safe-area-inset-right,0px) + 108px);bottom:calc(env(safe-area-inset-bottom,0px) + 132px);width:66px;height:66px}
+.mobile-collect-button{right:calc(env(safe-area-inset-right,0px) + 106px);bottom:calc(env(safe-area-inset-bottom,0px) + 132px);z-index:3;width:66px;height:66px}
 .mobile-run-button{right:calc(env(safe-area-inset-right,0px) + 168px);bottom:calc(env(safe-area-inset-bottom,0px) + 82px);width:66px;height:66px}
 .mobile-call-button{right:calc(env(safe-area-inset-right,0px) + 172px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:66px;height:66px}
 

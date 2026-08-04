@@ -59,6 +59,7 @@ const e = (t) => document.querySelector(t),
     );
   })();
 document.body.classList.toggle("mobile-device", n);
+const IS_MOBILE_DEVICE = n;
 const MOBILE_MODEL_ASSETS = new Set([
   "animals/sheep_rigged_game.glb",
   "animals/lion_rigged_game.glb",
@@ -114,6 +115,7 @@ const mobileInput = {
   lookPointerId: null,
   lookX: 0,
   lookY: 0,
+  movementYaw: Math.PI,
 };
 let distributionAdPauseActive = false;
 let distributionWasPausedBeforeAd = false;
@@ -137,14 +139,18 @@ function updateOrientationGate() {
   }
 }
 async function requestLandscapeMode() {
-  if (!n) return;
+  if (!IS_MOBILE_DEVICE) return;
   try {
     if (!document.fullscreenElement)
       await document.documentElement.requestFullscreen?.({ navigationUI: "hide" });
   } catch {}
   try {
-    await screen.orientation?.lock?.("landscape");
-  } catch {}
+    await screen.orientation?.lock?.("landscape-primary");
+  } catch {
+    try {
+      await screen.orientation?.lock?.("landscape");
+    } catch {}
+  }
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   syncMobileViewport();
   updateOrientationGate();
@@ -157,6 +163,23 @@ document.addEventListener("fullscreenchange", updateOrientationGate);
 document.querySelectorAll("#languageGate [data-lang]").forEach((button) => {
   button.addEventListener("click", () => requestLandscapeMode(), { capture: true });
 });
+if (n) {
+  // Mobile browsers only permit fullscreen/orientation locking from a user
+  // gesture. Use the very first touch anywhere in the game, then repeat on the
+  // explicit start controls below so the lock survives browser UI changes.
+  document.addEventListener(
+    "pointerup",
+    () => requestLandscapeMode(),
+    { capture: true, once: true },
+  );
+  document
+    .querySelectorAll("#startBtn,#continueBtn,#playBtn,#davidCard")
+    .forEach((button) =>
+      button.addEventListener("click", () => requestLandscapeMode(), {
+        capture: true,
+      }),
+    );
+}
 const s = e("#minimap").getContext("2d"),
   a = e("#rendererHost");
 let i,
@@ -197,6 +220,9 @@ const performanceState = {
   distantFogDensity: 0.00046,
   cityStaticBatches: [],
   cityCitizenAccumulator: 0,
+  nextLightingAt: 0,
+  nextAmbientAudioAt: 0,
+  nextRegionUiAt: 0,
   minimapRoadCacheRevision: -1,
   minimapVisibleRoads: [],
 };
@@ -851,6 +877,7 @@ const STARTUP_LOADING_MESSAGES = Object.freeze({
     essential: "필수 캐릭터와 양떼를 준비하고 있습니다…",
     world: "유대 광야와 예루샬라임을 만들고 있습니다…",
     graphics: "휴대폰 그래픽을 준비하고 있습니다…",
+    finalizing: "양떼와 성 안의 길을 마지막으로 배치하고 있습니다…",
     ready: "준비가 끝났습니다.",
   },
   en: {
@@ -858,6 +885,7 @@ const STARTUP_LOADING_MESSAGES = Object.freeze({
     essential: "Preparing the flock and essential characters…",
     world: "Building the Judean wilderness and Jerusalem…",
     graphics: "Preparing mobile graphics…",
+    finalizing: "Finishing the flock and city routes…",
     ready: "Ready.",
   },
   he: {
@@ -865,6 +893,7 @@ const STARTUP_LOADING_MESSAGES = Object.freeze({
     essential: "מכין את הצאן ואת הדמויות החיוניות…",
     world: "בונה את מדבר יהודה ואת ירושלים…",
     graphics: "מכין את התצוגה לנייד…",
+    finalizing: "משלים את הצאן ואת דרכי העיר…",
     ready: "המשחק מוכן.",
   },
 });
@@ -995,7 +1024,7 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
   if (c && i && r) {
     try {
       if (typeof c.compileAsync === "function")
-        await settleWithin(c.compileAsync(i, r), n ? 5500 : 14000, "GPU shader warmup");
+        await settleWithin(c.compileAsync(i, r), IS_MOBILE_DEVICE ? 5500 : 14000, "GPU shader warmup");
       else c.compile(i, r);
     } catch (error) {
       console.warn("Startup shader warmup skipped:", error);
@@ -1013,10 +1042,35 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
       "First animation frame",
     );
   }
+  if (loadingBar) loadingBar.style.width = "97%";
+  if (loadingPercent) loadingPercent.textContent = "97%";
+  if (loadingStatus) loadingStatus.textContent = loadingMessage("finalizing");
+}
+
+async function revealPlayableGame(loadingScreen, loadingBar, loadingPercent, loadingStatus) {
+  // The simulation is allowed to render behind the opaque loading screen. Only
+  // after two complete frames have run do we expose the controls to the player.
+  // This includes the long first-frame work that previously looked like a hang.
+  S = true;
+  b = false;
+  l?.start();
+  l?.getDelta();
+  await settleWithin(
+    new Promise((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    ),
+    IS_MOBILE_DEVICE ? 4200 : 2600,
+    "Playable first frames",
+  );
+  try {
+    c?.render?.(i, r);
+  } catch (error) {
+    console.warn("Playable frame verification skipped:", error);
+  }
   if (loadingBar) loadingBar.style.width = "100%";
   if (loadingPercent) loadingPercent.textContent = "100%";
   if (loadingStatus) loadingStatus.textContent = loadingMessage("ready");
-  await new Promise((resolve) => setTimeout(resolve, 260));
+  await new Promise((resolve) => setTimeout(resolve, 220));
   loadingScreen?.classList.add("hidden");
 }
 
@@ -2615,37 +2669,38 @@ async function runGameStartup(e) {
           i.add(r),
           addEventListener("resize", Le),
           c.setAnimationLoop(Qe);
-      })(),
-    setLoadingStage(88, "graphics"),
-    await finishStartupWarmup(
-      loadingScreen,
-      loadingBar,
-      loadingPercent,
-      loadingStatus,
-    ),
-    Te(),
-    e && no(),
-    (S = !0),
-    (b = !1),
-    l?.start(),
-    l?.getDelta(),
-    scheduleDeferredMobileAssetWarmup(),
-    document.documentElement.requestFullscreen?.().catch(() => {}),
-    n || c.domElement.requestPointerLock?.(),
-    eo(
-      `다비드의 도시 · 성전산 · 키드론 골짜기 · 올리브산
+      })();
+
+  // All heavy synchronous world work stays behind the loading screen. This is
+  // the stage that used to run after the overlay disappeared on mobile.
+  setLoadingStage(90, "finalizing");
+  Te();
+  if (e) no();
+  try {
+    createSouthernJerusalemUpgrade();
+  } catch (error) {
+    console.error("예루샬라임 주택·골목 생성 실패:", error);
+  }
+  setLoadingStage(94, "graphics");
+  await finishStartupWarmup(
+    loadingScreen,
+    loadingBar,
+    loadingPercent,
+    loadingStatus,
+  );
+  await revealPlayableGame(
+    loadingScreen,
+    loadingBar,
+    loadingPercent,
+    loadingStatus,
+  );
+  scheduleDeferredMobileAssetWarmup();
+  requestLandscapeMode();
+  if (!n) c.domElement.requestPointerLock?.();
+  eo(
+    `다비드의 도시 · 성전산 · 키드론 골짜기 · 올리브산
 성문과 골목을 따라 성전산까지 올라갈 수 있습니다.`,
-    ),
-    // Build only the lightweight residential layer on the existing playable
-    // Jerusalem surface. Never load the incompatible integrated GLB here.
-    setTimeout(() => {
-      if (!S || southernJerusalemUpgrade.created) return;
-      try {
-        createSouthernJerusalemUpgrade();
-      } catch (error) {
-        console.error("예루샬라임 주택·골목 생성 실패:", error);
-      }
-    }, 250);
+  );
 }
 (Lt.wind.loop = !0), (Lt.birds.loop = !0), (Lt.night.loop = !0);
 const Ft = [
@@ -2660,7 +2715,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.4",
+  Wt = "2.3.5",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -4120,7 +4175,10 @@ function createSouthernJerusalemUpgrade() {
     const alongZ = Math.cos(direction);
     const outward = side % 2 === 0 ? house.depth / 2 + 1.2 : house.width / 2 + 1.2;
     const ground = house.ground;
-    doorDummy.position.set(house.x + alongX * outward, ground + 23, house.z + alongZ * outward);
+    house.doorX = house.x + alongX * outward;
+    house.doorZ = house.z + alongZ * outward;
+    house.doorDirection = direction;
+    doorDummy.position.set(house.doorX, ground + 23, house.doorZ);
     doorDummy.rotation.set(0, direction, 0);
     doorDummy.scale.set(18, 42, 3);
     doorDummy.updateMatrix();
@@ -7284,6 +7342,32 @@ const CITY_CITIZEN_MAIN_LOOP = [
   { x: 420, z: 1180, zone: "south-square" },
   { x: 500, z: 680, zone: "east-road" },
 ];
+const CITY_CITIZEN_ALLEY_LOOPS = [
+  [
+    { x: -700, z: 760 },
+    { x: -700, z: 1030 },
+    { x: -700, z: 1320 },
+    { x: -700, z: 1600 },
+    { x: -700, z: 1880 },
+    { x: -520, z: 1880 },
+    { x: -520, z: 1600 },
+    { x: -520, z: 1320 },
+    { x: -520, z: 1030 },
+    { x: -520, z: 760 },
+  ],
+  [
+    { x: 520, z: 760 },
+    { x: 520, z: 1030 },
+    { x: 520, z: 1320 },
+    { x: 520, z: 1600 },
+    { x: 520, z: 1880 },
+    { x: 700, z: 1880 },
+    { x: 700, z: 1600 },
+    { x: 700, z: 1320 },
+    { x: 700, z: 1030 },
+    { x: 700, z: 760 },
+  ],
+];
 const CITY_CITIZEN_SOUTH_SPUR = [
   { x: 0, z: 1510, zone: "south-road" },
   { x: 0, z: 1900, zone: "south-gate" },
@@ -7360,6 +7444,33 @@ function chooseCitizenMainRoadRoute(citizen, fleeing = false) {
   );
   citizen.userData.pathIndex = 0;
 }
+function chooseCitizenAlleyRoute(citizen) {
+  const loopIndex = Number.isInteger(citizen.userData.alleyLoopIndex)
+    ? citizen.userData.alleyLoopIndex
+    : Math.floor(Math.random() * CITY_CITIZEN_ALLEY_LOOPS.length);
+  const loop = CITY_CITIZEN_ALLEY_LOOPS[loopIndex];
+  citizen.userData.alleyLoopIndex = loopIndex;
+  let nearest = 0;
+  let nearestDistance = Infinity;
+  for (let index = 0; index < loop.length; index++) {
+    const distance = Math.hypot(
+      loop[index].x - citizen.position.x,
+      loop[index].z - citizen.position.z,
+    );
+    if (distance < nearestDistance) {
+      nearest = index;
+      nearestDistance = distance;
+    }
+  }
+  const direction = citizen.userData.mainRoadDirection || (Math.random() < 0.5 ? 1 : -1);
+  citizen.userData.mainRoadDirection = direction;
+  citizen.userData.path = [];
+  for (let step = 1; step <= loop.length + 2; step++) {
+    const index = (nearest + direction * step + loop.length * 3) % loop.length;
+    citizen.userData.path.push({ x: loop[index].x, z: loop[index].z });
+  }
+  citizen.userData.pathIndex = 0;
+}
 function addCityCitizen(kind, index, template) {
   if (!i || !dt) return;
   const profile = cityCitizenProfiles[kind];
@@ -7408,6 +7519,9 @@ function addCityCitizen(kind, index, template) {
     panicFor: 0,
     dangerRepathFor: 0,
     updateOffset: index * 0.025,
+    entryActive: false,
+    entryRole: "hidden",
+    alleyLoopIndex: index % CITY_CITIZEN_ALLEY_LOOPS.length,
   };
   const model = (kind === "boy1" || kind === "boy2" || kind === "girl1" || kind === "girl2")
     ? cloneSkinnedModel(template)
@@ -7441,9 +7555,7 @@ function addCityCitizen(kind, index, template) {
   }
   i.add(citizen);
   mt.cityCitizens.push(citizen);
-  chooseCitizenRoadTarget(citizen, false);
-  if (!citizen.userData.path.length)
-    chooseCitizenMainRoadRoute(citizen, false);
+  citizen.visible = false;
 }
 function removeDuplicateDavidCharacters() {
   if (!i || !mt.player) return;
@@ -7459,13 +7571,20 @@ function removeDuplicateDavidCharacters() {
 }
 function resetCityCitizensForEntry() {
   if (!mt.cityCitizens.length) return;
-  const offset = 0;
-  for (let citizenIndex = 0; citizenIndex < mt.cityCitizens.length; citizenIndex++) {
-    const citizen = mt.cityCitizens[citizenIndex];
-    const spawn = CITY_CITIZEN_MAIN_LOOP[
-      (offset + citizenIndex * 2) % CITY_CITIZEN_MAIN_LOOP.length
-    ];
-    citizen.position.set(spawn.x, te(spawn.x, spawn.z), spawn.z);
+  const citizens = [...mt.cityCitizens];
+  for (let index = citizens.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [citizens[index], citizens[swapIndex]] = [citizens[swapIndex], citizens[index]];
+  }
+  const houseCandidates = southernJerusalemUpgrade.houses
+    .filter((house) => {
+      if (!Number.isFinite(house.doorX) || !Number.isFinite(house.doorZ)) return false;
+      const road = closestPointOnCityRoad(house.doorX, house.doorZ);
+      return !!road && road.distance < road.width * 0.5 + 58;
+    })
+    .sort(() => Math.random() - 0.5);
+
+  const resetNavigation = (citizen) => {
     citizen.userData.lastSafePosition.copy(citizen.position);
     citizen.userData.progressPosition.copy(citizen.position);
     citizen.userData.path = [];
@@ -7480,10 +7599,63 @@ function resetCityCitizensForEntry() {
     citizen.userData.repathFor = 0;
     citizen.userData.panicFor = 0;
     citizen.userData.dangerRepathFor = 0;
-    citizen.userData.mainRoadDirection = citizenIndex % 2 ? -1 : 1;
-    chooseCitizenRoadTarget(citizen, false);
-    if (!citizen.userData.path.length)
-      chooseCitizenMainRoadRoute(citizen, false);
+    citizen.userData.attackedFleeFor = 0;
+    citizen.userData.fleeing = false;
+    citizen.userData.mainRoadDirection = Math.random() < 0.5 ? -1 : 1;
+  };
+  const place = (citizen, point, role, active = true) => {
+    citizen.userData.entryRole = role;
+    citizen.userData.entryActive = active;
+    citizen.visible = active;
+    if (!active) {
+      citizen.userData.path = [];
+      return;
+    }
+    citizen.position.set(point.x, te(point.x, point.z), point.z);
+    resetNavigation(citizen);
+  };
+
+  citizens.forEach((citizen) => place(citizen, citizen.position, "hidden", false));
+
+  const mainCitizen = citizens[0];
+  const mainSpawn = CITY_CITIZEN_MAIN_LOOP[
+    Math.floor(Math.random() * CITY_CITIZEN_MAIN_LOOP.length)
+  ];
+  place(mainCitizen, mainSpawn, "main-road");
+  chooseCitizenMainRoadRoute(mainCitizen, false);
+
+  const alleyCitizen = citizens[1];
+  if (!alleyCitizen) return;
+  const alleyLoopIndex = Math.floor(Math.random() * CITY_CITIZEN_ALLEY_LOOPS.length);
+  const alleyLoop = CITY_CITIZEN_ALLEY_LOOPS[alleyLoopIndex];
+  const alleySpawn = alleyLoop[Math.floor(Math.random() * alleyLoop.length)];
+  place(alleyCitizen, alleySpawn, "alley");
+  alleyCitizen.userData.alleyLoopIndex = alleyLoopIndex;
+  chooseCitizenAlleyRoute(alleyCitizen);
+
+  for (let optionalIndex = 2; optionalIndex < Math.min(4, citizens.length); optionalIndex++) {
+    const citizen = citizens[optionalIndex];
+    const appears = Math.random() < 0.58;
+    const house = houseCandidates.shift();
+    if (!appears || !house) continue;
+    const direction = Number(house.doorDirection) || 0;
+    const outside = {
+      x: house.doorX + Math.sin(direction) * 30,
+      z: house.doorZ + Math.cos(direction) * 30,
+    };
+    const roadExit = nearestClearCityRoadPoint(outside.x, outside.z, 22);
+    const blocked = jt(
+      new t.Vector3(outside.x, te(outside.x, outside.z) + 5, outside.z),
+      citizen.userData.collisionRadius || 14,
+    );
+    const spawn = blocked && roadExit ? roadExit : outside;
+    place(citizen, spawn, "house");
+    citizen.userData.alleyLoopIndex = Math.floor(
+      Math.random() * CITY_CITIZEN_ALLEY_LOOPS.length,
+    );
+    if (roadExit && Math.hypot(roadExit.x - spawn.x, roadExit.z - spawn.z) > 8)
+      citizen.userData.path = [{ x: roadExit.x, z: roadExit.z }];
+    else chooseCitizenAlleyRoute(citizen);
   }
 }
 async function loadCityCitizenWithRetry(loader, attempts = 3) {
@@ -7531,20 +7703,34 @@ function ensureCityCitizens() {
     // Do not relocate already-visible citizens when one independently retried
     // asset finishes loading. That late whole-group reset was perceived as a
     // blink/alternation. Only the first complete creation receives start slots.
-    if (!hadCitizens) resetCityCitizensForEntry();
+    if (!hadCitizens) {
+      const playerInside = !!mt.player && Yt(mt.player.position.x, mt.player.position.z, -55);
+      if (playerInside) resetCityCitizensForEntry();
+      else mt.cityCitizens.forEach((citizen) => {
+        citizen.userData.entryActive = false;
+        citizen.userData.entryRole = "hidden";
+        citizen.visible = false;
+      });
+    }
   });
 }
 function planCityCitizenRoute(citizen, fleeing) {
   citizen.userData.path = [];
   citizen.userData.pathIndex = 0;
-  chooseCitizenRoadTarget(citizen, fleeing);
-  if (!citizen.userData.path.length)
-    chooseCitizenMainRoadRoute(citizen, fleeing);
+  if (fleeing) {
+    chooseCitizenRoadTarget(citizen, true);
+    if (!citizen.userData.path.length)
+      chooseCitizenMainRoadRoute(citizen, true);
+  } else if (citizen.userData.entryRole === "main-road") {
+    chooseCitizenMainRoadRoute(citizen, false);
+  } else {
+    chooseCitizenAlleyRoute(citizen);
+  }
   citizen.userData.repathFor = fleeing ? 1.25 : 4.2;
 }
 function isCityCitizenCrowdedAt(citizen, x, z) {
   for (const other of mt.cityCitizens) {
-    if (other === citizen || !other?.parent) continue;
+    if (other === citizen || !other?.parent || !other.userData.entryActive) continue;
     const minimum =
       (citizen.userData.collisionRadius || 12) +
       (other.userData.collisionRadius || 12) +
@@ -7590,7 +7776,7 @@ function beginCityBanditEmergency() {
   cityBanditEmergencyActive = true;
   suspendGuardForCityBandits();
   for (const citizen of mt.cityCitizens) {
-    if (!citizen?.parent) continue;
+    if (!citizen?.parent || !citizen.userData.entryActive) continue;
     citizen.userData.fleeing = true;
     citizen.userData.panicFor = 1.35;
     citizen.userData.dangerRepathFor = 0.7;
@@ -7601,7 +7787,11 @@ function beginCityBanditEmergency() {
 function endCityBanditEmergency() {
   cityBanditEmergencyActive = false;
   for (const citizen of mt.cityCitizens) {
-    if (!citizen?.parent || citizen.userData.attackedFleeFor > 0) continue;
+    if (
+      !citizen?.parent ||
+      !citizen.userData.entryActive ||
+      citizen.userData.attackedFleeFor > 0
+    ) continue;
     citizen.userData.fleeing = false;
     citizen.userData.panicFor = 0;
     citizen.userData.path = [];
@@ -7610,13 +7800,24 @@ function endCityBanditEmergency() {
   }
 }
 function updateCityCitizens(delta) {
-  if (mt.cityCitizens.length < 4 && !mt.cityCitizensLoading) ensureCityCitizens();
   const playerInside = !!mt.player &&
     Yt(mt.player.position.x, mt.player.position.z, -55);
+  const playerNearCity = !!mt.player &&
+    Yt(mt.player.position.x, mt.player.position.z, 320);
+  if (playerNearCity && mt.cityCitizens.length < 4 && !mt.cityCitizensLoading)
+    ensureCityCitizens();
   if (playerInside && !citizensPlayerWasInsideJerusalem) {
     removeDuplicateDavidCharacters();
+    resetCityCitizensForEntry();
   }
   citizensPlayerWasInsideJerusalem = playerInside;
+  if (!playerNearCity) {
+    mt.cityCitizens.forEach((citizen) => {
+      citizen.visible = false;
+    });
+    performanceState.cityCitizenAccumulator = 0;
+    return;
+  }
   const activeBandits = getActiveCityBandits();
   const banditActive = activeBandits.length > 0;
   if (banditActive && !cityBanditEmergencyActive)
@@ -7625,27 +7826,30 @@ function updateCityCitizens(delta) {
     suspendGuardForCityBandits();
   else if (cityBanditEmergencyActive)
     endCityBanditEmergency();
-  // Four collision/path agents do not need to query the dense city collider
-  // grid at monitor refresh rate. 30 Hz is smooth nearby; 8 Hz is sufficient
-  // while David is outside, with actual elapsed time preserved for movement.
+  // Only the citizens selected for this entry are simulated. Mobile uses a
+  // stable 24 Hz city-agent step; the renderer still interpolates their motion.
   performanceState.cityCitizenAccumulator += delta;
-  const citizenInterval = playerInside ? 1 / 30 : 1 / 8;
+  const citizenInterval = playerInside
+    ? IS_MOBILE_DEVICE
+      ? 1 / 24
+      : 1 / 30
+    : 1 / 10;
   if (performanceState.cityCitizenAccumulator < citizenInterval) return;
   const stepDelta = Math.min(0.13, performanceState.cityCitizenAccumulator);
   performanceState.cityCitizenAccumulator = 0;
   for (const citizen of mt.cityCitizens) {
-    if (!citizen.parent) continue;
+    if (!citizen.parent || !citizen.userData.entryActive) {
+      citizen.visible = false;
+      continue;
+    }
     const playerDistance = mt.player
       ? Math.hypot(
         mt.player.position.x - citizen.position.x,
         mt.player.position.z - citizen.position.z,
       )
       : Infinity;
-    // When David is inside, all four named citizens remain instantiated and
-    // visible together. Fog/frustum handles distance without deleting one.
     const visible = playerInside || playerDistance < 1100;
-    if (citizen.userData.importedModel)
-      citizen.userData.importedModel.visible = visible;
+    citizen.visible = visible;
     citizen.userData.repathFor -= stepDelta;
     citizen.userData.dangerRepathFor = Math.max(
       0,
@@ -7765,7 +7969,8 @@ function updateCityCitizens(delta) {
   }
 }
 function hitCityCitizen(citizen) {
-  if (!citizen?.parent) return false;
+  if (!citizen?.parent || !citizen.userData.entryActive || !citizen.visible)
+    return false;
   const banditEmergency = getActiveCityBandits().length > 0;
   setGuardAlerted(!banditEmergency);
   const guard = mt.southGateGuard;
@@ -7844,7 +8049,8 @@ function Te() {
     Z.set(-1150, 0, 1050),
     ($ = 1),
     ce(),
-    (A = 0),
+    (A = IS_MOBILE_DEVICE ? 3 : 0),
+    IS_MOBILE_DEVICE && (I = -Math.PI / 4),
     (L = "sling"),
     (C = !1),
     Re(),
@@ -7873,6 +8079,11 @@ function Te() {
       return _t(qt.x, qt.z);
     })();
   Jt(n.x, n.z), (o.rotation.y = Math.atan2(-o.position.x, -o.position.z));
+  if (IS_MOBILE_DEVICE) {
+    B = o.rotation.y;
+    I = -Math.PI / 4;
+    mobileInput.movementYaw = B;
+  }
   for (let t = 0; t < 10; t++) {
     const e = Se(t),
       o = mt.player.position.x - 80 + (t % 4) * 55,
@@ -8886,6 +9097,7 @@ document.addEventListener(
         "KeyV" !== t.code ||
           !S ||
           b ||
+          n ||
           specialSlingAttack.active ||
           t.repeat ||
           ((A = (A + 1) % F.length), Be(F[A].name)),
@@ -9030,6 +9242,7 @@ document.addEventListener(
                 (hitSouthGateGuard(), (s = !0), triggerCombatFeedback("hit"));
             }
             for (const citizen of mt.cityCitizens) {
+              if (!citizen.userData.entryActive || !citizen.visible) continue;
               const offset = citizen.position.clone().sub(o.position);
               offset.y = 0;
               const citizenDistance = offset.length();
@@ -9296,7 +9509,7 @@ function updateMobileCharge(value = 0) {
   button.classList.toggle("charging", charge > 0 || P);
 }
 function dispatchMobileKey(code, type = "keydown") {
-  const keyByCode = { Tab: "Tab", KeyV: "v", Space: " ", KeyZ: "z" };
+  const keyByCode = { Tab: "Tab", KeyE: "e", Space: " ", KeyZ: "z" };
   document.dispatchEvent(
     new KeyboardEvent(type, {
       code,
@@ -9321,7 +9534,7 @@ function setupMobileControls() {
     knob = e("#mobileJoystickKnob"),
     pauseButton = e("#mobilePauseBtn"),
     weaponButton = e("#mobileWeaponBtn"),
-    cameraButton = e("#mobileCameraBtn"),
+    collectButton = e("#mobileCollectBtn"),
     runButton = e("#mobileRunBtn"),
     callButton = e("#mobileCallBtn"),
     attackButton = e("#mobileAttackBtn");
@@ -9358,6 +9571,7 @@ function setupMobileControls() {
     event.preventDefault();
     event.stopPropagation();
     mobileInput.joystickPointerId = event.pointerId;
+    mobileInput.movementYaw = B;
     joystick.setPointerCapture?.(event.pointerId);
     updateJoystick(event);
   });
@@ -9371,38 +9585,6 @@ function setupMobileControls() {
   joystick.addEventListener("pointercancel", finishJoystick);
   joystick.addEventListener("lostpointercapture", finishJoystick);
 
-  a.addEventListener("pointerdown", (event) => {
-    if (!S || b || specialSlingAttack.active || mobileInput.lookPointerId !== null)
-      return;
-    mobileInput.lookPointerId = event.pointerId;
-    mobileInput.lookX = event.clientX;
-    mobileInput.lookY = event.clientY;
-    a.setPointerCapture?.(event.pointerId);
-  });
-  a.addEventListener("pointermove", (event) => {
-    if (
-      mobileInput.lookPointerId !== event.pointerId ||
-      !S ||
-      b ||
-      specialSlingAttack.active
-    )
-      return;
-    const dx = event.clientX - mobileInput.lookX;
-    const dy = event.clientY - mobileInput.lookY;
-    mobileInput.lookX = event.clientX;
-    mobileInput.lookY = event.clientY;
-    B -= dx * 0.0062;
-    I -= dy * 0.0028;
-    I = t.MathUtils.clamp(I, -1.3, 1.1);
-  });
-  const finishLook = (event) => {
-    if (mobileInput.lookPointerId === event.pointerId)
-      mobileInput.lookPointerId = null;
-  };
-  a.addEventListener("pointerup", finishLook);
-  a.addEventListener("pointercancel", finishLook);
-  a.addEventListener("lostpointercapture", finishLook);
-
   pauseButton?.addEventListener("click", (event) => {
     event.preventDefault();
     if (S && !b) Ie();
@@ -9413,11 +9595,11 @@ function setupMobileControls() {
     dispatchMobileKey("Tab");
     dispatchMobileKey("Tab", "keyup");
   });
-  cameraButton?.addEventListener("click", (event) => {
+  collectButton?.addEventListener("click", (event) => {
     event.preventDefault();
     if (!S || b || specialSlingAttack.active) return;
-    dispatchMobileKey("KeyV");
-    dispatchMobileKey("KeyV", "keyup");
+    dispatchMobileKey("KeyE");
+    dispatchMobileKey("KeyE", "keyup");
   });
   callButton?.addEventListener("click", (event) => {
     event.preventDefault();
@@ -9882,6 +10064,13 @@ function _e(o, n) {
       if (phaseLabel)
         phaseLabel.textContent =
           window.ShepherdI18n?.tr?.(a.name) || a.name;
+      const lightingNow = n * 1000;
+      if (
+        document.body.classList.contains("mobile-device") &&
+        lightingNow < performanceState.nextLightingAt
+      ) return;
+      performanceState.nextLightingAt =
+        lightingNow + (document.body.classList.contains("mobile-device") ? 100 : 0);
       const l = Math.max(
           0,
           Math.sin(Math.PI * t.MathUtils.clamp((s - 0.03) / 0.76, 0, 1)),
@@ -10069,10 +10258,16 @@ function _e(o, n) {
             setTimeout(() => Ut(3150, 0.03, 0.009, "square", 80), 75),
             (g = n + 0.8 + 2.4 * Math.random())));
     })(o, n),
-    It(),
+    frameNow >= performanceState.nextAmbientAudioAt &&
+      ((performanceState.nextAmbientAudioAt =
+        frameNow + (IS_MOBILE_DEVICE ? 500 : 220)),
+      It()),
     (function () {
       const t = mt.player?.position;
       if (!t) return;
+      if (frameNow < performanceState.nextRegionUiAt) return;
+      performanceState.nextRegionUiAt =
+        frameNow + (IS_MOBILE_DEVICE ? 260 : 120);
       const o = Ht(Ft[0], t.x, t.z, -70) < 1,
         n = e("#jerusalemLandmark");
       n && n.classList.toggle("show", o),
@@ -10184,8 +10379,9 @@ function _e(o, n) {
           -1,
           1,
         ),
-        a = new t.Vector3(Math.sin(B), 0, Math.cos(B)).normalize(),
-        i = new t.Vector3(-Math.cos(B), 0, Math.sin(B)).normalize(),
+        movementYaw = IS_MOBILE_DEVICE && mobileInput.active ? mobileInput.movementYaw : B,
+        a = new t.Vector3(Math.sin(movementYaw), 0, Math.cos(movementYaw)).normalize(),
+        i = new t.Vector3(-Math.cos(movementYaw), 0, Math.sin(movementYaw)).normalize(),
         c = (o.position.clone(), new t.Vector3());
       const running = !!K.Space || mobileInput.running;
       const movementMagnitude = mobileInput.active
@@ -10357,10 +10553,20 @@ function _e(o, n) {
         (o.position.z = t.MathUtils.clamp(o.position.z, -3720, 3720)),
         o.userData.lastSafePosition?.copy(o.position),
         o.position.x > 3300 && (o.position.x = 3300);
+      if (IS_MOBILE_DEVICE) {
+        A = 3;
+        I = t.MathUtils.lerp(I, -Math.PI / 4, Math.min(1, 7 * e));
+        if (hasMovementInput) {
+          const cameraTurn =
+            t.MathUtils.euclideanModulo(o.rotation.y - B + Math.PI, 2 * Math.PI) -
+            Math.PI;
+          B += cameraTurn * Math.min(1, 6.5 * e);
+        }
+      }
       const d = F[A],
-        p = G ? 92 : d.distance,
-        u = G ? 78 : d.height,
-        m = G ? 43 : d.fov,
+        p = G && !IS_MOBILE_DEVICE ? 92 : IS_MOBILE_DEVICE ? 340 : d.distance,
+        u = G && !IS_MOBILE_DEVICE ? 78 : IS_MOBILE_DEVICE ? 340 : d.height,
+        m = G && !IS_MOBILE_DEVICE ? 43 : IS_MOBILE_DEVICE ? 59 : d.fov,
         f = 1 - Math.pow(0.0015, e);
       (R = t.MathUtils.lerp(R, p, f)),
         (V = t.MathUtils.lerp(V, u, f)),
@@ -10370,19 +10576,29 @@ function _e(o, n) {
         M = Math.sin(I),
         y = new t.Vector3(Math.sin(B) * w, M, Math.cos(B) * w).normalize(),
         x = new t.Vector3(o.position.x, o.position.y + 58, o.position.z),
-        g = G ? i.clone().multiplyScalar(20) : new t.Vector3();
+        g = G && !IS_MOBILE_DEVICE ? i.clone().multiplyScalar(20) : new t.Vector3();
       x.add(g);
-      const v = !G && F[A].firstPerson,
+      const mobileFollowView = IS_MOBILE_DEVICE,
+        v = !mobileFollowView && !G && F[A].firstPerson,
         z = new t.Vector3(
           o.position.x,
           o.position.y + (v ? 74 : G ? 55 : 68),
           o.position.z,
         ).add(g);
       let D;
-      v
-        ? (D = z.clone().addScaledVector(y, 9))
-        : ((D = z.clone().addScaledVector(y, -R)),
-          (D.y += G ? 8 : 3 === A ? 34 : 24));
+      if (mobileFollowView) {
+        const flatForward = new t.Vector3(Math.sin(B), 0, Math.cos(B));
+        D = new t.Vector3(
+          o.position.x - flatForward.x * R,
+          o.position.y + V,
+          o.position.z - flatForward.z * R,
+        );
+      } else if (v) {
+        D = z.clone().addScaledVector(y, 9);
+      } else {
+        D = z.clone().addScaledVector(y, -R);
+        D.y += G ? 8 : 3 === A ? 34 : 24;
+      }
       const S = te(D.x, D.z) + 18;
       D.y < S && (D.y = S),
         [o.position.x, o.position.y, o.position.z, D.x, D.y, D.z].every(
@@ -10393,7 +10609,13 @@ function _e(o, n) {
           (o.userData.grounded = !0),
           D.set(o.position.x, o.position.y + V, o.position.z + R)),
         r.position.lerp(D, f);
-      const b = z.clone().addScaledVector(y, 520);
+      const b = mobileFollowView
+        ? new t.Vector3(
+            o.position.x + Math.sin(B) * 150,
+            o.position.y + 58,
+            o.position.z + Math.cos(B) * 150,
+          )
+        : z.clone().addScaledVector(y, 520);
       if (
         (r.lookAt(b),
         (() => {
@@ -10407,10 +10629,10 @@ function _e(o, n) {
           r.lookAt(b);
         })(),
         r.updateMatrixWorld(),
-        (o.visible = !(G || (!G && F[A].firstPerson))),
+        (o.visible = mobileFollowView || !(G || (!G && F[A].firstPerson))),
         mt.aimRig)
       ) {
-        mt.aimRig.visible = G;
+        mt.aimRig.visible = G && !mobileFollowView;
         const t = mt.aimRig.userData.sling;
         const shoulder = mt.aimRig.userData.rightShoulder;
         const elbow = mt.aimRig.userData.rightElbow;
@@ -11231,6 +11453,7 @@ function _e(o, n) {
         }
         if (!n && !o.userData.special) {
           for (const citizen of mt.cityCitizens) {
+            if (!citizen.userData.entryActive || !citizen.visible) continue;
             const target = citizen.position.clone().add(
               new t.Vector3(0, citizen.userData.bodyHeight * 0.52, 0),
             );
@@ -12066,9 +12289,11 @@ function no() {
     ut.thirstFailed = !1;
     ut.flockLost = !1;
     L = ["sling", "staff"].includes(saved.weapon) ? saved.weapon : "sling";
-    A = Number.isInteger(saved.cameraMode)
-      ? t.MathUtils.clamp(saved.cameraMode, 0, 3)
-      : 0;
+    A = IS_MOBILE_DEVICE
+      ? 3
+      : Number.isInteger(saved.cameraMode)
+        ? t.MathUtils.clamp(saved.cameraMode, 0, 3)
+        : 0;
     $ = t.MathUtils.clamp(Math.floor(savedNumber(saved.missionCycle, 1)), 1, 1e6);
     if (saved.goal && Number.isFinite(Number(saved.goal.x)) && Number.isFinite(Number(saved.goal.z))) {
       Z.set(Number(saved.goal.x), 0, Number(saved.goal.z));
@@ -12085,6 +12310,11 @@ function no() {
     if (saved.view) {
       if (Number.isFinite(Number(saved.view.yaw))) B = Number(saved.view.yaw);
       if (Number.isFinite(Number(saved.view.pitch))) I = t.MathUtils.clamp(Number(saved.view.pitch), -1.25, 0.62);
+    }
+    if (IS_MOBILE_DEVICE) {
+      I = -Math.PI / 4;
+      B = Number.isFinite(Number(player.rotationY)) ? Number(player.rotationY) : B;
+      mobileInput.movementYaw = B;
     }
     restoreSavedSheep(saved.sheep, placedPlayer);
     if (saved.route && typeof saved.route === "object") {
