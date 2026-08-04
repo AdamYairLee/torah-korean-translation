@@ -52,7 +52,7 @@
 .weapon-icon.staff:after{left:31px;top:0;width:15px;height:12px;border-radius:50%;background:#8c6037;transform:rotate(9deg)}
 
 
-/* v0.6.0: shepherd-life HUD, keyboard navigation and improved visual readability */
+/* Shepherd-life HUD, keyboard navigation and improved visual readability. */
 #thirstHud{
   display:none;position:absolute;left:20px;top:20px;min-width:245px;
   padding:10px 12px;background:#1d1812c4;border:1px solid #b79a6a;border-radius:8px;
@@ -179,13 +179,7 @@
 
 .alpha-badge{display:inline-block;margin:4px 0 8px;padding:6px 12px;border:1px solid #efd79a;background:#5f3f20cc;color:#ffe9ad;border-radius:999px;font-size:14px;font-weight:800;letter-spacing:.04em}.alpha-note{max-width:580px;margin:0 auto 24px;color:#f6ecd7;font-size:14px;line-height:1.6;text-shadow:0 2px 5px #000}.rights{margin:20px auto 0;max-width:620px;color:#d9cdb4;font-size:11px;line-height:1.55;opacity:.9}.title-wrap{max-width:760px}.title-wrap .subtitle{margin-bottom:14px}
 
-/* v0.2 multilingual UI */
-
-/* Persistent Korean/Hebrew language selector */
-.language-switch{position:fixed;top:12px;right:12px;z-index:10050;display:flex;gap:4px;padding:5px;background:rgba(24,18,13,.88);border:1px solid rgba(232,208,158,.55);border-radius:8px;box-shadow:0 3px 12px rgba(0,0,0,.35)}
-.language-switch button{min-width:62px;padding:7px 10px;margin:0;border:1px solid rgba(232,208,158,.4);border-radius:6px;background:#403226;color:#f5e9cc;font:600 13px/1.2 Arial,sans-serif;cursor:pointer}
-.language-switch button.active{background:#d5b56c;color:#21180f;border-color:#f2d88f}
-html[dir="rtl"] .language-switch{right:auto;left:12px}
+/* Multilingual RTL layout. */
 html[dir="rtl"] .stone-panel,html[dir="rtl"] .title-wrap,html[dir="rtl"] #notice,html[dir="rtl"] #dangerNotice,html[dir="rtl"] #missionResult{text-align:right}
 html[dir="rtl"] #hud,html[dir="rtl"] #minimap,html[dir="rtl"] #crosshair,html[dir="rtl"] #charge{direction:ltr}
 html[dir="rtl"] #mission,html[dir="rtl"] #help,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconnectHint,html[dir="rtl"] #worldRegionLabel{direction:rtl;text-align:right}
@@ -211,6 +205,8 @@ html[dir="rtl"] .console input{direction:rtl;text-align:right}
 html[dir="rtl"] #mission,html[dir="rtl"] #fullscreenHint,html[dir="rtl"] #reconnectHint{width:max-content;max-width:85vw;text-align:center}
 #guardAlertIndicator{position:absolute;top:calc(100% + 7px);left:50%;z-index:2;color:#fff;font-family:Arial,sans-serif;font-size:45px;line-height:1;opacity:0;transform:translateX(-50%) scale(.65);pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.86);transition:opacity 120ms ease,transform 160ms ease}#guardAlertIndicator.show{opacity:1;transform:translateX(-50%) scale(1)}
 .guard-caught{position:absolute;inset:0;z-index:45;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(92,92,92,.3);backdrop-filter:grayscale(1) blur(3px);animation:guardCaughtFade .22s ease-out}.guard-caught.hidden{display:none}.guard-caught div{direction:rtl;color:#fff;font-size:clamp(52px,8vw,112px);font-weight:1000;letter-spacing:.01em;text-align:center;-webkit-text-stroke:9px #fff;paint-order:stroke fill;filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 3px #000);text-shadow:-4px -4px 0 #050505,4px -4px 0 #050505,-4px 4px 0 #050505,4px 4px 0 #050505,0 0 0 #fff}@keyframes guardCaughtFade{from{opacity:0;filter:blur(7px)}to{opacity:1;filter:blur(0)}}
+.guard-caught div{direction:ltr}
+html[dir="rtl"] .guard-caught div{direction:rtl}
 .loading-screen{position:fixed;inset:0;z-index:1000;background:#020202;color:#f4ead2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}.loading-screen.hidden{display:none}.loading-screen h2{margin:0;font-size:20px;letter-spacing:.02em}.loading-sheep{font-size:78px;transform-origin:50% 55%;animation:loadingSheepTurn 2.2s linear infinite;filter:drop-shadow(0 7px 8px #000)}.loading-track{width:min(430px,70vw);height:14px;border:1px solid #b99a63;border-radius:999px;background:#241e16;overflow:hidden}.loading-track i{display:block;width:0;height:100%;background:linear-gradient(90deg,#85612f,#f1d487);transition:width .25s ease}.loading-screen>span{font-size:13px;color:#cdbd9d}@keyframes loadingSheepTurn{0%{transform:rotateY(0) rotate(0)}50%{transform:rotateY(180deg) rotate(5deg)}100%{transform:rotateY(360deg) rotate(0)}}
 
 /* v2.1.39 — supplied-equipment 2D art and parchment scroll minimap. */
@@ -372,3 +368,34 @@ html[dir="rtl"] #weaponHud{
 html[dir="rtl"] .pause-language-switch{
   direction:rtl;
 }
+html.i18n-pending body{visibility:hidden}
+body.language-unselected>:not(#languageGate):not(script){visibility:hidden}
+
+.language-gate{
+  position:fixed;
+  inset:0;
+  z-index:12000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(115,83,48,.32),transparent 42%),
+    linear-gradient(rgba(20,15,11,.9),rgba(9,7,5,.97));
+}
+.language-gate.hidden{display:none}
+.language-gate .stone-panel{
+  width:min(520px,92vw);
+  text-align:center;
+  color:#f5ead2;
+  border-color:#9a7f58;
+  background:
+    radial-gradient(ellipse at 45% 32%,rgba(255,246,216,.12),transparent 55%),
+    linear-gradient(145deg,#4e4334,#2c251d 72%);
+}
+.language-gate h1{margin:0 0 12px;font-size:clamp(36px,6vw,68px)}
+.language-gate h2{margin:0 0 10px;font-size:clamp(22px,3vw,32px)}
+.language-gate p{margin:0 0 22px;color:#e6d9bd}
+.language-gate-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.language-gate-buttons button{min-height:48px;margin:0}
+@media (max-width:600px){.language-gate-buttons{grid-template-columns:1fr}}

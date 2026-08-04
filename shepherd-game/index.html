@@ -1,42 +1,53 @@
 <!doctype html>
-<html lang="ko" dir="ltr">
+<html lang="en" dir="ltr" class="i18n-pending">
   <head>
     <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>양떼를 지켜라 · 공개 알파 데모 v0.6</title>
-    <link rel="canonical" href="https://jewishkorean.com/shepherd-game/" />
+    <title>Protect the Flock · v1.0</title>
     <meta
       name="description"
-      content="고대 예루샬라임과 유대 광야를 배경으로 양떼를 지키는 데스크톱 3D 공개 알파 게임입니다."
+      content="A desktop 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness."
     />
-    <link rel="stylesheet" href="game.css?v=2.1.43" />
+    <!-- Paste the 32-character GameDistribution gameId into content before submission. -->
+    <meta name="gd-game-id" content="" />
+    <link rel="stylesheet" href="game.css?v=2.2.0" />
   </head>
   <body>
+    <div id="languageGate" class="overlay language-gate">
+      <div class="stone-panel">
+        <h1>Protect the Flock</h1>
+        <h2>Select Language</h2>
+        <p>Choose the language to use throughout the game.</p>
+        <div class="language-gate-buttons">
+          <button type="button" data-lang="en" class="primary">English</button>
+          <button type="button" data-lang="ko">Korean</button>
+          <button type="button" data-lang="he">Hebrew</button>
+        </div>
+      </div>
+    </div>
     <div id="mobileBlock" class="overlay hidden">
       <div class="stone-panel">
         <h1>양떼를 지켜라</h1>
         <p>
           <span>이 게임은 데스크탑 환경에 맞게 제작되었습니다.</span><br /><span>더 넓은 화면과 키보드·마우스로 플레이해 주세요.</span>
         </p>
-        <a href="../index.html">토라웹으로 돌아가기</a>
       </div>
     </div>
     <div id="titleScreen" class="screen active">
       <div class="title-bg"></div>
       <div class="title-wrap">
         <h1 class="stone-title">양떼를 지켜라</h1>
-        <p class="alpha-badge">개발 중 공개 알파 데모</p>
-        <p class="subtitle">고대 예루샬라임과 광야 3D 액션 · v0.6 Alpha</p>
+        <p class="alpha-badge">v1.0</p>
+        <p class="subtitle">고대 예루샬라임과 유대 광야의 3D 양치기 모험</p>
         <p class="alpha-note">
-          <span>이 버전은 게임의 핵심 콘셉트와 플레이 방식을 소개하기 위한 공개 개발판입니다.</span><br /><span>일부 지형, 충돌, 인공지능 동작과 그래픽은 계속 변경될 수 있습니다.</span>
+          <span>양 떼를 이끌고 물과 안전한 야영지를 찾으십시오.</span><br /><span>야생 동물과 성 안의 위험으로부터 양 떼를 지키십시오.</span>
         </p>
         <button id="startBtn" class="primary">새 게임</button>
         <button id="continueBtn">이어하기</button>
         <button id="settingsBtn">설정</button>
-        <a class="back-link" href="../index.html">토라웹으로 돌아가기</a>
         <p class="rights">
           <span>© 2026 Adam / JewishKorean. All rights reserved.</span><br /><span>코드·그래픽·음원·게임 자산의 무단 복제, 재배포 및 상업적 이용을 금합니다.</span>
         </p>
@@ -144,10 +155,11 @@
             class="pause-language-switch"
             aria-label="언어 선택"
           >
-            <span>언어 선택</span>
+            <span>언어 변경</span>
             <div>
+              <button type="button" data-lang="en">영어</button>
               <button type="button" data-lang="ko">한국어</button>
-              <button type="button" data-lang="he">עברית</button>
+              <button type="button" data-lang="he">히브리어</button>
             </div>
           </div>
           <button id="resumeBtn">계속</button
@@ -222,7 +234,7 @@
         </div>
       </div>
       <div id="guardCaught" class="guard-caught hidden" aria-live="assertive">
-        <div>אל תעבוד עלי!</div>
+        <div>나를 속이려 하지 마!</div>
       </div>
     </div>
     <div id="gameLoading" class="loading-screen hidden" aria-live="polite">
@@ -230,7 +242,8 @@
       <div class="loading-track"><i id="loadingBar"></i></div>
       <span id="loadingPercent">0%</span>
     </div>
-    <script src="i18n.js?v=3.1.6"></script>
-    <script type="module" src="game.js?v=2.1.43"></script>
+    <script src="i18n.js?v=4.0.0"></script>
+    <script src="gd-sdk.js?v=1.0.0"></script>
+    <script type="module" src="game.js?v=2.2.0"></script>
   </body>
 </html>

@@ -1,5 +1,4 @@
 import * as t from "./three.module.js";
-import { FBXLoader } from "./FBXLoader.js";
 import { clone as cloneSkinnedModel } from "./SkeletonUtils.js";
 import { GLTFLoader } from "./GLTFLoader.js";
 import { mergeGeometries } from "./BufferGeometryUtils.js";
@@ -130,7 +129,6 @@ let Z = new t.Vector3(-1150, 0, 1050),
   Y = "",
   templeObjText = "",
   templeObjPromise = null,
-  templeAltarPromise = null,
   firstTempleModelPromise = null,
   firstTempleModelTemplate = null,
   lionModelPromise = null,
@@ -159,10 +157,7 @@ let Z = new t.Vector3(-1150, 0, 1050),
   oliveTreeModelTemplate = null,
   datePalmModelPromise = null,
   datePalmModelTemplate = null,
-  houseModelPromise = null,
   houseModelTemplates = null,
-  palaceModelPromise = null,
-  palaceModelTemplate = null,
   datePalmPlacements = [],
   _ = null,
   J = null,
@@ -308,17 +303,25 @@ function zt(t, e, o = 0) {
 function Dt(t) {
   o.forEach((e) => e.classList.toggle("active", e.id === t));
 }
+let distributionAdRequested = false;
+function startGameWithDistributionAd(continueFromSave) {
+  if (!distributionAdRequested) {
+    distributionAdRequested = true;
+    window.GameDistributionBridge?.showInterstitial?.();
+  }
+  return At(continueFromSave);
+}
 (e("#startBtn").onclick = () => {
   Dt("characterScreen");
 }),
   (e("#continueBtn").onclick = () => {
-    At(!0);
+    startGameWithDistributionAd(!0);
   }),
   (e("#playBtn").onclick = () => {
-    At(!1);
+    startGameWithDistributionAd(!1);
   }),
   (e("#davidCard").onclick = () => {
-    At(!1);
+    startGameWithDistributionAd(!1);
   }),
   (e("#settingsBtn").onclick = () => Pt(!1));
 const St = e("#soundEnabled");
@@ -506,6 +509,24 @@ function Vt(t) {
       m.currentTime + 0.15,
     ));
 }
+function pauseAllGameAudio() {
+  const audioTracks = [
+    Lt.wind,
+    Lt.birds,
+    Lt.night,
+    Lt.pickup,
+    Lt.mission,
+    Lt.danger,
+    Lt.staff,
+    ...Lt.sheep,
+  ];
+  audioTracks.forEach((audio) => {
+    try {
+      audio.pause();
+    } catch {}
+  });
+  if (m && m.state === "running") m.suspend().catch(() => {});
+}
 function Ut(t = 440, e = 0.12, o = 0.05, n = "sine", s = 0) {
   if (!y) return;
   if ((Rt(), !m || !M)) return;
@@ -661,110 +682,6 @@ function addImportedTempleModel(parent, courtY) {
     return false;
   }
 }
-function addPreparedTempleAltar(parent, courtY, fallbackAltar, fallbackRamp) {
-  if (templeAltarPromise) return templeAltarPromise;
-  templeAltarPromise = new GLTFLoader()
-    .loadAsync("./assets/models/temple_altar_square.glb")
-    .then((gltf) => {
-      const altar = gltf.scene;
-      altar.name = "PreparedSquareTempleAltar";
-      // The cleaned source altar body is 0.60 x 0.794 units. Scale each
-      // horizontal axis independently so the actual body is 170 x 170 in-game,
-      // then turn its stair run toward the existing southern approach.
-      altar.scale.set(283.3, 466.7, 214.1);
-      altar.rotation.y = -Math.PI / 2;
-      altar.position.set(205, courtY + 2, 34);
-      altar.traverse((child) => {
-        if (!child.isMesh) return;
-        child.castShadow = true;
-        child.receiveShadow = true;
-        child.frustumCulled = true;
-        child.userData.neverOcclude = true;
-        if (child.material) {
-          child.material.roughness = Math.max(child.material.roughness ?? 0.8, 0.72);
-          child.material.metalness = Math.min(child.material.metalness ?? 0, 0.08);
-        }
-      });
-      // The former full-size closure box produced a huge exposed brown wall,
-      // and projecting the scanned material onto that box corrupted its UVs.
-      // Never use a second full altar body as a visual repair layer.
-      fallbackAltar.visible = false;
-      parent.add(altar);
-      mt.templeAltarModel = altar;
-      fallbackRamp.visible = false;
-
-      // Repair only the two genuinely open parts of the scan.  Use one continuous
-      // masonry surface instead of rows of plain temporary-looking boxes.
-      const brickCanvas = document.createElement("canvas");
-      brickCanvas.width = 512;
-      brickCanvas.height = 512;
-      const brickContext = brickCanvas.getContext("2d");
-      brickContext.fillStyle = "#b99d70";
-      brickContext.fillRect(0, 0, 512, 512);
-      const rows = 8;
-      const rowHeight = 512 / rows;
-      const brickWidth = 128;
-      for (let row = 0; row < rows; row++) {
-        const y = row * rowHeight;
-        const offset = row % 2 ? -brickWidth / 2 : 0;
-        for (let x = offset; x < 512; x += brickWidth) {
-          const shade = 166 + ((row * 19 + Math.round(x)) % 23);
-          brickContext.fillStyle = `rgb(${shade + 19},${shade + 1},${shade - 31})`;
-          brickContext.fillRect(x + 3, y + 3, brickWidth - 6, rowHeight - 6);
-          brickContext.strokeStyle = "rgba(92,70,43,0.38)";
-          brickContext.lineWidth = 3;
-          brickContext.strokeRect(x + 3, y + 3, brickWidth - 6, rowHeight - 6);
-          brickContext.fillStyle = "rgba(255,239,201,0.14)";
-          brickContext.fillRect(x + 7, y + 7, brickWidth - 14, 5);
-        }
-      }
-      const brickTexture = new t.CanvasTexture(brickCanvas);
-      brickTexture.colorSpace = t.SRGBColorSpace;
-      brickTexture.wrapS = t.RepeatWrapping;
-      brickTexture.wrapT = t.RepeatWrapping;
-      brickTexture.repeat.set(2.25, 1.25);
-      brickTexture.anisotropy = 4;
-      const repairMaterial = new t.MeshToonMaterial({
-        color: 0xffffff,
-        map: brickTexture,
-      });
-      const repairGroup = new t.Group();
-      repairGroup.name = "AltarLocalStoneRepairs";
-      repairGroup.userData.neverOcclude = true;
-
-      // Solid walkable centre below the fire: closes the empty-looking upper well.
-      const topInfill = new t.Mesh(
-        new t.BoxGeometry(132, 8, 122),
-        repairMaterial,
-      );
-      topInfill.position.set(205, courtY + 105, -2);
-      topInfill.castShadow = true;
-      topInfill.receiveShadow = true;
-      topInfill.userData.neverOcclude = true;
-      repairGroup.add(topInfill);
-
-      // One complete rear wall face fills the scan opening edge-to-edge.  It stays
-      // inset inside the altar footprint and cannot protrude across the court.
-      const rearWall = new t.Mesh(
-        new t.BoxGeometry(150, 88, 6),
-        repairMaterial,
-      );
-      rearWall.position.set(205, courtY + 48, -78);
-      rearWall.castShadow = true;
-      rearWall.receiveShadow = true;
-      rearWall.userData.neverOcclude = true;
-      repairGroup.add(rearWall);
-      parent.add(repairGroup);
-      mt.templeAltarRepairs = repairGroup;
-      return altar;
-    })
-    .catch((error) => {
-      console.error("정리된 성전 제단 모델 적용 실패:", error);
-      return null;
-    });
-  return templeAltarPromise;
-}
-
 async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, loadingTimer) {
   // Scene construction, shader compilation and the first real frame all happen
   // behind the loading overlay. This prevents the player from entering while
@@ -790,67 +707,6 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
   if (loadingPercent) loadingPercent.textContent = "100%";
   await new Promise((resolve) => setTimeout(resolve, 260));
   loadingScreen?.classList.add("hidden");
-}
-
-function prepareStaticBuildingTemplate(root, name) {
-  root.updateMatrixWorld(true);
-  const bounds = new t.Box3().setFromObject(root);
-  const size = bounds.getSize(new t.Vector3());
-  const center = bounds.getCenter(new t.Vector3());
-  root.position.x -= center.x;
-  root.position.z -= center.z;
-  root.position.y -= bounds.min.y;
-  const container = new t.Group();
-  container.name = name;
-  container.add(root);
-  root.traverse((part) => {
-    if (!part.isMesh) return;
-    part.castShadow = false;
-    part.receiveShadow = true;
-    part.frustumCulled = true;
-    if (part.material) {
-      const materials = Array.isArray(part.material) ? part.material : [part.material];
-      for (const material of materials) {
-        material.precision = "mediump";
-        material.needsUpdate = true;
-      }
-    }
-  });
-  container.userData.nativeSize = size;
-  return container;
-}
-
-function loadHouseModels() {
-  if (houseModelPromise) return houseModelPromise;
-  const loader = new GLTFLoader();
-  const specs = [
-    ["common", "./assets/models/houses/house_common_game.glb"],
-    ["slope", "./assets/models/houses/house_slope_game.glb"],
-    ["wealthy", "./assets/models/houses/house_wealthy_game.glb"],
-  ];
-  houseModelPromise = Promise.all(
-    specs.map(([key, url]) =>
-      loader.loadAsync(url).then((gltf) => [
-        key,
-        prepareStaticBuildingTemplate(gltf.scene, `HouseTemplate_${key}`),
-      ]),
-    ),
-  ).then((entries) => (houseModelTemplates = Object.fromEntries(entries)));
-  return houseModelPromise;
-}
-
-function loadDavidPalaceModel() {
-  if (palaceModelPromise) return palaceModelPromise;
-  palaceModelPromise = new GLTFLoader()
-    .loadAsync("./assets/models/houses/david_palace_game.glb")
-    .then((gltf) => {
-      palaceModelTemplate = prepareStaticBuildingTemplate(
-        gltf.scene,
-        "DavidPalaceTemplate",
-      );
-      return palaceModelTemplate;
-    });
-  return palaceModelPromise;
 }
 
 function updateJerusalemBuildingLOD() {
@@ -2503,7 +2359,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = 239,
+  Wt = "2.2.0",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -7743,13 +7599,7 @@ function Be(t) {
 }
 function Ie() {
   (b = !0),
-    (function () {
-      for (const t of Object.values(Lt))
-        try {
-          t.pause();
-        } catch {}
-      m && "running" === m.state && m.suspend().catch(() => {});
-    })(),
+    pauseAllGameAudio(),
     e("#pause").classList.remove("hidden"),
     document.exitPointerLock?.(),
     setTimeout(() => ke(e("#pause"), 0), 0);
@@ -8606,6 +8456,10 @@ document.addEventListener(
     { capture: !0 },
   ),
   document.addEventListener("keydown", (t) => {
+    if (distributionAdPauseActive) {
+      t.preventDefault();
+      return;
+    }
     if (
       (Et(),
       !(function (t) {
@@ -11301,7 +11155,14 @@ function $e() {
     (e("#hpBar").style.width = t.MathUtils.clamp(ut.hp, 0, 100) + "%"),
     (e("#stoneCount").textContent = "돌 " + ut.stones + "/25"),
     (e("#respect").textContent = "존중 " + ut.respect + "/100"),
-    (e("#money").textContent = ut.money.toLocaleString("ko-KR") + " 셰켈"),
+    (e("#money").textContent =
+      ut.money.toLocaleString(
+        window.ShepherdI18n?.getLanguage?.() === "he"
+          ? "he-IL"
+          : window.ShepherdI18n?.getLanguage?.() === "ko"
+            ? "ko-KR"
+            : "en-US",
+      ) + " 셰켈"),
     (function () {
       const e = mt.player;
       if (!e) return;
@@ -11396,7 +11257,7 @@ function buildSaveRecord() {
     schemaVersion: SAVE_SCHEMA_VERSION,
     version: Wt,
     savedAt: Date.now(),
-    language: window.ShepherdI18n?.getLanguage?.() || "ko",
+    language: window.ShepherdI18n?.getLanguage?.() || "en",
     state,
     weapon: L,
     cameraMode: A,
@@ -11546,6 +11407,27 @@ function no() {
   }
 }
 refreshContinueAvailability();
+let distributionAdPauseActive = false;
+let distributionWasPausedBeforeAd = false;
+window.addEventListener("gamedistribution:pause", () => {
+  if (distributionAdPauseActive) return;
+  distributionAdPauseActive = true;
+  distributionWasPausedBeforeAd = b;
+  b = true;
+  Object.keys(K).forEach((key) => (K[key] = false));
+  G = false;
+  P = false;
+  pauseAllGameAudio();
+  document.exitPointerLock?.();
+});
+window.addEventListener("gamedistribution:resume", () => {
+  if (!distributionAdPauseActive) return;
+  distributionAdPauseActive = false;
+  if (!distributionWasPausedBeforeAd) {
+    b = false;
+    Bt();
+  }
+});
 addEventListener("pagehide", () => oo(!0));
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") oo(!0);
