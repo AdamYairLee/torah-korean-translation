@@ -78,6 +78,7 @@ const performanceState = {
   nextTargetLockAt: 0,
   nextHudAt: 0,
   nextAdaptiveQualityAt: 0,
+  nextAutoSaveAt: 0,
   currentPixelRatio: 0,
   hiddenCameraMeshes: [],
   occlusionRaycaster: new t.Raycaster(),
@@ -2496,6 +2497,9 @@ const Ft = [
     },
   ],
   Wt = 238,
+  SAVE_SCHEMA_VERSION = 2,
+  SAVE_PRIMARY_KEY = "shepherdGame3DSave",
+  SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
   qt = { x: -1180, z: 1650 };
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
@@ -8053,7 +8057,7 @@ function triggerFlockGameOver() {
   ut.stones = 0;
   ut.missionDone = !1;
   ut.cheatUsed = !1;
-  localStorage.removeItem("shepherdGame3DSave");
+  clearStoredGameSave();
   $e();
   b = !0;
   e("#gameOver").classList.remove("mission-fail");
@@ -8926,11 +8930,14 @@ document.addEventListener(
       c?.domElement.requestPointerLock?.(),
       ie();
   }),
-  (e("#saveBtn").onclick = oo),
-  (e("#quitBtn").onclick = () => location.reload()),
+  (e("#saveBtn").onclick = () => oo(!1)),
+  (e("#quitBtn").onclick = () => {
+    oo(!0);
+    location.reload();
+  }),
   (e("#restartBtn").onclick = () => {
     if (ut.flockLost) {
-      localStorage.removeItem("shepherdGame3DSave");
+      clearStoredGameSave();
       Te();
     } else {
       no() || Te();
@@ -9267,6 +9274,10 @@ function _e(o, n) {
   );
   updateAdaptiveRendering(frameNow);
   updateRouteChoice(frameNow);
+  if (frameNow >= performanceState.nextAutoSaveAt) {
+    performanceState.nextAutoSaveAt = frameNow + 45000;
+    oo(!0);
+  }
   (function () {
     if (!ct || lt) return;
     ct = !1;
@@ -11191,61 +11202,217 @@ function eo(t) {
     clearTimeout(to),
     (to = setTimeout(() => (e("#notice").innerText = ""), 2800));
 }
-function oo(t = !1) {
-  if (!mt.player) return;
-  const e = {
+function isUsableSaveRecord(record) {
+  if (!record || typeof record !== "object") return !1;
+  if (record.schemaVersion && record.schemaVersion > SAVE_SCHEMA_VERSION) return !1;
+  const player = record.player;
+  return !!(
+    record.state &&
+    typeof record.state === "object" &&
+    player &&
+    Number.isFinite(Number(player.x)) &&
+    Number.isFinite(Number(player.z))
+  );
+}
+function readStoredGameSave() {
+  for (const key of [SAVE_PRIMARY_KEY, SAVE_BACKUP_KEY]) {
+    try {
+      const encoded = localStorage.getItem(key);
+      if (!encoded) continue;
+      const record = JSON.parse(encoded);
+      if (isUsableSaveRecord(record)) return record;
+    } catch (error) {
+      console.warn(`저장 데이터 읽기 실패 (${key}):`, error);
+    }
+  }
+  return null;
+}
+function refreshContinueAvailability() {
+  const button = e("#continueBtn");
+  if (!button) return;
+  const available = !!readStoredGameSave();
+  button.disabled = !available;
+  button.setAttribute("aria-disabled", String(!available));
+}
+function clearStoredGameSave() {
+  try {
+    localStorage.removeItem(SAVE_PRIMARY_KEY);
+    localStorage.removeItem(SAVE_BACKUP_KEY);
+  } catch (error) {
+    console.warn("저장 데이터 삭제 실패:", error);
+  }
+  refreshContinueAvailability();
+}
+function buildSaveRecord() {
+  const state = {
+    hp: ut.hp,
+    stones: ut.stones,
+    quality: ut.quality,
+    money: ut.money,
+    respect: ut.respect,
+    invincible: !!ut.invincible,
+    skill: ut.skill,
+    missionDone: !!ut.missionDone,
+    cheatUsed: !!ut.cheatUsed,
+    thirst: ut.thirst,
+    worldTime: ut.worldTime,
+  };
+  return {
+    schemaVersion: SAVE_SCHEMA_VERSION,
     version: Wt,
-    state: ut,
+    savedAt: Date.now(),
+    language: window.ShepherdI18n?.getLanguage?.() || "ko",
+    state,
     weapon: L,
     cameraMode: A,
+    view: { yaw: B, pitch: I },
     missionCycle: $,
     goal: { x: Z.x, z: Z.z },
-    player: { x: mt.player.position.x, z: mt.player.position.z },
-    sheep: mt.sheep.map((t) => ({ x: t.position.x, z: t.position.z })),
+    player: {
+      x: mt.player.position.x,
+      z: mt.player.position.z,
+      rotationY: mt.player.rotation.y,
+    },
+    sheep: mt.sheep.map((sheep) => ({
+      x: sheep.position.x,
+      z: sheep.position.z,
+      hp: Number.isFinite(sheep.userData.hp) ? sheep.userData.hp : 100,
+    })),
+    route: {
+      id: routeChoice.id,
+      name: routeChoice.name,
+      spawnMultiplier: routeChoice.spawnMultiplier,
+      rewardRespect: routeChoice.rewardRespect,
+    },
   };
-  localStorage.setItem("shepherdGame3DSave", JSON.stringify(e)),
-    t || eo("저장되었습니다.");
 }
-function no() {
+let saveStatusTimer = 0;
+function showPauseSaveStatus(message, failed = !1) {
+  const status = e("#saveStatus");
+  if (!status) return;
+  status.textContent = window.ShepherdI18n?.tr?.(message) || message;
+  status.classList.toggle("error", failed);
+  clearTimeout(saveStatusTimer);
+  saveStatusTimer = setTimeout(() => {
+    status.textContent = "";
+    status.classList.remove("error");
+  }, 2600);
+}
+function oo(silent = !1) {
+  if (!S || !mt.player || ut.flockLost) return !1;
   try {
-    const e = JSON.parse(localStorage.getItem("shepherdGame3DSave"));
-    if (!e) return !1;
-    if (e.version !== Wt)
-      return localStorage.removeItem("shepherdGame3DSave"), !1;
-    Object.assign(ut, e.state || {}),
-      Number.isFinite(ut.thirst) || (ut.thirst = 100),
-      (ut.stones = t.MathUtils.clamp(ut.stones || 0, 0, 25)),
-      (ut.respect = t.MathUtils.clamp(ut.respect || 0, 0, 100)),
-      (ut.money = t.MathUtils.clamp(ut.money || 0, 0, 1e7)),
-      (L = e.weapon || "sling"),
-      (A = Number.isInteger(e.cameraMode)
-        ? t.MathUtils.clamp(e.cameraMode, 0, 3)
-        : 0),
-      (ut.thirstFailed = !1),
-      (ut.flockLost = !1),
-      ($ = e.missionCycle || 1),
-      e.goal &&
-        (Z.set(e.goal.x, 0, e.goal.z),
-        (Ft.some((t) => Math.hypot(Z.x - t.x, Z.z - t.z) < t.r + 300) ||
-          he(Z.x, Z.z) > 0.65) &&
-          Z.set(-1150, 0, 1050),
-        ce());
-    const o = e.player || qt,
-      n = Jt(o.x, o.z);
-    return (
-      Array.isArray(e.sheep) &&
-        e.sheep.forEach((t, e) => {
-          if (!mt.sheep[e]) return;
-          const o = _t(
-            Number.isFinite(t.x) ? t.x : n.x + (e % 4) * 55,
-            Number.isFinite(t.z) ? t.z : n.z - 120 + 62 * Math.floor(e / 4),
-          );
-          mt.sheep[e].position.set(o.x, te(o.x, o.z) + 22, o.z);
-        }),
-      $e(),
-      !0
-    );
-  } catch {
-    return localStorage.removeItem("shepherdGame3DSave"), !1;
+    const encoded = JSON.stringify(buildSaveRecord());
+    localStorage.setItem(SAVE_BACKUP_KEY, encoded);
+    localStorage.setItem(SAVE_PRIMARY_KEY, encoded);
+    if (localStorage.getItem(SAVE_PRIMARY_KEY) !== encoded)
+      throw new Error("저장소 확인값이 일치하지 않습니다.");
+    refreshContinueAvailability();
+    if (!silent) {
+      eo("저장되었습니다.");
+      showPauseSaveStatus("저장 완료");
+    }
+    return !0;
+  } catch (error) {
+    console.error("게임 저장 실패:", error);
+    if (!silent) {
+      eo("저장하지 못했습니다. 브라우저의 사이트 데이터 허용 여부를 확인해 주세요.");
+      showPauseSaveStatus("저장 실패", !0);
+    }
+    return !1;
   }
 }
+function restoreSavedSheep(savedSheep, playerPosition) {
+  if (!Array.isArray(savedSheep)) return;
+  const entries = savedSheep
+    .filter((sheep) => sheep && Number.isFinite(Number(sheep.x)) && Number.isFinite(Number(sheep.z)))
+    .slice(0, 50);
+  while (mt.sheep.length > entries.length) {
+    const sheep = mt.sheep.pop();
+    sheep?.parent?.remove(sheep);
+  }
+  while (mt.sheep.length < entries.length) Se(mt.sheep.length);
+  entries.forEach((saved, index) => {
+    const fallbackX = playerPosition.x + (index % 4) * 55;
+    const fallbackZ = playerPosition.z - 120 + 62 * Math.floor(index / 4);
+    const savedX = Number(saved.x);
+    const savedZ = Number(saved.z);
+    const safe = _t(
+      Number.isFinite(savedX) ? savedX : fallbackX,
+      Number.isFinite(savedZ) ? savedZ : fallbackZ,
+    );
+    const sheep = mt.sheep[index];
+    sheep.position.set(safe.x, te(safe.x, safe.z) + 22, safe.z);
+    const savedHp = Number(saved.hp);
+    sheep.userData.hp = t.MathUtils.clamp(Number.isFinite(savedHp) ? savedHp : 100, 1, 100);
+    sheep.userData.lastPos.copy(sheep.position);
+  });
+}
+function savedNumber(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+function no() {
+  const saved = readStoredGameSave();
+  if (!saved) return refreshContinueAvailability(), !1;
+  try {
+    const state = saved.state || {};
+    ut.hp = t.MathUtils.clamp(savedNumber(state.hp, 100), 1, 100);
+    ut.stones = t.MathUtils.clamp(savedNumber(state.stones, 0), 0, 25);
+    ut.quality = ["거친 돌", "둥근 돌", "좋은 돌", "큰 돌"].includes(state.quality)
+      ? state.quality
+      : "좋은 돌";
+    ut.money = t.MathUtils.clamp(savedNumber(state.money, 0), 0, 1e7);
+    ut.respect = t.MathUtils.clamp(savedNumber(state.respect, 0), 0, 100);
+    ut.invincible = !!state.invincible;
+    ut.skill = t.MathUtils.clamp(savedNumber(state.skill, 0), 0, 50);
+    ut.missionDone = !!state.missionDone;
+    ut.cheatUsed = !!state.cheatUsed;
+    ut.thirst = t.MathUtils.clamp(savedNumber(state.thirst, 100), 0, 100);
+    ut.worldTime = Number.isFinite(Number(state.worldTime))
+      ? ((Number(state.worldTime) % 1) + 1) % 1
+      : 0.29;
+    ut.thirstFailed = !1;
+    ut.flockLost = !1;
+    L = ["sling", "staff"].includes(saved.weapon) ? saved.weapon : "sling";
+    A = Number.isInteger(saved.cameraMode)
+      ? t.MathUtils.clamp(saved.cameraMode, 0, 3)
+      : 0;
+    $ = t.MathUtils.clamp(Math.floor(savedNumber(saved.missionCycle, 1)), 1, 1e6);
+    if (saved.goal && Number.isFinite(Number(saved.goal.x)) && Number.isFinite(Number(saved.goal.z))) {
+      Z.set(Number(saved.goal.x), 0, Number(saved.goal.z));
+      if (
+        Ft.some((city) => Math.hypot(Z.x - city.x, Z.z - city.z) < city.r + 300) ||
+        he(Z.x, Z.z) > 0.65
+      )
+        Z.set(-1150, 0, 1050);
+      ce();
+    }
+    const player = saved.player || qt;
+    const placedPlayer = Jt(Number(player.x), Number(player.z));
+    if (Number.isFinite(Number(player.rotationY))) mt.player.rotation.y = Number(player.rotationY);
+    if (saved.view) {
+      if (Number.isFinite(Number(saved.view.yaw))) B = Number(saved.view.yaw);
+      if (Number.isFinite(Number(saved.view.pitch))) I = t.MathUtils.clamp(Number(saved.view.pitch), -1.25, 0.62);
+    }
+    restoreSavedSheep(saved.sheep, placedPlayer);
+    if (saved.route && typeof saved.route === "object") {
+      routeChoice.id = typeof saved.route.id === "string" ? saved.route.id : "";
+      routeChoice.name = typeof saved.route.name === "string" ? saved.route.name : "";
+      routeChoice.spawnMultiplier = t.MathUtils.clamp(savedNumber(saved.route.spawnMultiplier, 1), 0.5, 3);
+      routeChoice.rewardRespect = t.MathUtils.clamp(savedNumber(saved.route.rewardRespect, 0), 0, 10);
+    }
+    $e();
+    Re();
+    oo(!0);
+    return !0;
+  } catch (error) {
+    console.error("게임 불러오기 실패:", error);
+    return !1;
+  }
+}
+refreshContinueAvailability();
+addEventListener("pagehide", () => oo(!0));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") oo(!0);
+});
+addEventListener("shepherd:before-language-change", () => oo(!0));

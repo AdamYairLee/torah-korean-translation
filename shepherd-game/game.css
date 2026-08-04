@@ -364,6 +364,7 @@ html[dir="rtl"] #weaponHud{
   color:#2d241a;
   box-shadow:inset 0 1px 0 #f3ddb0,0 0 0 2px rgba(95,73,48,.18);
 }
+.pause-save-status{min-height:22px;margin:-4px auto 4px;font-size:14px;font-weight:800;color:#3f632c}.pause-save-status.error{color:#8b3028}
 html[dir="rtl"] .pause-language-switch{
   direction:rtl;
 }
