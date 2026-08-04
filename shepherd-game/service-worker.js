@@ -1,4 +1,4 @@
-const CACHE_VERSION = "protect-the-flock-v2.3.2";
+const CACHE_VERSION = "protect-the-flock-v2.3.3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_FILES = [
@@ -60,13 +60,19 @@ async function networkFirst(request, fallbackUrl = null) {
   }
 }
 
-async function cacheFirst(request) {
+async function cacheFirst(request, event) {
   const cached = await caches.match(request, { ignoreSearch: true });
   if (cached) return cached;
   const response = await fetch(request);
   if (response && response.ok) {
-    const cache = await caches.open(RUNTIME_CACHE);
-    await cache.put(request, response.clone());
+    // Never hold the game's response until a large GLB/audio file has also
+    // finished writing to Cache Storage. On older Android devices that doubled
+    // startup pressure and left the loading overlay at its artificial 92% cap.
+    const cacheWrite = caches
+      .open(RUNTIME_CACHE)
+      .then((cache) => cache.put(request, response.clone()))
+      .catch((error) => console.warn("Runtime asset cache skipped:", error));
+    event?.waitUntil?.(cacheWrite);
   }
   return response;
 }
@@ -87,5 +93,5 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(cacheFirst(request));
+  event.respondWith(cacheFirst(request, event));
 });

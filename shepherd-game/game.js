@@ -208,6 +208,7 @@ let Z = new t.Vector3(-1150, 0, 1050),
   templeObjPromise = null,
   firstTempleModelPromise = null,
   firstTempleModelTemplate = null,
+  pendingFirstTemplePlacement = null,
   lionModelPromise = null,
   lionModelTemplate = null,
   foxModelPromise = null,
@@ -790,13 +791,157 @@ function addImportedTempleModel(parent, courtY) {
     return false;
   }
 }
-async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, loadingTimer) {
+const STARTUP_LOADING_MESSAGES = Object.freeze({
+  ko: {
+    starting: "게임을 준비하고 있습니다…",
+    essential: "필수 캐릭터와 양떼를 준비하고 있습니다…",
+    world: "유대 광야와 예루샬라임을 만들고 있습니다…",
+    graphics: "휴대폰 그래픽을 준비하고 있습니다…",
+    ready: "준비가 끝났습니다.",
+  },
+  en: {
+    starting: "Preparing the game…",
+    essential: "Preparing the flock and essential characters…",
+    world: "Building the Judean wilderness and Jerusalem…",
+    graphics: "Preparing mobile graphics…",
+    ready: "Ready.",
+  },
+  he: {
+    starting: "מכין את המשחק…",
+    essential: "מכין את הצאן ואת הדמויות החיוניות…",
+    world: "בונה את מדבר יהודה ואת ירושלים…",
+    graphics: "מכין את התצוגה לנייד…",
+    ready: "המשחק מוכן.",
+  },
+});
+
+function loadingMessage(key) {
+  const language = document.documentElement.lang?.toLowerCase().startsWith("he")
+    ? "he"
+    : document.documentElement.lang?.toLowerCase().startsWith("en")
+      ? "en"
+      : "ko";
+  return STARTUP_LOADING_MESSAGES[language][key] || STARTUP_LOADING_MESSAGES.ko[key];
+}
+
+function settleWithin(promise, timeoutMs, label) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      console.warn(`${label} startup wait ended after ${timeoutMs}ms; continuing with fallback.`);
+      resolve(null);
+    }, timeoutMs);
+    Promise.resolve(promise).then(
+      (value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        console.warn(`${label} startup asset skipped:`, error);
+        resolve(null);
+      },
+    );
+  });
+}
+
+async function loadStartupAssets(setLoadingStage) {
+  const davidObjTask = Y
+    ? Promise.resolve(Y)
+    : (_ ||
+        (_ = fetch("./assets/models/david_lowpoly.obj")
+          .then((response) => {
+            if (!response.ok) throw new Error(`David OBJ ${response.status}`);
+            return response.text();
+          })
+          .then((text) => {
+            Y = text;
+            return text;
+          })
+          .catch((error) => {
+            console.error("다비드 OBJ 로드 실패:", error);
+            Y = "";
+            return "";
+          })),
+      _);
+
+  setLoadingStage(18, "essential");
+  if (n) {
+    // Mobile enters with only the tiny procedural-David source and the shared
+    // flock model prepared. Large temple, citizens, enemies and vegetation are
+    // decoded one at a time after the first playable frame instead of all at
+    // once behind the loading overlay.
+    await Promise.allSettled([
+      settleWithin(davidObjTask, 10000, "David OBJ"),
+      settleWithin(loadSheepModel(), 16000, "Sheep model"),
+    ]);
+    return;
+  }
+
+  const desktopAssets = [
+    [davidObjTask, "David OBJ"],
+    [loadFirstTempleModel(), "First Temple"],
+    [loadLionModel(), "Lion"],
+    [loadFoxModel(), "Fox"],
+    [loadWolfModel(), "Wolf"],
+    [loadSheepModel(), "Sheep"],
+    [loadBanditModel(), "Bandit"],
+    [loadOliveTreeModel(), "Olive tree"],
+    [loadDatePalmModel(), "Date palm"],
+    [loadSouthGateGuardModel(), "South gate guard"],
+    [loadCityBoy1Model(), "City boy 1"],
+    [loadCityBoyModel(), "City boy 2"],
+    [loadCityGirl1Model(), "City girl 1"],
+    [loadCityGirlModel(), "City girl 2"],
+  ];
+  await Promise.allSettled(
+    desktopAssets.map(([task, label]) => settleWithin(task, 45000, label)),
+  );
+}
+
+let deferredMobileAssetWarmupStarted = false;
+function scheduleDeferredMobileAssetWarmup() {
+  if (!n || deferredMobileAssetWarmupStarted) return;
+  deferredMobileAssetWarmupStarted = true;
+  const queue = [
+    [loadFirstTempleModel, "First Temple"],
+    [loadOliveTreeModel, "Olive tree"],
+    [loadDatePalmModel, "Date palm"],
+    [loadWolfModel, "Wolf"],
+    [loadFoxModel, "Fox"],
+    [loadLionModel, "Lion"],
+    [loadBanditModel, "Bandit"],
+    [loadSouthGateGuardModel, "South gate guard"],
+    [loadCityBoy1Model, "City boy 1"],
+    [loadCityBoyModel, "City boy 2"],
+    [loadCityGirl1Model, "City girl 1"],
+    [loadCityGirlModel, "City girl 2"],
+  ];
+  const runQueue = async () => {
+    for (const [loader, label] of queue) {
+      await settleWithin(Promise.resolve().then(() => loader()), 30000, label);
+      await new Promise((resolve) => setTimeout(resolve, 180));
+    }
+  };
+  if (typeof requestIdleCallback === "function")
+    requestIdleCallback(runQueue, { timeout: 2400 });
+  else setTimeout(runQueue, 1800);
+}
+
+async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, loadingStatus) {
   // Scene construction, shader compilation and the first real frame all happen
   // behind the loading overlay. This prevents the player from entering while
   // the GPU and browser are still settling the newly-created wilderness.
   if (c && i && r) {
     try {
-      if (typeof c.compileAsync === "function") await c.compileAsync(i, r);
+      if (typeof c.compileAsync === "function")
+        await settleWithin(c.compileAsync(i, r), n ? 5500 : 14000, "GPU shader warmup");
       else c.compile(i, r);
     } catch (error) {
       console.warn("Startup shader warmup skipped:", error);
@@ -806,13 +951,17 @@ async function finishStartupWarmup(loadingScreen, loadingBar, loadingPercent, lo
     } catch (error) {
       console.warn("First frame render skipped:", error);
     }
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolve)),
+    await settleWithin(
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+      1800,
+      "First animation frame",
     );
   }
-  clearInterval(loadingTimer);
   if (loadingBar) loadingBar.style.width = "100%";
   if (loadingPercent) loadingPercent.textContent = "100%";
+  if (loadingStatus) loadingStatus.textContent = loadingMessage("ready");
   await new Promise((resolve) => setTimeout(resolve, 260));
   loadingScreen?.classList.add("hidden");
 }
@@ -865,51 +1014,15 @@ async function runGameStartup(e) {
   const loadingScreen = document.querySelector("#gameLoading");
   const loadingBar = document.querySelector("#loadingBar");
   const loadingPercent = document.querySelector("#loadingPercent");
+  const loadingStatus = document.querySelector("#loadingStatus");
+  const setLoadingStage = (percent, messageKey) => {
+    if (loadingBar) loadingBar.style.width = `${percent}%`;
+    if (loadingPercent) loadingPercent.textContent = `${Math.round(percent)}%`;
+    if (loadingStatus) loadingStatus.textContent = loadingMessage(messageKey);
+  };
   loadingScreen?.classList.remove("hidden");
-  if (loadingBar) loadingBar.style.width = "8%";
-  if (loadingPercent) loadingPercent.textContent = "8%";
-  let loadingPulse = 8;
-  const loadingTimer = setInterval(() => {
-    loadingPulse = Math.min(92, loadingPulse + Math.max(1, (94 - loadingPulse) * 0.08));
-    if (loadingBar) loadingBar.style.width = `${loadingPulse}%`;
-    if (loadingPercent) loadingPercent.textContent = `${Math.round(loadingPulse)}%`;
-  }, 180);
-  await Promise.all([
-    Y
-      ? Promise.resolve()
-      : (_ ||
-          (_ = fetch("./assets/models/david_lowpoly.obj")
-            .then((t) => {
-              if (!t.ok) throw new Error(`David OBJ ${t.status}`);
-              return t.text();
-            })
-            .then((t) => {
-              Y = t;
-            })
-            .catch((t) => {
-              console.error("다비드 OBJ 로드 실패:", t), (Y = "");
-            })),
-        _),
-    // Finish every shared model decode before scene construction. A timed-out
-    // loader keeps running because browser fetch/decode work is not cancelled;
-    // allowing those jobs to overlap terrain/material creation can leave the
-    // visible terrain without a completed GPU program.
-    loadFirstTempleModel().catch(() => null),
-    loadLionModel().catch(() => null),
-    loadFoxModel().catch(() => null),
-    loadWolfModel().catch(() => null),
-    loadSheepModel().catch(() => null),
-    loadBanditModel().catch(() => null),
-    loadOliveTreeModel().catch(() => null),
-    loadDatePalmModel().catch(() => null),
-    loadSouthGateGuardModel().catch(() => null),
-    // Load the four citizens as one startup set so Boy 2 and Girl 2 cannot
-    // appear in alternating late-load waves after play has already begun.
-    loadCityBoy1Model().catch(() => null),
-    loadCityBoyModel().catch(() => null),
-    loadCityGirl1Model().catch(() => null),
-    loadCityGirlModel().catch(() => null),
-  ]),
+  setLoadingStage(8, "starting");
+  await loadStartupAssets(setLoadingStage),
     (async function () {
       if ((Ct(), y))
         try {
@@ -920,6 +1033,7 @@ async function runGameStartup(e) {
       y && Ut(520, 0.12, 0.08, "sine", 160);
     }),
     Dt("gameScreen"),
+    setLoadingStage(46, "world"),
     c ||
       (function () {
         (i = new t.Scene()),
@@ -1817,7 +1931,30 @@ async function runGameStartup(e) {
                   // Replace every hidden procedural visual with the purchased model
                   // before creating live effects. Fire, smoke and the laver are added
                   // afterwards so loading the temple can never hide them again.
-                  addPurchasedFirstTemple(r, d, n + a, s + i);
+                  const templeFallbackChildren = [...r.children].filter(
+                    (child) => !child.isLight,
+                  );
+                  if (
+                    !addPurchasedFirstTemple(
+                      r,
+                      d,
+                      n + a,
+                      s + i,
+                      templeFallbackChildren,
+                    )
+                  ) {
+                    // On mobile the 28 MB sanctuary mesh is intentionally
+                    // decoded after play begins. Preserve exactly the old
+                    // fallback children so the late swap cannot remove fire,
+                    // smoke, the laver or other effects added below.
+                    pendingFirstTemplePlacement = {
+                      parent: r,
+                      courtY: d,
+                      worldCenterX: n + a,
+                      worldCenterZ: s + i,
+                      removableChildren: templeFallbackChildren,
+                    };
+                  }
                   // addPurchasedFirstTemple removes the old visual construction, so
                   // its old collision proxies must not survive invisibly. Rebuild the
                   // collision set from the two actual solid bodies only.
@@ -2425,11 +2562,12 @@ async function runGameStartup(e) {
           addEventListener("resize", Le),
           c.setAnimationLoop(Qe);
       })(),
+    setLoadingStage(88, "graphics"),
     await finishStartupWarmup(
       loadingScreen,
       loadingBar,
       loadingPercent,
-      loadingTimer,
+      loadingStatus,
     ),
     Te(),
     e && no(),
@@ -2437,6 +2575,7 @@ async function runGameStartup(e) {
     (b = !1),
     l?.start(),
     l?.getDelta(),
+    scheduleDeferredMobileAssetWarmup(),
     document.documentElement.requestFullscreen?.().catch(() => {}),
     n || c.domElement.requestPointerLock?.(),
     eo(
@@ -2467,7 +2606,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.2",
+  Wt = "2.3.3",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -5847,6 +5986,7 @@ function loadFirstTempleModel() {
           });
         });
         firstTempleModelTemplate = scene;
+        applyPendingFirstTempleModel();
         resolve(scene);
       },
       undefined,
@@ -5859,7 +5999,13 @@ function loadFirstTempleModel() {
   });
   return firstTempleModelPromise;
 }
-function addPurchasedFirstTemple(parent, courtY, worldCenterX, worldCenterZ) {
+function addPurchasedFirstTemple(
+  parent,
+  courtY,
+  worldCenterX,
+  worldCenterZ,
+  removableChildren = null,
+) {
   if (!firstTempleModelTemplate) return false;
   const model = firstTempleModelTemplate.clone(true);
   // Face the sanctuary entrance toward geographic east (+X in this world).
@@ -5892,8 +6038,9 @@ function addPurchasedFirstTemple(parent, courtY, worldCenterX, worldCenterZ) {
   // Permanently remove the obsolete procedural temple, wall and basin meshes.
   // Removing them (instead of toggling visibility) prevents the old enclosure
   // from returning after entering/leaving the Temple Mount.
-  for (const child of [...parent.children]) {
-    if (!child.isLight) parent.remove(child);
+  const obsoleteChildren = removableChildren || [...parent.children].filter((child) => !child.isLight);
+  for (const child of obsoleteChildren) {
+    if (child.parent === parent && !child.isLight) parent.remove(child);
   }
   parent.add(model);
   // The imported court must not receive an old rectangular collision shell.
@@ -5902,6 +6049,19 @@ function addPurchasedFirstTemple(parent, courtY, worldCenterX, worldCenterZ) {
   mt.purchasedFirstTemple = model;
   mt.importedTemple = model;
   return true;
+}
+function applyPendingFirstTempleModel() {
+  const pending = pendingFirstTemplePlacement;
+  if (!pending || !firstTempleModelTemplate || !pending.parent?.parent) return false;
+  const applied = addPurchasedFirstTemple(
+    pending.parent,
+    pending.courtY,
+    pending.worldCenterX,
+    pending.worldCenterZ,
+    pending.removableChildren,
+  );
+  if (applied) pendingFirstTemplePlacement = null;
+  return applied;
 }
 function createDatePalmClone() {
   if (!datePalmModelTemplate) return null;

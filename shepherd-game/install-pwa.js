@@ -124,7 +124,10 @@
     });
 
     if ("serviceWorker" in navigator && window.isSecureContext && /^https?:$/.test(location.protocol)) {
-      navigator.serviceWorker.register("./service-worker.js", { scope: "./" }).catch((error) => {
+      navigator.serviceWorker.register("./service-worker.js?v=2.3.3", {
+        scope: "./",
+        updateViaCache: "none",
+      }).catch((error) => {
         console.warn("App installation service could not start:", error);
       });
     }
