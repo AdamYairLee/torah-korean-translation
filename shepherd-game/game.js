@@ -122,6 +122,7 @@ const mobileInput = {
   lookX: 0,
   lookY: 0,
   movementYaw: Math.PI,
+  desiredWorldHeading: Math.PI,
 };
 let distributionAdPauseActive = false;
 let distributionWasPausedBeforeAd = false;
@@ -2728,7 +2729,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.7",
+  Wt = "2.3.8",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -8199,6 +8200,7 @@ function Te() {
     B = o.rotation.y;
     I = -Math.PI / 4;
     mobileInput.movementYaw = B;
+    mobileInput.desiredWorldHeading = B;
   }
   for (let t = 0; t < 10; t++) {
     const e = Se(t),
@@ -8294,24 +8296,16 @@ function Re() {
   const mobileWeaponButton = e("#mobileWeaponBtn");
   const mobileWeaponIcon = e("#mobileWeaponIcon");
   if (mobileAttack) {
-    mobileAttack.classList.toggle("sling", "sling" === L);
-    mobileAttack.classList.toggle("staff", "staff" === L);
-    mobileAttack.setAttribute(
-      "aria-label",
-      "sling" === L ? "돌팔매 던지기" : "지팡이 사용",
-    );
+    // Mobile has two dedicated action buttons. The large edge button always
+    // remains the sling, regardless of the weapon last used on desktop/HUD.
+    mobileAttack.classList.add("sling");
+    mobileAttack.classList.remove("staff");
+    mobileAttack.setAttribute("aria-label", "돌팔매 던지기");
   }
   if (mobileWeaponIcon) {
-    // The large edge button always shows the weapon that will attack. The
-    // smaller switch button shows the other weapon, so two identical icons can
-    // never be mistaken for overlapping attack controls.
-    const nextWeapon = "sling" === L ? "staff" : "sling";
-    mobileWeaponIcon.classList.toggle("sling", "sling" === nextWeapon);
-    mobileWeaponIcon.classList.toggle("staff", "staff" === nextWeapon);
-    mobileWeaponButton?.setAttribute(
-      "aria-label",
-      nextWeapon === "sling" ? "돌팔매로 변경" : "지팡이로 변경",
-    );
+    mobileWeaponIcon.classList.remove("sling");
+    mobileWeaponIcon.classList.add("staff");
+    mobileWeaponButton?.setAttribute("aria-label", "지팡이 사용");
   }
 }
 function triggerCombatFeedback(kind) {
@@ -9655,6 +9649,7 @@ function resetMobileMovement() {
   mobileInput.steeringAngle = 0;
   mobileInput.targetSteeringAngle = 0;
   mobileInput.steeringInitialized = false;
+  mobileInput.desiredWorldHeading = B;
   mobileInput.joystickPointerId = null;
   const knob = e("#mobileJoystickKnob");
   if (knob) knob.style.transform = "translate(-50%,-50%)";
@@ -9674,8 +9669,9 @@ function setupMobileControls() {
   const updateJoystick = (event) => {
     if (mobileInput.joystickPointerId !== event.pointerId) return;
     const rect = joystick.getBoundingClientRect();
-    // Use more of the physical pad so a small thumb movement cannot become a
-    // full-speed turn. This also reduces the pressure needed to steer.
+    // The visual knob and the movement vector use the same physical radius.
+    // A modest dead zone filters resting-thumb noise without delaying a real
+    // direction change.
     const radius = Math.max(38, rect.width * 0.42);
     let dx = event.clientX - (rect.left + rect.width / 2);
     let dy = event.clientY - (rect.top + rect.height / 2);
@@ -9687,10 +9683,10 @@ function setupMobileControls() {
     const normalizedX = dx / radius;
     const normalizedY = dy / radius;
     const magnitude = Math.min(1, Math.hypot(normalizedX, normalizedY));
-    const deadZone = 0.21;
+    const deadZone = 0.13;
     mobileInput.active = magnitude > deadZone;
     mobileInput.targetMagnitude = mobileInput.active
-      ? Math.pow((magnitude - deadZone) / (1 - deadZone), 1.55)
+      ? Math.pow((magnitude - deadZone) / (1 - deadZone), 1.08)
       : 0;
     mobileInput.targetForward = mobileInput.active
       ? -normalizedY / Math.max(magnitude, 0.001)
@@ -9699,14 +9695,35 @@ function setupMobileControls() {
       ? normalizedX / Math.max(magnitude, 0.001)
       : 0;
     if (mobileInput.active) {
-      mobileInput.targetSteeringAngle = Math.atan2(
+      const nextSteeringAngle = Math.atan2(
         mobileInput.targetStrafe,
         mobileInput.targetForward,
       );
       if (!mobileInput.steeringInitialized) {
-        mobileInput.steeringAngle = mobileInput.targetSteeringAngle;
+        mobileInput.movementYaw = B;
         mobileInput.steeringInitialized = true;
+      } else {
+        const physicalAngleChange =
+          t.MathUtils.euclideanModulo(
+            nextSteeringAngle - mobileInput.targetSteeringAngle + Math.PI,
+            Math.PI * 2,
+          ) - Math.PI;
+        // Re-anchor only when the thumb actually changes direction. Camera
+        // follow movement alone must never rotate a held joystick vector.
+        if (Math.abs(physicalAngleChange) > 0.022)
+          mobileInput.movementYaw = B;
       }
+      mobileInput.targetSteeringAngle = nextSteeringAngle;
+      mobileInput.steeringAngle = nextSteeringAngle;
+      mobileInput.desiredWorldHeading =
+        t.MathUtils.euclideanModulo(
+          mobileInput.movementYaw - nextSteeringAngle + Math.PI,
+          Math.PI * 2,
+        ) - Math.PI;
+    } else {
+      mobileInput.magnitude = 0;
+      mobileInput.forward = 0;
+      mobileInput.strafe = 0;
     }
     knob.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
   };
@@ -9715,6 +9732,7 @@ function setupMobileControls() {
     event.stopPropagation();
     mobileInput.joystickPointerId = event.pointerId;
     mobileInput.movementYaw = B;
+    mobileInput.desiredWorldHeading = B;
     mobileInput.steeringInitialized = false;
     joystick.setPointerCapture?.(event.pointerId);
     updateJoystick(event);
@@ -9733,11 +9751,18 @@ function setupMobileControls() {
     event.preventDefault();
     if (S && !b) Ie();
   });
-  weaponButton?.addEventListener("click", (event) => {
+  weaponButton?.addEventListener("pointerdown", (event) => {
     event.preventDefault();
-    if (!S || b || specialSlingAttack.active) return;
-    dispatchMobileKey("Tab");
-    dispatchMobileKey("Tab", "keyup");
+    event.stopPropagation();
+    if (!S || b || specialSlingAttack.active || attackPointerId !== null) return;
+    // This is a dedicated staff action, not a weapon-switch menu. One touch
+    // equips the staff and immediately performs the existing attack/guidance
+    // action according to what is in front of David.
+    L = "staff";
+    Re();
+    document.dispatchEvent(
+      new MouseEvent("mousedown", { button: 0, bubbles: true, cancelable: true }),
+    );
   });
   collectButton?.addEventListener("click", (event) => {
     event.preventDefault();
@@ -9748,8 +9773,28 @@ function setupMobileControls() {
   callButton?.addEventListener("click", (event) => {
     event.preventDefault();
     if (!S || b || specialSlingAttack.active) return;
-    dispatchMobileKey("KeyZ");
-    dispatchMobileKey("KeyZ", "keyup");
+    const player = mt.player;
+    if (!player) return;
+    const now = performance.now();
+    const callableSheep = mt.sheep.filter((sheep) => !sheep.userData.safeHold);
+    callableSheep.forEach((sheep, index) => {
+      const angle = (index / Math.max(1, callableSheep.length)) * Math.PI * 2;
+      sheep.userData.mobileRushSlot = index;
+      sheep.userData.mobileRushCount = callableSheep.length;
+      sheep.userData.mobileRushUntil = now + 20000;
+      sheep.userData.recallUntil = now + 20000;
+      sheep.userData.urgeUntil = 0;
+      sheep.userData.fear = Math.min(sheep.userData.fear || 0, 0.12);
+      sheep.userData.target.set(
+        player.position.x + 76 * Math.sin(angle),
+        0,
+        player.position.z + 76 * Math.cos(angle),
+      );
+      sheep.userData.stuckTime = 0;
+      sheep.userData.lostSince = 0;
+    });
+    kt("sheep");
+    eo("양 떼 전체를 불러 모았습니다.");
   });
   const finishRun = (event) => {
     if (event) event.preventDefault();
@@ -9769,11 +9814,12 @@ function setupMobileControls() {
   runButton?.addEventListener("lostpointercapture", finishRun);
 
   let attackPointerId = null;
+  let attackMode = null;
   const finishAttack = (event) => {
     if (attackPointerId === null) return;
     if (event && event.pointerId !== attackPointerId) return;
     event?.preventDefault?.();
-    if ("sling" === L) {
+    if (attackMode === "sling") {
       document.dispatchEvent(
         new MouseEvent("mouseup", { button: 0, bubbles: true, cancelable: true }),
       );
@@ -9782,6 +9828,7 @@ function setupMobileControls() {
       );
     }
     attackPointerId = null;
+    attackMode = null;
     attackButton.classList.remove("pressed");
     updateMobileCharge(0);
   };
@@ -9790,14 +9837,11 @@ function setupMobileControls() {
     event.stopPropagation();
     if (!S || b || specialSlingAttack.active || attackPointerId !== null) return;
     attackPointerId = event.pointerId;
+    attackMode = "sling";
     attackButton.setPointerCapture?.(event.pointerId);
     attackButton.classList.add("pressed");
-    if ("staff" === L) {
-      document.dispatchEvent(
-        new MouseEvent("mousedown", { button: 0, bubbles: true, cancelable: true }),
-      );
-      return;
-    }
+    L = "sling";
+    Re();
     document.dispatchEvent(
       new MouseEvent("mousedown", { button: 2, bubbles: true, cancelable: true }),
     );
@@ -10594,32 +10638,17 @@ function _e(o, n) {
           }
         }
       if (IS_MOBILE_DEVICE) {
-        // Treat direction and speed separately. Interpolating X/Y directly can
-        // cross the centre when a thumb moves around the rim and suddenly
-        // resolve to the opposite direction. A capped angular turn makes the
-        // pad feel weighty and keeps Jerusalem alley steering deterministic.
-        const insideCityStick = Yt(o.position.x, o.position.z, -55);
-        const magnitudeResponse = 1 - Math.exp(-4.1 * e);
+        // Direction is applied immediately; only speed receives a short ramp.
+        // The old angular cap made the vector lag behind the visible knob and
+        // was the main source of delayed or opposite-feeling steering.
+        const magnitudeResponse = 1 - Math.exp(-12.5 * e);
         mobileInput.magnitude = t.MathUtils.lerp(
           mobileInput.magnitude,
           mobileInput.targetMagnitude,
           magnitudeResponse,
         );
-        if (mobileInput.active && mobileInput.steeringInitialized) {
-          const steeringDelta =
-            t.MathUtils.euclideanModulo(
-              mobileInput.targetSteeringAngle -
-                mobileInput.steeringAngle +
-                Math.PI,
-              Math.PI * 2,
-            ) - Math.PI;
-          const maximumStickTurn = (insideCityStick ? 1.0 : 1.28) * e;
-          mobileInput.steeringAngle += t.MathUtils.clamp(
-            steeringDelta,
-            -maximumStickTurn,
-            maximumStickTurn,
-          );
-        }
+        if (mobileInput.active && mobileInput.steeringInitialized)
+          mobileInput.steeringAngle = mobileInput.targetSteeringAngle;
         mobileInput.forward =
           Math.cos(mobileInput.steeringAngle) * mobileInput.magnitude;
         mobileInput.strafe =
@@ -10656,23 +10685,22 @@ function _e(o, n) {
       );
       if (hasMovementInput) {
         c.normalize();
+        const r = Math.atan2(c.x, c.z);
+        if (IS_MOBILE_DEVICE) mobileInput.desiredWorldHeading = r;
         const moveSpeed =
             (running ? 310 : 145) *
             (G ? 0.55 : 1) *
             Math.max(0.18, movementMagnitude),
           moveStep = c.clone().multiplyScalar(moveSpeed * e);
         movePlayerWithSweptCollision(o, moveStep);
-        const r = Math.atan2(c.x, c.z);
         let l =
           t.MathUtils.euclideanModulo(r - o.rotation.y + Math.PI, 2 * Math.PI) -
           Math.PI;
         (o.rotation.y += IS_MOBILE_DEVICE
           ? (() => {
-              const insideCityTurn = Yt(o.position.x, o.position.z, -55);
-              const maximumPlayerTurn =
-                (insideCityTurn ? 1.35 : 1.68) + 0.42 * movementMagnitude;
+              const maximumPlayerTurn = 4.8 + 0.8 * movementMagnitude;
               return t.MathUtils.clamp(
-                l * Math.min(1, 4.5 * e),
+                l * Math.min(1, 13 * e),
                 -maximumPlayerTurn * e,
                 maximumPlayerTurn * e,
               );
@@ -10826,11 +10854,14 @@ function _e(o, n) {
         I = t.MathUtils.lerp(I, mobileAimPitch, Math.min(1, 5.2 * e));
         if (hasMovementInput) {
           const cameraTurn =
-            t.MathUtils.euclideanModulo(o.rotation.y - B + Math.PI, 2 * Math.PI) -
+            t.MathUtils.euclideanModulo(
+              mobileInput.desiredWorldHeading - B + Math.PI,
+              2 * Math.PI,
+            ) -
             Math.PI;
           const insideCitySteering = Yt(o.position.x, o.position.z, -55);
-          const maximumCameraTurn = (insideCitySteering ? 0.72 : 0.96) * e;
-          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-2.05 * e));
+          const maximumCameraTurn = (insideCitySteering ? 3.45 : 4.15) * e;
+          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-8.2 * e));
           B += t.MathUtils.clamp(
             weightedCameraTurn,
             -maximumCameraTurn,
@@ -11051,6 +11082,29 @@ function _e(o, n) {
             n.position.x - s.position.x,
             n.position.z - s.position.z,
           );
+          let mobileFlockRush =
+            IS_MOBILE_DEVICE &&
+            !s.userData.safeHold &&
+            (s.userData.mobileRushUntil || 0) > now;
+          if (mobileFlockRush && playerDistance <= 110) {
+            s.userData.mobileRushUntil = 0;
+            mobileFlockRush = false;
+          }
+          if (mobileFlockRush) {
+            const rushCount = Math.max(
+              1,
+              s.userData.mobileRushCount || mt.sheep.length,
+            );
+            const rushAngle =
+              ((s.userData.mobileRushSlot || 0) / rushCount) * Math.PI * 2;
+            s.userData.target.set(
+              n.position.x + 76 * Math.sin(rushAngle),
+              0,
+              n.position.z + 76 * Math.cos(rushAngle),
+            );
+            s.userData.recallUntil = now + 350;
+            s.userData.stuckTime = 0;
+          }
           // Repair sheep already embedded in the wall (including positions
           // loaded from an older save) before any steering or flock separation.
           if (
@@ -11133,7 +11187,10 @@ function _e(o, n) {
             const calmingRate = playerDistance < 260 ? 0.56 : 0.18;
             s.userData.fear = Math.max(0, (s.userData.fear || 0) - e * calmingRate);
           }
-          if ((s.userData.fear || 0) > 0.18 && !s.userData.safeHold) {
+          if (mobileFlockRush) {
+            s.userData.fear = Math.max(0, (s.userData.fear || 0) - e * 3.2);
+            i = s.userData.target;
+          } else if ((s.userData.fear || 0) > 0.18 && !s.userData.safeHold) {
             const panicDistance = 150 + 210 * s.userData.fear;
             i = wt.set(
               s.position.x + s.userData.fearDirection.x * panicDistance,
@@ -11245,19 +11302,18 @@ function _e(o, n) {
             l = r.z - s.position.z,
             h = Math.hypot(c, l),
             d = (s.userData.recallUntil || 0) > performance.now();
+          const flockRunning = !!K.KeyZ || mobileFlockRush;
           if (h > 18) {
-            const flockRunning = !!K.KeyZ;
             const o =
-              (s.userData.fear || 0) > 0.18
-                ? 98 + 52 * s.userData.fear
-                :
-              (s.userData.urgeUntil || 0) > performance.now()
-                ? 112
-                : flockRunning
-                  ? 310
-                : d
-                  ? 82
-                  : 58;
+              flockRunning
+                ? 310
+                : (s.userData.fear || 0) > 0.18
+                  ? 98 + 52 * s.userData.fear
+                  : (s.userData.urgeUntil || 0) > performance.now()
+                    ? 112
+                  : d
+                    ? 82
+                    : 58;
             let moveX = s.position.x;
             let moveZ = s.position.z;
             const desiredAngle = Math.atan2(l, c);
@@ -11379,12 +11435,17 @@ function _e(o, n) {
           updateRiggedAnimalAnimation(
             s,
             p,
-            K.KeyZ ? 1 : (s.userData.fear || 0) > 0.18 ? 0.82 : d ? 0.62 : 0.32,
+            flockRunning
+              ? 1
+              : (s.userData.fear || 0) > 0.18
+                ? 0.82
+                : d
+                  ? 0.62
+                  : 0.32,
             false,
           );
           if (p && s.userData.legs) {
             const panicking = (s.userData.fear || 0) > 0.18;
-            const flockRunning = !!K.KeyZ;
             s.userData.runPhase +=
               e * (flockRunning ? 17.2 : panicking ? 14 : d ? 12 : 8);
             const o =
@@ -11406,7 +11467,7 @@ function _e(o, n) {
           }
           const u = p
             ? Math.abs(Math.sin(2 * (s.userData.runPhase || 0))) *
-              (K.KeyZ ? 2.45 : d ? 2.1 : 1.15)
+              (flockRunning ? 2.45 : d ? 2.1 : 1.15)
             : 0;
           s.position.y = te(s.position.x, s.position.z) + 1 + u;
         }),
@@ -12689,6 +12750,7 @@ function no() {
       I = -Math.PI / 4;
       B = Number.isFinite(Number(player.rotationY)) ? Number(player.rotationY) : B;
       mobileInput.movementYaw = B;
+      mobileInput.desiredWorldHeading = B;
     }
     restoreSavedSheep(saved.sheep, placedPlayer);
     if (saved.route && typeof saved.route === "object") {

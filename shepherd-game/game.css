@@ -495,10 +495,9 @@ body.mobile-device #mobileControls button,body.mobile-device #mobileJoystick{poi
 .mobile-attack-button.staff .mobile-attack-icon{background-image:url("assets/ui/weapon-staff.svg")}
 #mobileChargeRing{position:absolute;inset:3px;border-radius:50%;background:conic-gradient(#efd074 calc(var(--charge,0)*1turn),rgba(29,28,26,.42) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 0);mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 0);opacity:0;pointer-events:none}
 .mobile-attack-button.charging #mobileChargeRing{opacity:1}.mobile-attack-button.staff #mobileChargeRing{opacity:0!important}
-.mobile-weapon-button{right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 140px);z-index:4;width:68px;height:68px;flex-direction:column;gap:0;contain:layout paint}
-.mobile-weapon-icon{width:35px;height:35px;background-position:center;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 2px 2px #0009);pointer-events:none}
+.mobile-weapon-button{right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 140px);z-index:4;width:68px;height:68px;contain:layout paint}
+.mobile-weapon-icon{width:48px;height:48px;background-position:center;background-repeat:no-repeat;background-size:contain;filter:drop-shadow(0 2px 2px #0009);pointer-events:none}
 .mobile-weapon-icon.sling{background-image:url("assets/ui/weapon-sling.svg")}.mobile-weapon-icon.staff{background-image:url("assets/ui/weapon-staff.svg")}
-.mobile-weapon-label{max-width:64px;font-size:10px;font-weight:900;line-height:1.05;text-align:center;pointer-events:none}
 .mobile-collect-button{right:calc(env(safe-area-inset-right,0px) + 106px);bottom:calc(env(safe-area-inset-bottom,0px) + 132px);z-index:3;width:66px;height:66px}
 .mobile-run-button{right:calc(env(safe-area-inset-right,0px) + 168px);bottom:calc(env(safe-area-inset-bottom,0px) + 82px);width:66px;height:66px}
 .mobile-call-button{right:calc(env(safe-area-inset-right,0px) + 172px);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);width:66px;height:66px}
