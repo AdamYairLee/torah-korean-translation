@@ -47,11 +47,62 @@ function loadJerusalemMap() {
 
 const e = (t) => document.querySelector(t),
   o = [...document.querySelectorAll(".screen")],
-  n =
-    /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(
-      navigator.userAgent,
-    ) && Math.min(screen.width, screen.height) < 1e3;
-e("#mobileBlock").classList.toggle("hidden", !n);
+  n = (() => {
+    const ua = navigator.userAgent || "";
+    const touchPoints = navigator.maxTouchPoints || 0;
+    const coarsePointer = window.matchMedia?.("(pointer: coarse)")?.matches || false;
+    const iPadDesktopMode = navigator.platform === "MacIntel" && touchPoints > 1;
+    return (
+      /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini|Silk|Kindle/i.test(ua) ||
+      iPadDesktopMode ||
+      (touchPoints > 1 && coarsePointer && Math.min(screen.width, screen.height) < 1366)
+    );
+  })();
+document.body.classList.toggle("mobile-device", n);
+const mobileInput = {
+  active: false,
+  forward: 0,
+  strafe: 0,
+  magnitude: 0,
+  running: false,
+  joystickPointerId: null,
+  lookPointerId: null,
+  lookX: 0,
+  lookY: 0,
+};
+let distributionAdPauseActive = false;
+let distributionWasPausedBeforeAd = false;
+function updateOrientationGate() {
+  const gate = e("#orientationGate");
+  if (!gate) return;
+  const portrait = innerHeight > innerWidth;
+  document.body.classList.toggle("portrait-device", n && portrait);
+  gate.classList.toggle("hidden", !n || !portrait);
+  if (n && portrait && S) {
+    b = true;
+    Object.keys(K).forEach((key) => (K[key] = false));
+    mobileInput.active = false;
+    mobileInput.running = false;
+    pauseAllGameAudio();
+  } else if (n && S && !distributionAdPauseActive && e("#pause")?.classList.contains("hidden")) {
+    b = false;
+    Bt();
+  }
+}
+async function requestLandscapeMode() {
+  if (!n) return;
+  try {
+    if (!document.fullscreenElement)
+      await document.documentElement.requestFullscreen?.({ navigationUI: "hide" });
+  } catch {}
+  try {
+    await screen.orientation?.lock?.("landscape");
+  } catch {}
+  updateOrientationGate();
+}
+addEventListener("orientationchange", updateOrientationGate);
+addEventListener("resize", updateOrientationGate);
+window.visualViewport?.addEventListener?.("resize", updateOrientationGate);
 const s = e("#minimap").getContext("2d"),
   a = e("#rendererHost");
 let i,
@@ -125,6 +176,7 @@ let N = !1,
   H = !1;
 const K = {},
   X = 7600;
+updateOrientationGate();
 let Z = new t.Vector3(-1150, 0, 1050),
   Y = "",
   templeObjText = "",
@@ -196,10 +248,10 @@ const nightWatch = {
 const lightingPerformance = {
   nextTorchUpdateAt: 0,
   nextSunShadowUpdateAt: 0,
-  maxLocalPointLights: 2,
-  torchLightDistance: 680,
-  torchVisualDistance: 1800,
-  sunShadowEnabled: true,
+  maxLocalPointLights: n ? 1 : 2,
+  torchLightDistance: n ? 520 : 680,
+  torchVisualDistance: n ? 1450 : 1800,
+  sunShadowEnabled: !n,
 };
 const combatFeedback = {
   shakeUntil: 0,
@@ -303,15 +355,26 @@ function zt(t, e, o = 0) {
 function Dt(t) {
   o.forEach((e) => e.classList.toggle("active", e.id === t));
 }
-let distributionAdRequested = false;
-function startGameWithDistributionAd(continueFromSave) {
-  if (!distributionAdRequested) {
-    distributionAdRequested = true;
-    window.GameDistributionBridge?.showInterstitial?.();
+const CAMP_SUCCESS_AD_CHANCE = 0.33;
+async function requestMobileInterstitial(placement) {
+  if (!n) return false;
+  try {
+    return !!(await window.GameDistributionBridge?.showInterstitial?.(placement));
+  } catch (error) {
+    console.warn("Mobile ad hook skipped:", error);
+    return false;
+  }
+}
+async function startGameWithDistributionAd(continueFromSave) {
+  await requestLandscapeMode();
+  if (continueFromSave) {
+    await ensureSaveStorageReady();
+    await requestMobileInterstitial("saved-game-reopen");
   }
   return At(continueFromSave);
 }
-(e("#startBtn").onclick = () => {
+(e("#startBtn").onclick = async () => {
+  await requestLandscapeMode();
   Dt("characterScreen");
 }),
   (e("#continueBtn").onclick = () => {
@@ -346,7 +409,7 @@ function Tt() {
   S &&
     (t
       ? (e("#pause").classList.remove("hidden"), (b = !0))
-      : ((b = !1), c?.domElement.requestPointerLock?.()));
+      : ((b = !1), n || c?.domElement.requestPointerLock?.()));
 }
 function openKeyGuide() {
   e("#settingsPanel").classList.add("hidden");
@@ -389,6 +452,24 @@ function closeKeyGuide() {
       Ct(),
       y && Ut(520, 0.05, 0.025, "sine", 60);
   }),
+  (function bindPauseSoundControls() {
+    const pauseSound = e("#pauseSoundEnabled");
+    const pauseVolume = e("#pauseVolumeRange");
+    const pauseVolumeValue = e("#pauseVolumeValue");
+    if (!pauseSound || !pauseVolume || !pauseVolumeValue) return;
+    pauseSound.checked = y;
+    pauseVolume.value = bt.value;
+    pauseVolumeValue.textContent = bt.value;
+    pauseSound.addEventListener("change", () => {
+      St.checked = pauseSound.checked;
+      St.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    pauseVolume.addEventListener("input", () => {
+      bt.value = pauseVolume.value;
+      pauseVolumeValue.textContent = pauseVolume.value;
+      bt.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  })(),
   (e("#pauseSettingsBtn").onclick = () => {
     e("#pause").classList.add("hidden"), Pt(!0);
   });
@@ -725,7 +806,7 @@ function updateJerusalemBuildingLOD() {
 function At(e) {
   if (startupComplete) {
     Dt("gameScreen");
-    c?.domElement.requestPointerLock?.();
+    n || c?.domElement.requestPointerLock?.();
     return Promise.resolve();
   }
   if (startupPromise) return startupPromise;
@@ -831,10 +912,10 @@ async function runGameStartup(e) {
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
           })),
-          (performanceState.currentPixelRatio = Math.min(devicePixelRatio, 0.76)),
+          (performanceState.currentPixelRatio = Math.min(devicePixelRatio, n ? 0.58 : 0.76)),
           c.setPixelRatio(performanceState.currentPixelRatio),
           c.setSize(innerWidth, innerHeight),
-          (c.shadowMap.enabled = !0),
+          (c.shadowMap.enabled = !n),
           (c.shadowMap.type = t.BasicShadowMap),
           // The sun completes a cycle over many real minutes. Re-rendering the
           // entire city shadow map every display frame wastes a second city
@@ -851,7 +932,7 @@ async function runGameStartup(e) {
         const e = new t.DirectionalLight(16769706, 3);
         (h = e),
           e.position.set(-700, 1200, 500),
-          (e.castShadow = !0),
+          (e.castShadow = !n),
           e.shadow.mapSize.set(512, 512),
           (e.shadow.camera.left = -1300),
           (e.shadow.camera.right = 1300),
@@ -879,7 +960,7 @@ async function runGameStartup(e) {
             // A single GPU draw call supplies the whole star field.  Per-star
             // reveal thresholds let dusk uncover stars gradually without
             // creating lights, meshes, shadows or per-frame object loops.
-            const starCount = 280,
+            const starCount = n ? 140 : 280,
               starPositions = new Float32Array(3 * starCount),
               starColors = new Float32Array(3 * starCount),
               starReveal = new Float32Array(starCount),
@@ -2330,7 +2411,7 @@ async function runGameStartup(e) {
     l?.start(),
     l?.getDelta(),
     document.documentElement.requestFullscreen?.().catch(() => {}),
-    c.domElement.requestPointerLock?.(),
+    n || c.domElement.requestPointerLock?.(),
     eo(
       `다비드의 도시 · 성전산 · 키드론 골짜기 · 올리브산
 성문과 골목을 따라 성전산까지 올라갈 수 있습니다.`,
@@ -2359,11 +2440,16 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.2.0",
+  Wt = "2.3.0",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
   qt = { x: -1180, z: 1650 };
+const SAVE_DB_NAME = "protectTheFlockSaves";
+const SAVE_DB_STORE = "gameSaves";
+const SAVE_DB_SLOT = "latest";
+let indexedSaveCache = null;
+let saveDatabasePromise = null;
 function Nt(t, e, o, n = "solid") {
   z.push({ shape: "circle", x: t, z: e, r: o, type: n });
   collisionRevision++;
@@ -5154,7 +5240,7 @@ function showGuardCaught() {
     caught.classList.add("hidden");
     resetSouthGateGuard(guard, true);
     b = false;
-    c?.domElement?.requestPointerLock?.().catch?.(() => {});
+    n || c?.domElement?.requestPointerLock?.().catch?.(() => {});
   }, 3000);
 }
 function canNpcMoveBetween(npc, from, to) {
@@ -7573,7 +7659,7 @@ function Le() {
     r.updateProjectionMatrix(),
     c.setSize(innerWidth, innerHeight),
     c.setPixelRatio(
-      performanceState.currentPixelRatio || Math.min(devicePixelRatio, 0.76),
+      performanceState.currentPixelRatio || Math.min(devicePixelRatio, n ? 0.58 : 0.76),
     );
 }
 function Ce(t) {
@@ -7598,6 +7684,14 @@ function Be(t) {
     (Be.timer = setTimeout(() => o.classList.remove("show"), 1500)));
 }
 function Ie() {
+  resetMobileMovement();
+  mobileInput.running = false;
+  const pauseSound = e("#pauseSoundEnabled");
+  const pauseVolume = e("#pauseVolumeRange");
+  const pauseVolumeValue = e("#pauseVolumeValue");
+  if (pauseSound) pauseSound.checked = y;
+  if (pauseVolume) pauseVolume.value = String(Math.round(v * 100));
+  if (pauseVolumeValue) pauseVolumeValue.textContent = String(Math.round(v * 100));
   (b = !0),
     pauseAllGameAudio(),
     e("#pause").classList.remove("hidden"),
@@ -7608,7 +7702,7 @@ function Ee() {
   const t = e("#cheatConsole");
   t.classList.toggle("hidden"),
     t.classList.contains("hidden")
-      ? ((b = !1), c.domElement.requestPointerLock?.())
+      ? ((b = !1), n || c.domElement.requestPointerLock?.())
       : ((b = !0), document.exitPointerLock?.(), e("#cheatInput").focus());
 }
 function Re() {
@@ -7617,6 +7711,20 @@ function Re() {
     (t.classList.toggle("sling", "sling" === L),
     t.classList.toggle("staff", "staff" === L),
     t.setAttribute("aria-label", "sling" === L ? "회전식 돌팔매" : "지팡이"));
+  const mobileAttack = e("#mobileAttackBtn");
+  const mobileWeaponIcon = e("#mobileWeaponIcon");
+  if (mobileAttack) {
+    mobileAttack.classList.toggle("sling", "sling" === L);
+    mobileAttack.classList.toggle("staff", "staff" === L);
+    mobileAttack.setAttribute(
+      "aria-label",
+      "sling" === L ? "돌팔매 던지기" : "지팡이 사용",
+    );
+  }
+  if (mobileWeaponIcon) {
+    mobileWeaponIcon.classList.toggle("sling", "sling" === L);
+    mobileWeaponIcon.classList.toggle("staff", "staff" === L);
+  }
 }
 function triggerCombatFeedback(kind) {
   const now = performance.now();
@@ -8314,6 +8422,11 @@ function startSpecialSlingAttack(target, charge, aimDirection) {
   N = false;
   for (const code of ["KeyW", "KeyA", "KeyS", "KeyD", "Space"])
     K[code] = false;
+  mobileInput.active = false;
+  mobileInput.forward = 0;
+  mobileInput.strafe = 0;
+  mobileInput.magnitude = 0;
+  mobileInput.running = false;
   e("#crosshair").style.display = "none";
   e("#charge").style.display = "none";
   const direction = validTarget
@@ -8514,6 +8627,7 @@ document.addEventListener(
         ((K[t.code] = !specialSlingAttack.active),
         S &&
           !b &&
+          !n &&
           document.pointerLockElement !== c?.domElement &&
           ["KeyW", "KeyA", "KeyS", "KeyD", "Space"].includes(t.code) &&
           c?.domElement.requestPointerLock?.().catch?.(() => {}),
@@ -8583,7 +8697,7 @@ document.addEventListener(
               ? ((b = !1),
                 Bt(),
                 e("#pause").classList.add("hidden"),
-                c.domElement.requestPointerLock?.())
+                (n || c.domElement.requestPointerLock?.()))
               : Ie());
     }
   }),
@@ -8597,7 +8711,8 @@ document.addEventListener(
       (I = t.MathUtils.clamp(I, -1.3, 1.1)));
   }),
   a.addEventListener("click", () => {
-    S &&
+    !n &&
+      S &&
       !b &&
       document.pointerLockElement !== c?.domElement &&
       c?.domElement.requestPointerLock?.();
@@ -8612,10 +8727,10 @@ document.addEventListener(
     // look. Explicit Escape still opens the real pause menu.
   }),
   window.addEventListener("focus", () => {
-    S && !b && c?.domElement.requestPointerLock?.().catch?.(() => {});
+    !n && S && !b && c?.domElement.requestPointerLock?.().catch?.(() => {});
   }),
   a.addEventListener("mouseenter", () => {
-    S && !b && c?.domElement.requestPointerLock?.().catch?.(() => {});
+    !n && S && !b && c?.domElement.requestPointerLock?.().catch?.(() => {});
   }),
   document.addEventListener("contextmenu", (t) => t.preventDefault()),
   document.addEventListener("mousedown", (o) => {
@@ -8811,7 +8926,7 @@ document.addEventListener(
       document
         .querySelectorAll(".menu-focus")
         .forEach((t) => t.classList.remove("menu-focus")),
-      c.domElement.requestPointerLock?.();
+      (n || c.domElement.requestPointerLock?.());
   }),
   (e("#practiceYesBtn").onclick = () =>
     (function () {
@@ -8874,13 +8989,13 @@ document.addEventListener(
         (I = -0.04),
         (A = 1),
         (e("#crosshair").style.display = "block"),
-        c.domElement.requestPointerLock?.(),
+        (n || c.domElement.requestPointerLock?.()),
         eo("과녁을 향해 돌팔매를 5번 연습하십시오.");
     })()),
   (e("#practiceNoBtn").onclick = () => {
     e("#practicePrompt").classList.add("hidden"),
       (b = !1),
-      c?.domElement.requestPointerLock?.(),
+      (n || c?.domElement.requestPointerLock?.()),
       ie();
   }),
   (e("#saveBtn").onclick = () => oo(!1)),
@@ -8900,7 +9015,7 @@ document.addEventListener(
     e("#gameOver").classList.add("hidden");
     e("#gameOver").classList.remove("mission-fail");
     b = !1;
-    c?.domElement.requestPointerLock?.();
+    n || c?.domElement.requestPointerLock?.();
   }),
   e("#cheatInput").addEventListener("keydown", (t) => {
     if ("Enter" === t.key) {
@@ -8919,8 +9034,210 @@ document.addEventListener(
           $e()),
         Ee(),
         t.stopPropagation();
-    }
+      }
   });
+function updateMobileCharge(value = 0) {
+  const button = e("#mobileAttackBtn");
+  if (!button) return;
+  const charge = t.MathUtils.clamp(Number(value) || 0, 0, 1);
+  button.style.setProperty("--charge", String(charge));
+  button.classList.toggle("charging", charge > 0 || P);
+}
+function dispatchMobileKey(code, type = "keydown") {
+  const keyByCode = { Tab: "Tab", KeyV: "v", Space: " ", KeyZ: "z" };
+  document.dispatchEvent(
+    new KeyboardEvent(type, {
+      code,
+      key: keyByCode[code] || code,
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+}
+function resetMobileMovement() {
+  mobileInput.active = false;
+  mobileInput.forward = 0;
+  mobileInput.strafe = 0;
+  mobileInput.magnitude = 0;
+  mobileInput.joystickPointerId = null;
+  const knob = e("#mobileJoystickKnob");
+  if (knob) knob.style.transform = "translate(-50%,-50%)";
+}
+function setupMobileControls() {
+  if (!n) return;
+  const joystick = e("#mobileJoystick"),
+    knob = e("#mobileJoystickKnob"),
+    pauseButton = e("#mobilePauseBtn"),
+    weaponButton = e("#mobileWeaponBtn"),
+    cameraButton = e("#mobileCameraBtn"),
+    runButton = e("#mobileRunBtn"),
+    callButton = e("#mobileCallBtn"),
+    attackButton = e("#mobileAttackBtn");
+  if (!joystick || !knob || !attackButton) return;
+
+  const updateJoystick = (event) => {
+    if (mobileInput.joystickPointerId !== event.pointerId) return;
+    const rect = joystick.getBoundingClientRect();
+    const radius = Math.max(34, rect.width * 0.34);
+    let dx = event.clientX - (rect.left + rect.width / 2);
+    let dy = event.clientY - (rect.top + rect.height / 2);
+    const rawLength = Math.hypot(dx, dy);
+    if (rawLength > radius) {
+      dx = (dx / rawLength) * radius;
+      dy = (dy / rawLength) * radius;
+    }
+    const normalizedX = dx / radius;
+    const normalizedY = dy / radius;
+    const magnitude = Math.min(1, Math.hypot(normalizedX, normalizedY));
+    const deadZone = 0.1;
+    mobileInput.active = magnitude > deadZone;
+    mobileInput.magnitude = mobileInput.active
+      ? (magnitude - deadZone) / (1 - deadZone)
+      : 0;
+    mobileInput.forward = mobileInput.active
+      ? -normalizedY * mobileInput.magnitude / Math.max(magnitude, 0.001)
+      : 0;
+    mobileInput.strafe = mobileInput.active
+      ? normalizedX * mobileInput.magnitude / Math.max(magnitude, 0.001)
+      : 0;
+    knob.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
+  };
+  joystick.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    mobileInput.joystickPointerId = event.pointerId;
+    joystick.setPointerCapture?.(event.pointerId);
+    updateJoystick(event);
+  });
+  joystick.addEventListener("pointermove", updateJoystick);
+  const finishJoystick = (event) => {
+    if (mobileInput.joystickPointerId !== event.pointerId) return;
+    event.preventDefault();
+    resetMobileMovement();
+  };
+  joystick.addEventListener("pointerup", finishJoystick);
+  joystick.addEventListener("pointercancel", finishJoystick);
+  joystick.addEventListener("lostpointercapture", finishJoystick);
+
+  a.addEventListener("pointerdown", (event) => {
+    if (!S || b || specialSlingAttack.active || mobileInput.lookPointerId !== null)
+      return;
+    mobileInput.lookPointerId = event.pointerId;
+    mobileInput.lookX = event.clientX;
+    mobileInput.lookY = event.clientY;
+    a.setPointerCapture?.(event.pointerId);
+  });
+  a.addEventListener("pointermove", (event) => {
+    if (
+      mobileInput.lookPointerId !== event.pointerId ||
+      !S ||
+      b ||
+      specialSlingAttack.active
+    )
+      return;
+    const dx = event.clientX - mobileInput.lookX;
+    const dy = event.clientY - mobileInput.lookY;
+    mobileInput.lookX = event.clientX;
+    mobileInput.lookY = event.clientY;
+    B -= dx * 0.0062;
+    I -= dy * 0.0028;
+    I = t.MathUtils.clamp(I, -1.3, 1.1);
+  });
+  const finishLook = (event) => {
+    if (mobileInput.lookPointerId === event.pointerId)
+      mobileInput.lookPointerId = null;
+  };
+  a.addEventListener("pointerup", finishLook);
+  a.addEventListener("pointercancel", finishLook);
+  a.addEventListener("lostpointercapture", finishLook);
+
+  pauseButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (S && !b) Ie();
+  });
+  weaponButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (!S || b || specialSlingAttack.active) return;
+    dispatchMobileKey("Tab");
+    dispatchMobileKey("Tab", "keyup");
+  });
+  cameraButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (!S || b || specialSlingAttack.active) return;
+    dispatchMobileKey("KeyV");
+    dispatchMobileKey("KeyV", "keyup");
+  });
+  callButton?.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (!S || b || specialSlingAttack.active) return;
+    dispatchMobileKey("KeyZ");
+    dispatchMobileKey("KeyZ", "keyup");
+  });
+  const finishRun = (event) => {
+    if (event) event.preventDefault();
+    mobileInput.running = false;
+    runButton?.classList.remove("pressed");
+  };
+  runButton?.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!S || b || specialSlingAttack.active) return;
+    runButton.setPointerCapture?.(event.pointerId);
+    mobileInput.running = true;
+    runButton.classList.add("pressed");
+  });
+  runButton?.addEventListener("pointerup", finishRun);
+  runButton?.addEventListener("pointercancel", finishRun);
+  runButton?.addEventListener("lostpointercapture", finishRun);
+
+  let attackPointerId = null;
+  const finishAttack = (event) => {
+    if (attackPointerId === null) return;
+    if (event && event.pointerId !== attackPointerId) return;
+    event?.preventDefault?.();
+    if ("sling" === L) {
+      document.dispatchEvent(
+        new MouseEvent("mouseup", { button: 0, bubbles: true, cancelable: true }),
+      );
+      document.dispatchEvent(
+        new MouseEvent("mouseup", { button: 2, bubbles: true, cancelable: true }),
+      );
+    }
+    attackPointerId = null;
+    attackButton.classList.remove("pressed");
+    updateMobileCharge(0);
+  };
+  attackButton.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!S || b || specialSlingAttack.active || attackPointerId !== null) return;
+    attackPointerId = event.pointerId;
+    attackButton.setPointerCapture?.(event.pointerId);
+    attackButton.classList.add("pressed");
+    if ("staff" === L) {
+      document.dispatchEvent(
+        new MouseEvent("mousedown", { button: 0, bubbles: true, cancelable: true }),
+      );
+      return;
+    }
+    document.dispatchEvent(
+      new MouseEvent("mousedown", { button: 2, bubbles: true, cancelable: true }),
+    );
+    document.dispatchEvent(
+      new MouseEvent("mousedown", { button: 0, bubbles: true, cancelable: true }),
+    );
+    updateMobileCharge(0.001);
+  });
+  attackButton.addEventListener("pointerup", finishAttack);
+  attackButton.addEventListener("pointercancel", finishAttack);
+  attackButton.addEventListener("lostpointercapture", finishAttack);
+  addEventListener("blur", () => {
+    resetMobileMovement();
+    finishRun();
+    finishAttack();
+  });
+}
+setupMobileControls();
 let Fe = null,
   We = new t.Vector3();
 function qe(e, o) {
@@ -9037,7 +9354,16 @@ function Ke() {
     (routeChoice.spawnMultiplier = 1),
     (routeChoice.rewardRespect = 0),
     oo(!0),
-    o || setTimeout(ie, 4300);
+    o ||
+      setTimeout(async () => {
+        if (
+          n &&
+          (window.GameDistributionBridge?.isTestMode?.() ||
+            Math.random() < CAMP_SUCCESS_AD_CHANCE)
+        )
+          await requestMobileInterstitial("camp-success");
+        ie();
+      }, 4300);
 }
 const Xe = [
   { name: "새벽", start: 0, end: 0.1 },
@@ -9098,17 +9424,29 @@ function updateAdaptiveRendering(now) {
   const consistentlySlow = performanceState.slowFrameFor > 1.4;
   const targetRatio = Math.min(
     devicePixelRatio,
-    consistentlySlow
-      ? onOliveMount
-        ? 0.54
-        : insideCity
-          ? 0.58
-          : 0.6
-      : onOliveMount
-        ? 0.66
-        : insideCity
-          ? 0.72
-          : 0.76,
+    n
+      ? consistentlySlow
+        ? onOliveMount
+          ? 0.4
+          : insideCity
+            ? 0.43
+            : 0.46
+        : onOliveMount
+          ? 0.48
+          : insideCity
+            ? 0.53
+            : 0.58
+      : consistentlySlow
+        ? onOliveMount
+          ? 0.54
+          : insideCity
+            ? 0.58
+            : 0.6
+        : onOliveMount
+          ? 0.66
+          : insideCity
+            ? 0.72
+            : 0.76,
   );
   if (Math.abs(targetRatio - performanceState.currentPixelRatio) > 0.01) {
     performanceState.currentPixelRatio = targetRatio;
@@ -9283,7 +9621,8 @@ function _e(o, n) {
   })(),
     P &&
       ((T = Math.min(1, T + 0.55 * o)),
-      (e("#charge i").style.width = 100 * T + "%")),
+      (e("#charge i").style.width = 100 * T + "%"),
+      updateMobileCharge(T)),
     (function (o, n) {
       Number.isFinite(ut.worldTime) || (ut.worldTime = 0.29),
         // One full in-game day now takes 22 real minutes instead of 24.
@@ -9577,31 +9916,49 @@ function _e(o, n) {
               (staff.rotation.x *= Math.max(0, 1 - 10 * e));
           }
         }
-      const n = (K.KeyW ? 1 : 0) - (K.KeyS ? 1 : 0),
-        s = (K.KeyD ? 1 : 0) - (K.KeyA ? 1 : 0),
+      const forwardInput = t.MathUtils.clamp(
+          (K.KeyW ? 1 : 0) - (K.KeyS ? 1 : 0) + mobileInput.forward,
+          -1,
+          1,
+        ),
+        strafeInput = t.MathUtils.clamp(
+          (K.KeyD ? 1 : 0) - (K.KeyA ? 1 : 0) + mobileInput.strafe,
+          -1,
+          1,
+        ),
         a = new t.Vector3(Math.sin(B), 0, Math.cos(B)).normalize(),
         i = new t.Vector3(-Math.cos(B), 0, Math.sin(B)).normalize(),
         c = (o.position.clone(), new t.Vector3());
+      const running = !!K.Space || mobileInput.running;
+      const movementMagnitude = mobileInput.active
+        ? t.MathUtils.clamp(Math.hypot(forwardInput, strafeInput), 0, 1)
+        : 1;
       const hasMovementInput =
         !specialSlingAttack.active &&
-        c.addScaledVector(a, n).addScaledVector(i, s).lengthSq() > 0;
+        c
+          .addScaledVector(a, forwardInput)
+          .addScaledVector(i, strafeInput)
+          .lengthSq() > 0;
       o.userData.updateLocomotionAnimation?.(
         e,
         hasMovementInput,
-        hasMovementInput && !!K.Space,
+        hasMovementInput && running,
       );
       if (hasMovementInput) {
         c.normalize();
-        const n = (K.Space ? 310 : 145) * (G ? 0.55 : 1),
-          s = c.clone().multiplyScalar(n * e);
-        movePlayerWithSweptCollision(o, s);
+        const moveSpeed =
+            (running ? 310 : 145) *
+            (G ? 0.55 : 1) *
+            Math.max(0.18, movementMagnitude),
+          moveStep = c.clone().multiplyScalar(moveSpeed * e);
+        movePlayerWithSweptCollision(o, moveStep);
         const r = Math.atan2(c.x, c.z);
         let l =
           t.MathUtils.euclideanModulo(r - o.rotation.y + Math.PI, 2 * Math.PI) -
           Math.PI;
         (o.rotation.y += l * Math.min(1, 12 * e)),
-          (o.userData.walkPhase += e * (K.Space ? 17.2 : 9));
-        const h = !!K.Space,
+          (o.userData.walkPhase += e * (running ? 17.2 : 9));
+        const h = running,
           d = Math.sin(o.userData.walkPhase) * (h ? 0.8 : 0.38),
           p = o.userData.bodyRoot || o;
         (p.rotation.x = t.MathUtils.lerp(
@@ -11210,6 +11567,67 @@ function isUsableSaveRecord(record) {
     Number.isFinite(Number(player.z))
   );
 }
+function openSaveDatabase() {
+  if (saveDatabasePromise) return saveDatabasePromise;
+  if (!("indexedDB" in window)) return Promise.reject(new Error("IndexedDB unavailable"));
+  saveDatabasePromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(SAVE_DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(SAVE_DB_STORE))
+        database.createObjectStore(SAVE_DB_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("IndexedDB open failed"));
+    request.onblocked = () => reject(new Error("IndexedDB open blocked"));
+  });
+  return saveDatabasePromise;
+}
+async function readIndexedGameSave() {
+  const database = await openSaveDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SAVE_DB_STORE, "readonly");
+    const request = transaction.objectStore(SAVE_DB_STORE).get(SAVE_DB_SLOT);
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error || new Error("IndexedDB read failed"));
+  });
+}
+async function writeIndexedGameSave(record) {
+  const database = await openSaveDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = database.transaction(SAVE_DB_STORE, "readwrite");
+    transaction.objectStore(SAVE_DB_STORE).put(record, SAVE_DB_SLOT);
+    transaction.oncomplete = () => resolve(true);
+    transaction.onerror = () => reject(transaction.error || new Error("IndexedDB write failed"));
+    transaction.onabort = () => reject(transaction.error || new Error("IndexedDB write aborted"));
+  });
+}
+async function deleteIndexedGameSave() {
+  try {
+    const database = await openSaveDatabase();
+    await new Promise((resolve, reject) => {
+      const transaction = database.transaction(SAVE_DB_STORE, "readwrite");
+      transaction.objectStore(SAVE_DB_STORE).delete(SAVE_DB_SLOT);
+      transaction.oncomplete = resolve;
+      transaction.onerror = () => reject(transaction.error || new Error("IndexedDB delete failed"));
+    });
+  } catch (error) {
+    console.warn("Indexed save deletion skipped:", error);
+  }
+}
+const saveStorageReadyPromise = (async () => {
+  try {
+    const record = await readIndexedGameSave();
+    if (isUsableSaveRecord(record)) indexedSaveCache = record;
+  } catch (error) {
+    console.info("Indexed save fallback unavailable:", error);
+  } finally {
+    refreshContinueAvailability();
+  }
+})();
+async function ensureSaveStorageReady() {
+  await saveStorageReadyPromise;
+}
 function readStoredGameSave() {
   for (const key of [SAVE_PRIMARY_KEY, SAVE_BACKUP_KEY]) {
     try {
@@ -11221,7 +11639,7 @@ function readStoredGameSave() {
       console.warn(`저장 데이터 읽기 실패 (${key}):`, error);
     }
   }
-  return null;
+  return isUsableSaveRecord(indexedSaveCache) ? indexedSaveCache : null;
 }
 function refreshContinueAvailability() {
   const button = e("#continueBtn");
@@ -11237,6 +11655,8 @@ function clearStoredGameSave() {
   } catch (error) {
     console.warn("저장 데이터 삭제 실패:", error);
   }
+  indexedSaveCache = null;
+  deleteIndexedGameSave();
   refreshContinueAvailability();
 }
 function buildSaveRecord() {
@@ -11297,11 +11717,25 @@ function showPauseSaveStatus(message, failed = !1) {
 function oo(silent = !1) {
   if (!S || !mt.player || ut.flockLost) return !1;
   try {
-    const encoded = JSON.stringify(buildSaveRecord());
-    localStorage.setItem(SAVE_BACKUP_KEY, encoded);
-    localStorage.setItem(SAVE_PRIMARY_KEY, encoded);
-    if (localStorage.getItem(SAVE_PRIMARY_KEY) !== encoded)
-      throw new Error("저장소 확인값이 일치하지 않습니다.");
+    const record = buildSaveRecord();
+    const encoded = JSON.stringify(record);
+    let localSaveSucceeded = false;
+    try {
+      localStorage.setItem(SAVE_BACKUP_KEY, encoded);
+      localStorage.setItem(SAVE_PRIMARY_KEY, encoded);
+      if (localStorage.getItem(SAVE_PRIMARY_KEY) !== encoded)
+        throw new Error("저장소 확인값이 일치하지 않습니다.");
+      localSaveSucceeded = true;
+    } catch (localError) {
+      console.warn("Local save unavailable; using IndexedDB fallback:", localError);
+    }
+    indexedSaveCache = record;
+    if ("indexedDB" in window)
+      writeIndexedGameSave(record).catch((error) =>
+        console.warn("Indexed save backup failed:", error),
+      );
+    if (!localSaveSucceeded && !("indexedDB" in window))
+      throw new Error("사용 가능한 브라우저 저장소가 없습니다.");
     refreshContinueAvailability();
     if (!silent) {
       eo("저장되었습니다.");
@@ -11407,26 +11841,28 @@ function no() {
   }
 }
 refreshContinueAvailability();
-let distributionAdPauseActive = false;
-let distributionWasPausedBeforeAd = false;
 window.addEventListener("gamedistribution:pause", () => {
   if (distributionAdPauseActive) return;
   distributionAdPauseActive = true;
   distributionWasPausedBeforeAd = b;
   b = true;
   Object.keys(K).forEach((key) => (K[key] = false));
+  resetMobileMovement();
+  mobileInput.running = false;
   G = false;
   P = false;
+  updateMobileCharge(0);
   pauseAllGameAudio();
   document.exitPointerLock?.();
 });
 window.addEventListener("gamedistribution:resume", () => {
   if (!distributionAdPauseActive) return;
   distributionAdPauseActive = false;
-  if (!distributionWasPausedBeforeAd) {
+  if (!distributionWasPausedBeforeAd && (!n || innerWidth >= innerHeight)) {
     b = false;
     Bt();
   }
+  updateOrientationGate();
 });
 addEventListener("pagehide", () => oo(!0));
 document.addEventListener("visibilitychange", () => {

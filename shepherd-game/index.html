@@ -6,14 +6,22 @@
       name="viewport"
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <title>Protect the Flock · v1.0</title>
+    <title>Protect the Flock · v2.3.1</title>
     <meta
       name="description"
-      content="A desktop 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness."
+      content="A cross-device 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness."
     />
     <!-- Paste the 32-character GameDistribution gameId into content before submission. -->
     <meta name="gd-game-id" content="" />
-    <link rel="stylesheet" href="game.css?v=2.2.0" />
+    <meta name="theme-color" content="#8b5a2b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Protect the Flock" />
+    <link rel="manifest" href="manifest.webmanifest?v=2.3.1" />
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/icons/favicon-64.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-180.png" />
+    <link rel="stylesheet" href="game.css?v=2.3.1" />
   </head>
   <body>
     <div id="languageGate" class="overlay language-gate">
@@ -28,19 +36,30 @@
         </div>
       </div>
     </div>
-    <div id="mobileBlock" class="overlay hidden">
+    <div id="orientationGate" class="overlay hidden" role="dialog" aria-modal="true" aria-label="화면 회전 안내">
       <div class="stone-panel">
-        <h1>양떼를 지켜라</h1>
-        <p>
-          <span>이 게임은 데스크탑 환경에 맞게 제작되었습니다.</span><br /><span>더 넓은 화면과 키보드·마우스로 플레이해 주세요.</span>
-        </p>
+        <div class="rotate-device" aria-hidden="true">↻</div>
+        <h2>기기를 가로로 돌려주세요</h2>
+        <p>게임은 휴대폰과 태블릿에서 가로 화면으로 진행됩니다.</p>
       </div>
     </div>
+    <aside id="installBanner" class="install-banner hidden" role="dialog" aria-label="앱 설치 안내">
+      <img src="assets/icons/icon-192.png" alt="양떼를 지켜라 앱 아이콘" width="72" height="72" />
+      <div class="install-banner-copy">
+        <strong>앱으로 설치하시겠습니까?</strong>
+        <span>홈 화면에서 전체 화면으로 바로 게임을 시작할 수 있습니다.</span>
+        <small id="installHelp" class="hidden" aria-live="polite"></small>
+      </div>
+      <div class="install-banner-actions">
+        <button id="installAppBtn" class="primary" type="button">앱으로 설치</button>
+        <button id="installLaterBtn" type="button">나중에</button>
+      </div>
+    </aside>
     <div id="titleScreen" class="screen active">
       <div class="title-bg"></div>
       <div class="title-wrap">
         <h1 class="stone-title">양떼를 지켜라</h1>
-        <p class="alpha-badge">v1.0</p>
+        <p class="alpha-badge">v2.3.1</p>
         <p class="subtitle">고대 예루샬라임과 유대 광야의 3D 양치기 모험</p>
         <p class="alpha-note">
           <span>양 떼를 이끌고 물과 안전한 야영지를 찾으십시오.</span><br /><span>야생 동물과 성 안의 위험으로부터 양 떼를 지키십시오.</span>
@@ -134,6 +153,33 @@
         </div>
         <div id="notice"></div>
       </div>
+      <div id="mobileControls" aria-label="모바일 게임 조작">
+        <button id="mobilePauseBtn" class="mobile-stone-button mobile-pause-button" type="button" aria-label="일시정지">
+          <span aria-hidden="true">Ⅱ</span>
+        </button>
+        <div id="mobileJoystick" class="mobile-joystick" role="application" aria-label="이동 조이스틱">
+          <div id="mobileJoystickKnob" class="mobile-joystick-knob"></div>
+        </div>
+        <div class="mobile-action-cluster">
+          <button id="mobileCallBtn" class="mobile-stone-button mobile-call-button" type="button" aria-label="양떼 부르기">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 39c-6-2-7-10-2-14-2-7 6-12 12-8 4-6 14-4 15 3 7-4 15 3 12 10 5 5 1 14-7 14H20c-3 0-5-2-6-5Zm8 2v11m18-11v11M7 18l-4-4m8-2-1-6m39 9 6-4m-2 10 7 1"/></svg>
+          </button>
+          <button id="mobileRunBtn" class="mobile-stone-button mobile-run-button" type="button" aria-label="달리기">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="38" cy="10" r="6"/><path d="m31 21 11 9 10 1m-21-10-8 14-10 5m20-9-7 12-12 11m19-11 12 10"/></svg>
+          </button>
+          <button id="mobileCameraBtn" class="mobile-stone-button mobile-camera-button" type="button" aria-label="시점 변경">
+            <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 21h12l5-7h14l5 7h12v31H8z"/><circle cx="32" cy="36" r="11"/></svg>
+          </button>
+          <button id="mobileWeaponBtn" class="mobile-stone-button mobile-weapon-button" type="button" aria-label="무기 선택">
+            <span id="mobileWeaponIcon" class="mobile-weapon-icon sling" aria-hidden="true"></span>
+            <span class="mobile-weapon-label">무기 선택</span>
+          </button>
+          <button id="mobileAttackBtn" class="mobile-stone-button mobile-attack-button sling" type="button" aria-label="돌팔매 던지기">
+            <i id="mobileChargeRing" aria-hidden="true"></i>
+            <span class="mobile-attack-icon" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
       <div
         id="practicePrompt"
         class="overlay hidden"
@@ -162,18 +208,23 @@
               <button type="button" data-lang="he">히브리어</button>
             </div>
           </div>
+          <div class="pause-sound-settings">
+            <label class="pause-sound-toggle"><input id="pauseSoundEnabled" type="checkbox" checked /> <span>소리 설정</span></label>
+            <label for="pauseVolumeRange">게임 볼륨 <strong id="pauseVolumeValue">55</strong></label>
+            <input id="pauseVolumeRange" type="range" min="0" max="100" step="1" value="55" />
+          </div>
           <button id="resumeBtn">계속</button
           ><button id="pauseSettingsBtn">설정</button
           ><button id="saveBtn">저장</button
           ><div id="saveStatus" class="pause-save-status" aria-live="polite"></div>
-          <button id="quitBtn">메인 화면</button>
+          <button id="quitBtn">게임 종료</button>
         </div>
       </div>
       <div id="settingsPanel" class="overlay hidden" aria-label="설정 메뉴">
         <div class="stone-panel settings-panel">
           <h2>설정</h2>
           <p class="keyboard-help">Tab 또는 방향키로 선택 · Enter로 실행</p>
-          <label for="sensitivityRange"
+          <label class="sensitivity-control" for="sensitivityRange"
             >마우스 감도 <strong id="sensitivityValue">60</strong></label
           ><label class="sound-toggle"
             ><input id="soundEnabled" type="checkbox" checked /> 환경음과 효과음
@@ -188,6 +239,7 @@
             step="1"
             value="55"
           /><input
+            class="sensitivity-control"
             id="sensitivityRange"
             type="range"
             min="10"
@@ -195,7 +247,7 @@
             step="1"
             value="60"
           />
-          <p class="settings-help">
+          <p class="settings-help sensitivity-control">
             낮을수록 천천히, 높을수록 빠르게 시야가 움직입니다.
           </p>
           <button id="keyGuideBtn">키 소개</button>
@@ -242,8 +294,9 @@
       <div class="loading-track"><i id="loadingBar"></i></div>
       <span id="loadingPercent">0%</span>
     </div>
-    <script src="i18n.js?v=4.0.0"></script>
-    <script src="gd-sdk.js?v=1.0.0"></script>
-    <script type="module" src="game.js?v=2.2.0"></script>
+    <script src="i18n.js?v=4.2.0"></script>
+    <script src="gd-sdk.js?v=1.1.0"></script>
+    <script src="install-pwa.js?v=1.0.0" defer></script>
+    <script type="module" src="game.js?v=2.3.1"></script>
   </body>
 </html>

@@ -1,11 +1,20 @@
 (() => {
   const supported = ['en', 'ko', 'he'];
-  const urlLang = new URLSearchParams(location.search).get('lang');
+  const urlParams = new URLSearchParams(location.search);
+  const urlLang = urlParams.get('lang');
   const saveLanguage = value => {
     try { localStorage.setItem('shepherdLanguage', value); }
     catch (error) { console.warn('Could not save the language setting:', error); }
   };
-  let lang = supported.includes(urlLang) ? urlLang : null;
+  let savedLang = null;
+  try { savedLang = localStorage.getItem('shepherdLanguage'); }
+  catch (error) { console.warn('Could not read the language setting:', error); }
+  const pwaLaunch = urlParams.get('pwa') === '1';
+  let lang = supported.includes(urlLang)
+    ? urlLang
+    : pwaLaunch && supported.includes(savedLang)
+      ? savedLang
+      : null;
 
   const he = {
     '양떼를 지켜라':'שמור על הצאן','고대 예루샬라임과 유대 광야의 3D 양치기 모험':'הרפתקת רועים תלת־ממדית בירושלים העתיקה ובמדבר יהודה',
@@ -49,7 +58,16 @@
     '성전 뜰에서 에너지가 회복되었습니다.':'האנרגיה של דוד התחדשה בחצר המקדש.',
     '게임을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.':'לא ניתן היה להתחיל את המשחק. נסה שוב בעוד רגע.',
     '성 안의 사람을 공격해 경비병이 추격합니다.':'תקפת אדם בתוך העיר, והשומר רודף אחריך.',
-    '나를 속이려 하지 마!':'אל תעבוד עלי!'
+    '나를 속이려 하지 마!':'אל תעבוד עלי!',
+    '화면 회전 안내':'הנחיה לסיבוב המסך','기기를 가로로 돌려주세요':'סובבו את המכשיר למצב אופקי',
+    '게임은 휴대폰과 태블릿에서 가로 화면으로 진행됩니다.':'המשחק פועל בטלפונים ובטאבלטים במצב אופקי.',
+    '모바일 게임 조작':'פקדי משחק למכשיר נייד','이동 조이스틱':'בקר תנועה','양떼 부르기':'קריאה לצאן',
+    '돌팔매 던지기':'הטלת אבן בקלע','지팡이 사용':'שימוש במקל הרועים','무기 선택':'בחירת נשק','달리기':'ריצה','소리 설정':'הגדרות צליל','게임 종료':'יציאה מהמשחק',
+    '앱 설치 안내':'התקנת היישום','양떼를 지켜라 앱 아이콘':'סמל היישום שמור על הצאן',
+    '앱으로 설치하시겠습니까?':'להתקין את המשחק כיישום?','홈 화면에서 전체 화면으로 바로 게임을 시작할 수 있습니다.':'אפשר להפעיל את המשחק ישירות ממסך הבית ובמסך מלא.',
+    '앱으로 설치':'התקנת היישום','나중에':'אחר כך',
+    'iPhone/iPad에서는 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택하십시오.':'ב־iPhone או iPad לחצו על כפתור השיתוף ולאחר מכן בחרו „הוספה למסך הבית”.',
+    '브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하십시오.':'בתפריט הדפדפן בחרו „התקנת יישום” או „הוספה למסך הבית”.'
   };
 
   const en = {
@@ -148,7 +166,16 @@
     '경비병 경계':'Guard Alert','성전 뜰에서 에너지가 회복되었습니다.':'David recovered his energy in the Temple courtyard.',
     '게임을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.':'The game could not start. Please try again in a moment.',
     '성 안의 사람을 공격해 경비병이 추격합니다.':'You attacked someone inside the city, and the guard is chasing you.',
-    '나를 속이려 하지 마!':"You can't fool me!"
+    '나를 속이려 하지 마!':"You can't fool me!",
+    '화면 회전 안내':'Screen rotation instructions','기기를 가로로 돌려주세요':'Rotate your device to landscape',
+    '게임은 휴대폰과 태블릿에서 가로 화면으로 진행됩니다.':'The game runs in landscape mode on phones and tablets.',
+    '모바일 게임 조작':'Mobile game controls','이동 조이스틱':'Movement joystick','양떼 부르기':'Call the flock',
+    '돌팔매 던지기':'Throw with sling','지팡이 사용':'Use shepherd staff','무기 선택':'Select weapon','달리기':'Run','소리 설정':'Sound settings','게임 종료':'Exit Game',
+    '앱 설치 안내':'App installation','양떼를 지켜라 앱 아이콘':'Protect the Flock app icon',
+    '앱으로 설치하시겠습니까?':'Install this game as an app?','홈 화면에서 전체 화면으로 바로 게임을 시작할 수 있습니다.':'Launch the game directly from your home screen in full screen.',
+    '앱으로 설치':'Install App','나중에':'Later',
+    'iPhone/iPad에서는 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택하십시오.':'On iPhone or iPad, tap Share and then choose “Add to Home Screen.”',
+    '브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하십시오.':'Choose “Install app” or “Add to Home Screen” from the browser menu.'
   };
 
   function activeDictionary() {
@@ -234,14 +261,14 @@
     if (document.body) document.body.classList.toggle('lang-he', lang === 'he');
     const description = document.querySelector('meta[name="description"]');
     if (lang === 'he') {
-      document.title = 'שמור על הצאן · v1.0';
-      if (description) description.content = 'הרפתקת רועים תלת־ממדית בירושלים העתיקה ובמדבר יהודה.';
+      document.title = 'שמור על הצאן · v2.3.1';
+      if (description) description.content = 'הרפתקת רועים תלת־ממדית למחשבים ולמכשירים ניידים, בירושלים העתיקה ובמדבר יהודה.';
     } else if (lang === 'ko') {
-      document.title = '양떼를 지켜라 · v1.0';
-      if (description) description.content = '고대 예루샬라임과 유대 광야를 배경으로 양 떼를 지키는 데스크톱 3D 양치기 모험입니다.';
+      document.title = '양떼를 지켜라 · v2.3.1';
+      if (description) description.content = '고대 예루샬라임과 유대 광야를 배경으로 양 떼를 지키는 데스크톱·모바일 3D 양치기 모험입니다.';
     } else {
-      document.title = 'Protect the Flock · v1.0';
-      if (description) description.content = 'A desktop 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness.';
+      document.title = 'Protect the Flock · v2.3.1';
+      if (description) description.content = 'A cross-device 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness.';
     }
   }
 

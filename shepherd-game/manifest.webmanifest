@@ -1,0 +1,42 @@
+{
+  "id": "./",
+  "name": "Protect the Flock · 양떼를 지켜라",
+  "short_name": "Protect the Flock",
+  "description": "A 3D shepherd adventure in ancient Jerusalem and the Judean wilderness.",
+  "lang": "en",
+  "dir": "auto",
+  "start_url": "./?pwa=1",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#15100b",
+  "theme_color": "#8b5a2b",
+  "categories": ["games", "education", "kids"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
