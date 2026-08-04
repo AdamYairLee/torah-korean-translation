@@ -59,6 +59,22 @@ const e = (t) => document.querySelector(t),
     );
   })();
 document.body.classList.toggle("mobile-device", n);
+function getVisibleViewportSize() {
+  const viewport = window.visualViewport;
+  return {
+    width: Math.max(1, Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth)),
+    height: Math.max(1, Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight)),
+  };
+}
+function syncMobileViewport() {
+  const { width, height } = getVisibleViewportSize();
+  const rootStyle = document.documentElement.style;
+  rootStyle.setProperty("--app-width", `${width}px`);
+  rootStyle.setProperty("--app-height", `${height}px`);
+  rootStyle.setProperty("--viewport-top", "0px");
+  document.body.classList.toggle("short-mobile-landscape", n && width >= height && height <= 560);
+}
+syncMobileViewport();
 const mobileInput = {
   active: false,
   forward: 0,
@@ -73,9 +89,11 @@ const mobileInput = {
 let distributionAdPauseActive = false;
 let distributionWasPausedBeforeAd = false;
 function updateOrientationGate() {
+  syncMobileViewport();
   const gate = e("#orientationGate");
   if (!gate) return;
-  const portrait = innerHeight > innerWidth;
+  const viewport = getVisibleViewportSize();
+  const portrait = viewport.height > viewport.width;
   document.body.classList.toggle("portrait-device", n && portrait);
   gate.classList.toggle("hidden", !n || !portrait);
   if (n && portrait && S) {
@@ -98,11 +116,18 @@ async function requestLandscapeMode() {
   try {
     await screen.orientation?.lock?.("landscape");
   } catch {}
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  syncMobileViewport();
   updateOrientationGate();
 }
 addEventListener("orientationchange", updateOrientationGate);
 addEventListener("resize", updateOrientationGate);
 window.visualViewport?.addEventListener?.("resize", updateOrientationGate);
+window.visualViewport?.addEventListener?.("scroll", syncMobileViewport);
+document.addEventListener("fullscreenchange", updateOrientationGate);
+document.querySelectorAll("#languageGate [data-lang]").forEach((button) => {
+  button.addEventListener("click", () => requestLandscapeMode(), { capture: true });
+});
 const s = e("#minimap").getContext("2d"),
   a = e("#rendererHost");
 let i,
@@ -399,6 +424,7 @@ function Pt(o = !0) {
   )),
     (e("#sensitivityValue").textContent = n.value),
     (e("#settingsPanel").dataset.fromPause = o ? "1" : "0"),
+    document.body.classList.toggle("title-settings-open", !o && !S),
     e("#settingsPanel").classList.remove("hidden"),
     S && ((b = !0), document.exitPointerLock?.()),
     setTimeout(() => ke(e("#settingsPanel"), 0), 0);
@@ -406,6 +432,7 @@ function Pt(o = !0) {
 function Tt() {
   e("#settingsPanel").classList.add("hidden");
   const t = "1" === e("#settingsPanel").dataset.fromPause;
+  document.body.classList.remove("title-settings-open");
   S &&
     (t
       ? (e("#pause").classList.remove("hidden"), (b = !0))
@@ -2440,7 +2467,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.0",
+  Wt = "2.3.2",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",

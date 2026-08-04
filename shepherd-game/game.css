@@ -552,3 +552,237 @@ body.mobile-device .rights{margin-top:7px;font-size:9px}
   body.mobile-device #minimapScroll{transform:scale(.42)}
   body.mobile-device .hud-top-right{right:100px;transform:scale(.58)}
 }
+
+/* v2.3.2 — full mobile viewport and short-landscape screen layout. */
+:root{
+  --app-width:100vw;
+  --app-height:100dvh;
+  --viewport-top:0px;
+}
+html,body{
+  width:var(--app-width);
+  height:var(--app-height);
+  min-height:var(--app-height);
+}
+.screen{
+  width:var(--app-width);
+  height:var(--app-height);
+  min-height:0;
+}
+.overlay{
+  max-width:var(--app-width);
+  max-height:var(--app-height);
+}
+.title-copy,.title-actions{position:relative;z-index:1}
+.title-actions{display:flex;flex-direction:column;align-items:center}
+
+body.mobile-device{
+  position:fixed;
+  left:0;
+  top:var(--viewport-top);
+  width:var(--app-width);
+  height:var(--app-height);
+}
+body.mobile-device .screen,
+body.mobile-device .overlay{
+  position:fixed;
+  inset:0;
+  width:var(--app-width);
+  height:var(--app-height);
+}
+body.mobile-device #titleScreen.active{
+  align-items:center;
+  justify-content:center;
+  padding:
+    calc(env(safe-area-inset-top,0px) + 7px)
+    calc(env(safe-area-inset-right,0px) + 9px)
+    calc(env(safe-area-inset-bottom,0px) + 7px)
+    calc(env(safe-area-inset-left,0px) + 9px);
+}
+body.mobile-device #titleScreen .title-wrap{
+  box-sizing:border-box;
+  width:min(900px,100%);
+  max-width:none;
+  max-height:calc(var(--app-height) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 14px);
+  margin:auto;
+  overflow:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+}
+body.mobile-device #titleScreen .title-wrap::-webkit-scrollbar{display:none}
+body.mobile-device .overlay .stone-panel{
+  width:min(620px,calc(var(--app-width) - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 18px));
+  max-width:calc(var(--app-width) - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 18px);
+  max-height:calc(var(--app-height) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 14px);
+  overflow:auto;
+  overscroll-behavior:contain;
+}
+body.mobile-device #gameScreen,
+body.mobile-device #rendererHost,
+body.mobile-device #hud,
+body.mobile-device #mobileControls{
+  width:var(--app-width);
+  height:var(--app-height);
+}
+
+/* Title settings must also work before the 3D game screen has been opened. */
+body.title-settings-open #gameScreen{
+  display:block;
+  position:fixed;
+  inset:0;
+  z-index:12600;
+  width:var(--app-width);
+  height:var(--app-height);
+  background:transparent;
+}
+body.title-settings-open #gameScreen>:not(#settingsPanel):not(#keyGuidePanel){display:none!important}
+body.title-settings-open #settingsPanel,
+body.title-settings-open #keyGuidePanel{pointer-events:auto}
+
+@media (orientation:landscape) and (max-height:560px){
+  body.mobile-device #titleScreen .title-wrap{
+    display:grid;
+    grid-template-columns:minmax(0,1.55fr) minmax(154px,.58fr);
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:clamp(12px,3vw,34px);
+    row-gap:3px;
+    padding:clamp(9px,2.8vh,17px) clamp(14px,3.2vw,30px);
+    border-radius:13px;
+  }
+  body.mobile-device .title-copy{min-width:0;text-align:center}
+  body.mobile-device .stone-title{
+    margin:0 0 2px;
+    font-size:clamp(30px,10.5vh,56px);
+    line-height:.98;
+    text-shadow:0 2px 0 #7d6848,0 4px 0 #55452f,0 7px 14px #000;
+  }
+  body.mobile-device .alpha-badge{
+    margin:2px 0 4px;
+    padding:3px 9px;
+    font-size:clamp(9px,2.8vh,12px);
+  }
+  body.mobile-device .title-wrap .subtitle{
+    margin:2px 0 4px;
+    font-size:clamp(9px,3vh,13px);
+    line-height:1.22;
+  }
+  body.mobile-device .alpha-note{
+    margin:0 auto;
+    font-size:clamp(8px,2.7vh,11px);
+    line-height:1.35;
+  }
+  body.mobile-device .title-actions{
+    width:100%;
+    gap:clamp(3px,1.2vh,6px);
+  }
+  body.mobile-device .title-wrap .title-actions button{
+    display:block;
+    width:100%;
+    min-width:0;
+    min-height:34px;
+    margin:0;
+    padding:clamp(6px,2vh,9px) 10px;
+    font-size:clamp(11px,3.2vh,14px);
+  }
+  body.mobile-device .rights{
+    grid-column:1/-1;
+    margin:2px auto 0;
+    max-width:none;
+    font-size:clamp(6px,2vh,8.5px);
+    line-height:1.25;
+  }
+
+  body.mobile-device .language-gate{padding:7px}
+  body.mobile-device .language-gate .stone-panel{
+    width:min(660px,94vw);
+    padding:clamp(8px,2.4vh,14px) clamp(14px,3vw,24px);
+    border-width:5px;
+  }
+  body.mobile-device .language-gate h1{margin:0 0 3px;font-size:clamp(27px,9vh,44px);line-height:1}
+  body.mobile-device .language-gate h2{margin:0 0 3px;font-size:clamp(16px,5vh,23px)}
+  body.mobile-device .language-gate p{margin:0 0 7px;font-size:clamp(10px,3.2vh,13px)}
+  body.mobile-device .language-gate-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  body.mobile-device .language-gate-buttons button{min-width:0;min-height:34px;padding:6px 8px;font-size:12px}
+
+  body.mobile-device #orientationGate .stone-panel{padding:12px 18px;border-width:5px}
+  body.mobile-device #orientationGate .rotate-device{font-size:42px;margin-bottom:2px}
+  body.mobile-device #orientationGate h2{margin:2px 0 5px;font-size:20px}
+  body.mobile-device #orientationGate p{font-size:11px;line-height:1.35}
+
+  body.mobile-device #characterScreen.active{
+    display:grid;
+    grid-template-columns:minmax(160px,34vw) minmax(190px,1fr);
+    grid-template-rows:auto auto 1fr;
+    column-gap:clamp(14px,4vw,40px);
+    align-items:center;
+    justify-items:center;
+    padding:
+      calc(env(safe-area-inset-top,0px) + 6px)
+      calc(env(safe-area-inset-right,0px) + 12px)
+      calc(env(safe-area-inset-bottom,0px) + 6px)
+      calc(env(safe-area-inset-left,0px) + 12px);
+  }
+  body.mobile-device #characterScreen>h2{grid-column:2;grid-row:1;margin:0 0 2px;font-size:clamp(18px,6vh,25px)}
+  body.mobile-device #characterScreen>p{grid-column:2;grid-row:2;margin:0 0 7px;font-size:clamp(9px,3vh,12px)}
+  body.mobile-device .cards.single-character{grid-column:1;grid-row:1/4;margin:0}
+  body.mobile-device .character-card.david-only{
+    width:min(230px,31vw);
+    height:calc(var(--app-height) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 12px);
+    max-height:310px;
+    min-height:190px;
+    padding:6px;
+  }
+  body.mobile-device .character-preview{min-height:0;height:auto;flex:1;margin-bottom:4px;object-fit:contain}
+  body.mobile-device .character-card.david-only b{font-size:clamp(15px,4.8vh,20px)}
+  body.mobile-device .character-card.david-only span{font-size:clamp(8px,2.5vh,10px);margin-top:2px}
+  body.mobile-device #characterScreen>button{
+    grid-column:2;
+    grid-row:3;
+    align-self:start;
+    width:min(260px,85%);
+    min-width:0;
+    margin:2px auto 0;
+    padding:clamp(7px,2.4vh,10px) 15px;
+  }
+
+  body.mobile-device #pause .stone-panel,
+  body.mobile-device .settings-panel,
+  body.mobile-device .key-guide-panel{
+    width:min(670px,84vw);
+    max-height:calc(var(--app-height) - 10px);
+    padding:10px 16px;
+    border-width:5px;
+  }
+  body.mobile-device .settings-panel h2,
+  body.mobile-device .key-guide-panel h2{margin:0 0 5px;font-size:20px}
+  body.mobile-device .settings-panel label{margin:5px 0;font-size:12px}
+  body.mobile-device .settings-panel>button,
+  body.mobile-device .key-guide-panel>button{min-width:120px;margin:4px auto;padding:7px 12px}
+  body.mobile-device .key-guide-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 10px;font-size:10px}
+
+  .install-banner{
+    bottom:calc(env(safe-area-inset-bottom,0px) + 5px);
+    width:min(650px,calc(100vw - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px) - 14px));
+    min-height:56px;
+    grid-template-columns:44px minmax(0,1fr) auto;
+    gap:7px;
+    padding:6px 8px;
+  }
+  .install-banner img{width:42px;height:42px;border-radius:10px}
+  .install-banner-copy{gap:1px}.install-banner-copy strong{font-size:12px}.install-banner-copy span{font-size:9px}.install-banner-copy small{font-size:8px}
+  .install-banner-actions{gap:3px}.install-banner-actions button{min-width:70px;padding:6px 7px;font-size:10px}
+  body.mobile-device.install-banner-visible #titleScreen.active{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 68px)}
+  body.mobile-device.install-banner-visible #titleScreen .title-wrap{
+    max-height:calc(var(--app-height) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 76px);
+  }
+}
+
+@media (orientation:landscape) and (max-height:330px){
+  body.mobile-device #titleScreen .title-wrap{padding:7px 12px;column-gap:12px}
+  body.mobile-device .alpha-note{font-size:8px}
+  body.mobile-device .rights span:last-child{display:none}
+  body.mobile-device #pause .pause-language-switch,
+  body.mobile-device #pause .pause-sound-settings{margin:3px auto;padding:4px 7px}
+  body.mobile-device #pause>.stone-panel>button{min-width:105px;margin:3px;padding:6px 9px}
+}

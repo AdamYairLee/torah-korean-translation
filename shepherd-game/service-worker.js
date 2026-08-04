@@ -1,4 +1,4 @@
-const CACHE_VERSION = "protect-the-flock-v2.3.1";
+const CACHE_VERSION = "protect-the-flock-v2.3.2";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const SHELL_FILES = [
