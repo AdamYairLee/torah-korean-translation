@@ -452,6 +452,11 @@ body.mobile-device{overscroll-behavior:none;touch-action:none;-webkit-user-selec
 body.mobile-device #rendererHost,body.mobile-device #rendererHost canvas{touch-action:none}
 body.mobile-device #mobileControls{position:absolute;inset:0;z-index:18;display:block;pointer-events:none;direction:ltr}
 body.mobile-device #mobileControls button,body.mobile-device #mobileJoystick{pointer-events:auto;touch-action:none}
+/* v2.3.9: avoid live backdrop sampling over the WebGL canvas on mobile. */
+body.mobile-device .mobile-stone-button{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
 .mobile-stone-button{
   position:absolute;display:flex;align-items:center;justify-content:center;margin:0;padding:0;
   border:1px solid rgba(78,76,72,.78);border-radius:50%;color:#ece9e0;opacity:.72;
@@ -509,7 +514,18 @@ body.mobile-device .hud-status,body.mobile-device #thirstHud,body.mobile-device 
 body.mobile-device #minimapScroll{left:auto;right:calc(env(safe-area-inset-right,0px) + 7px);top:calc(env(safe-area-inset-top,0px) + 7px);bottom:auto;transform:scale(.49);transform-origin:top right;opacity:.6}
 body.mobile-device .hud-top-right{right:calc(env(safe-area-inset-right,0px) + 112px);top:calc(env(safe-area-inset-top,0px) + 8px);gap:0;opacity:.58;transform:scale(.68);transform-origin:top right}
 body.mobile-device #weaponHud{display:none}
-body.mobile-device .hud-top-right .hud-status{height:122px;min-height:122px;width:196px;min-width:196px;padding:12px 14px;background:linear-gradient(138deg,rgba(216,199,164,.76),rgba(172,151,113,.76))}
+body.mobile-device .hud-top-right .hud-status{
+  height:124px;min-height:124px;width:196px;min-width:196px;
+  padding:10px 13px;gap:2px;justify-content:center;line-height:1.22;
+  background:linear-gradient(138deg,rgba(216,199,164,.76),rgba(172,151,113,.76));
+}
+body.mobile-device .hud-status>div,
+body.mobile-device .hud-status .meter span{
+  font-size:13px;line-height:1.22;white-space:nowrap;
+}
+body.mobile-device .hud-status .meter{width:100%;gap:6px;min-width:0}
+body.mobile-device .hud-status .meter>div{width:auto;min-width:72px;flex:1 1 auto;height:10px}
+body.mobile-device .hud-status>div:not(.meter){min-height:16px;display:flex;align-items:center}
 body.mobile-device #fullscreenHint,body.mobile-device #reconnectHint{display:none}
 body.mobile-device #mission{bottom:16px;max-width:48vw;font-size:15px;white-space:normal}
 body.mobile-device #notice{top:62%;max-width:62vw;font-size:18px}

@@ -239,6 +239,8 @@ const performanceState = {
   nextLightingAt: 0,
   nextAmbientAudioAt: 0,
   nextRegionUiAt: 0,
+  nextEnemyHealthUiAt: 0,
+  nextCosmeticAt: 0,
   minimapRoadCacheRevision: -1,
   minimapVisibleRoads: [],
   sheepUpdatePhase: 0,
@@ -260,24 +262,21 @@ function targetPixelRatio(slow = false, onOliveMount = false, insideCity = false
     return Math.min(dpr, target);
   }
   const viewport = getVisibleViewportSize();
-  const cssPixels = viewport.width * viewport.height;
-  const clearBase = cssPixels > 620000 ? 1.02 : cssPixels > 410000 ? 1.1 : 1.18;
-  const scenePenalty = onOliveMount ? 0.08 : insideCity ? 0.05 : 0;
-  // Web games cannot read Android's native thermal headroom API. Use the
-  // sustained render budget instead: tier 1 trims only distant work, while
-  // tier 2 also lowers the internal resolution enough to stop heat build-up.
-  // The floor stays above the former blurry 0.58/0.40 mobile ratios.
-  const thermalPenalty =
+  const cssPixels = Math.max(1, viewport.width * viewport.height);
+  // MDN recommends treating the drawing buffer as a per-pixel VRAM/GPU
+  // budget. A hard pixel budget is more reliable than a fixed DPR floor on
+  // very high-resolution phones, where even DPR < 1 can still submit well
+  // over a million shaded pixels every frame.
+  let pixelBudget =
     performanceState.mobileThermalTier >= 2
-      ? 0.2
+      ? 360000
       : performanceState.mobileThermalTier === 1
-        ? 0.1
-        : 0;
-  const slowPenalty = slow ? 0.12 : 0;
-  return Math.min(
-    dpr,
-    Math.max(0.86, clearBase - scenePenalty - thermalPenalty - slowPenalty),
-  );
+        ? 470000
+        : 620000;
+  if (onOliveMount || insideCity) pixelBudget *= 0.93;
+  if (slow) pixelBudget *= 0.9;
+  const budgetRatio = Math.sqrt(pixelBudget / cssPixels);
+  return Math.min(dpr, 1.08, Math.max(0.42, budgetRatio));
 }
 let D = "",
   S = !1,
@@ -2729,7 +2728,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.8",
+  Wt = "2.3.9",
   SAVE_SCHEMA_VERSION = 2,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -9702,17 +9701,10 @@ function setupMobileControls() {
       if (!mobileInput.steeringInitialized) {
         mobileInput.movementYaw = B;
         mobileInput.steeringInitialized = true;
-      } else {
-        const physicalAngleChange =
-          t.MathUtils.euclideanModulo(
-            nextSteeringAngle - mobileInput.targetSteeringAngle + Math.PI,
-            Math.PI * 2,
-          ) - Math.PI;
-        // Re-anchor only when the thumb actually changes direction. Camera
-        // follow movement alone must never rotate a held joystick vector.
-        if (Math.abs(physicalAngleChange) > 0.022)
-          mobileInput.movementYaw = B;
       }
+      // Keep the touch-start camera yaw as the basis for this whole gesture.
+      // Re-anchoring to B while B itself is following David makes tiny thumb
+      // motion move the target again and can create a runaway/overshoot turn.
       mobileInput.targetSteeringAngle = nextSteeringAngle;
       mobileInput.steeringAngle = nextSteeringAngle;
       mobileInput.desiredWorldHeading =
@@ -10860,8 +10852,11 @@ function _e(o, n) {
             ) -
             Math.PI;
           const insideCitySteering = Yt(o.position.x, o.position.z, -55);
-          const maximumCameraTurn = (insideCitySteering ? 3.45 : 4.15) * e;
-          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-8.2 * e));
+          // Camera inertia is intentionally heavier than David's movement.
+          // Movement direction is immediate, but the view follows with a
+          // capped, predictable pan and is even calmer inside Jerusalem.
+          const maximumCameraTurn = (insideCitySteering ? 1.85 : 2.35) * e;
+          const weightedCameraTurn = cameraTurn * (1 - Math.exp(-5.7 * e));
           B += t.MathUtils.clamp(
             weightedCameraTurn,
             -maximumCameraTurn,
@@ -11899,6 +11894,13 @@ function _e(o, n) {
       );
     })(o),
     (function () {
+      if (
+        IS_MOBILE_DEVICE &&
+        frameNow < performanceState.nextEnemyHealthUiAt
+      )
+        return;
+      performanceState.nextEnemyHealthUiAt =
+        frameNow + (IS_MOBILE_DEVICE ? 100 : 0);
       const t = mt.player;
       if (t)
         for (const e of mt.enemies) {
@@ -11993,6 +11995,9 @@ function _e(o, n) {
             setTimeout(() => ke(e("#gameOver"), 0), 0)));
     })(o),
     (function (t, e) {
+      if (IS_MOBILE_DEVICE && frameNow < performanceState.nextCosmeticAt) return;
+      performanceState.nextCosmeticAt =
+        frameNow + (IS_MOBILE_DEVICE ? 66 : 0);
       mt.templeSmoke &&
         ((mt.templeSmoke.position.x =
           mt.templeSmoke.userData.baseX + 3.5 * Math.sin(0.23 * e)),
@@ -12364,9 +12369,9 @@ function updateMobileThermalBudget(renderCostMs, frameDeltaMs, now) {
   // deadlines form a conservative local proxy for sustained power demand.
   const interval = performanceState.mobileFrameInterval;
   const pressureRatio = Math.max(
-    performanceState.mobileRenderCostMs / Math.max(7.5, interval * 0.42),
-    calls / 285,
-    triangles / 950000,
+    performanceState.mobileRenderCostMs / Math.max(6.5, interval * 0.36),
+    calls / 190,
+    triangles / 520000,
     frameDeltaMs / Math.max(1, interval * 1.18),
   );
   const elapsedSeconds = Math.min(0.08, Math.max(0.012, frameDeltaMs / 1000));
@@ -12386,11 +12391,11 @@ function updateMobileThermalBudget(renderCostMs, frameDeltaMs, now) {
 
   const pressure = performanceState.mobileThermalPressure;
   const previousTier = performanceState.mobileThermalTier;
-  if (pressure >= 18) performanceState.mobileThermalTier = 2;
-  else if (pressure >= 6) performanceState.mobileThermalTier = 1;
-  else if (previousTier === 2 && pressure < 11)
+  if (pressure >= 12) performanceState.mobileThermalTier = 2;
+  else if (pressure >= 4) performanceState.mobileThermalTier = 1;
+  else if (previousTier === 2 && pressure < 7)
     performanceState.mobileThermalTier = 1;
-  else if (previousTier === 1 && pressure < 2)
+  else if (previousTier === 1 && pressure < 1.5)
     performanceState.mobileThermalTier = 0;
 
   // 30 and 20 FPS divide evenly into common 60/120 Hz displays. This avoids
@@ -12403,7 +12408,7 @@ function updateMobileThermalBudget(renderCostMs, frameDeltaMs, now) {
     performanceState.nextAdaptiveQualityAt = 0;
 }
 function Qe() {
-  if (!S || b) return;
+  if (!S || b || document.visibilityState === "hidden") return;
   const now = performance.now();
   if (
     n &&

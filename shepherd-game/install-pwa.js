@@ -124,7 +124,7 @@
     });
 
     if ("serviceWorker" in navigator && window.isSecureContext && /^https?:$/.test(location.protocol)) {
-      navigator.serviceWorker.register("./service-worker.js?v=2.3.8", {
+      navigator.serviceWorker.register("./service-worker.js?v=2.3.9", {
         scope: "./",
         updateViaCache: "none",
       }).catch((error) => {
