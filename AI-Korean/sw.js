@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-korean-master-v1-6-pwa-install-ad-once';
+const CACHE_NAME = 'ai-korean-master-v1-7-install-button-ad-once';
 const CORE_ASSETS = [
   './',
   './index.html',

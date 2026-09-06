@@ -44,7 +44,7 @@
   <link rel="manifest" href="manifest.json?v=6" />
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="stylesheet" href="css/style.css?v=6" />
+<link rel="stylesheet" href="css/style.css?v=7" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNJDSEN912"></script>
 <script>
@@ -56,6 +56,9 @@ gtag('config', 'G-TNJDSEN912');
 </script>
 </head>
 <body>
+  <button id="installAppTopButton" class="install-top-button" type="button" aria-label="Install AI Korean Master">📱 התקנה / Install</button>
+  <div id="installHelpPopover" class="install-help-popover" hidden></div>
+
   <a href="https://jewishkorean.com" class="home-btn">דף הבית <span>(홈으로 돌아가기)</span></a>
 
   <main id="app" class="fade-in">
@@ -87,7 +90,7 @@ gtag('config', 'G-TNJDSEN912');
 
   <script src="js/config.js"></script>
   <script src="js/app.js?v=6"></script>
-  <script src="js/install.js?v=1"></script>
+  <script src="js/install.js?v=2"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
