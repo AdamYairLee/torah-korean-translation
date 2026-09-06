@@ -598,5 +598,1805 @@
     "he": "אבקש גם בפעם הבאה",
     "roman": "daeumedo butakdeurilgeyo",
     "en": "Please help me again next time"
+  },
+  {
+    "ko": "일찍 일어났어요",
+    "he": "קמתי מוקדם",
+    "roman": "iljjik ileonateoyo",
+    "en": "I woke up early"
+  },
+  {
+    "ko": "알람을 못 들었어요",
+    "he": "לא שמעתי את השעון המעורר",
+    "roman": "alrameul mot deuleoteoyo",
+    "en": "I didn't hear the alarm"
+  },
+  {
+    "ko": "아직 잠이 덜 깼어요",
+    "he": "אני עדיין לא לגמרי ער",
+    "roman": "ajik jami deol kkaeteoyo",
+    "en": "I'm still not fully awake"
+  },
+  {
+    "ko": "먼저 씻고 올게요",
+    "he": "אלך קודם להתרחץ",
+    "roman": "meonjeo ssitgo olgeyo",
+    "en": "I'll wash up first"
+  },
+  {
+    "ko": "커피부터 마셔야겠어요",
+    "he": "אני חייב להתחיל עם קפה",
+    "roman": "keopibuteo masyeoyageteoyo",
+    "en": "I need coffee first"
+  },
+  {
+    "ko": "오늘은 천천히 준비할래요",
+    "he": "היום אתארגן לאט",
+    "roman": "oneuleun cheoncheonhi junbihalraeyo",
+    "en": "I'll get ready slowly today"
+  },
+  {
+    "ko": "창문 좀 열어도 돼요?",
+    "he": "אפשר לפתוח קצת את החלון?",
+    "roman": "changmun jom yeoleodo dwaeyo?",
+    "en": "Can I open the window a little?"
+  },
+  {
+    "ko": "이불을 개어 놓았어요",
+    "he": "קיפלתי את השמיכה",
+    "roman": "ibuleul gaeeo notateoyo",
+    "en": "I folded the blanket"
+  },
+  {
+    "ko": "불 끄는 걸 깜빡했어요",
+    "he": "שכחתי לכבות את האור",
+    "roman": "bul kkeuneun geol kkamppakhaeteoyo",
+    "en": "I forgot to turn off the light"
+  },
+  {
+    "ko": "나가기 전에 문 잠가 주세요",
+    "he": "נא לנעול את הדלת לפני שיוצאים",
+    "roman": "nagagi jeone mun jamga juseyo",
+    "en": "Please lock the door before leaving"
+  },
+  {
+    "ko": "아침은 간단히 먹을게요",
+    "he": "אוכל ארוחת בוקר קלה",
+    "roman": "achimeun gandanhi meokeulgeyo",
+    "en": "I'll have a light breakfast"
+  },
+  {
+    "ko": "계란을 하나 더 구워 주세요",
+    "he": "תטגן עוד ביצה אחת בבקשה",
+    "roman": "gyeraneul hana deo guwo juseyo",
+    "en": "Please fry one more egg"
+  },
+  {
+    "ko": "국이 조금 짜요",
+    "he": "המרק קצת מלוח",
+    "roman": "guki jogeum jjayo",
+    "en": "The soup is a little salty"
+  },
+  {
+    "ko": "밥이 아직 뜨거워요",
+    "he": "האורז עדיין חם",
+    "roman": "bapi ajik tteugeowoyo",
+    "en": "The rice is still hot"
+  },
+  {
+    "ko": "물 한 잔만 주세요",
+    "he": "כוס מים אחת בבקשה",
+    "roman": "mul han janman juseyo",
+    "en": "Just a glass of water, please"
+  },
+  {
+    "ko": "냉장고에 우유가 없어요",
+    "he": "אין חלב במקרר",
+    "roman": "naengjanggoe uyuga eopeoyo",
+    "en": "There is no milk in the fridge"
+  },
+  {
+    "ko": "이건 전자레인지에 데우면 돼요",
+    "he": "אפשר לחמם את זה במיקרוגל",
+    "roman": "igeon jeonjareinjie deumyeon dwaeyo",
+    "en": "You can heat this in the microwave"
+  },
+  {
+    "ko": "남은 음식은 냉장고에 넣어 주세요",
+    "he": "שים את האוכל שנשאר במקרר בבקשה",
+    "roman": "nameun eumsikeun naengjanggoe neoteo juseyo",
+    "en": "Please put the leftovers in the fridge"
+  },
+  {
+    "ko": "설거지는 제가 할게요",
+    "he": "אני אשטוף את הכלים",
+    "roman": "seolgeojineun jega halgeyo",
+    "en": "I'll do the dishes"
+  },
+  {
+    "ko": "너무 배불러서 더 못 먹겠어요",
+    "he": "אני מלא מדי ולא יכול לאכול יותר",
+    "roman": "neomu baebulreoseo deo mot meokgeteoyo",
+    "en": "I'm too full to eat more"
+  },
+  {
+    "ko": "오늘은 바람이 많이 불어요",
+    "he": "יש היום הרבה רוח",
+    "roman": "oneuleun barami mani buleoyo",
+    "en": "It's very windy today"
+  },
+  {
+    "ko": "아침보다 훨씬 따뜻해졌어요",
+    "he": "נהיה הרבה יותר חם מאשר בבוקר",
+    "roman": "achimboda hwolssin ttatteuthaejyeoteoyo",
+    "en": "It's much warmer than this morning"
+  },
+  {
+    "ko": "비 올 것 같으니까 우산 챙기세요",
+    "he": "נראה שירד גשם, קח מטרייה",
+    "roman": "bi ol geot gateunikka usan chaenggiseyo",
+    "en": "It looks like rain, so take an umbrella"
+  },
+  {
+    "ko": "겉옷 하나 가져가는 게 좋겠어요",
+    "he": "כדאי לקחת עליונית",
+    "roman": "geotot hana gajyeoganeun ge jotgeteoyo",
+    "en": "It would be good to take a jacket"
+  },
+  {
+    "ko": "햇빛이 너무 강해요",
+    "he": "השמש חזקה מדי",
+    "roman": "haetbiti neomu ganghaeyo",
+    "en": "The sunlight is too strong"
+  },
+  {
+    "ko": "오늘은 반팔 입어도 되겠어요",
+    "he": "היום אפשר ללבוש קצר",
+    "roman": "oneuleun banpal ipeodo doegeteoyo",
+    "en": "Short sleeves should be fine today"
+  },
+  {
+    "ko": "신발이 젖었어요",
+    "he": "הנעליים שלי נרטבו",
+    "roman": "sinbali jeoteoteoyo",
+    "en": "My shoes got wet"
+  },
+  {
+    "ko": "이 옷은 생각보다 따뜻해요",
+    "he": "הבגד הזה חם יותר ממה שחשבתי",
+    "roman": "i oteun saenggakboda ttatteuthaeyo",
+    "en": "This clothing is warmer than I thought"
+  },
+  {
+    "ko": "밖에 나가니까 갑자기 추워졌어요",
+    "he": "כשיצאתי פתאום נהיה קר",
+    "roman": "bake naganikka gapjagi chuwojyeoteoyo",
+    "en": "It suddenly got cold when I went outside"
+  },
+  {
+    "ko": "날씨가 좋아서 걷고 싶어요",
+    "he": "מזג האוויר טוב ומתחשק לי ללכת ברגל",
+    "roman": "nalssiga jotaseo geotgo sipeoyo",
+    "en": "The weather is nice, so I want to walk"
+  },
+  {
+    "ko": "버스가 몇 분 뒤에 와요?",
+    "he": "בעוד כמה דקות האוטובוס מגיע?",
+    "roman": "beoseuga myeot bun dwie wayo?",
+    "en": "How many minutes until the bus comes?"
+  },
+  {
+    "ko": "이번 정류장에서 내려야 해요",
+    "he": "צריך לרדת בתחנה הזאת",
+    "roman": "ibeon jeongryujangeseo naeryeoya haeyo",
+    "en": "I need to get off at this stop"
+  },
+  {
+    "ko": "한 정거장 더 가세요",
+    "he": "תמשיך עוד תחנה אחת",
+    "roman": "han jeonggeojang deo gaseyo",
+    "en": "Go one more stop"
+  },
+  {
+    "ko": "환승하려면 어디로 가야 해요?",
+    "he": "לאן צריך ללכת כדי להחליף קו?",
+    "roman": "hwanseungharyeomyeon eodiro gaya haeyo?",
+    "en": "Where do I go to transfer?"
+  },
+  {
+    "ko": "교통카드에 돈을 충전해야 해요",
+    "he": "אני צריך להטעין כסף בכרטיס התחבורה",
+    "roman": "gyotongkadeue doneul chungjeonhaeya haeyo",
+    "en": "I need to top up my transit card"
+  },
+  {
+    "ko": "택시를 부를까요?",
+    "he": "שנזמין מונית?",
+    "roman": "taeksireul bureulkkayo?",
+    "en": "Shall we call a taxi?"
+  },
+  {
+    "ko": "지금 길이 많이 막혀요",
+    "he": "יש עכשיו הרבה פקקים",
+    "roman": "jigeum gili mani makhyeoyo",
+    "en": "Traffic is heavy right now"
+  },
+  {
+    "ko": "걸어가면 십 분 정도 걸려요",
+    "he": "ברגל זה לוקח בערך עשר דקות",
+    "roman": "geoleogamyeon sip bun jeongdo geolryeoyo",
+    "en": "It takes about ten minutes on foot"
+  },
+  {
+    "ko": "막차 시간을 확인해 볼게요",
+    "he": "אבדוק מתי האוטובוס האחרון",
+    "roman": "makcha siganeul hwakinhae bolgeyo",
+    "en": "I'll check the time of the last bus"
+  },
+  {
+    "ko": "반대 방향으로 탄 것 같아요",
+    "he": "נראה שעליתי לכיוון ההפוך",
+    "roman": "bandae banghyangeuro tan geot gatayo",
+    "en": "I think I got on in the wrong direction"
+  },
+  {
+    "ko": "이 길로 계속 가면 돼요?",
+    "he": "צריך להמשיך ישר בדרך הזאת?",
+    "roman": "i gilro gyesok gamyeon dwaeyo?",
+    "en": "Should I keep going on this road?"
+  },
+  {
+    "ko": "다음 사거리에서 왼쪽으로 도세요",
+    "he": "פנה שמאלה בצומת הבא",
+    "roman": "daeum sageorieseo oenjjokeuro doseyo",
+    "en": "Turn left at the next intersection"
+  },
+  {
+    "ko": "횡단보도 건너편에 있어요",
+    "he": "זה נמצא מעבר למעבר החצייה",
+    "roman": "hoengdanbodo geonneopyeone iteoyo",
+    "en": "It's across the crosswalk"
+  },
+  {
+    "ko": "길을 잘못 든 것 같아요",
+    "he": "נראה שטעיתי בדרך",
+    "roman": "gileul jalmot deun geot gatayo",
+    "en": "I think I took the wrong way"
+  },
+  {
+    "ko": "지도에서 위치를 보여 주세요",
+    "he": "תראה לי את המיקום במפה בבקשה",
+    "roman": "jidoeseo wichireul boyeo juseyo",
+    "en": "Please show me the location on the map"
+  },
+  {
+    "ko": "여기서 멀지 않아요",
+    "he": "זה לא רחוק מכאן",
+    "roman": "yeogiseo meolji anayo",
+    "en": "It's not far from here"
+  },
+  {
+    "ko": "건물 뒤쪽으로 가세요",
+    "he": "לך לצד האחורי של הבניין",
+    "roman": "geonmul dwijjokeuro gaseyo",
+    "en": "Go to the back of the building"
+  },
+  {
+    "ko": "입구가 어디인지 못 찾겠어요",
+    "he": "אני לא מוצא איפה הכניסה",
+    "roman": "ipguga eodiinji mot chatgeteoyo",
+    "en": "I can't find the entrance"
+  },
+  {
+    "ko": "엘리베이터는 오른쪽에 있어요",
+    "he": "המעלית נמצאת מימין",
+    "roman": "elribeiteoneun oreunjjoke iteoyo",
+    "en": "The elevator is on the right"
+  },
+  {
+    "ko": "계단으로 올라가도 돼요",
+    "he": "אפשר לעלות במדרגות",
+    "roman": "gyedaneuro olragado dwaeyo",
+    "en": "You can go up by the stairs"
+  },
+  {
+    "ko": "이거 다른 색도 있어요?",
+    "he": "יש את זה גם בצבע אחר?",
+    "roman": "igeo dareun saekdo iteoyo?",
+    "en": "Do you have this in another color?"
+  },
+  {
+    "ko": "한 사이즈 큰 걸 입어 볼게요",
+    "he": "אמדוד מידה אחת יותר גדולה",
+    "roman": "han saijeu keun geol ipeo bolgeyo",
+    "en": "I'll try one size larger"
+  },
+  {
+    "ko": "세일은 언제까지예요?",
+    "he": "עד מתי המבצע?",
+    "roman": "seileun eonjekkajiyeyo?",
+    "en": "Until when is the sale?"
+  },
+  {
+    "ko": "영수증을 받을 수 있을까요?",
+    "he": "אפשר לקבל קבלה?",
+    "roman": "yeongsujeungeul bateul su iteulkkayo?",
+    "en": "Could I get a receipt?"
+  },
+  {
+    "ko": "이건 교환 가능한가요?",
+    "he": "אפשר להחליף את זה?",
+    "roman": "igeon gyohwan ganeunghangayo?",
+    "en": "Can this be exchanged?"
+  },
+  {
+    "ko": "생각했던 것보다 비싸네요",
+    "he": "זה יקר יותר ממה שחשבתי",
+    "roman": "saenggakhaetdeon geotboda bissaneyo",
+    "en": "It's more expensive than I expected"
+  },
+  {
+    "ko": "현금으로 내면 더 싸요?",
+    "he": "זה זול יותר אם משלמים במזומן?",
+    "roman": "hyeongeumeuro naemyeon deo ssayo?",
+    "en": "Is it cheaper if I pay cash?"
+  },
+  {
+    "ko": "선물용으로 포장해 주세요",
+    "he": "תארוז את זה כמתנה בבקשה",
+    "roman": "seonmulyongeuro pojanghae juseyo",
+    "en": "Please wrap this as a gift"
+  },
+  {
+    "ko": "그냥 구경하는 중이에요",
+    "he": "אני רק מסתכל",
+    "roman": "geunyang gugyeonghaneun jungieyo",
+    "en": "I'm just looking around"
+  },
+  {
+    "ko": "재고가 들어오면 알려 주세요",
+    "he": "תעדכן אותי כשיגיע למלאי",
+    "roman": "jaegoga deuleoomyeon alryeo juseyo",
+    "en": "Please let me know when it's back in stock"
+  },
+  {
+    "ko": "창가 자리 있나요?",
+    "he": "יש מקום ליד החלון?",
+    "roman": "changga jari itnayo?",
+    "en": "Is there a seat by the window?"
+  },
+  {
+    "ko": "메뉴 좀 더 볼게요",
+    "he": "אסתכל עוד קצת בתפריט",
+    "roman": "menyu jom deo bolgeyo",
+    "en": "I'll look at the menu a little longer"
+  },
+  {
+    "ko": "맵지 않게 해 주세요",
+    "he": "בבקשה לא חריף",
+    "roman": "maepji ange hae juseyo",
+    "en": "Please make it not spicy"
+  },
+  {
+    "ko": "소스는 따로 주세요",
+    "he": "את הרוטב בצד בבקשה",
+    "roman": "soseuneun ttaro juseyo",
+    "en": "Please serve the sauce separately"
+  },
+  {
+    "ko": "이 음식에 견과류가 들어가요?",
+    "he": "יש במנה הזאת אגוזים?",
+    "roman": "i eumsike gyeongwaryuga deuleogayo?",
+    "en": "Does this dish contain nuts?"
+  },
+  {
+    "ko": "커피는 얼음 적게 넣어 주세요",
+    "he": "בקפה בבקשה מעט קרח",
+    "roman": "keopineun eoleum jeokge neoteo juseyo",
+    "en": "Please put less ice in the coffee"
+  },
+  {
+    "ko": "주문한 음식이 아직 안 나왔어요",
+    "he": "האוכל שהזמנתי עדיין לא הגיע",
+    "roman": "jumunhan eumsiki ajik an nawateoyo",
+    "en": "My order hasn't come out yet"
+  },
+  {
+    "ko": "이건 제가 주문한 게 아니에요",
+    "he": "זה לא מה שהזמנתי",
+    "roman": "igeon jega jumunhan ge anieyo",
+    "en": "This isn't what I ordered"
+  },
+  {
+    "ko": "계산은 따로 할게요",
+    "he": "נשלם בנפרד",
+    "roman": "gyesaneun ttaro halgeyo",
+    "en": "We'll pay separately"
+  },
+  {
+    "ko": "정말 맛있게 먹었어요",
+    "he": "נהניתי מאוד מהאוכל",
+    "roman": "jeongmal matitge meokeoteoyo",
+    "en": "I really enjoyed the meal"
+  },
+  {
+    "ko": "약속 시간을 한 시간 미뤄도 될까요?",
+    "he": "אפשר לדחות את הפגישה בשעה?",
+    "roman": "yaksok siganeul han sigan mirwodo doelkkayo?",
+    "en": "Can we postpone the appointment by an hour?"
+  },
+  {
+    "ko": "제가 조금 늦을 것 같아요",
+    "he": "נראה שאאחר קצת",
+    "roman": "jega jogeum neuteul geot gatayo",
+    "en": "I think I'll be a little late"
+  },
+  {
+    "ko": "예정보다 일찍 도착했어요",
+    "he": "הגעתי מוקדם מהצפוי",
+    "roman": "yejeongboda iljjik dochakhaeteoyo",
+    "en": "I arrived earlier than expected"
+  },
+  {
+    "ko": "이번 주는 시간이 별로 없어요",
+    "he": "אין לי הרבה זמן השבוע",
+    "roman": "ibeon juneun sigani byeolro eopeoyo",
+    "en": "I don't have much time this week"
+  },
+  {
+    "ko": "금요일 오후는 괜찮아요",
+    "he": "יום שישי אחר הצהריים מתאים לי",
+    "roman": "geumyoil ohuneun gwaenchanayo",
+    "en": "Friday afternoon works for me"
+  },
+  {
+    "ko": "정확한 시간은 나중에 정해요",
+    "he": "נקבע את השעה המדויקת אחר כך",
+    "roman": "jeonghwakhan siganeun najunge jeonghaeyo",
+    "en": "Let's decide the exact time later"
+  },
+  {
+    "ko": "일정이 바뀌면 바로 알려 주세요",
+    "he": "תעדכן אותי מיד אם התוכנית משתנה",
+    "roman": "iljeongi bakkwimyeon baro alryeo juseyo",
+    "en": "Please tell me right away if the schedule changes"
+  },
+  {
+    "ko": "잠깐 시간 괜찮으세요?",
+    "he": "יש לך רגע?",
+    "roman": "jamkkan sigan gwaenchaneuseyo?",
+    "en": "Do you have a moment?"
+  },
+  {
+    "ko": "오늘 안에는 어려울 것 같아요",
+    "he": "נראה שיהיה קשה להספיק היום",
+    "roman": "oneul aneneun eoryeoul geot gatayo",
+    "en": "I don't think I can make it today"
+  },
+  {
+    "ko": "다음 주로 넘기는 게 어때요?",
+    "he": "מה דעתך להעביר את זה לשבוע הבא?",
+    "roman": "daeum juro neomgineun ge eottaeyo?",
+    "en": "How about moving it to next week?"
+  },
+  {
+    "ko": "메시지 확인이 늦었어요",
+    "he": "ראיתי את ההודעה באיחור",
+    "roman": "mesiji hwakini neuteoteoyo",
+    "en": "I saw the message late"
+  },
+  {
+    "ko": "전화 못 받아서 미안해요",
+    "he": "סליחה שלא עניתי לטלפון",
+    "roman": "jeonhwa mot bataseo mianhaeyo",
+    "en": "Sorry I couldn't answer the phone"
+  },
+  {
+    "ko": "나중에 다시 전화할게요",
+    "he": "אתקשר שוב אחר כך",
+    "roman": "najunge dasi jeonhwahalgeyo",
+    "en": "I'll call again later"
+  },
+  {
+    "ko": "사진을 몇 장 보내 주세요",
+    "he": "תשלח לי כמה תמונות בבקשה",
+    "roman": "sajineul myeot jang bonae juseyo",
+    "en": "Please send me a few photos"
+  },
+  {
+    "ko": "주소를 문자로 보내 드릴게요",
+    "he": "אשלח לך את הכתובת בהודעה",
+    "roman": "jusoreul munjaro bonae deurilgeyo",
+    "en": "I'll text you the address"
+  },
+  {
+    "ko": "배터리가 거의 없어요",
+    "he": "כמעט נגמרה לי הסוללה",
+    "roman": "baeteoriga geoui eopeoyo",
+    "en": "My battery is almost dead"
+  },
+  {
+    "ko": "지금은 통화하기 어려워요",
+    "he": "קשה לי לדבר עכשיו",
+    "roman": "jigeumeun tonghwahagi eoryeowoyo",
+    "en": "It's hard to talk right now"
+  },
+  {
+    "ko": "와이파이 비밀번호가 뭐예요?",
+    "he": "מה הסיסמה של הוויי פיי?",
+    "roman": "waipai bimilbeonhoga mwoyeyo?",
+    "en": "What's the Wi Fi password?"
+  },
+  {
+    "ko": "링크가 열리지 않아요",
+    "he": "הקישור לא נפתח",
+    "roman": "ringkeuga yeolriji anayo",
+    "en": "The link won't open"
+  },
+  {
+    "ko": "답장 천천히 하셔도 돼요",
+    "he": "אפשר לענות כשנוח לך",
+    "roman": "dapjang cheoncheonhi hasyeodo dwaeyo",
+    "en": "You can reply when you have time"
+  },
+  {
+    "ko": "오랜만에 얼굴 보니까 좋네요",
+    "he": "כיף לראות אותך אחרי הרבה זמן",
+    "roman": "oraenmane eolgul bonikka jotneyo",
+    "en": "It's nice to see you after a long time"
+  },
+  {
+    "ko": "요즘 뭐에 빠져 있어요?",
+    "he": "במה אתה מתעניין לאחרונה?",
+    "roman": "yojeum mwoe ppajyeo iteoyo?",
+    "en": "What are you into these days?"
+  },
+  {
+    "ko": "이번 주말에 같이 나갈래요?",
+    "he": "רוצה לצאת יחד בסוף השבוע?",
+    "roman": "ibeon jumale gati nagalraeyo?",
+    "en": "Do you want to go out together this weekend?"
+  },
+  {
+    "ko": "친구 한 명 더 불러도 돼요?",
+    "he": "אפשר להזמין עוד חבר?",
+    "roman": "chingu han myeong deo bulreodo dwaeyo?",
+    "en": "Can I invite one more friend?"
+  },
+  {
+    "ko": "오늘은 제가 살게요",
+    "he": "היום אני מזמין",
+    "roman": "oneuleun jega salgeyo",
+    "en": "It's my treat today"
+  },
+  {
+    "ko": "다음에는 우리 집에 놀러 오세요",
+    "he": "בפעם הבאה תבוא לבקר אצלי",
+    "roman": "daeumeneun uri jipe nolreo oseyo",
+    "en": "Come visit my place next time"
+  },
+  {
+    "ko": "사진 찍을 때 저도 불러 주세요",
+    "he": "תקרא לי כשמצטלמים",
+    "roman": "sajin jjikeul ttae jeodo bulreo juseyo",
+    "en": "Call me when you take the picture"
+  },
+  {
+    "ko": "정말 시간 가는 줄 몰랐어요",
+    "he": "לא שמתי לב איך הזמן עבר",
+    "roman": "jeongmal sigan ganeun jul molrateoyo",
+    "en": "I completely lost track of time"
+  },
+  {
+    "ko": "조심해서 들어가세요",
+    "he": "תחזור הביתה בזהירות",
+    "roman": "josimhaeseo deuleogaseyo",
+    "en": "Get home safely"
+  },
+  {
+    "ko": "다음에 또 같이 해요",
+    "he": "נעשה את זה שוב בפעם הבאה",
+    "roman": "daeume tto gati haeyo",
+    "en": "Let's do it together again next time"
+  },
+  {
+    "ko": "아이들이 벌써 잠들었어요",
+    "he": "הילדים כבר נרדמו",
+    "roman": "aideuli beolsseo jamdeuleoteoyo",
+    "en": "The children are already asleep"
+  },
+  {
+    "ko": "집에 손님이 오기로 했어요",
+    "he": "אמורים להגיע אלינו אורחים",
+    "roman": "jipe sonnimi ogiro haeteoyo",
+    "en": "We have guests coming over"
+  },
+  {
+    "ko": "거실을 조금 정리해야겠어요",
+    "he": "צריך קצת לסדר את הסלון",
+    "roman": "geosileul jogeum jeongrihaeyageteoyo",
+    "en": "I need to tidy up the living room"
+  },
+  {
+    "ko": "빨래가 아직 안 말랐어요",
+    "he": "הכביסה עדיין לא התייבשה",
+    "roman": "ppalraega ajik an malrateoyo",
+    "en": "The laundry isn't dry yet"
+  },
+  {
+    "ko": "쓰레기 버리고 올게요",
+    "he": "אלך לזרוק את הזבל",
+    "roman": "sseuregi beorigo olgeyo",
+    "en": "I'll go take out the trash"
+  },
+  {
+    "ko": "택배 오면 대신 받아 주세요",
+    "he": "אם יגיע משלוח, תקבל אותו בשבילי בבקשה",
+    "roman": "taekbae omyeon daesin bata juseyo",
+    "en": "Please receive the package for me if it arrives"
+  },
+  {
+    "ko": "오늘 저녁은 집에서 먹어요",
+    "he": "נאכל בבית הערב",
+    "roman": "oneul jeonyeokeun jipeseo meokeoyo",
+    "en": "We'll eat at home tonight"
+  },
+  {
+    "ko": "방이 너무 어두워요",
+    "he": "החדר חשוך מדי",
+    "roman": "bangi neomu eoduwoyo",
+    "en": "The room is too dark"
+  },
+  {
+    "ko": "에어컨 온도를 조금 올려 주세요",
+    "he": "תעלה קצת את הטמפרטורה במזגן",
+    "roman": "eeokeon ondoreul jogeum olryeo juseyo",
+    "en": "Please raise the air conditioner temperature a little"
+  },
+  {
+    "ko": "열쇠를 어디에 뒀는지 모르겠어요",
+    "he": "אני לא יודע איפה שמתי את המפתח",
+    "roman": "yeolsoereul eodie dwotneunji moreugeteoyo",
+    "en": "I don't know where I put the key"
+  },
+  {
+    "ko": "목이 조금 아파요",
+    "he": "קצת כואב לי הגרון",
+    "roman": "moki jogeum apayo",
+    "en": "My throat hurts a little"
+  },
+  {
+    "ko": "어제부터 기침이 나요",
+    "he": "אני משתעל מאז אתמול",
+    "roman": "eojebuteo gichimi nayo",
+    "en": "I've been coughing since yesterday"
+  },
+  {
+    "ko": "약은 식후에 먹어야 해요",
+    "he": "צריך לקחת את התרופה אחרי האוכל",
+    "roman": "yakeun sikhue meokeoya haeyo",
+    "en": "You need to take the medicine after eating"
+  },
+  {
+    "ko": "오늘은 무리하지 않는 게 좋겠어요",
+    "he": "עדיף לא להתאמץ היום",
+    "roman": "oneuleun murihaji anneun ge jotgeteoyo",
+    "en": "It's better not to overdo it today"
+  },
+  {
+    "ko": "병원 예약을 잡고 싶어요",
+    "he": "אני רוצה לקבוע תור לרופא",
+    "roman": "byeongwon yeyakeul japgo sipeoyo",
+    "en": "I'd like to make a doctor's appointment"
+  },
+  {
+    "ko": "이 약은 처방전이 필요한가요?",
+    "he": "צריך מרשם לתרופה הזאת?",
+    "roman": "i yakeun cheobangjeoni pilyohangayo?",
+    "en": "Does this medicine require a prescription?"
+  },
+  {
+    "ko": "알레르기가 있어서 확인하고 싶어요",
+    "he": "יש לי אלרגיה ואני רוצה לבדוק",
+    "roman": "alrereugiga iteoseo hwakinhago sipeoyo",
+    "en": "I have an allergy and want to check"
+  },
+  {
+    "ko": "어디가 제일 불편하세요?",
+    "he": "איפה הכי מפריע לך?",
+    "roman": "eodiga jeil bulpyeonhaseyo?",
+    "en": "Where do you feel the most discomfort?"
+  },
+  {
+    "ko": "며칠 쉬면 나아질 것 같아요",
+    "he": "נראה שכמה ימי מנוחה יעזרו",
+    "roman": "myeochil swimyeon naajil geot gatayo",
+    "en": "I think a few days of rest will help"
+  },
+  {
+    "ko": "지금은 통증이 많이 줄었어요",
+    "he": "עכשיו הכאב ירד בהרבה",
+    "roman": "jigeumeun tongjeungi mani juleoteoyo",
+    "en": "The pain has decreased a lot now"
+  },
+  {
+    "ko": "과제가 생각보다 많아요",
+    "he": "יש יותר שיעורי בית ממה שחשבתי",
+    "roman": "gwajega saenggakboda manayo",
+    "en": "There is more homework than I expected"
+  },
+  {
+    "ko": "오늘은 집중이 잘 안 돼요",
+    "he": "קשה לי להתרכז היום",
+    "roman": "oneuleun jipjungi jal an dwaeyo",
+    "en": "I can't concentrate well today"
+  },
+  {
+    "ko": "도서관에서 공부할까요?",
+    "he": "נלמד בספרייה?",
+    "roman": "doseogwaneseo gongbuhalkkayo?",
+    "en": "Shall we study at the library?"
+  },
+  {
+    "ko": "이 부분만 다시 설명해 주세요",
+    "he": "תסביר שוב רק את החלק הזה בבקשה",
+    "roman": "i bubunman dasi seolmyeonghae juseyo",
+    "en": "Please explain just this part again"
+  },
+  {
+    "ko": "메모해 두는 게 좋겠어요",
+    "he": "כדאי לרשום את זה",
+    "roman": "memohae duneun ge jotgeteoyo",
+    "en": "It would be good to write this down"
+  },
+  {
+    "ko": "오늘 배운 걸 복습할 거예요",
+    "he": "אחזור היום על מה שלמדתי",
+    "roman": "oneul baeun geol bokseuphal geoyeyo",
+    "en": "I'm going to review what I learned today"
+  },
+  {
+    "ko": "잠깐 쉬었다가 계속해요",
+    "he": "ננוח קצת ואז נמשיך",
+    "roman": "jamkkan swieotdaga gyesokhaeyo",
+    "en": "Let's take a short break and continue"
+  },
+  {
+    "ko": "마감 전에 끝낼 수 있을 것 같아요",
+    "he": "נראה שאוכל לסיים לפני המועד",
+    "roman": "magam jeone kkeutnael su iteul geot gatayo",
+    "en": "I think I can finish before the deadline"
+  },
+  {
+    "ko": "자료를 찾는 데 시간이 좀 걸렸어요",
+    "he": "לקח לי קצת זמן למצוא את החומר",
+    "roman": "jaryoreul chatneun de sigani jom geolryeoteoyo",
+    "en": "It took me a while to find the material"
+  },
+  {
+    "ko": "이 문제는 혼자 풀어 볼게요",
+    "he": "אנסה לפתור את הבעיה הזאת לבד",
+    "roman": "i munjeneun honja puleo bolgeyo",
+    "en": "I'll try to solve this problem by myself"
+  },
+  {
+    "ko": "앱을 최신 버전으로 업데이트했어요",
+    "he": "עדכנתי את האפליקציה לגרסה האחרונה",
+    "roman": "aepeul choesin beojeoneuro eopdeiteuhaeteoyo",
+    "en": "I updated the app to the latest version"
+  },
+  {
+    "ko": "사진이 너무 커서 안 보내져요",
+    "he": "התמונה גדולה מדי ולא נשלחת",
+    "roman": "sajini neomu keoseo an bonaejyeoyo",
+    "en": "The photo is too large to send"
+  },
+  {
+    "ko": "파일 이름을 바꿔 주세요",
+    "he": "תשנה את שם הקובץ בבקשה",
+    "roman": "pail ireumeul bakkwo juseyo",
+    "en": "Please rename the file"
+  },
+  {
+    "ko": "화면 밝기를 조금 낮췄어요",
+    "he": "הורדתי קצת את בהירות המסך",
+    "roman": "hwamyeon bakgireul jogeum natchwoteoyo",
+    "en": "I lowered the screen brightness a little"
+  },
+  {
+    "ko": "이어폰이 연결됐는지 확인해 보세요",
+    "he": "תבדוק שהאוזניות מחוברות",
+    "roman": "ieoponi yeongyeoldwaetneunji hwakinhae boseyo",
+    "en": "Check whether the earphones are connected"
+  },
+  {
+    "ko": "비밀번호를 다시 설정했어요",
+    "he": "איפסתי את הסיסמה",
+    "roman": "bimilbeonhoreul dasi seoljeonghaeteoyo",
+    "en": "I reset the password"
+  },
+  {
+    "ko": "저장 공간이 부족해요",
+    "he": "אין מספיק מקום אחסון",
+    "roman": "jeojang gonggani bujokhaeyo",
+    "en": "There isn't enough storage space"
+  },
+  {
+    "ko": "로그아웃했다가 다시 들어와 보세요",
+    "he": "תתנתק ותתחבר שוב",
+    "roman": "rogeuauthaetdaga dasi deuleowa boseyo",
+    "en": "Try logging out and back in"
+  },
+  {
+    "ko": "알림을 잠시 꺼 두었어요",
+    "he": "כיביתי את ההתראות לזמן מה",
+    "roman": "alrimeul jamsi kkeo dueoteoyo",
+    "en": "I turned off notifications for a while"
+  },
+  {
+    "ko": "충전기를 집에 두고 왔어요",
+    "he": "השארתי את המטען בבית",
+    "roman": "chungjeongireul jipe dugo wateoyo",
+    "en": "I left the charger at home"
+  },
+  {
+    "ko": "은행은 몇 시에 문을 닫아요?",
+    "he": "באיזו שעה הבנק נסגר?",
+    "roman": "eunhaengeun myeot sie muneul datayo?",
+    "en": "What time does the bank close?"
+  },
+  {
+    "ko": "우체국에 들렀다가 갈게요",
+    "he": "אעבור בדואר לפני שאגיע",
+    "roman": "ucheguke deulreotdaga galgeyo",
+    "en": "I'll stop by the post office first"
+  },
+  {
+    "ko": "복사 한 장 부탁드려요",
+    "he": "עותק אחד בבקשה",
+    "roman": "boksa han jang butakdeuryeoyo",
+    "en": "One copy, please"
+  },
+  {
+    "ko": "이 서류는 어디에 제출해요?",
+    "he": "איפה מגישים את המסמך הזה?",
+    "roman": "i seoryuneun eodie jechulhaeyo?",
+    "en": "Where do I submit this document?"
+  },
+  {
+    "ko": "번호표를 먼저 뽑아야 해요",
+    "he": "צריך קודם לקחת מספר",
+    "roman": "beonhopyoreul meonjeo ppopaya haeyo",
+    "en": "You need to take a number first"
+  },
+  {
+    "ko": "접수는 저쪽 창구에서 해요",
+    "he": "הקבלה היא בדלפק שם",
+    "roman": "jeopsuneun jeojjok changgueseo haeyo",
+    "en": "Registration is at that counter"
+  },
+  {
+    "ko": "신분증을 가지고 오셨어요?",
+    "he": "הבאת תעודה מזהה?",
+    "roman": "sinbunjeungeul gajigo osyeoteoyo?",
+    "en": "Did you bring your ID?"
+  },
+  {
+    "ko": "오늘은 예약 없이도 가능해요",
+    "he": "היום אפשר גם בלי תור",
+    "roman": "oneuleun yeyak eopido ganeunghaeyo",
+    "en": "Today it's possible without an appointment"
+  },
+  {
+    "ko": "처리하는 데 며칠 걸려요?",
+    "he": "כמה ימים לוקח לטפל בזה?",
+    "roman": "cheorihaneun de myeochil geolryeoyo?",
+    "en": "How many days does it take to process?"
+  },
+  {
+    "ko": "완료되면 문자로 연락이 와요",
+    "he": "כשהטיפול יסתיים תגיע הודעה",
+    "roman": "wanryodoemyeon munjaro yeonraki wayo",
+    "en": "You'll get a text when it's completed"
+  },
+  {
+    "ko": "체크인은 몇 시부터예요?",
+    "he": "מאיזו שעה אפשר לעשות צ'ק אין?",
+    "roman": "chekeuineun myeot sibuteoyeyo?",
+    "en": "What time does check in start?"
+  },
+  {
+    "ko": "짐을 먼저 맡겨도 될까요?",
+    "he": "אפשר להשאיר קודם את המזוודות?",
+    "roman": "jimeul meonjeo matgyeodo doelkkayo?",
+    "en": "Can I leave my luggage first?"
+  },
+  {
+    "ko": "조용한 방으로 부탁드려요",
+    "he": "חדר שקט בבקשה",
+    "roman": "joyonghan bangeuro butakdeuryeoyo",
+    "en": "I'd like a quiet room, please"
+  },
+  {
+    "ko": "수건을 두 장 더 받을 수 있을까요?",
+    "he": "אפשר לקבל עוד שתי מגבות?",
+    "roman": "sugeoneul du jang deo bateul su iteulkkayo?",
+    "en": "Could I get two more towels?"
+  },
+  {
+    "ko": "아침 식사는 어디에서 먹어요?",
+    "he": "איפה אוכלים ארוחת בוקר?",
+    "roman": "achim siksaneun eodieseo meokeoyo?",
+    "en": "Where is breakfast served?"
+  },
+  {
+    "ko": "근처에 편의점이 있나요?",
+    "he": "יש חנות נוחות קרובה?",
+    "roman": "geuncheoe pyeonuijeomi itnayo?",
+    "en": "Is there a convenience store nearby?"
+  },
+  {
+    "ko": "공항까지 얼마나 걸려요?",
+    "he": "כמה זמן לוקח להגיע לשדה התעופה?",
+    "roman": "gonghangkkaji eolmana geolryeoyo?",
+    "en": "How long does it take to get to the airport?"
+  },
+  {
+    "ko": "여권을 방에 두고 왔어요",
+    "he": "השארתי את הדרכון בחדר",
+    "roman": "yeogwoneul bange dugo wateoyo",
+    "en": "I left my passport in the room"
+  },
+  {
+    "ko": "예약 확인서를 보여 드릴게요",
+    "he": "אראה לך את אישור ההזמנה",
+    "roman": "yeyak hwakinseoreul boyeo deurilgeyo",
+    "en": "I'll show you the booking confirmation"
+  },
+  {
+    "ko": "체크아웃을 조금 늦게 할 수 있나요?",
+    "he": "אפשר לעשות צ'ק אאוט קצת מאוחר?",
+    "roman": "chekeuauteul jogeum neutge hal su itnayo?",
+    "en": "Can I check out a little later?"
+  },
+  {
+    "ko": "화장실이 어느 층에 있어요?",
+    "he": "באיזו קומה השירותים?",
+    "roman": "hwajangsili eoneu cheunge iteoyo?",
+    "en": "Which floor is the restroom on?"
+  },
+  {
+    "ko": "여기서 사진 찍어도 돼요?",
+    "he": "מותר לצלם כאן?",
+    "roman": "yeogiseo sajin jjikeodo dwaeyo?",
+    "en": "Can I take photos here?"
+  },
+  {
+    "ko": "입장권은 온라인으로 샀어요",
+    "he": "קניתי את כרטיס הכניסה באינטרנט",
+    "roman": "ipjanggwoneun onraineuro sateoyo",
+    "en": "I bought the admission ticket online"
+  },
+  {
+    "ko": "줄이 생각보다 길어요",
+    "he": "התור ארוך יותר ממה שחשבתי",
+    "roman": "juli saenggakboda gileoyo",
+    "en": "The line is longer than I expected"
+  },
+  {
+    "ko": "잠시 밖에 나갔다 와도 돼요?",
+    "he": "אפשר לצאת לרגע ולחזור?",
+    "roman": "jamsi bake nagatda wado dwaeyo?",
+    "en": "Can I step outside for a moment and come back?"
+  },
+  {
+    "ko": "이 자리는 비어 있나요?",
+    "he": "המקום הזה פנוי?",
+    "roman": "i jarineun bieo itnayo?",
+    "en": "Is this seat available?"
+  },
+  {
+    "ko": "여기는 음식 반입이 안 돼요",
+    "he": "אסור להכניס לכאן אוכל",
+    "roman": "yeogineun eumsik banipi an dwaeyo",
+    "en": "Food isn't allowed in here"
+  },
+  {
+    "ko": "문 닫기 전에 들어가야 해요",
+    "he": "צריך להיכנס לפני שסוגרים",
+    "roman": "mun datgi jeone deuleogaya haeyo",
+    "en": "We need to enter before it closes"
+  },
+  {
+    "ko": "안내 방송을 잘 못 들었어요",
+    "he": "לא שמעתי טוב את ההודעה",
+    "roman": "annae bangsongeul jal mot deuleoteoyo",
+    "en": "I couldn't hear the announcement well"
+  },
+  {
+    "ko": "출구는 저 표지판을 따라가세요",
+    "he": "עקוב אחרי השלט ליציאה",
+    "roman": "chulguneun jeo pyojipaneul ttaragaseyo",
+    "en": "Follow that sign to the exit"
+  },
+  {
+    "ko": "생각보다 재미있었어요",
+    "he": "זה היה יותר מעניין ממה שחשבתי",
+    "roman": "saenggakboda jaemiiteoteoyo",
+    "en": "It was more interesting than I expected"
+  },
+  {
+    "ko": "그 말 들으니까 마음이 놓여요",
+    "he": "זה מרגיע אותי לשמוע את זה",
+    "roman": "geu mal deuleunikka maeumi notyeoyo",
+    "en": "I feel relieved hearing that"
+  },
+  {
+    "ko": "오늘은 기분이 좀 가라앉아 있어요",
+    "he": "מצב הרוח שלי קצת ירוד היום",
+    "roman": "oneuleun gibuni jom garaana iteoyo",
+    "en": "I'm feeling a little down today"
+  },
+  {
+    "ko": "괜히 걱정한 것 같아요",
+    "he": "נראה שדאגתי סתם",
+    "roman": "gwaenhi geokjeonghan geot gatayo",
+    "en": "I think I worried for nothing"
+  },
+  {
+    "ko": "솔직히 조금 실망했어요",
+    "he": "למען האמת קצת התאכזבתי",
+    "roman": "soljikhi jogeum silmanghaeteoyo",
+    "en": "Honestly, I was a little disappointed"
+  },
+  {
+    "ko": "저는 그 생각에 동의해요",
+    "he": "אני מסכים עם הרעיון הזה",
+    "roman": "jeoneun geu saenggake donguihaeyo",
+    "en": "I agree with that idea"
+  },
+  {
+    "ko": "제 취향은 아닌 것 같아요",
+    "he": "נראה שזה לא בדיוק הטעם שלי",
+    "roman": "je chwihyangeun anin geot gatayo",
+    "en": "I don't think it's my style"
+  },
+  {
+    "ko": "생각할 시간이 조금 필요해요",
+    "he": "אני צריך קצת זמן לחשוב",
+    "roman": "saenggakhal sigani jogeum pilyohaeyo",
+    "en": "I need a little time to think"
+  },
+  {
+    "ko": "그렇게까지 나쁘진 않아요",
+    "he": "זה לא עד כדי כך גרוע",
+    "roman": "geureotgekkaji nappeujin anayo",
+    "en": "It's not that bad"
+  },
+  {
+    "ko": "결과가 어떻게 나올지 궁금해요",
+    "he": "מסקרן אותי איך זה ייצא",
+    "roman": "gyeolgwaga eotteotge naolji gunggeumhaeyo",
+    "en": "I'm curious how it will turn out"
+  },
+  {
+    "ko": "전보다 훨씬 자신감이 생겼어요",
+    "he": "יש לי הרבה יותר ביטחון מקודם",
+    "roman": "jeonboda hwolssin jasingami saenggyeoteoyo",
+    "en": "I feel much more confident than before"
+  },
+  {
+    "ko": "조금만 천천히 말씀해 주세요",
+    "he": "תדבר קצת יותר לאט בבקשה",
+    "roman": "jogeumman cheoncheonhi malsseumhae juseyo",
+    "en": "Please speak a little more slowly"
+  },
+  {
+    "ko": "한 번만 더 보여 주실래요?",
+    "he": "אפשר להראות לי עוד פעם?",
+    "roman": "han beonman deo boyeo jusilraeyo?",
+    "en": "Could you show me one more time?"
+  },
+  {
+    "ko": "제가 먼저 해 봐도 될까요?",
+    "he": "אפשר שאני אנסה קודם?",
+    "roman": "jega meonjeo hae bwado doelkkayo?",
+    "en": "May I try first?"
+  },
+  {
+    "ko": "여기 잠깐 놓아도 괜찮아요?",
+    "he": "אפשר להניח את זה כאן לרגע?",
+    "roman": "yeogi jamkkan notado gwaenchanayo?",
+    "en": "Is it okay if I leave this here for a moment?"
+  },
+  {
+    "ko": "조금만 기다려 주시면 돼요",
+    "he": "צריך רק להמתין קצת",
+    "roman": "jogeumman gidaryeo jusimyeon dwaeyo",
+    "en": "You just need to wait a little"
+  },
+  {
+    "ko": "도와주실 수 있으면 좋겠어요",
+    "he": "אשמח אם תוכל לעזור",
+    "roman": "dowajusil su iteumyeon jotgeteoyo",
+    "en": "I'd appreciate it if you could help"
+  },
+  {
+    "ko": "혹시 펜 하나 빌릴 수 있을까요?",
+    "he": "אפשר לשאול עט?",
+    "roman": "hoksi pen hana bilril su iteulkkayo?",
+    "en": "Could I borrow a pen?"
+  },
+  {
+    "ko": "제가 잘못 이해했으면 말씀해 주세요",
+    "he": "אם הבנתי לא נכון, תגיד לי בבקשה",
+    "roman": "jega jalmot ihaehaeteumyeon malsseumhae juseyo",
+    "en": "Please tell me if I misunderstood"
+  },
+  {
+    "ko": "먼저 하셔도 괜찮아요",
+    "he": "אתה יכול להתחיל קודם",
+    "roman": "meonjeo hasyeodo gwaenchanayo",
+    "en": "It's okay if you go first"
+  },
+  {
+    "ko": "불편하시면 바로 말씀해 주세요",
+    "he": "אם לא נוח לך, תגיד מיד",
+    "roman": "bulpyeonhasimyeon baro malsseumhae juseyo",
+    "en": "Please tell me right away if you're uncomfortable"
+  },
+  {
+    "ko": "갑자기 전기가 나갔어요",
+    "he": "פתאום הייתה הפסקת חשמל",
+    "roman": "gapjagi jeongiga nagateoyo",
+    "en": "The power suddenly went out"
+  },
+  {
+    "ko": "물이 잘 안 내려가요",
+    "he": "המים לא מתנקזים טוב",
+    "roman": "muli jal an naeryeogayo",
+    "en": "The water isn't draining properly"
+  },
+  {
+    "ko": "문이 안에서 잠긴 것 같아요",
+    "he": "נראה שהדלת ננעלה מבפנים",
+    "roman": "muni aneseo jamgin geot gatayo",
+    "en": "It seems the door is locked from the inside"
+  },
+  {
+    "ko": "이 부분이 자꾸 느슨해져요",
+    "he": "החלק הזה כל הזמן משתחרר",
+    "roman": "i bubuni jakku neuseunhaejyeoyo",
+    "en": "This part keeps coming loose"
+  },
+  {
+    "ko": "다른 방법으로 해 보는 게 좋겠어요",
+    "he": "כדאי לנסות בדרך אחרת",
+    "roman": "dareun bangbeopeuro hae boneun ge jotgeteoyo",
+    "en": "It would be better to try another way"
+  },
+  {
+    "ko": "원인을 아직 못 찾았어요",
+    "he": "עדיין לא מצאתי את הסיבה",
+    "roman": "wonineul ajik mot chatateoyo",
+    "en": "I haven't found the cause yet"
+  },
+  {
+    "ko": "일단 전원을 껐다 켜 보세요",
+    "he": "קודם תכבה ותדליק מחדש",
+    "roman": "ildan jeonwoneul kkeotda kyeo boseyo",
+    "en": "First, try turning the power off and on"
+  },
+  {
+    "ko": "문제가 다시 생기면 연락 주세요",
+    "he": "אם הבעיה תחזור, תיצור קשר",
+    "roman": "munjega dasi saenggimyeon yeonrak juseyo",
+    "en": "Contact me if the problem happens again"
+  },
+  {
+    "ko": "생각보다 쉽게 해결됐어요",
+    "he": "זה נפתר בקלות יותר ממה שחשבתי",
+    "roman": "saenggakboda swipge haegyeoldwaeteoyo",
+    "en": "It was solved more easily than expected"
+  },
+  {
+    "ko": "이제 정상적으로 돌아왔어요",
+    "he": "עכשיו הכול חזר לעבוד כרגיל",
+    "roman": "ije jeongsangjeokeuro dolawateoyo",
+    "en": "Now it's back to normal"
+  },
+  {
+    "ko": "이번 토요일에는 집에서 쉴 거예요",
+    "he": "בשבת הזאת אנוח בבית",
+    "roman": "ibeon toyoileneun jipeseo swil geoyeyo",
+    "en": "I'm going to rest at home this Saturday"
+  },
+  {
+    "ko": "일요일 아침에 출발하면 어때요?",
+    "he": "מה דעתך לצאת ביום ראשון בבוקר?",
+    "roman": "ilyoil achime chulbalhamyeon eottaeyo?",
+    "en": "How about leaving Sunday morning?"
+  },
+  {
+    "ko": "주말에 날씨가 좋으면 산에 가요",
+    "he": "אם מזג האוויר יהיה טוב בסוף השבוע, נלך להר",
+    "roman": "jumale nalssiga joteumyeon sane gayo",
+    "en": "If the weather is good this weekend, let's go to the mountains"
+  },
+  {
+    "ko": "오후에는 별다른 계획이 없어요",
+    "he": "אין לי תוכניות מיוחדות אחר הצהריים",
+    "roman": "ohueneun byeoldareun gyehoeki eopeoyo",
+    "en": "I don't have any particular plans in the afternoon"
+  },
+  {
+    "ko": "저녁에는 영화를 보려고 해요",
+    "he": "אני מתכנן לראות סרט בערב",
+    "roman": "jeonyeokeneun yeonghwareul boryeogo haeyo",
+    "en": "I'm planning to watch a movie tonight"
+  },
+  {
+    "ko": "이번에는 멀리 가지 말아요",
+    "he": "הפעם לא ניסע רחוק",
+    "roman": "ibeoneneun meolri gaji malayo",
+    "en": "Let's not go far this time"
+  },
+  {
+    "ko": "사람이 적은 곳으로 가고 싶어요",
+    "he": "אני רוצה ללכת למקום פחות עמוס",
+    "roman": "sarami jeokeun goteuro gago sipeoyo",
+    "en": "I want to go somewhere less crowded"
+  },
+  {
+    "ko": "시간 되면 시장에도 들러요",
+    "he": "אם יהיה זמן, נעבור גם בשוק",
+    "roman": "sigan doemyeon sijangedo deulreoyo",
+    "en": "If we have time, let's stop by the market too"
+  },
+  {
+    "ko": "아침에 결정해도 늦지 않아요",
+    "he": "לא מאוחר להחליט בבוקר",
+    "roman": "achime gyeoljeonghaedo neutji anayo",
+    "en": "It's not too late to decide in the morning"
+  },
+  {
+    "ko": "아무 계획 없이 쉬는 것도 좋아요",
+    "he": "גם לנוח בלי תוכניות זה טוב",
+    "roman": "amu gyehoek eopi swineun geotdo jotayo",
+    "en": "It's nice to rest without any plans"
+  },
+  {
+    "ko": "요즘 매일 조금씩 걷고 있어요",
+    "he": "לאחרונה אני הולך קצת כל יום",
+    "roman": "yojeum maeil jogeumssik geotgo iteoyo",
+    "en": "I've been walking a little every day lately"
+  },
+  {
+    "ko": "수영을 다시 배우고 싶어요",
+    "he": "אני רוצה לחזור ללמוד שחייה",
+    "roman": "suyeongeul dasi baeugo sipeoyo",
+    "en": "I want to learn swimming again"
+  },
+  {
+    "ko": "운동하고 나면 기분이 좋아져요",
+    "he": "אחרי אימון אני מרגיש טוב יותר",
+    "roman": "undonghago namyeon gibuni jotajyeoyo",
+    "en": "I feel better after exercising"
+  },
+  {
+    "ko": "오늘은 스트레칭만 할게요",
+    "he": "היום אעשה רק מתיחות",
+    "roman": "oneuleun seuteurechingman halgeyo",
+    "en": "I'll only stretch today"
+  },
+  {
+    "ko": "새로운 취미를 하나 시작했어요",
+    "he": "התחלתי תחביב חדש",
+    "roman": "saeroun chwimireul hana sijakhaeteoyo",
+    "en": "I started a new hobby"
+  },
+  {
+    "ko": "사진 찍는 걸 좋아하세요?",
+    "he": "אתה אוהב לצלם?",
+    "roman": "sajin jjikneun geol jotahaseyo?",
+    "en": "Do you like taking photos?"
+  },
+  {
+    "ko": "저는 요리할 때 음악을 들어요",
+    "he": "אני שומע מוזיקה כשאני מבשל",
+    "roman": "jeoneun yorihal ttae eumakeul deuleoyo",
+    "en": "I listen to music while cooking"
+  },
+  {
+    "ko": "주말마다 책을 조금씩 읽어요",
+    "he": "אני קורא קצת בכל סוף שבוע",
+    "roman": "jumalmada chaekeul jogeumssik ikeoyo",
+    "en": "I read a little every weekend"
+  },
+  {
+    "ko": "오랜만에 그림을 그렸어요",
+    "he": "ציירתי אחרי הרבה זמן",
+    "roman": "oraenmane geurimeul geuryeoteoyo",
+    "en": "I drew for the first time in a while"
+  },
+  {
+    "ko": "혼자 하는 운동이 더 편해요",
+    "he": "יותר נוח לי להתאמן לבד",
+    "roman": "honja haneun undongi deo pyeonhaeyo",
+    "en": "I prefer exercising alone"
+  },
+  {
+    "ko": "전구를 새것으로 바꿨어요",
+    "he": "החלפתי את הנורה בחדשה",
+    "roman": "jeongureul saegeoteuro bakkwoteoyo",
+    "en": "I replaced the light bulb with a new one"
+  },
+  {
+    "ko": "벽에 작은 구멍이 생겼어요",
+    "he": "נוצר חור קטן בקיר",
+    "roman": "byeoke jakeun gumeongi saenggyeoteoyo",
+    "en": "A small hole appeared in the wall"
+  },
+  {
+    "ko": "수도꼭지에서 물이 새요",
+    "he": "יש נזילה מהברז",
+    "roman": "sudokkokjieseo muli saeyo",
+    "en": "The faucet is leaking"
+  },
+  {
+    "ko": "선반이 조금 기울어졌어요",
+    "he": "המדף קצת נטה",
+    "roman": "seonbani jogeum giuleojyeoteoyo",
+    "en": "The shelf is slightly tilted"
+  },
+  {
+    "ko": "나사를 더 꽉 조여야 해요",
+    "he": "צריך להדק יותר את הבורג",
+    "roman": "nasareul deo kkwak joyeoya haeyo",
+    "en": "The screw needs to be tightened more"
+  },
+  {
+    "ko": "청소기 필터를 갈아야겠어요",
+    "he": "צריך להחליף את הפילטר של השואב",
+    "roman": "cheongsogi pilteoreul galayageteoyo",
+    "en": "I need to replace the vacuum filter"
+  },
+  {
+    "ko": "창문이 잘 안 닫혀요",
+    "he": "החלון לא נסגר טוב",
+    "roman": "changmuni jal an dathyeoyo",
+    "en": "The window doesn't close properly"
+  },
+  {
+    "ko": "이건 전문가를 불러야 할 것 같아요",
+    "he": "נראה שצריך להזמין איש מקצוע",
+    "roman": "igeon jeonmungareul bulreoya hal geot gatayo",
+    "en": "I think we need to call a professional for this"
+  },
+  {
+    "ko": "고장 난 부분을 사진으로 찍었어요",
+    "he": "צילמתי את החלק שהתקלקל",
+    "roman": "gojang nan bubuneul sajineuro jjikeoteoyo",
+    "en": "I took a photo of the broken part"
+  },
+  {
+    "ko": "수리비가 얼마나 나올지 모르겠어요",
+    "he": "אני לא יודע כמה יעלה התיקון",
+    "roman": "suribiga eolmana naolji moreugeteoyo",
+    "en": "I don't know how much the repair will cost"
+  },
+  {
+    "ko": "카드 비밀번호를 눌러야 하나요?",
+    "he": "צריך להקליד את הקוד של הכרטיס?",
+    "roman": "kadeu bimilbeonhoreul nulreoya hanayo?",
+    "en": "Do I need to enter the card PIN?"
+  },
+  {
+    "ko": "잔돈이 없어서 큰돈밖에 없어요",
+    "he": "אין לי עודף, יש לי רק שטר גדול",
+    "roman": "jandoni eopeoseo keundonbake eopeoyo",
+    "en": "I don't have change, only a large bill"
+  },
+  {
+    "ko": "계좌로 바로 보내 드릴게요",
+    "he": "אעביר לך ישירות לחשבון",
+    "roman": "gyejwaro baro bonae deurilgeyo",
+    "en": "I'll transfer it directly to your account"
+  },
+  {
+    "ko": "이번 달은 지출이 많았어요",
+    "he": "היו לי הרבה הוצאות החודש",
+    "roman": "ibeon daleun jichuli manateoyo",
+    "en": "I had a lot of expenses this month"
+  },
+  {
+    "ko": "가격을 다시 한번 확인해 주세요",
+    "he": "תבדוק שוב את המחיר בבקשה",
+    "roman": "gagyeokeul dasi hanbeon hwakinhae juseyo",
+    "en": "Please check the price one more time"
+  },
+  {
+    "ko": "수수료가 따로 붙나요?",
+    "he": "יש עמלה נוספת?",
+    "roman": "susuryoga ttaro butnayo?",
+    "en": "Is there an additional fee?"
+  },
+  {
+    "ko": "돈이 두 번 빠져나간 것 같아요",
+    "he": "נראה שחייבו אותי פעמיים",
+    "roman": "doni du beon ppajyeonagan geot gatayo",
+    "en": "I think I was charged twice"
+  },
+  {
+    "ko": "환불은 언제 들어와요?",
+    "he": "מתי ההחזר ייכנס?",
+    "roman": "hwanbuleun eonje deuleowayo?",
+    "en": "When will the refund come through?"
+  },
+  {
+    "ko": "예산 안에서 고르고 싶어요",
+    "he": "אני רוצה לבחור משהו במסגרת התקציב",
+    "roman": "yesan aneseo goreugo sipeoyo",
+    "en": "I want to choose within my budget"
+  },
+  {
+    "ko": "이번에는 비용을 반씩 나눠요",
+    "he": "הפעם נחלק את העלות חצי חצי",
+    "roman": "ibeoneneun biyongeul banssik nanwoyo",
+    "en": "Let's split the cost in half this time"
+  },
+  {
+    "ko": "이 단어 뜻이 정확히 뭐예요?",
+    "he": "מה בדיוק פירוש המילה הזאת?",
+    "roman": "i daneo tteuti jeonghwakhi mwoyeyo?",
+    "en": "What exactly does this word mean?"
+  },
+  {
+    "ko": "제가 발음을 제대로 했어요?",
+    "he": "הגיתי את זה נכון?",
+    "roman": "jega baleumeul jedaero haeteoyo?",
+    "en": "Did I pronounce it correctly?"
+  },
+  {
+    "ko": "이 표현은 존댓말이에요?",
+    "he": "הביטוי הזה הוא בצורה מנומסת?",
+    "roman": "i pyohyeoneun jondaetmalieyo?",
+    "en": "Is this expression in polite speech?"
+  },
+  {
+    "ko": "모르는 표현은 적어 두고 있어요",
+    "he": "אני רושם ביטויים שאני לא מכיר",
+    "roman": "moreuneun pyohyeoneun jeokeo dugo iteoyo",
+    "en": "I write down expressions I don't know"
+  },
+  {
+    "ko": "말은 알아듣는데 대답이 어려워요",
+    "he": "אני מבין כשמדברים, אבל קשה לי לענות",
+    "roman": "maleun aladeutneunde daedapi eoryeowoyo",
+    "en": "I understand speech, but answering is hard"
+  },
+  {
+    "ko": "비슷한 말로 다시 설명해 주세요",
+    "he": "תסביר שוב במילים דומות בבקשה",
+    "roman": "biseuthan malro dasi seolmyeonghae juseyo",
+    "en": "Please explain it again in similar words"
+  },
+  {
+    "ko": "이 문장은 자연스럽게 들려요?",
+    "he": "המשפט הזה נשמע טבעי?",
+    "roman": "i munjangeun jayeonseureopge deulryeoyo?",
+    "en": "Does this sentence sound natural?"
+  },
+  {
+    "ko": "존댓말로 말하는 게 더 안전해요",
+    "he": "יותר בטוח לדבר בצורה מנומסת",
+    "roman": "jondaetmalro malhaneun ge deo anjeonhaeyo",
+    "en": "It's safer to use polite speech"
+  },
+  {
+    "ko": "한글은 읽을 수 있지만 아직 느려요",
+    "he": "אני יכול לקרוא האנגול, אבל עדיין לאט",
+    "roman": "hangeuleun ikeul su itjiman ajik neuryeoyo",
+    "en": "I can read Hangul, but I'm still slow"
+  },
+  {
+    "ko": "실수해도 계속 말해 보는 게 중요해요",
+    "he": "חשוב להמשיך לדבר גם אם טועים",
+    "roman": "silsuhaedo gyesok malhae boneun ge jungyohaeyo",
+    "en": "It's important to keep speaking even if you make mistakes"
+  },
+  {
+    "ko": "생일 축하해요, 좋은 하루 보내세요",
+    "he": "יום הולדת שמח, שיהיה לך יום נהדר",
+    "roman": "saengil chukhahaeyo, joteun haru bonaeseyo",
+    "en": "Happy birthday, have a great day"
+  },
+  {
+    "ko": "초대해 주셔서 정말 감사합니다",
+    "he": "תודה רבה שהזמנת אותי",
+    "roman": "chodaehae jusyeoseo jeongmal gamsahapnida",
+    "en": "Thank you very much for inviting me"
+  },
+  {
+    "ko": "작은 선물을 준비했어요",
+    "he": "הכנתי מתנה קטנה",
+    "roman": "jakeun seonmuleul junbihaeteoyo",
+    "en": "I prepared a small gift"
+  },
+  {
+    "ko": "오늘 정말 멋져 보이세요",
+    "he": "אתה נראה נהדר היום",
+    "roman": "oneul jeongmal meotjyeo boiseyo",
+    "en": "You look great today"
+  },
+  {
+    "ko": "기념으로 사진 한 장 찍어요",
+    "he": "בוא נצלם תמונה למזכרת",
+    "roman": "ginyeomeuro sajin han jang jjikeoyo",
+    "en": "Let's take a photo as a keepsake"
+  },
+  {
+    "ko": "축하할 일이 생겨서 기뻐요",
+    "he": "אני שמח שיש סיבה לחגוג",
+    "roman": "chukhahal ili saenggyeoseo gippeoyo",
+    "en": "I'm glad we have something to celebrate"
+  },
+  {
+    "ko": "다 같이 건배할까요?",
+    "he": "נרים כוסית יחד?",
+    "roman": "da gati geonbaehalkkayo?",
+    "en": "Shall we make a toast together?"
+  },
+  {
+    "ko": "행사가 몇 시에 끝나요?",
+    "he": "באיזו שעה האירוע מסתיים?",
+    "roman": "haengsaga myeot sie kkeutnayo?",
+    "en": "What time does the event end?"
+  },
+  {
+    "ko": "사람이 많아서 조금 정신없어요",
+    "he": "יש הרבה אנשים וקצת עמוס כאן",
+    "roman": "sarami manaseo jogeum jeongsineopeoyo",
+    "en": "There are many people, so it's a little hectic"
+  },
+  {
+    "ko": "좋은 추억으로 남을 것 같아요",
+    "he": "נראה שזה יישאר כזיכרון טוב",
+    "roman": "joteun chueokeuro nameul geot gatayo",
+    "en": "I think this will remain a good memory"
+  },
+  {
+    "ko": "지갑을 잃어버린 것 같아요",
+    "he": "נראה שאיבדתי את הארנק",
+    "roman": "jigapeul ileobeorin geot gatayo",
+    "en": "I think I lost my wallet"
+  },
+  {
+    "ko": "휴대폰을 어디에 두고 왔어요",
+    "he": "השארתי את הטלפון איפשהו",
+    "roman": "hyudaeponeul eodie dugo wateoyo",
+    "en": "I left my phone somewhere"
+  },
+  {
+    "ko": "경찰에 신고해야 할까요?",
+    "he": "צריך לדווח למשטרה?",
+    "roman": "gyeongchale singohaeya halkkayo?",
+    "en": "Should I report it to the police?"
+  },
+  {
+    "ko": "여기서 기다리는 게 더 안전해요",
+    "he": "יותר בטוח לחכות כאן",
+    "roman": "yeogiseo gidarineun ge deo anjeonhaeyo",
+    "en": "It's safer to wait here"
+  },
+  {
+    "ko": "연기가 나는데 괜찮은 건가요?",
+    "he": "יש עשן, זה בסדר?",
+    "roman": "yeongiga naneunde gwaenchaneun geongayo?",
+    "en": "There's smoke, is that okay?"
+  },
+  {
+    "ko": "비상구가 어디에 있어요?",
+    "he": "איפה יציאת החירום?",
+    "roman": "bisangguga eodie iteoyo?",
+    "en": "Where is the emergency exit?"
+  },
+  {
+    "ko": "도움이 필요하면 바로 전화하세요",
+    "he": "אם תצטרך עזרה, תתקשר מיד",
+    "roman": "doumi pilyohamyeon baro jeonhwahaseyo",
+    "en": "Call right away if you need help"
+  },
+  {
+    "ko": "길에서 넘어져서 무릎을 다쳤어요",
+    "he": "נפלתי ברחוב ופגעתי בברך",
+    "roman": "gileseo neomeojyeoseo mureupeul dachyeoteoyo",
+    "en": "I fell on the street and hurt my knee"
+  },
+  {
+    "ko": "가방은 항상 앞쪽에 두세요",
+    "he": "תשמור את התיק תמיד לפניך",
+    "roman": "gabangeun hangsang apjjoke duseyo",
+    "en": "Keep your bag in front of you at all times"
+  },
+  {
+    "ko": "배송이 예상보다 늦어지고 있어요",
+    "he": "המשלוח מתעכב יותר מהצפוי",
+    "roman": "baesongi yesangboda neuteojigo iteoyo",
+    "en": "The delivery is taking longer than expected"
+  },
+  {
+    "ko": "주문 번호를 확인해 볼게요",
+    "he": "אבדוק את מספר ההזמנה",
+    "roman": "jumun beonhoreul hwakinhae bolgeyo",
+    "en": "I'll check the order number"
+  },
+  {
+    "ko": "주소를 잘못 입력했어요",
+    "he": "הזנתי כתובת לא נכונה",
+    "roman": "jusoreul jalmot ipryeokhaeteoyo",
+    "en": "I entered the wrong address"
+  },
+  {
+    "ko": "문 앞에 놓고 가 주세요",
+    "he": "תשאיר את זה ליד הדלת בבקשה",
+    "roman": "mun ape notgo ga juseyo",
+    "en": "Please leave it by the door"
+  },
+  {
+    "ko": "포장이 조금 찌그러졌어요",
+    "he": "האריזה קצת נמעכה",
+    "roman": "pojangi jogeum jjigeureojyeoteoyo",
+    "en": "The packaging is a little crushed"
+  },
+  {
+    "ko": "제품이 사진과 달라 보여요",
+    "he": "המוצר נראה שונה מהתמונה",
+    "roman": "jepumi sajingwa dalra boyeoyo",
+    "en": "The product looks different from the photo"
+  },
+  {
+    "ko": "반품 신청을 이미 했어요",
+    "he": "כבר ביקשתי להחזיר את המוצר",
+    "roman": "banpum sincheongeul imi haeteoyo",
+    "en": "I already requested a return"
+  },
+  {
+    "ko": "배송비는 제가 내야 하나요?",
+    "he": "אני צריך לשלם את דמי המשלוח?",
+    "roman": "baesongbineun jega naeya hanayo?",
+    "en": "Do I have to pay the shipping fee?"
+  },
+  {
+    "ko": "같은 상품을 다시 주문했어요",
+    "he": "הזמנתי שוב את אותו מוצר",
+    "roman": "gateun sangpumeul dasi jumunhaeteoyo",
+    "en": "I ordered the same product again"
+  },
+  {
+    "ko": "도착 날짜가 바뀌었어요",
+    "he": "תאריך ההגעה השתנה",
+    "roman": "dochak naljjaga bakkwieoteoyo",
+    "en": "The arrival date changed"
+  },
+  {
+    "ko": "강아지가 산책을 기다리고 있어요",
+    "he": "הכלב מחכה לטיול",
+    "roman": "gangajiga sanchaekeul gidarigo iteoyo",
+    "en": "The dog is waiting for a walk"
+  },
+  {
+    "ko": "고양이가 창가에서 자고 있어요",
+    "he": "החתול ישן ליד החלון",
+    "roman": "goyangiga changgaeseo jago iteoyo",
+    "en": "The cat is sleeping by the window"
+  },
+  {
+    "ko": "새들이 아침부터 많이 울어요",
+    "he": "הציפורים מצייצות הרבה מאז הבוקר",
+    "roman": "saedeuli achimbuteo mani uleoyo",
+    "en": "The birds have been chirping a lot since morning"
+  },
+  {
+    "ko": "공원에 꽃이 많이 피었어요",
+    "he": "הרבה פרחים פרחו בפארק",
+    "roman": "gongwone kkoti mani pieoteoyo",
+    "en": "Many flowers have bloomed in the park"
+  },
+  {
+    "ko": "오늘 하늘이 정말 맑아요",
+    "he": "השמיים ממש בהירים היום",
+    "roman": "oneul haneuli jeongmal makayo",
+    "en": "The sky is really clear today"
+  },
+  {
+    "ko": "나무 그늘에서 잠깐 쉬어요",
+    "he": "בוא ננוח קצת בצל העץ",
+    "roman": "namu geuneuleseo jamkkan swieoyo",
+    "en": "Let's rest for a moment in the shade of the tree"
+  },
+  {
+    "ko": "바닷바람이 생각보다 차가워요",
+    "he": "רוח הים קרה יותר ממה שחשבתי",
+    "roman": "badatbarami saenggakboda chagawoyo",
+    "en": "The sea breeze is colder than I expected"
+  },
+  {
+    "ko": "해 지기 전에 돌아가요",
+    "he": "נחזור לפני השקיעה",
+    "roman": "hae jigi jeone dolagayo",
+    "en": "Let's go back before sunset"
+  },
+  {
+    "ko": "길가에 야생화가 예쁘게 피었어요",
+    "he": "פרחי הבר בצד הדרך פורחים יפה",
+    "roman": "gilgae yasaenghwaga yeppeuge pieoteoyo",
+    "en": "The wildflowers by the road are blooming beautifully"
+  },
+  {
+    "ko": "조용한 곳에서 잠깐 앉아 있고 싶어요",
+    "he": "אני רוצה לשבת קצת במקום שקט",
+    "roman": "joyonghan goteseo jamkkan ana itgo sipeoyo",
+    "en": "I want to sit somewhere quiet for a while"
+  },
+  {
+    "ko": "오늘 하루가 정말 길게 느껴졌어요",
+    "he": "היום הרגיש ממש ארוך",
+    "roman": "oneul haruga jeongmal gilge neukkyeojyeoteoyo",
+    "en": "Today felt really long"
+  },
+  {
+    "ko": "생각보다 많은 일을 끝냈어요",
+    "he": "סיימתי יותר דברים ממה שחשבתי",
+    "roman": "saenggakboda maneun ileul kkeutnaeteoyo",
+    "en": "I finished more things than I expected"
+  },
+  {
+    "ko": "내일 할 일은 미리 적어 뒀어요",
+    "he": "כבר רשמתי מה צריך לעשות מחר",
+    "roman": "naeil hal ileun miri jeokeo dwoteoyo",
+    "en": "I wrote down tomorrow's tasks in advance"
+  },
+  {
+    "ko": "오늘은 일찍 자려고 해요",
+    "he": "אני מתכוון ללכת לישון מוקדם היום",
+    "roman": "oneuleun iljjik jaryeogo haeyo",
+    "en": "I'm planning to go to bed early tonight"
+  },
+  {
+    "ko": "하루 종일 정신없이 바빴어요",
+    "he": "הייתי עסוק בלי הפסקה כל היום",
+    "roman": "haru jongil jeongsineopi bappateoyo",
+    "en": "I was extremely busy all day"
+  },
+  {
+    "ko": "그래도 좋은 일이 하나 있었어요",
+    "he": "בכל זאת קרה היום משהו טוב",
+    "roman": "geuraedo joteun ili hana iteoteoyo",
+    "en": "Still, one good thing happened today"
+  },
+  {
+    "ko": "오늘 배운 걸 잊지 않았으면 좋겠어요",
+    "he": "אני מקווה שלא אשכח את מה שלמדתי היום",
+    "roman": "oneul baeun geol itji anateumyeon jotgeteoyo",
+    "en": "I hope I don't forget what I learned today"
+  },
+  {
+    "ko": "내일은 조금 더 여유가 있었으면 해요",
+    "he": "אני מקווה שמחר יהיה לי קצת יותר זמן פנוי",
+    "roman": "naeileun jogeum deo yeoyuga iteoteumyeon haeyo",
+    "en": "I hope I have a little more breathing room tomorrow"
+  },
+  {
+    "ko": "지금은 그냥 조용히 쉬고 싶어요",
+    "he": "עכשיו אני רק רוצה לנוח בשקט",
+    "roman": "jigeumeun geunyang joyonghi swigo sipeoyo",
+    "en": "Right now I just want to rest quietly"
+  },
+  {
+    "ko": "오늘도 무사히 끝나서 다행이에요",
+    "he": "טוב שגם היום הסתיים בשלום",
+    "roman": "oneuldo musahi kkeutnaseo dahaengieyo",
+    "en": "I'm glad today ended safely too"
   }
 ]

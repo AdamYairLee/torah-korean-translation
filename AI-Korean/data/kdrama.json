@@ -698,5 +698,2105 @@
     "en": "You have to be happy.",
     "roman": "haengbokhaeya hae.",
     "speak": "행복해야 해."
+  },
+  {
+    "ko": "이게 대체 뭐야?",
+    "he": "מה זה בכלל?",
+    "roman": "ige daeche mwoya?",
+    "en": "What on earth is this?",
+    "speak": "이게 대체 뭐야?"
+  },
+  {
+    "ko": "이 시간에 여긴 웬일이야?",
+    "he": "מה אתה עושה כאן בשעה כזאת?",
+    "roman": "i sigane yeogin weniliya?",
+    "en": "What brings you here at this hour?",
+    "speak": "이 시간에 여긴 웬일이야?"
+  },
+  {
+    "ko": "설마 네가 한 거야?",
+    "he": "אל תגיד לי שאתה עשית את זה",
+    "roman": "seolma nega han geoya?",
+    "en": "Don't tell me you did this",
+    "speak": "설마 네가 한 거야?"
+  },
+  {
+    "ko": "지금 나 놀리는 거지?",
+    "he": "אתה צוחק עליי עכשיו, נכון?",
+    "roman": "jigeum na nolrineun geoji?",
+    "en": "You're messing with me, right?",
+    "speak": "지금 나 놀리는 거지?"
+  },
+  {
+    "ko": "어떻게 이런 일이 생겨?",
+    "he": "איך דבר כזה קורה?",
+    "roman": "eotteotge ireon ili saenggyeo?",
+    "en": "How can something like this happen?",
+    "speak": "어떻게 이런 일이 생겨?"
+  },
+  {
+    "ko": "내가 잘못 본 거 아니지?",
+    "he": "לא ראיתי לא נכון, נכון?",
+    "roman": "naega jalmot bon geo aniji?",
+    "en": "I didn't see that wrong, did I?",
+    "speak": "내가 잘못 본 거 아니지?"
+  },
+  {
+    "ko": "잠깐, 다시 말해 봐.",
+    "he": "רגע, תגיד את זה שוב",
+    "roman": "jamkkan, dasi malhae bwa.",
+    "en": "Wait, say that again",
+    "speak": "잠깐, 다시 말해 봐."
+  },
+  {
+    "ko": "진심으로 하는 말이야?",
+    "he": "אתה אומר את זה ברצינות?",
+    "roman": "jinsimeuro haneun maliya?",
+    "en": "Are you serious about that?",
+    "speak": "진심으로 하는 말이야?"
+  },
+  {
+    "ko": "이걸 나한테 왜 보여 줘?",
+    "he": "למה אתה מראה לי את זה?",
+    "roman": "igeol nahante wae boyeo jwo?",
+    "en": "Why are you showing me this?",
+    "speak": "이걸 나한테 왜 보여 줘?"
+  },
+  {
+    "ko": "도대체 언제부터였어?",
+    "he": "ממתי זה בכלל?",
+    "roman": "dodaeche eonjebuteoyeoteo?",
+    "en": "Since when has this been going on?",
+    "speak": "도대체 언제부터였어?"
+  },
+  {
+    "ko": "뭔가 숨기고 있지?",
+    "he": "אתה מסתיר משהו, נכון?",
+    "roman": "mwonga sumgigo itji?",
+    "en": "You're hiding something, aren't you?",
+    "speak": "뭔가 숨기고 있지?"
+  },
+  {
+    "ko": "왜 자꾸 말을 돌려?",
+    "he": "למה אתה כל הזמן מתחמק?",
+    "roman": "wae jakku maleul dolryeo?",
+    "en": "Why do you keep dodging the question?",
+    "speak": "왜 자꾸 말을 돌려?"
+  },
+  {
+    "ko": "나한테 솔직하게 말해.",
+    "he": "תגיד לי את האמת",
+    "roman": "nahante soljikhage malhae.",
+    "en": "Be honest with me",
+    "speak": "나한테 솔직하게 말해."
+  },
+  {
+    "ko": "그 사람을 어떻게 알아?",
+    "he": "איך אתה מכיר אותו?",
+    "roman": "geu sarameul eotteotge ala?",
+    "en": "How do you know that person?",
+    "speak": "그 사람을 어떻게 알아?"
+  },
+  {
+    "ko": "어제 어디 있었어?",
+    "he": "איפה היית אתמול?",
+    "roman": "eoje eodi iteoteo?",
+    "en": "Where were you yesterday?",
+    "speak": "어제 어디 있었어?"
+  },
+  {
+    "ko": "왜 전화 안 받았어?",
+    "he": "למה לא ענית לטלפון?",
+    "roman": "wae jeonhwa an batateo?",
+    "en": "Why didn't you answer the phone?",
+    "speak": "왜 전화 안 받았어?"
+  },
+  {
+    "ko": "그 얘기 누구한테 들었어?",
+    "he": "ממי שמעת את זה?",
+    "roman": "geu yaegi nuguhante deuleoteo?",
+    "en": "Who told you that?",
+    "speak": "그 얘기 누구한테 들었어?"
+  },
+  {
+    "ko": "나 몰래 뭘 한 거야?",
+    "he": "מה עשית מאחורי הגב שלי?",
+    "roman": "na molrae mwol han geoya?",
+    "en": "What did you do behind my back?",
+    "speak": "나 몰래 뭘 한 거야?"
+  },
+  {
+    "ko": "증거가 있으면 보여 줘.",
+    "he": "אם יש לך הוכחה, תראה לי",
+    "roman": "jeunggeoga iteumyeon boyeo jwo.",
+    "en": "If you have proof, show me",
+    "speak": "증거가 있으면 보여 줘."
+  },
+  {
+    "ko": "아직도 나를 의심해?",
+    "he": "אתה עדיין חושד בי?",
+    "roman": "ajikdo nareul uisimhae?",
+    "en": "Do you still doubt me?",
+    "speak": "아직도 나를 의심해?"
+  },
+  {
+    "ko": "그만 좀 우겨.",
+    "he": "תפסיק להתעקש",
+    "roman": "geuman jom ugyeo.",
+    "en": "Stop insisting",
+    "speak": "그만 좀 우겨."
+  },
+  {
+    "ko": "내 말 좀 끝까지 들어.",
+    "he": "תקשיב לי עד הסוף",
+    "roman": "nae mal jom kkeutkkaji deuleo.",
+    "en": "Listen to me until I'm finished",
+    "speak": "내 말 좀 끝까지 들어."
+  },
+  {
+    "ko": "왜 항상 네 마음대로 해?",
+    "he": "למה אתה תמיד עושה מה שאתה רוצה?",
+    "roman": "wae hangsang ne maeumdaero hae?",
+    "en": "Why do you always do whatever you want?",
+    "speak": "왜 항상 네 마음대로 해?"
+  },
+  {
+    "ko": "이번엔 내가 참을 수 없어.",
+    "he": "הפעם אני לא יכול לשתוק",
+    "roman": "ibeonen naega chameul su eopeo.",
+    "en": "I can't put up with it this time",
+    "speak": "이번엔 내가 참을 수 없어."
+  },
+  {
+    "ko": "그런 식으로 말하지 마.",
+    "he": "אל תדבר אליי ככה",
+    "roman": "geureon sikeuro malhaji ma.",
+    "en": "Don't talk to me like that",
+    "speak": "그런 식으로 말하지 마."
+  },
+  {
+    "ko": "지금 싸우자는 거야?",
+    "he": "אתה רוצה לריב עכשיו?",
+    "roman": "jigeum ssaujaneun geoya?",
+    "en": "Are you trying to start a fight?",
+    "speak": "지금 싸우자는 거야?"
+  },
+  {
+    "ko": "내가 틀렸다는 거야?",
+    "he": "אתה אומר שאני טועה?",
+    "roman": "naega teulryeotdaneun geoya?",
+    "en": "Are you saying I'm wrong?",
+    "speak": "내가 틀렸다는 거야?"
+  },
+  {
+    "ko": "그 얘기는 여기서 끝내.",
+    "he": "תסיים את הסיפור הזה כאן",
+    "roman": "geu yaegineun yeogiseo kkeutnae.",
+    "en": "End that discussion here",
+    "speak": "그 얘기는 여기서 끝내."
+  },
+  {
+    "ko": "내 앞에서 소리 지르지 마.",
+    "he": "אל תצעק מולי",
+    "roman": "nae apeseo sori jireuji ma.",
+    "en": "Don't shout in front of me",
+    "speak": "내 앞에서 소리 지르지 마."
+  },
+  {
+    "ko": "우리 둘 다 진정할 필요가 있어.",
+    "he": "שנינו צריכים להירגע",
+    "roman": "uri dul da jinjeonghal pilyoga iteo.",
+    "en": "We both need to calm down",
+    "speak": "우리 둘 다 진정할 필요가 있어."
+  },
+  {
+    "ko": "내가 너무 심했어.",
+    "he": "הגזמתי",
+    "roman": "naega neomu simhaeteo.",
+    "en": "I went too far",
+    "speak": "내가 너무 심했어."
+  },
+  {
+    "ko": "그때는 내가 잘못했어.",
+    "he": "אז אני טעיתי",
+    "roman": "geuttaeneun naega jalmothaeteo.",
+    "en": "I was wrong then",
+    "speak": "그때는 내가 잘못했어."
+  },
+  {
+    "ko": "상처 주려던 건 아니었어.",
+    "he": "לא התכוונתי לפגוע בך",
+    "roman": "sangcheo juryeodeon geon anieoteo.",
+    "en": "I didn't mean to hurt you",
+    "speak": "상처 주려던 건 아니었어."
+  },
+  {
+    "ko": "내 말 때문에 속상했지?",
+    "he": "נפגעת ממה שאמרתי, נכון?",
+    "roman": "nae mal ttaemune soksanghaetji?",
+    "en": "What I said hurt you, didn't it?",
+    "speak": "내 말 때문에 속상했지?"
+  },
+  {
+    "ko": "변명하지 않을게.",
+    "he": "אני לא אמציא תירוצים",
+    "roman": "byeonmyeonghaji aneulge.",
+    "en": "I won't make excuses",
+    "speak": "변명하지 않을게."
+  },
+  {
+    "ko": "한 번만 용서해 줘.",
+    "he": "תסלח לי רק הפעם",
+    "roman": "han beonman yongseohae jwo.",
+    "en": "Please forgive me just this once",
+    "speak": "한 번만 용서해 줘."
+  },
+  {
+    "ko": "늦게 말해서 미안해.",
+    "he": "סליחה שסיפרתי מאוחר",
+    "roman": "neutge malhaeseo mianhae.",
+    "en": "Sorry I told you so late",
+    "speak": "늦게 말해서 미안해."
+  },
+  {
+    "ko": "내가 먼저 사과할게.",
+    "he": "אני אתנצל ראשון",
+    "roman": "naega meonjeo sagwahalge.",
+    "en": "I'll apologize first",
+    "speak": "내가 먼저 사과할게."
+  },
+  {
+    "ko": "다시는 같은 실수 안 할게.",
+    "he": "לא אעשה שוב את אותה טעות",
+    "roman": "dasineun gateun silsu an halge.",
+    "en": "I won't make the same mistake again",
+    "speak": "다시는 같은 실수 안 할게."
+  },
+  {
+    "ko": "시간이 필요하면 기다릴게.",
+    "he": "אם אתה צריך זמן, אני אחכה",
+    "roman": "sigani pilyohamyeon gidarilge.",
+    "en": "If you need time, I'll wait",
+    "speak": "시간이 필요하면 기다릴게."
+  },
+  {
+    "ko": "너랑 있으면 편해.",
+    "he": "נוח לי כשאני איתך",
+    "roman": "neorang iteumyeon pyeonhae.",
+    "en": "I feel comfortable when I'm with you",
+    "speak": "너랑 있으면 편해."
+  },
+  {
+    "ko": "오늘따라 네가 보고 싶었어.",
+    "he": "היום התגעגעתי אליך במיוחד",
+    "roman": "oneulttara nega bogo sipeoteo.",
+    "en": "I missed you especially today",
+    "speak": "오늘따라 네가 보고 싶었어."
+  },
+  {
+    "ko": "나도 모르게 자꾸 웃게 돼.",
+    "he": "אני כל הזמן מחייך בלי לשים לב",
+    "roman": "nado moreuge jakku utge dwae.",
+    "en": "I keep smiling without realizing it",
+    "speak": "나도 모르게 자꾸 웃게 돼."
+  },
+  {
+    "ko": "네가 오니까 분위기가 달라졌어.",
+    "he": "מאז שהגעת האווירה השתנתה",
+    "roman": "nega onikka bunwigiga dalrajyeoteo.",
+    "en": "The atmosphere changed when you came",
+    "speak": "네가 오니까 분위기가 달라졌어."
+  },
+  {
+    "ko": "조금 더 같이 걷자.",
+    "he": "בוא נלך יחד עוד קצת",
+    "roman": "jogeum deo gati geotja.",
+    "en": "Let's walk together a little longer",
+    "speak": "조금 더 같이 걷자."
+  },
+  {
+    "ko": "내가 너 좋아하면 안 돼?",
+    "he": "אסור לי לאהוב אותך?",
+    "roman": "naega neo jotahamyeon an dwae?",
+    "en": "Can't I like you?",
+    "speak": "내가 너 좋아하면 안 돼?"
+  },
+  {
+    "ko": "오늘은 그냥 네 옆에 있고 싶어.",
+    "he": "היום אני רק רוצה להיות לידך",
+    "roman": "oneuleun geunyang ne yeope itgo sipeo.",
+    "en": "Today I just want to be by your side",
+    "speak": "오늘은 그냥 네 옆에 있고 싶어."
+  },
+  {
+    "ko": "손 잡아도 돼?",
+    "he": "אפשר להחזיק לך את היד?",
+    "roman": "son japado dwae?",
+    "en": "Can I hold your hand?",
+    "speak": "손 잡아도 돼?"
+  },
+  {
+    "ko": "네가 웃으면 나도 좋아.",
+    "he": "כשאתה מחייך גם אני שמח",
+    "roman": "nega uteumyeon nado jota.",
+    "en": "When you smile, I'm happy too",
+    "speak": "네가 웃으면 나도 좋아."
+  },
+  {
+    "ko": "우리 천천히 알아가자.",
+    "he": "בוא נכיר לאט לאט",
+    "roman": "uri cheoncheonhi alagaja.",
+    "en": "Let's get to know each other slowly",
+    "speak": "우리 천천히 알아가자."
+  },
+  {
+    "ko": "이제 우리 그만하자.",
+    "he": "בוא נסיים את זה",
+    "roman": "ije uri geumanhaja.",
+    "en": "Let's end this now",
+    "speak": "이제 우리 그만하자."
+  },
+  {
+    "ko": "더는 서로 힘들게 하지 말자.",
+    "he": "בוא לא נכאיב יותר אחד לשני",
+    "roman": "deoneun seoro himdeulge haji malja.",
+    "en": "Let's stop hurting each other",
+    "speak": "더는 서로 힘들게 하지 말자."
+  },
+  {
+    "ko": "좋았던 기억만 남기고 싶어.",
+    "he": "אני רוצה להשאיר רק את הזיכרונות הטובים",
+    "roman": "jotatdeon gieokman namgigo sipeo.",
+    "en": "I want to keep only the good memories",
+    "speak": "좋았던 기억만 남기고 싶어."
+  },
+  {
+    "ko": "이런 식으로 끝날 줄 몰랐어.",
+    "he": "לא חשבתי שזה ייגמר ככה",
+    "roman": "ireon sikeuro kkeutnal jul molrateo.",
+    "en": "I didn't think it would end like this",
+    "speak": "이런 식으로 끝날 줄 몰랐어."
+  },
+  {
+    "ko": "내가 먼저 놓아줄게.",
+    "he": "אני אשחרר אותך ראשון",
+    "roman": "naega meonjeo notajulge.",
+    "en": "I'll be the first to let go",
+    "speak": "내가 먼저 놓아줄게."
+  },
+  {
+    "ko": "다시 돌아오라고는 안 할게.",
+    "he": "לא אבקש ממך לחזור",
+    "roman": "dasi dolaoragoneun an halge.",
+    "en": "I won't ask you to come back",
+    "speak": "다시 돌아오라고는 안 할게."
+  },
+  {
+    "ko": "우리 서로 미워하지는 말자.",
+    "he": "בוא לא נשנא אחד את השני",
+    "roman": "uri seoro miwohajineun malja.",
+    "en": "Let's not hate each other",
+    "speak": "우리 서로 미워하지는 말자."
+  },
+  {
+    "ko": "마지막 인사는 하고 가.",
+    "he": "לפחות תגיד שלום לפני שאתה הולך",
+    "roman": "majimak insaneun hago ga.",
+    "en": "At least say goodbye before you go",
+    "speak": "마지막 인사는 하고 가."
+  },
+  {
+    "ko": "이제는 각자 길을 가야 해.",
+    "he": "עכשיו כל אחד צריך ללכת לדרכו",
+    "roman": "ijeneun gakja gileul gaya hae.",
+    "en": "Now we each have to go our own way",
+    "speak": "이제는 각자 길을 가야 해."
+  },
+  {
+    "ko": "잘 지내라는 말밖에 못 하겠다.",
+    "he": "כל מה שאני יכול לומר זה שתהיה בטוב",
+    "roman": "jal jinaeraneun malbake mot hagetda.",
+    "en": "All I can say is take care",
+    "speak": "잘 지내라는 말밖에 못 하겠다."
+  },
+  {
+    "ko": "너 없었으면 큰일 날 뻔했어.",
+    "he": "בלעדיך הייתי מסתבך בגדול",
+    "roman": "neo eopeoteumyeon keunil nal ppeonhaeteo.",
+    "en": "I would have been in serious trouble without you",
+    "speak": "너 없었으면 큰일 날 뻔했어."
+  },
+  {
+    "ko": "친구끼리 이 정도는 해 줄 수 있지.",
+    "he": "חברים יכולים לעשות לפחות את זה אחד בשביל השני",
+    "roman": "chingukkiri i jeongdoneun hae jul su itji.",
+    "en": "Friends can do at least this much for each other",
+    "speak": "친구끼리 이 정도는 해 줄 수 있지."
+  },
+  {
+    "ko": "오늘은 내가 네 편이야.",
+    "he": "היום אני בצד שלך",
+    "roman": "oneuleun naega ne pyeoniya.",
+    "en": "I'm on your side today",
+    "speak": "오늘은 내가 네 편이야."
+  },
+  {
+    "ko": "힘들면 나한테 와.",
+    "he": "אם קשה לך, תבוא אליי",
+    "roman": "himdeulmyeon nahante wa.",
+    "en": "Come to me if things get hard",
+    "speak": "힘들면 나한테 와."
+  },
+  {
+    "ko": "우리 사이에 비밀이 어딨어?",
+    "he": "איזה סודות יש בינינו?",
+    "roman": "uri saie bimili eoditeo?",
+    "en": "What secrets are there between us?",
+    "speak": "우리 사이에 비밀이 어딨어?"
+  },
+  {
+    "ko": "너답지 않게 왜 그래?",
+    "he": "למה אתה מתנהג לא כמו עצמך?",
+    "roman": "neodapji ange wae geurae?",
+    "en": "Why are you acting unlike yourself?",
+    "speak": "너답지 않게 왜 그래?"
+  },
+  {
+    "ko": "같이 욕먹어 줄게.",
+    "he": "אני אחטוף איתך",
+    "roman": "gati yokmeokeo julge.",
+    "en": "I'll take the blame with you",
+    "speak": "같이 욕먹어 줄게."
+  },
+  {
+    "ko": "일단 밥부터 먹고 얘기하자.",
+    "he": "קודם נאכל ואז נדבר",
+    "roman": "ildan bapbuteo meokgo yaegihaja.",
+    "en": "Let's eat first and then talk",
+    "speak": "일단 밥부터 먹고 얘기하자."
+  },
+  {
+    "ko": "내가 뒤에서 밀어 줄게.",
+    "he": "אני אתמוך בך מאחור",
+    "roman": "naega dwieseo mileo julge.",
+    "en": "I'll support you from behind",
+    "speak": "내가 뒤에서 밀어 줄게."
+  },
+  {
+    "ko": "이럴 때 친구가 필요한 거야.",
+    "he": "בשביל רגעים כאלה צריך חבר",
+    "roman": "ireol ttae chinguga pilyohan geoya.",
+    "en": "This is when you need a friend",
+    "speak": "이럴 때 친구가 필요한 거야."
+  },
+  {
+    "ko": "엄마한테는 아직 말하지 마.",
+    "he": "אל תספר עדיין לאמא",
+    "roman": "eommahanteneun ajik malhaji ma.",
+    "en": "Don't tell Mom yet",
+    "speak": "엄마한테는 아직 말하지 마."
+  },
+  {
+    "ko": "아빠가 알면 난리 날 거야.",
+    "he": "אם אבא יידע תהיה סערה",
+    "roman": "appaga almyeon nanri nal geoya.",
+    "en": "Dad will go crazy if he finds out",
+    "speak": "아빠가 알면 난리 날 거야."
+  },
+  {
+    "ko": "우리 가족 일은 우리가 해결해.",
+    "he": "אנחנו נפתור את העניינים של המשפחה שלנו",
+    "roman": "uri gajok ileun uriga haegyeolhae.",
+    "en": "We'll handle our family matters ourselves",
+    "speak": "우리 가족 일은 우리가 해결해."
+  },
+  {
+    "ko": "동생한테 괜히 화내지 마.",
+    "he": "אל תוציא סתם כעס על אחיך הקטן",
+    "roman": "dongsaenghante gwaenhi hwanaeji ma.",
+    "en": "Don't take your anger out on your younger sibling",
+    "speak": "동생한테 괜히 화내지 마."
+  },
+  {
+    "ko": "할머니가 많이 걱정하셔.",
+    "he": "סבתא מאוד דואגת",
+    "roman": "halmeoniga mani geokjeonghasyeo.",
+    "en": "Grandma is very worried",
+    "speak": "할머니가 많이 걱정하셔."
+  },
+  {
+    "ko": "집에 늦게 들어오지 마.",
+    "he": "אל תחזור הביתה מאוחר",
+    "roman": "jipe neutge deuleooji ma.",
+    "en": "Don't come home late",
+    "speak": "집에 늦게 들어오지 마."
+  },
+  {
+    "ko": "누나한테는 내가 말할게.",
+    "he": "אני אספר לאחות הגדולה",
+    "roman": "nunahanteneun naega malhalge.",
+    "en": "I'll tell your older sister",
+    "speak": "누나한테는 내가 말할게."
+  },
+  {
+    "ko": "형이 대신 책임질게.",
+    "he": "האח הגדול ייקח אחריות במקומך",
+    "roman": "hyeongi daesin chaekimjilge.",
+    "en": "Your older brother will take responsibility",
+    "speak": "형이 대신 책임질게."
+  },
+  {
+    "ko": "가족이라고 다 이해되는 건 아니야.",
+    "he": "זה שאנחנו משפחה לא אומר שמבינים הכול",
+    "roman": "gajokirago da ihaedoeneun geon aniya.",
+    "en": "Being family doesn't mean we understand everything",
+    "speak": "가족이라고 다 이해되는 건 아니야."
+  },
+  {
+    "ko": "그래도 집은 집이잖아.",
+    "he": "ועדיין, בית זה בית",
+    "roman": "geuraedo jipeun jipijana.",
+    "en": "Still, home is home",
+    "speak": "그래도 집은 집이잖아."
+  },
+  {
+    "ko": "선생님이 널 찾고 있어.",
+    "he": "המורה מחפש אותך",
+    "roman": "seonsaengnimi neol chatgo iteo.",
+    "en": "The teacher is looking for you",
+    "speak": "선생님이 널 찾고 있어."
+  },
+  {
+    "ko": "오늘 발표 네 차례야.",
+    "he": "היום תורך להציג",
+    "roman": "oneul balpyo ne charyeya.",
+    "en": "It's your turn to present today",
+    "speak": "오늘 발표 네 차례야."
+  },
+  {
+    "ko": "팀장님한테 들키면 끝이야.",
+    "he": "אם ראש הצוות יתפוס אותנו, גמרנו",
+    "roman": "timjangnimhante deulkimyeon kkeutiya.",
+    "en": "If the team leader catches us, we're done",
+    "speak": "팀장님한테 들키면 끝이야."
+  },
+  {
+    "ko": "보고서 아직 안 냈지?",
+    "he": "עוד לא הגשת את הדוח, נכון?",
+    "roman": "bogoseo ajik an naetji?",
+    "en": "You haven't submitted the report yet, right?",
+    "speak": "보고서 아직 안 냈지?"
+  },
+  {
+    "ko": "왜 나한테만 시켜?",
+    "he": "למה רק אותי שולחים לעשות את זה?",
+    "roman": "wae nahanteman sikyeo?",
+    "en": "Why do they make only me do it?",
+    "speak": "왜 나한테만 시켜?"
+  },
+  {
+    "ko": "시험 망친 것 같아.",
+    "he": "נראה לי שהרסתי את המבחן",
+    "roman": "siheom mangchin geot gata.",
+    "en": "I think I messed up the exam",
+    "speak": "시험 망친 것 같아."
+  },
+  {
+    "ko": "오늘 야근 확정이네.",
+    "he": "נראה שהיום בטוח עובדים עד מאוחר",
+    "roman": "oneul yageun hwakjeongine.",
+    "en": "Looks like overtime is certain today",
+    "speak": "오늘 야근 확정이네."
+  },
+  {
+    "ko": "회의 중에 졸지 마.",
+    "he": "אל תירדם באמצע הישיבה",
+    "roman": "hoeui junge jolji ma.",
+    "en": "Don't fall asleep during the meeting",
+    "speak": "회의 중에 졸지 마."
+  },
+  {
+    "ko": "내 자리 건드리지 마.",
+    "he": "אל תיגע במקום שלי",
+    "roman": "nae jari geondeuriji ma.",
+    "en": "Don't touch my desk",
+    "speak": "내 자리 건드리지 마."
+  },
+  {
+    "ko": "퇴근하고 한잔할래?",
+    "he": "רוצה לשתות משהו אחרי העבודה?",
+    "roman": "toegeunhago hanjanhalrae?",
+    "en": "Want to grab a drink after work?",
+    "speak": "퇴근하고 한잔할래?"
+  },
+  {
+    "ko": "아무한테도 말하면 안 돼.",
+    "he": "אסור לך לספר לאף אחד",
+    "roman": "amuhantedo malhamyeon an dwae.",
+    "en": "You can't tell anyone",
+    "speak": "아무한테도 말하면 안 돼."
+  },
+  {
+    "ko": "이건 우리 둘만 아는 거야.",
+    "he": "רק שנינו יודעים את זה",
+    "roman": "igeon uri dulman aneun geoya.",
+    "en": "This stays between the two of us",
+    "speak": "이건 우리 둘만 아는 거야."
+  },
+  {
+    "ko": "그 비밀을 왜 지금 말해?",
+    "he": "למה אתה מספר את הסוד הזה עכשיו?",
+    "roman": "geu bimileul wae jigeum malhae?",
+    "en": "Why are you telling that secret now?",
+    "speak": "그 비밀을 왜 지금 말해?"
+  },
+  {
+    "ko": "이미 다 알고 있었어.",
+    "he": "כבר ידעתי הכול",
+    "roman": "imi da algo iteoteo.",
+    "en": "I already knew everything",
+    "speak": "이미 다 알고 있었어."
+  },
+  {
+    "ko": "숨긴다고 없어지는 일 아니야.",
+    "he": "זה לא ייעלם רק כי מסתירים את זה",
+    "roman": "sumgindago eopeojineun il aniya.",
+    "en": "It won't disappear just because you hide it",
+    "speak": "숨긴다고 없어지는 일 아니야."
+  },
+  {
+    "ko": "언젠가는 밝혀질 거야.",
+    "he": "יום אחד האמת תצא לאור",
+    "roman": "eonjenganeun bakhyeojil geoya.",
+    "en": "It'll come out someday",
+    "speak": "언젠가는 밝혀질 거야."
+  },
+  {
+    "ko": "그 사람한테는 절대 들키면 안 돼.",
+    "he": "אסור בשום אופן שהוא יגלה",
+    "roman": "geu saramhanteneun jeoldae deulkimyeon an dwae.",
+    "en": "That person must never find out",
+    "speak": "그 사람한테는 절대 들키면 안 돼."
+  },
+  {
+    "ko": "내가 비밀 지켜 줄게.",
+    "he": "אני אשמור את הסוד שלך",
+    "roman": "naega bimil jikyeo julge.",
+    "en": "I'll keep your secret",
+    "speak": "내가 비밀 지켜 줄게."
+  },
+  {
+    "ko": "진실을 알고 싶지 않아?",
+    "he": "אתה לא רוצה לדעת את האמת?",
+    "roman": "jinsileul algo sipji ana?",
+    "en": "Don't you want to know the truth?",
+    "speak": "진실을 알고 싶지 않아?"
+  },
+  {
+    "ko": "이제는 말할 때가 됐어.",
+    "he": "עכשיו הגיע הזמן לספר",
+    "roman": "ijeneun malhal ttaega dwaeteo.",
+    "en": "It's time to tell the truth now",
+    "speak": "이제는 말할 때가 됐어."
+  },
+  {
+    "ko": "여기 오래 있으면 위험해.",
+    "he": "מסוכן להישאר כאן הרבה זמן",
+    "roman": "yeogi orae iteumyeon wiheomhae.",
+    "en": "It's dangerous to stay here long",
+    "speak": "여기 오래 있으면 위험해."
+  },
+  {
+    "ko": "뒤를 보지 말고 가.",
+    "he": "לך ואל תסתכל לאחור",
+    "roman": "dwireul boji malgo ga.",
+    "en": "Go without looking back",
+    "speak": "뒤를 보지 말고 가."
+  },
+  {
+    "ko": "누가 따라오는 것 같아.",
+    "he": "נראה שמישהו עוקב אחרינו",
+    "roman": "nuga ttaraoneun geot gata.",
+    "en": "I think someone is following us",
+    "speak": "누가 따라오는 것 같아."
+  },
+  {
+    "ko": "문 잠그고 절대 열지 마.",
+    "he": "תנעל את הדלת ואל תפתח בשום אופן",
+    "roman": "mun jamgeugo jeoldae yeolji ma.",
+    "en": "Lock the door and don't open it",
+    "speak": "문 잠그고 절대 열지 마."
+  },
+  {
+    "ko": "경찰이 올 때까지 기다려.",
+    "he": "תחכה עד שהמשטרה תגיע",
+    "roman": "gyeongchali ol ttaekkaji gidaryeo.",
+    "en": "Wait until the police arrive",
+    "speak": "경찰이 올 때까지 기다려."
+  },
+  {
+    "ko": "여긴 내가 막을 테니까 먼저 가.",
+    "he": "אני אעכב אותם כאן, תלך קודם",
+    "roman": "yeogin naega makeul tenikka meonjeo ga.",
+    "en": "I'll hold them off here, you go first",
+    "speak": "여긴 내가 막을 테니까 먼저 가."
+  },
+  {
+    "ko": "지금 당장 이곳을 떠나야 해.",
+    "he": "צריך לעזוב את המקום הזה עכשיו",
+    "roman": "jigeum dangjang igoteul tteonaya hae.",
+    "en": "We need to leave this place right now",
+    "speak": "지금 당장 이곳을 떠나야 해."
+  },
+  {
+    "ko": "차 안에 있어, 밖으로 나오지 마.",
+    "he": "תישאר ברכב ואל תצא",
+    "roman": "cha ane iteo, bakeuro naoji ma.",
+    "en": "Stay in the car, don't come out",
+    "speak": "차 안에 있어, 밖으로 나오지 마."
+  },
+  {
+    "ko": "무슨 일이 있어도 연락 끊지 마.",
+    "he": "לא משנה מה יקרה, אל תנתק קשר",
+    "roman": "museun ili iteodo yeonrak kkeunji ma.",
+    "en": "No matter what happens, don't lose contact",
+    "speak": "무슨 일이 있어도 연락 끊지 마."
+  },
+  {
+    "ko": "내가 신호하면 뛰어.",
+    "he": "כשתראה את הסימן שלי, תרוץ",
+    "roman": "naega sinhohamyeon ttwieo.",
+    "en": "Run when I give you the signal",
+    "speak": "내가 신호하면 뛰어."
+  },
+  {
+    "ko": "이번엔 끝까지 해 볼 거야.",
+    "he": "הפעם אני הולך עד הסוף",
+    "roman": "ibeonen kkeutkkaji hae bol geoya.",
+    "en": "This time I'm going all the way",
+    "speak": "이번엔 끝까지 해 볼 거야."
+  },
+  {
+    "ko": "누가 뭐래도 내 길 갈 거야.",
+    "he": "לא משנה מה יגידו, אלך בדרך שלי",
+    "roman": "nuga mworaedo nae gil gal geoya.",
+    "en": "No matter what anyone says, I'll follow my path",
+    "speak": "누가 뭐래도 내 길 갈 거야."
+  },
+  {
+    "ko": "포기하기엔 너무 멀리 왔어.",
+    "he": "הגעתי רחוק מדי כדי לוותר",
+    "roman": "pogihagien neomu meolri wateo.",
+    "en": "I've come too far to give up",
+    "speak": "포기하기엔 너무 멀리 왔어."
+  },
+  {
+    "ko": "오늘 안 되면 내일 다시 해.",
+    "he": "אם לא היום, ננסה שוב מחר",
+    "roman": "oneul an doemyeon naeil dasi hae.",
+    "en": "If it doesn't work today, try again tomorrow",
+    "speak": "오늘 안 되면 내일 다시 해."
+  },
+  {
+    "ko": "내가 직접 확인할 거야.",
+    "he": "אני אבדוק את זה בעצמי",
+    "roman": "naega jikjeop hwakinhal geoya.",
+    "en": "I'll check it myself",
+    "speak": "내가 직접 확인할 거야."
+  },
+  {
+    "ko": "이번에는 피하지 않을 거야.",
+    "he": "הפעם לא אברח מזה",
+    "roman": "ibeoneneun pihaji aneul geoya.",
+    "en": "I won't avoid it this time",
+    "speak": "이번에는 피하지 않을 거야."
+  },
+  {
+    "ko": "끝을 볼 때까지 멈추지 마.",
+    "he": "אל תעצור עד שתראה את הסוף",
+    "roman": "kkeuteul bol ttaekkaji meomchuji ma.",
+    "en": "Don't stop until you see it through",
+    "speak": "끝을 볼 때까지 멈추지 마."
+  },
+  {
+    "ko": "내 선택은 내가 책임져.",
+    "he": "אני אחראי לבחירה שלי",
+    "roman": "nae seontaekeun naega chaekimjyeo.",
+    "en": "I'll take responsibility for my choice",
+    "speak": "내 선택은 내가 책임져."
+  },
+  {
+    "ko": "겁나도 해야 할 건 해야지.",
+    "he": "גם אם מפחיד, צריך לעשות מה שצריך",
+    "roman": "geopnado haeya hal geon haeyaji.",
+    "en": "Even if it's scary, we have to do what needs to be done",
+    "speak": "겁나도 해야 할 건 해야지."
+  },
+  {
+    "ko": "이번 기회는 절대 놓치지 않을 거야.",
+    "he": "אני לא אפספס את ההזדמנות הזאת",
+    "roman": "ibeon gihoeneun jeoldae notchiji aneul geoya.",
+    "en": "I won't miss this opportunity",
+    "speak": "이번 기회는 절대 놓치지 않을 거야."
+  },
+  {
+    "ko": "너한테 기대한 내가 바보였어.",
+    "he": "הייתי טיפש שציפיתי ממך",
+    "roman": "neohante gidaehan naega baboyeoteo.",
+    "en": "I was foolish to expect anything from you",
+    "speak": "너한테 기대한 내가 바보였어."
+  },
+  {
+    "ko": "결국 이렇게 되는구나.",
+    "he": "בסוף זה באמת הגיע לזה",
+    "roman": "gyeolguk ireotge doeneunguna.",
+    "en": "So this is how it ends up",
+    "speak": "결국 이렇게 되는구나."
+  },
+  {
+    "ko": "내가 믿었던 사람이 너였는데.",
+    "he": "דווקא בך האמנתי",
+    "roman": "naega miteotdeon sarami neoyeotneunde.",
+    "en": "You were the one I trusted",
+    "speak": "내가 믿었던 사람이 너였는데."
+  },
+  {
+    "ko": "약속은 다 잊은 거야?",
+    "he": "שכחת את כל ההבטחות?",
+    "roman": "yaksokeun da iteun geoya?",
+    "en": "Did you forget all your promises?",
+    "speak": "약속은 다 잊은 거야?"
+  },
+  {
+    "ko": "내가 얼마나 기다렸는지 알아?",
+    "he": "אתה יודע כמה חיכיתי?",
+    "roman": "naega eolmana gidaryeotneunji ala?",
+    "en": "Do you know how long I waited?",
+    "speak": "내가 얼마나 기다렸는지 알아?"
+  },
+  {
+    "ko": "말 한마디 없이 사라졌잖아.",
+    "he": "נעלמת בלי לומר מילה",
+    "roman": "mal hanmadi eopi sarajyeotjana.",
+    "en": "You disappeared without a word",
+    "speak": "말 한마디 없이 사라졌잖아."
+  },
+  {
+    "ko": "괜찮은 척하는 것도 지쳤어.",
+    "he": "נמאס לי להעמיד פנים שהכול בסדר",
+    "roman": "gwaenchaneun cheokhaneun geotdo jichyeoteo.",
+    "en": "I'm tired of pretending I'm fine",
+    "speak": "괜찮은 척하는 것도 지쳤어."
+  },
+  {
+    "ko": "이제는 기대도 안 해.",
+    "he": "עכשיו אני כבר לא מצפה לכלום",
+    "roman": "ijeneun gidaedo an hae.",
+    "en": "I don't expect anything anymore",
+    "speak": "이제는 기대도 안 해."
+  },
+  {
+    "ko": "상처받은 건 나뿐이었나 봐.",
+    "he": "נראה שרק אני נפגעתי",
+    "roman": "sangcheobateun geon nappunieotna bwa.",
+    "en": "Looks like I was the only one hurt",
+    "speak": "상처받은 건 나뿐이었나 봐."
+  },
+  {
+    "ko": "그렇게 쉽게 잊을 수 있어?",
+    "he": "אתה באמת יכול לשכוח כל כך בקלות?",
+    "roman": "geureotge swipge iteul su iteo?",
+    "en": "Can you really forget that easily?",
+    "speak": "그렇게 쉽게 잊을 수 있어?"
+  },
+  {
+    "ko": "왜 그 사람이랑 있었어?",
+    "he": "למה היית עם האדם הזה?",
+    "roman": "wae geu saramirang iteoteo?",
+    "en": "Why were you with that person?",
+    "speak": "왜 그 사람이랑 있었어?"
+  },
+  {
+    "ko": "나보다 그 사람이 더 좋아?",
+    "he": "אתה אוהב אותו יותר ממני?",
+    "roman": "naboda geu sarami deo jota?",
+    "en": "Do you like that person more than me?",
+    "speak": "나보다 그 사람이 더 좋아?"
+  },
+  {
+    "ko": "질투하는 거 아니거든.",
+    "he": "אני בכלל לא מקנא",
+    "roman": "jiltuhaneun geo anigeodeun.",
+    "en": "I'm not jealous at all",
+    "speak": "질투하는 거 아니거든."
+  },
+  {
+    "ko": "둘이 무슨 사이야?",
+    "he": "מה יש ביניכם?",
+    "roman": "duli museun saiya?",
+    "en": "What's going on between you two?",
+    "speak": "둘이 무슨 사이야?"
+  },
+  {
+    "ko": "나한테는 그런 표정 안 짓잖아.",
+    "he": "אליי אתה אף פעם לא מחייך ככה",
+    "roman": "nahanteneun geureon pyojeong an jitjana.",
+    "en": "You never make that face with me",
+    "speak": "나한테는 그런 표정 안 짓잖아."
+  },
+  {
+    "ko": "왜 그 사람 얘기만 하면 웃어?",
+    "he": "למה אתה מחייך בכל פעם שמדברים עליו?",
+    "roman": "wae geu saram yaegiman hamyeon uteo?",
+    "en": "Why do you smile whenever that person comes up?",
+    "speak": "왜 그 사람 얘기만 하면 웃어?"
+  },
+  {
+    "ko": "나도 신경 안 쓰고 싶은데 안 돼.",
+    "he": "גם אני רוצה לא להתייחס, אבל אני לא מצליח",
+    "roman": "nado singyeong an sseugo sipeunde an dwae.",
+    "en": "I want not to care, but I can't",
+    "speak": "나도 신경 안 쓰고 싶은데 안 돼."
+  },
+  {
+    "ko": "괜히 비교하게 돼.",
+    "he": "אני מוצא את עצמי משווה בלי סיבה",
+    "roman": "gwaenhi bigyohage dwae.",
+    "en": "I keep comparing without meaning to",
+    "speak": "괜히 비교하게 돼."
+  },
+  {
+    "ko": "내가 너무 예민한 거야?",
+    "he": "אני רגיש מדי?",
+    "roman": "naega neomu yeminhan geoya?",
+    "en": "Am I being too sensitive?",
+    "speak": "내가 너무 예민한 거야?"
+  },
+  {
+    "ko": "솔직히 조금 질투했어.",
+    "he": "האמת שקצת קינאתי",
+    "roman": "soljikhi jogeum jiltuhaeteo.",
+    "en": "Honestly, I was a little jealous",
+    "speak": "솔직히 조금 질투했어."
+  },
+  {
+    "ko": "우리 다시 처음부터 해 볼까?",
+    "he": "אולי נתחיל שוב מהתחלה?",
+    "roman": "uri dasi cheoeumbuteo hae bolkka?",
+    "en": "Shall we start over from the beginning?",
+    "speak": "우리 다시 처음부터 해 볼까?"
+  },
+  {
+    "ko": "나도 네 입장을 이해해 볼게.",
+    "he": "אני אנסה להבין גם את הצד שלך",
+    "roman": "nado ne ipjangeul ihaehae bolge.",
+    "en": "I'll try to understand your side too",
+    "speak": "나도 네 입장을 이해해 볼게."
+  },
+  {
+    "ko": "지난 일은 더 이상 꺼내지 말자.",
+    "he": "בוא לא נחזור יותר למה שהיה",
+    "roman": "jinan ileun deo isang kkeonaeji malja.",
+    "en": "Let's not bring up the past anymore",
+    "speak": "지난 일은 더 이상 꺼내지 말자."
+  },
+  {
+    "ko": "이번엔 서로 믿어 보자.",
+    "he": "הפעם בוא ננסה לסמוך אחד על השני",
+    "roman": "ibeonen seoro miteo boja.",
+    "en": "This time, let's try trusting each other",
+    "speak": "이번엔 서로 믿어 보자."
+  },
+  {
+    "ko": "우리 둘 다 변할 수 있어.",
+    "he": "שנינו יכולים להשתנות",
+    "roman": "uri dul da byeonhal su iteo.",
+    "en": "We can both change",
+    "speak": "우리 둘 다 변할 수 있어."
+  },
+  {
+    "ko": "다시 웃을 수 있어서 다행이야.",
+    "he": "טוב שאנחנו יכולים לחייך שוב",
+    "roman": "dasi uteul su iteoseo dahaengiya.",
+    "en": "I'm glad we can smile again",
+    "speak": "다시 웃을 수 있어서 다행이야."
+  },
+  {
+    "ko": "한 번 더 기회를 줘.",
+    "he": "תן לי עוד הזדמנות אחת",
+    "roman": "han beon deo gihoereul jwo.",
+    "en": "Give me one more chance",
+    "speak": "한 번 더 기회를 줘."
+  },
+  {
+    "ko": "천천히 다시 시작하면 돼.",
+    "he": "אפשר להתחיל שוב לאט",
+    "roman": "cheoncheonhi dasi sijakhamyeon dwae.",
+    "en": "We can start again slowly",
+    "speak": "천천히 다시 시작하면 돼."
+  },
+  {
+    "ko": "나도 이제 화 안 낼게.",
+    "he": "גם אני לא אכעס יותר",
+    "roman": "nado ije hwa an naelge.",
+    "en": "I won't get angry anymore either",
+    "speak": "나도 이제 화 안 낼게."
+  },
+  {
+    "ko": "이번엔 오래 가자.",
+    "he": "הפעם בוא נחזיק מעמד הרבה זמן",
+    "roman": "ibeonen orae gaja.",
+    "en": "Let's make it last this time",
+    "speak": "이번엔 오래 가자."
+  },
+  {
+    "ko": "잠깐만 내 얘기 들어 줘.",
+    "he": "רק תקשיב לי לרגע",
+    "roman": "jamkkanman nae yaegi deuleo jwo.",
+    "en": "Just listen to me for a moment",
+    "speak": "잠깐만 내 얘기 들어 줘."
+  },
+  {
+    "ko": "오늘만 나랑 있어 줘.",
+    "he": "תישאר איתי רק היום",
+    "roman": "oneulman narang iteo jwo.",
+    "en": "Stay with me just for today",
+    "speak": "오늘만 나랑 있어 줘."
+  },
+  {
+    "ko": "아무것도 묻지 말고 따라와.",
+    "he": "אל תשאל כלום ופשוט תבוא איתי",
+    "roman": "amugeotdo mutji malgo ttarawa.",
+    "en": "Don't ask anything, just follow me",
+    "speak": "아무것도 묻지 말고 따라와."
+  },
+  {
+    "ko": "지금은 혼자 있고 싶어.",
+    "he": "עכשיו אני רוצה להיות לבד",
+    "roman": "jigeumeun honja itgo sipeo.",
+    "en": "I want to be alone right now",
+    "speak": "지금은 혼자 있고 싶어."
+  },
+  {
+    "ko": "조금만 생각할 시간을 줘.",
+    "he": "תן לי קצת זמן לחשוב",
+    "roman": "jogeumman saenggakhal siganeul jwo.",
+    "en": "Give me a little time to think",
+    "speak": "조금만 생각할 시간을 줘."
+  },
+  {
+    "ko": "내 편 한 번만 들어 줘.",
+    "he": "רק הפעם תהיה בצד שלי",
+    "roman": "nae pyeon han beonman deuleo jwo.",
+    "en": "Take my side just this once",
+    "speak": "내 편 한 번만 들어 줘."
+  },
+  {
+    "ko": "오늘은 모른 척해 줘.",
+    "he": "היום תעמיד פנים שאתה לא יודע",
+    "roman": "oneuleun moreun cheokhae jwo.",
+    "en": "Pretend you don't know today",
+    "speak": "오늘은 모른 척해 줘."
+  },
+  {
+    "ko": "나 대신 이거 좀 해 줘.",
+    "he": "תעשה את זה בשבילי בבקשה",
+    "roman": "na daesin igeo jom hae jwo.",
+    "en": "Please do this for me",
+    "speak": "나 대신 이거 좀 해 줘."
+  },
+  {
+    "ko": "여기서 조금만 기다려 줘.",
+    "he": "תחכה לי כאן קצת",
+    "roman": "yeogiseo jogeumman gidaryeo jwo.",
+    "en": "Wait here for me a little",
+    "speak": "여기서 조금만 기다려 줘."
+  },
+  {
+    "ko": "한 번만 믿어 봐.",
+    "he": "רק תנסה להאמין לי פעם אחת",
+    "roman": "han beonman miteo bwa.",
+    "en": "Just trust me once",
+    "speak": "한 번만 믿어 봐."
+  },
+  {
+    "ko": "너 지금 얼굴 빨개졌어.",
+    "he": "הפנים שלך אדומות עכשיו",
+    "roman": "neo jigeum eolgul ppalgaejyeoteo.",
+    "en": "Your face just turned red",
+    "speak": "너 지금 얼굴 빨개졌어."
+  },
+  {
+    "ko": "왜 갑자기 말이 없어?",
+    "he": "למה פתאום שתקת?",
+    "roman": "wae gapjagi mali eopeo?",
+    "en": "Why did you suddenly go quiet?",
+    "speak": "왜 갑자기 말이 없어?"
+  },
+  {
+    "ko": "너 방금 질투했지?",
+    "he": "קינאת עכשיו, נכון?",
+    "roman": "neo banggeum jiltuhaetji?",
+    "en": "You were jealous just now, weren't you?",
+    "speak": "너 방금 질투했지?"
+  },
+  {
+    "ko": "또 혼자 멋있는 척한다.",
+    "he": "שוב אתה עושה את עצמך מגניב לבד",
+    "roman": "tto honja meotitneun cheokhanda.",
+    "en": "There you go acting cool again",
+    "speak": "또 혼자 멋있는 척한다."
+  },
+  {
+    "ko": "그 표정 진짜 웃겨.",
+    "he": "הפרצוף הזה ממש מצחיק",
+    "roman": "geu pyojeong jinjja utgyeo.",
+    "en": "That expression is hilarious",
+    "speak": "그 표정 진짜 웃겨."
+  },
+  {
+    "ko": "너 생각보다 귀엽다.",
+    "he": "אתה יותר חמוד ממה שחשבתי",
+    "roman": "neo saenggakboda gwiyeopda.",
+    "en": "You're cuter than I thought",
+    "speak": "너 생각보다 귀엽다."
+  },
+  {
+    "ko": "지금 웃으면 안 되는 상황이야.",
+    "he": "זה ממש לא הזמן לצחוק",
+    "roman": "jigeum uteumyeon an doeneun sanghwangiya.",
+    "en": "This is really not the time to laugh",
+    "speak": "지금 웃으면 안 되는 상황이야."
+  },
+  {
+    "ko": "왜 나만 보면 장난쳐?",
+    "he": "למה אתה תמיד מתגרה בי?",
+    "roman": "wae naman bomyeon jangnanchyeo?",
+    "en": "Why do you always tease me?",
+    "speak": "왜 나만 보면 장난쳐?"
+  },
+  {
+    "ko": "그 말 녹음해 둘걸.",
+    "he": "הייתי צריך להקליט את מה שאמרת",
+    "roman": "geu mal nokeumhae dulgeol.",
+    "en": "I should have recorded what you said",
+    "speak": "그 말 녹음해 둘걸."
+  },
+  {
+    "ko": "너 오늘 이상하게 솔직하네.",
+    "he": "היום אתה פתאום כנה בצורה מוזרה",
+    "roman": "neo oneul isanghage soljikhane.",
+    "en": "You're strangely honest today",
+    "speak": "너 오늘 이상하게 솔직하네."
+  },
+  {
+    "ko": "우리 전에 만난 적 있지?",
+    "he": "נפגשנו פעם, נכון?",
+    "roman": "uri jeone mannan jeok itji?",
+    "en": "We've met before, haven't we?",
+    "speak": "우리 전에 만난 적 있지?"
+  },
+  {
+    "ko": "이런 데서 다시 만날 줄이야.",
+    "he": "לא חשבתי שניפגש שוב במקום כזה",
+    "roman": "ireon deseo dasi mannal juliya.",
+    "en": "I never thought we'd meet again in a place like this",
+    "speak": "이런 데서 다시 만날 줄이야."
+  },
+  {
+    "ko": "우연이라고 하기엔 너무 이상해.",
+    "he": "זה מוזר מדי בשביל להיות צירוף מקרים",
+    "roman": "uyeonirago hagien neomu isanghae.",
+    "en": "It's too strange to be a coincidence",
+    "speak": "우연이라고 하기엔 너무 이상해."
+  },
+  {
+    "ko": "계속 같은 곳에서 마주치네.",
+    "he": "אנחנו ממשיכים להיתקל זה בזה באותם מקומות",
+    "roman": "gyesok gateun goteseo majuchine.",
+    "en": "We keep running into each other in the same places",
+    "speak": "계속 같은 곳에서 마주치네."
+  },
+  {
+    "ko": "혹시 운명 같은 거 믿어?",
+    "he": "אתה מאמין בדברים כמו גורל?",
+    "roman": "hoksi unmyeong gateun geo miteo?",
+    "en": "Do you believe in things like fate?",
+    "speak": "혹시 운명 같은 거 믿어?"
+  },
+  {
+    "ko": "내가 여기 온 이유가 있었나 봐.",
+    "he": "כנראה הייתה סיבה שהגעתי לכאן",
+    "roman": "naega yeogi on iyuga iteotna bwa.",
+    "en": "Maybe there was a reason I came here",
+    "speak": "내가 여기 온 이유가 있었나 봐."
+  },
+  {
+    "ko": "그날 네가 안 왔으면 어땠을까?",
+    "he": "מה היה קורה אם לא היית מגיע באותו יום?",
+    "roman": "geunal nega an wateumyeon eottaeteulkka?",
+    "en": "What if you hadn't come that day?",
+    "speak": "그날 네가 안 왔으면 어땠을까?"
+  },
+  {
+    "ko": "이상하게 자꾸 너랑 엮여.",
+    "he": "משום מה אני כל הזמן מסתבך איתך",
+    "roman": "isanghage jakku neorang yeokyeo.",
+    "en": "Somehow I keep getting tangled up with you",
+    "speak": "이상하게 자꾸 너랑 엮여."
+  },
+  {
+    "ko": "우리가 다시 만날 줄 알았어?",
+    "he": "חשבת שניפגש שוב?",
+    "roman": "uriga dasi mannal jul alateo?",
+    "en": "Did you think we'd meet again?",
+    "speak": "우리가 다시 만날 줄 알았어?"
+  },
+  {
+    "ko": "세상 참 좁다.",
+    "he": "העולם באמת קטן",
+    "roman": "sesang cham jopda.",
+    "en": "It's a small world",
+    "speak": "세상 참 좁다."
+  },
+  {
+    "ko": "그때 사진 아직 가지고 있어.",
+    "he": "עדיין יש לי את התמונה מאז",
+    "roman": "geuttae sajin ajik gajigo iteo.",
+    "en": "I still have the photo from back then",
+    "speak": "그때 사진 아직 가지고 있어."
+  },
+  {
+    "ko": "그 노래 들으면 네 생각나.",
+    "he": "השיר הזה מזכיר לי אותך",
+    "roman": "geu norae deuleumyeon ne saenggakna.",
+    "en": "That song makes me think of you",
+    "speak": "그 노래 들으면 네 생각나."
+  },
+  {
+    "ko": "우리 처음 만난 날 기억나?",
+    "he": "אתה זוכר את היום שבו נפגשנו לראשונה?",
+    "roman": "uri cheoeum mannan nal gieokna?",
+    "en": "Do you remember the day we first met?",
+    "speak": "우리 처음 만난 날 기억나?"
+  },
+  {
+    "ko": "그때는 다 쉬울 줄 알았어.",
+    "he": "אז חשבתי שהכול יהיה פשוט",
+    "roman": "geuttaeneun da swiul jul alateo.",
+    "en": "Back then I thought everything would be easy",
+    "speak": "그때는 다 쉬울 줄 알았어."
+  },
+  {
+    "ko": "오랜만에 여기 오니까 이상하다.",
+    "he": "מוזר לחזור לכאן אחרי כל כך הרבה זמן",
+    "roman": "oraenmane yeogi onikka isanghada.",
+    "en": "It feels strange coming back here after so long",
+    "speak": "오랜만에 여기 오니까 이상하다."
+  },
+  {
+    "ko": "아직도 그날이 생생해.",
+    "he": "היום ההוא עדיין חי לי בזיכרון",
+    "roman": "ajikdo geunali saengsaenghae.",
+    "en": "That day is still vivid in my memory",
+    "speak": "아직도 그날이 생생해."
+  },
+  {
+    "ko": "예전에는 매일 같이 있었잖아.",
+    "he": "פעם היינו יחד כל יום",
+    "roman": "yejeoneneun maeil gati iteotjana.",
+    "en": "We used to be together every day",
+    "speak": "예전에는 매일 같이 있었잖아."
+  },
+  {
+    "ko": "시간이 이렇게 빨리 갔네.",
+    "he": "הזמן עבר כל כך מהר",
+    "roman": "sigani ireotge ppalri gatne.",
+    "en": "Time passed so quickly",
+    "speak": "시간이 이렇게 빨리 갔네."
+  },
+  {
+    "ko": "그때로 돌아갈 수 있다면 좋겠다.",
+    "he": "הלוואי שיכולתי לחזור לזמן ההוא",
+    "roman": "geuttaero dolagal su itdamyeon jotgetda.",
+    "en": "I wish I could go back to that time",
+    "speak": "그때로 돌아갈 수 있다면 좋겠다."
+  },
+  {
+    "ko": "좋은 기억까지 지우진 말자.",
+    "he": "בוא לא נמחק גם את הזיכרונות הטובים",
+    "roman": "joteun gieokkkaji jiujin malja.",
+    "en": "Let's not erase the good memories too",
+    "speak": "좋은 기억까지 지우진 말자."
+  },
+  {
+    "ko": "나한테 선택하라고 하지 마.",
+    "he": "אל תכריח אותי לבחור",
+    "roman": "nahante seontaekharago haji ma.",
+    "en": "Don't make me choose",
+    "speak": "나한테 선택하라고 하지 마."
+  },
+  {
+    "ko": "이번 결정은 내가 할게.",
+    "he": "אני אקבל את ההחלטה הפעם",
+    "roman": "ibeon gyeoljeongeun naega halge.",
+    "en": "I'll make the decision this time",
+    "speak": "이번 결정은 내가 할게."
+  },
+  {
+    "ko": "둘 다 포기할 수 없어.",
+    "he": "אני לא יכול לוותר על אף אחד מהם",
+    "roman": "dul da pogihal su eopeo.",
+    "en": "I can't give up either one",
+    "speak": "둘 다 포기할 수 없어."
+  },
+  {
+    "ko": "무엇이 맞는지 아직 모르겠어.",
+    "he": "אני עדיין לא יודע מה נכון",
+    "roman": "mueoti matneunji ajik moreugeteo.",
+    "en": "I still don't know what's right",
+    "speak": "무엇이 맞는지 아직 모르겠어."
+  },
+  {
+    "ko": "마음 가는 대로 해도 될까?",
+    "he": "אפשר פשוט ללכת עם הלב?",
+    "roman": "maeum ganeun daero haedo doelkka?",
+    "en": "Can I just follow my heart?",
+    "speak": "마음 가는 대로 해도 될까?"
+  },
+  {
+    "ko": "한 번 선택하면 되돌릴 수 없어.",
+    "he": "אחרי שבוחרים אי אפשר לחזור אחורה",
+    "roman": "han beon seontaekhamyeon doedolril su eopeo.",
+    "en": "Once you choose, you can't go back",
+    "speak": "한 번 선택하면 되돌릴 수 없어."
+  },
+  {
+    "ko": "남들이 정해 준 길은 싫어.",
+    "he": "אני לא רוצה דרך שאחרים בחרו בשבילי",
+    "roman": "namdeuli jeonghae jun gileun sileo.",
+    "en": "I don't want a path others chose for me",
+    "speak": "남들이 정해 준 길은 싫어."
+  },
+  {
+    "ko": "이번만큼은 내 마음을 따를 거야.",
+    "he": "הפעם אני אלך אחרי הלב שלי",
+    "roman": "ibeonmankeumeun nae maeumeul ttareul geoya.",
+    "en": "This time I'll follow my heart",
+    "speak": "이번만큼은 내 마음을 따를 거야."
+  },
+  {
+    "ko": "후회하더라도 내가 결정하고 싶어.",
+    "he": "גם אם אתחרט, אני רוצה להחליט בעצמי",
+    "roman": "huhoehadeorado naega gyeoljeonghago sipeo.",
+    "en": "Even if I regret it, I want to decide for myself",
+    "speak": "후회하더라도 내가 결정하고 싶어."
+  },
+  {
+    "ko": "네가 원하는 답은 못 해 줘.",
+    "he": "אני לא יכול לתת לך את התשובה שאתה רוצה",
+    "roman": "nega wonhaneun dapeun mot hae jwo.",
+    "en": "I can't give you the answer you want",
+    "speak": "네가 원하는 답은 못 해 줘."
+  },
+  {
+    "ko": "내가 꼭 돌아올게.",
+    "he": "אני מבטיח שאחזור",
+    "roman": "naega kkok dolaolge.",
+    "en": "I promise I'll come back",
+    "speak": "내가 꼭 돌아올게."
+  },
+  {
+    "ko": "이번엔 약속 지킬게.",
+    "he": "הפעם אקיים את ההבטחה",
+    "roman": "ibeonen yaksok jikilge.",
+    "en": "I'll keep my promise this time",
+    "speak": "이번엔 약속 지킬게."
+  },
+  {
+    "ko": "무슨 일이 있어도 네 편일게.",
+    "he": "לא משנה מה יקרה, אהיה בצד שלך",
+    "roman": "museun ili iteodo ne pyeonilge.",
+    "en": "No matter what happens, I'll be on your side",
+    "speak": "무슨 일이 있어도 네 편일게."
+  },
+  {
+    "ko": "다시는 혼자 두지 않을게.",
+    "he": "לא אשאיר אותך לבד שוב",
+    "roman": "dasineun honja duji aneulge.",
+    "en": "I won't leave you alone again",
+    "speak": "다시는 혼자 두지 않을게."
+  },
+  {
+    "ko": "우리끼리 한 약속 기억하지?",
+    "he": "אתה זוכר את ההבטחה שלנו, נכון?",
+    "roman": "urikkiri han yaksok gieokhaji?",
+    "en": "You remember our promise, right?",
+    "speak": "우리끼리 한 약속 기억하지?"
+  },
+  {
+    "ko": "내가 먼저 연락하겠다고 했잖아.",
+    "he": "אמרתי שאני אצור קשר ראשון",
+    "roman": "naega meonjeo yeonrakhagetdago haetjana.",
+    "en": "I said I'd contact you first",
+    "speak": "내가 먼저 연락하겠다고 했잖아."
+  },
+  {
+    "ko": "기다리게 하지 않을게.",
+    "he": "לא אתן לך לחכות",
+    "roman": "gidarige haji aneulge.",
+    "en": "I won't keep you waiting",
+    "speak": "기다리게 하지 않을게."
+  },
+  {
+    "ko": "이번 약속만은 꼭 믿어 줘.",
+    "he": "בבקשה תאמין לפחות להבטחה הזאת",
+    "roman": "ibeon yaksokmaneun kkok miteo jwo.",
+    "en": "Please believe this promise at least",
+    "speak": "이번 약속만은 꼭 믿어 줘."
+  },
+  {
+    "ko": "말보다 행동으로 보여 줄게.",
+    "he": "אני אראה לך במעשים, לא במילים",
+    "roman": "malboda haengdongeuro boyeo julge.",
+    "en": "I'll show you with actions, not words",
+    "speak": "말보다 행동으로 보여 줄게."
+  },
+  {
+    "ko": "우리 약속은 아직 안 끝났어.",
+    "he": "ההבטחה שלנו עדיין לא נגמרה",
+    "roman": "uri yaksokeun ajik an kkeutnateo.",
+    "en": "Our promise isn't over yet",
+    "speak": "우리 약속은 아직 안 끝났어."
+  },
+  {
+    "ko": "벌써 가려고?",
+    "he": "אתה כבר הולך?",
+    "roman": "beolsseo garyeogo?",
+    "en": "Are you leaving already?",
+    "speak": "벌써 가려고?"
+  },
+  {
+    "ko": "조금만 더 있다 가.",
+    "he": "תישאר עוד קצת לפני שאתה הולך",
+    "roman": "jogeumman deo itda ga.",
+    "en": "Stay a little longer before you go",
+    "speak": "조금만 더 있다 가."
+  },
+  {
+    "ko": "도착하면 바로 연락해.",
+    "he": "תיצור קשר מיד כשתגיע",
+    "roman": "dochakhamyeon baro yeonrakhae.",
+    "en": "Contact me as soon as you arrive",
+    "speak": "도착하면 바로 연락해."
+  },
+  {
+    "ko": "내가 데리러 갈게.",
+    "he": "אני אבוא לאסוף אותך",
+    "roman": "naega derireo galge.",
+    "en": "I'll come pick you up",
+    "speak": "내가 데리러 갈게."
+  },
+  {
+    "ko": "이번엔 내가 배웅할게.",
+    "he": "הפעם אני אלווה אותך",
+    "roman": "ibeonen naega baeunghalge.",
+    "en": "I'll see you off this time",
+    "speak": "이번엔 내가 배웅할게."
+  },
+  {
+    "ko": "기차 놓치면 큰일이야.",
+    "he": "אם נפספס את הרכבת נהיה בצרה",
+    "roman": "gicha notchimyeon keuniliya.",
+    "en": "We'll be in trouble if we miss the train",
+    "speak": "기차 놓치면 큰일이야."
+  },
+  {
+    "ko": "가기 전에 얼굴은 보고 가야지.",
+    "he": "לפחות תראה אותי לפני שאתה הולך",
+    "roman": "gagi jeone eolguleun bogo gayaji.",
+    "en": "You should at least see me before you go",
+    "speak": "가기 전에 얼굴은 보고 가야지."
+  },
+  {
+    "ko": "생각보다 빨리 왔네.",
+    "he": "הגעת מהר יותר ממה שחשבתי",
+    "roman": "saenggakboda ppalri watne.",
+    "en": "You got here faster than I expected",
+    "speak": "생각보다 빨리 왔네."
+  },
+  {
+    "ko": "여기까지 직접 온 거야?",
+    "he": "באת עד לכאן בעצמך?",
+    "roman": "yeogikkaji jikjeop on geoya?",
+    "en": "Did you come all the way here yourself?",
+    "speak": "여기까지 직접 온 거야?"
+  },
+  {
+    "ko": "떠나기 전에 할 말이 있어.",
+    "he": "יש לי משהו לומר לפני שאתה עוזב",
+    "roman": "tteonagi jeone hal mali iteo.",
+    "en": "I have something to say before you leave",
+    "speak": "떠나기 전에 할 말이 있어."
+  },
+  {
+    "ko": "메시지 읽고 왜 답 안 했어?",
+    "he": "למה קראת את ההודעה ולא ענית?",
+    "roman": "mesiji ikgo wae dap an haeteo?",
+    "en": "Why did you read my message and not reply?",
+    "speak": "메시지 읽고 왜 답 안 했어?"
+  },
+  {
+    "ko": "전화 한 통이면 됐잖아.",
+    "he": "שיחת טלפון אחת הייתה מספיקה",
+    "roman": "jeonhwa han tongimyeon dwaetjana.",
+    "en": "One phone call would have been enough",
+    "speak": "전화 한 통이면 됐잖아."
+  },
+  {
+    "ko": "번호 바꾼 거 왜 말 안 했어?",
+    "he": "למה לא אמרת שהחלפת מספר?",
+    "roman": "beonho bakkun geo wae mal an haeteo?",
+    "en": "Why didn't you tell me you changed your number?",
+    "speak": "번호 바꾼 거 왜 말 안 했어?"
+  },
+  {
+    "ko": "계속 연락하려고 했어.",
+    "he": "ניסיתי ליצור איתך קשר כל הזמן",
+    "roman": "gyesok yeonrakharyeogo haeteo.",
+    "en": "I kept trying to contact you",
+    "speak": "계속 연락하려고 했어."
+  },
+  {
+    "ko": "지금 어디야? 위치 보내.",
+    "he": "איפה אתה עכשיו? תשלח מיקום",
+    "roman": "jigeum eodiya? wichi bonae.",
+    "en": "Where are you now? Send your location",
+    "speak": "지금 어디야? 위치 보내."
+  },
+  {
+    "ko": "내 문자 봤으면 답 좀 해.",
+    "he": "אם ראית את ההודעה שלי, תענה",
+    "roman": "nae munja bwateumyeon dap jom hae.",
+    "en": "If you saw my text, please reply",
+    "speak": "내 문자 봤으면 답 좀 해."
+  },
+  {
+    "ko": "휴대폰 꺼 놓은 이유가 뭐야?",
+    "he": "למה כיבית את הטלפון?",
+    "roman": "hyudaepon kkeo noteun iyuga mwoya?",
+    "en": "Why did you turn off your phone?",
+    "speak": "휴대폰 꺼 놓은 이유가 뭐야?"
+  },
+  {
+    "ko": "이 번호 아직도 쓰는구나.",
+    "he": "אתה עדיין משתמש במספר הזה",
+    "roman": "i beonho ajikdo sseuneunguna.",
+    "en": "So you're still using this number",
+    "speak": "이 번호 아직도 쓰는구나."
+  },
+  {
+    "ko": "새벽에 왜 전화했어?",
+    "he": "למה התקשרת באמצע הלילה?",
+    "roman": "saebyeoke wae jeonhwahaeteo?",
+    "en": "Why did you call in the middle of the night?",
+    "speak": "새벽에 왜 전화했어?"
+  },
+  {
+    "ko": "연락 끊은 사람이 왜 이제 와?",
+    "he": "למה אתה חוזר עכשיו אחרי שנעלמת?",
+    "roman": "yeonrak kkeuneun sarami wae ije wa?",
+    "en": "Why are you coming back now after cutting contact?",
+    "speak": "연락 끊은 사람이 왜 이제 와?"
+  },
+  {
+    "ko": "라면 먹고 갈래?",
+    "he": "רוצה לאכול ראמן לפני שאתה הולך?",
+    "roman": "ramyeon meokgo galrae?",
+    "en": "Want to have ramen before you go?",
+    "speak": "라면 먹고 갈래?"
+  },
+  {
+    "ko": "너 또 밥 안 먹었지?",
+    "he": "שוב לא אכלת, נכון?",
+    "roman": "neo tto bap an meokeotji?",
+    "en": "You skipped a meal again, didn't you?",
+    "speak": "너 또 밥 안 먹었지?"
+  },
+  {
+    "ko": "오늘은 내가 요리할게.",
+    "he": "היום אני אבשל",
+    "roman": "oneuleun naega yorihalge.",
+    "en": "I'll cook today",
+    "speak": "오늘은 내가 요리할게."
+  },
+  {
+    "ko": "한잔만 하고 들어가자.",
+    "he": "בוא נשתה רק כוס אחת ואז נחזור",
+    "roman": "hanjanman hago deuleogaja.",
+    "en": "Let's have just one drink and head home",
+    "speak": "한잔만 하고 들어가자."
+  },
+  {
+    "ko": "이거 네가 만든 거야?",
+    "he": "אתה הכנת את זה?",
+    "roman": "igeo nega mandeun geoya?",
+    "en": "Did you make this?",
+    "speak": "이거 네가 만든 거야?"
+  },
+  {
+    "ko": "매운 거 못 먹는다며.",
+    "he": "אמרת שאתה לא יכול לאכול חריף",
+    "roman": "maeun geo mot meokneundamyeo.",
+    "en": "You said you can't handle spicy food",
+    "speak": "매운 거 못 먹는다며."
+  },
+  {
+    "ko": "내 것도 한입 먹어 봐.",
+    "he": "תטעם ביס גם משלי",
+    "roman": "nae geotdo hanip meokeo bwa.",
+    "en": "Try a bite of mine too",
+    "speak": "내 것도 한입 먹어 봐."
+  },
+  {
+    "ko": "배고프면 말하지 그랬어.",
+    "he": "היית צריך לומר שאתה רעב",
+    "roman": "baegopeumyeon malhaji geuraeteo.",
+    "en": "You should have said you were hungry",
+    "speak": "배고프면 말하지 그랬어."
+  },
+  {
+    "ko": "술 취했으면 그냥 집에 가.",
+    "he": "אם אתה שיכור, פשוט תלך הביתה",
+    "roman": "sul chwihaeteumyeon geunyang jipe ga.",
+    "en": "If you're drunk, just go home",
+    "speak": "술 취했으면 그냥 집에 가."
+  },
+  {
+    "ko": "다 먹었으면 계산하자.",
+    "he": "אם סיימנו לאכול, בוא נשלם",
+    "roman": "da meokeoteumyeon gyesanhaja.",
+    "en": "If we're done eating, let's pay",
+    "speak": "다 먹었으면 계산하자."
+  },
+  {
+    "ko": "돈 때문에 사람 무시하지 마.",
+    "he": "אל תזלזל באנשים בגלל כסף",
+    "roman": "don ttaemune saram musihaji ma.",
+    "en": "Don't look down on people because of money",
+    "speak": "돈 때문에 사람 무시하지 마."
+  },
+  {
+    "ko": "내가 돈 없다고 불쌍해 보여?",
+    "he": "אני נראה לך מסכן כי אין לי כסף?",
+    "roman": "naega don eopdago bulssanghae boyeo?",
+    "en": "Do I look pitiful because I don't have money?",
+    "speak": "내가 돈 없다고 불쌍해 보여?"
+  },
+  {
+    "ko": "이 집이 네 거라고?",
+    "he": "אתה אומר שהבית הזה שלך?",
+    "roman": "i jipi ne georago?",
+    "en": "You're saying this house is yours?",
+    "speak": "이 집이 네 거라고?"
+  },
+  {
+    "ko": "재벌이면 다 되는 줄 알아?",
+    "he": "אתה חושב שכסף פותר הכול?",
+    "roman": "jaebeolimyeon da doeneun jul ala?",
+    "en": "Do you think being rich lets you do anything?",
+    "speak": "재벌이면 다 되는 줄 알아?"
+  },
+  {
+    "ko": "내 힘으로 여기까지 왔어.",
+    "he": "הגעתי עד לכאן בכוחות עצמי",
+    "roman": "nae himeuro yeogikkaji wateo.",
+    "en": "I got this far on my own",
+    "speak": "내 힘으로 여기까지 왔어."
+  },
+  {
+    "ko": "돈으로 못 사는 것도 있어.",
+    "he": "יש דברים שכסף לא יכול לקנות",
+    "roman": "doneuro mot saneun geotdo iteo.",
+    "en": "There are things money can't buy",
+    "speak": "돈으로 못 사는 것도 있어."
+  },
+  {
+    "ko": "조건 보고 만나는 거 아니야.",
+    "he": "אני לא איתך בגלל המעמד שלך",
+    "roman": "jogeon bogo mannaneun geo aniya.",
+    "en": "I'm not with you because of your status",
+    "speak": "조건 보고 만나는 거 아니야."
+  },
+  {
+    "ko": "네 배경은 나한테 중요하지 않아.",
+    "he": "הרקע שלך לא חשוב לי",
+    "roman": "ne baegyeongeun nahante jungyohaji ana.",
+    "en": "Your background doesn't matter to me",
+    "speak": "네 배경은 나한테 중요하지 않아."
+  },
+  {
+    "ko": "이번엔 빚을 꼭 갚을게.",
+    "he": "הפעם אחזיר את החוב בוודאות",
+    "roman": "ibeonen biteul kkok gapeulge.",
+    "en": "I'll definitely pay back the debt this time",
+    "speak": "이번엔 빚을 꼭 갚을게."
+  },
+  {
+    "ko": "돈 얘기는 나중에 하자.",
+    "he": "נדבר על כסף אחר כך",
+    "roman": "don yaegineun najunge haja.",
+    "en": "Let's talk about money later",
+    "speak": "돈 얘기는 나중에 하자."
+  },
+  {
+    "ko": "여기서는 규칙을 따라야 해.",
+    "he": "כאן צריך לציית לכללים",
+    "roman": "yeogiseoneun gyuchikeul ttaraya hae.",
+    "en": "You have to follow the rules here",
+    "speak": "여기서는 규칙을 따라야 해."
+  },
+  {
+    "ko": "변호사 올 때까지 아무 말도 하지 마.",
+    "he": "אל תגיד כלום עד שהעורך דין יגיע",
+    "roman": "byeonhosa ol ttaekkaji amu maldo haji ma.",
+    "en": "Don't say anything until the lawyer arrives",
+    "speak": "변호사 올 때까지 아무 말도 하지 마."
+  },
+  {
+    "ko": "증언을 바꾸면 안 돼.",
+    "he": "אסור לשנות את העדות",
+    "roman": "jeungeoneul bakkumyeon an dwae.",
+    "en": "You must not change your testimony",
+    "speak": "증언을 바꾸면 안 돼."
+  },
+  {
+    "ko": "내가 책임자랑 직접 얘기할게.",
+    "he": "אני אדבר ישירות עם האחראי",
+    "roman": "naega chaekimjarang jikjeop yaegihalge.",
+    "en": "I'll speak directly with the person in charge",
+    "speak": "내가 책임자랑 직접 얘기할게."
+  },
+  {
+    "ko": "이건 공식적인 절차야.",
+    "he": "זה הליך רשמי",
+    "roman": "igeon gongsikjeokin jeolchaya.",
+    "en": "This is an official procedure",
+    "speak": "이건 공식적인 절차야."
+  },
+  {
+    "ko": "당신에게 묻는 건 하나뿐입니다.",
+    "he": "יש לי רק שאלה אחת אליך",
+    "roman": "dangsinege mutneun geon hanappunipnida.",
+    "en": "I'm asking you only one thing",
+    "speak": "당신에게 묻는 건 하나뿐입니다."
+  },
+  {
+    "ko": "서류에 서명하기 전에 읽어.",
+    "he": "תקרא לפני שאתה חותם על המסמך",
+    "roman": "seoryue seomyeonghagi jeone ikeo.",
+    "en": "Read it before signing the document",
+    "speak": "서류에 서명하기 전에 읽어."
+  },
+  {
+    "ko": "결정은 이미 내려졌어.",
+    "he": "ההחלטה כבר התקבלה",
+    "roman": "gyeoljeongeun imi naeryeojyeoteo.",
+    "en": "The decision has already been made",
+    "speak": "결정은 이미 내려졌어."
+  },
+  {
+    "ko": "누구도 법 위에 있지 않아.",
+    "he": "אף אחד לא מעל החוק",
+    "roman": "nugudo beop wie itji ana.",
+    "en": "No one is above the law",
+    "speak": "누구도 법 위에 있지 않아."
+  },
+  {
+    "ko": "사실대로 말하면 돼.",
+    "he": "פשוט תגיד את האמת",
+    "roman": "sasildaero malhamyeon dwae.",
+    "en": "You just need to tell the truth",
+    "speak": "사실대로 말하면 돼."
+  },
+  {
+    "ko": "의사 선생님이 뭐래?",
+    "he": "מה הרופא אמר?",
+    "roman": "uisa seonsaengnimi mworae?",
+    "en": "What did the doctor say?",
+    "speak": "의사 선생님이 뭐래?"
+  },
+  {
+    "ko": "검사 결과 아직 안 나왔어.",
+    "he": "תוצאות הבדיקה עוד לא הגיעו",
+    "roman": "geomsa gyeolgwa ajik an nawateo.",
+    "en": "The test results aren't out yet",
+    "speak": "검사 결과 아직 안 나왔어."
+  },
+  {
+    "ko": "병원에서 밤새 기다렸어.",
+    "he": "חיכיתי כל הלילה בבית החולים",
+    "roman": "byeongwoneseo bamsae gidaryeoteo.",
+    "en": "I waited all night at the hospital",
+    "speak": "병원에서 밤새 기다렸어."
+  },
+  {
+    "ko": "너 아픈데 왜 말 안 했어?",
+    "he": "למה לא אמרת שאתה חולה?",
+    "roman": "neo apeunde wae mal an haeteo?",
+    "en": "Why didn't you tell me you were sick?",
+    "speak": "너 아픈데 왜 말 안 했어?"
+  },
+  {
+    "ko": "괜찮아질 때까지 옆에 있을게.",
+    "he": "אשאר לידך עד שתרגיש טוב יותר",
+    "roman": "gwaenchanajil ttaekkaji yeope iteulge.",
+    "en": "I'll stay by your side until you get better",
+    "speak": "괜찮아질 때까지 옆에 있을게."
+  },
+  {
+    "ko": "수술은 잘 끝났대.",
+    "he": "אמרו שהניתוח עבר בהצלחה",
+    "roman": "susuleun jal kkeutnatdae.",
+    "en": "They said the surgery went well",
+    "speak": "수술은 잘 끝났대."
+  },
+  {
+    "ko": "오늘은 퇴원 못 한대.",
+    "he": "אמרו שלא תוכל להשתחרר היום",
+    "roman": "oneuleun toewon mot handae.",
+    "en": "They said you can't be discharged today",
+    "speak": "오늘은 퇴원 못 한대."
+  },
+  {
+    "ko": "너무 무리해서 그런 거야.",
+    "he": "זה קרה כי התאמצת יותר מדי",
+    "roman": "neomu murihaeseo geureon geoya.",
+    "en": "This happened because you pushed yourself too hard",
+    "speak": "너무 무리해서 그런 거야."
+  },
+  {
+    "ko": "약 꼭 제시간에 먹어.",
+    "he": "תקח את התרופה בזמן",
+    "roman": "yak kkok jesigane meokeo.",
+    "en": "Make sure to take your medicine on time",
+    "speak": "약 꼭 제시간에 먹어."
+  },
+  {
+    "ko": "일어나면 바로 나한테 말해.",
+    "he": "תגיד לי מיד כשאתה מתעורר",
+    "roman": "ileonamyeon baro nahante malhae.",
+    "en": "Tell me as soon as you wake up",
+    "speak": "일어나면 바로 나한테 말해."
+  },
+  {
+    "ko": "내 뒤로 숨어.",
+    "he": "תתחבא מאחוריי",
+    "roman": "nae dwiro sumeo.",
+    "en": "Hide behind me",
+    "speak": "내 뒤로 숨어."
+  },
+  {
+    "ko": "왼쪽 길로 빠져.",
+    "he": "תברח דרך הדרך השמאלית",
+    "roman": "oenjjok gilro ppajyeo.",
+    "en": "Take the road on the left",
+    "speak": "왼쪽 길로 빠져."
+  },
+  {
+    "ko": "차 세워!",
+    "he": "תעצור את הרכב!",
+    "roman": "cha sewo!",
+    "en": "Stop the car!",
+    "speak": "차 세워!"
+  },
+  {
+    "ko": "저 사람 놓치면 안 돼.",
+    "he": "אסור לנו לאבד אותו",
+    "roman": "jeo saram notchimyeon an dwae.",
+    "en": "We can't lose that person",
+    "speak": "저 사람 놓치면 안 돼."
+  },
+  {
+    "ko": "위층부터 확인해.",
+    "he": "תבדוק קודם את הקומה העליונה",
+    "roman": "wicheungbuteo hwakinhae.",
+    "en": "Check the upper floor first",
+    "speak": "위층부터 확인해."
+  },
+  {
+    "ko": "문 열기 전에 신호 기다려.",
+    "he": "תחכה לסימן לפני שאתה פותח את הדלת",
+    "roman": "mun yeolgi jeone sinho gidaryeo.",
+    "en": "Wait for the signal before opening the door",
+    "speak": "문 열기 전에 신호 기다려."
+  },
+  {
+    "ko": "내가 앞장설게.",
+    "he": "אני אלך ראשון",
+    "roman": "naega apjangseolge.",
+    "en": "I'll lead the way",
+    "speak": "내가 앞장설게."
+  },
+  {
+    "ko": "지금 움직이면 들켜.",
+    "he": "אם נזוז עכשיו יתפסו אותנו",
+    "roman": "jigeum umjikimyeon deulkyeo.",
+    "en": "If we move now, we'll be spotted",
+    "speak": "지금 움직이면 들켜."
+  },
+  {
+    "ko": "셋 세면 동시에 뛰는 거야.",
+    "he": "בספירה לשלוש רצים יחד",
+    "roman": "set semyeon dongsie ttwineun geoya.",
+    "en": "On three, we run at the same time",
+    "speak": "셋 세면 동시에 뛰는 거야."
+  },
+  {
+    "ko": "출구부터 확보해.",
+    "he": "קודם תוודא שהיציאה פנויה",
+    "roman": "chulgubuteo hwakbohae.",
+    "en": "Secure the exit first",
+    "speak": "출구부터 확보해."
+  },
+  {
+    "ko": "내가 방금 뭐라고 했지?",
+    "he": "מה אמרתי עכשיו?",
+    "roman": "naega banggeum mworago haetji?",
+    "en": "What did I just say?",
+    "speak": "내가 방금 뭐라고 했지?"
+  },
+  {
+    "ko": "아무 일도 없었던 걸로 하자.",
+    "he": "בוא נעמיד פנים שלא קרה כלום",
+    "roman": "amu ildo eopeotdeon geolro haja.",
+    "en": "Let's pretend nothing happened",
+    "speak": "아무 일도 없었던 걸로 하자."
+  },
+  {
+    "ko": "왜 하필 지금 넘어져?",
+    "he": "למה נפלת דווקא עכשיו?",
+    "roman": "wae hapil jigeum neomeojyeo?",
+    "en": "Why did you have to fall right now?",
+    "speak": "왜 하필 지금 넘어져?"
+  },
+  {
+    "ko": "너 바지 뒤집어 입었어.",
+    "he": "לבשת את המכנסיים הפוך",
+    "roman": "neo baji dwijipeo ipeoteo.",
+    "en": "You're wearing your pants backwards",
+    "speak": "너 바지 뒤집어 입었어."
+  },
+  {
+    "ko": "그걸 진짜 믿었어?",
+    "he": "באמת האמנת לזה?",
+    "roman": "geugeol jinjja miteoteo?",
+    "en": "You actually believed that?",
+    "speak": "그걸 진짜 믿었어?"
+  },
+  {
+    "ko": "사람들 다 보고 있잖아.",
+    "he": "כולם מסתכלים עלינו",
+    "roman": "saramdeul da bogo itjana.",
+    "en": "Everyone is watching us",
+    "speak": "사람들 다 보고 있잖아."
+  },
+  {
+    "ko": "제발 모르는 사람인 척해 줘.",
+    "he": "בבקשה תעמיד פנים שאתה לא מכיר אותי",
+    "roman": "jebal moreuneun saramin cheokhae jwo.",
+    "en": "Please pretend you don't know me",
+    "speak": "제발 모르는 사람인 척해 줘."
+  },
+  {
+    "ko": "오늘 왜 이렇게 꼬이는 거야?",
+    "he": "למה הכול משתבש לי היום?",
+    "roman": "oneul wae ireotge kkoineun geoya?",
+    "en": "Why is everything going wrong today?",
+    "speak": "오늘 왜 이렇게 꼬이는 거야?"
+  },
+  {
+    "ko": "웃지 마, 나 진지해.",
+    "he": "אל תצחק, אני רציני",
+    "roman": "utji ma, na jinjihae.",
+    "en": "Don't laugh, I'm serious",
+    "speak": "웃지 마, 나 진지해."
+  },
+  {
+    "ko": "이건 평생 놀림감이다.",
+    "he": "יצחקו עליי בגלל זה כל החיים",
+    "roman": "igeon pyeongsaeng nolrimgamida.",
+    "en": "I'll be teased about this forever",
+    "speak": "이건 평생 놀림감이다."
+  },
+  {
+    "ko": "이제 정말 마지막이네.",
+    "he": "אז זה באמת הסוף",
+    "roman": "ije jeongmal majimakine.",
+    "en": "So this really is the end",
+    "speak": "이제 정말 마지막이네."
+  },
+  {
+    "ko": "여기서 다시 시작하자.",
+    "he": "בוא נתחיל מחדש מכאן",
+    "roman": "yeogiseo dasi sijakhaja.",
+    "en": "Let's start again from here",
+    "speak": "여기서 다시 시작하자."
+  },
+  {
+    "ko": "우리 이야기는 아직 안 끝났어.",
+    "he": "הסיפור שלנו עדיין לא נגמר",
+    "roman": "uri iyagineun ajik an kkeutnateo.",
+    "en": "Our story isn't over yet",
+    "speak": "우리 이야기는 아직 안 끝났어."
+  },
+  {
+    "ko": "다음에는 웃으면서 만나자.",
+    "he": "בפעם הבאה בוא ניפגש עם חיוך",
+    "roman": "daeumeneun uteumyeonseo mannaja.",
+    "en": "Let's meet with a smile next time",
+    "speak": "다음에는 웃으면서 만나자."
+  },
+  {
+    "ko": "오늘 일은 잊지 않을게.",
+    "he": "לא אשכח את מה שקרה היום",
+    "roman": "oneul ileun itji aneulge.",
+    "en": "I won't forget what happened today",
+    "speak": "오늘 일은 잊지 않을게."
+  },
+  {
+    "ko": "내일이면 조금 달라질 거야.",
+    "he": "מחר הדברים יהיו קצת שונים",
+    "roman": "naeilimyeon jogeum dalrajil geoya.",
+    "en": "Things will be a little different tomorrow",
+    "speak": "내일이면 조금 달라질 거야."
+  },
+  {
+    "ko": "이제 각자 해야 할 일을 하자.",
+    "he": "עכשיו כל אחד יעשה את מה שעליו לעשות",
+    "roman": "ije gakja haeya hal ileul haja.",
+    "en": "Now let's each do what we need to do",
+    "speak": "이제 각자 해야 할 일을 하자."
+  },
+  {
+    "ko": "언젠가 다시 얘기할 수 있겠지.",
+    "he": "יום אחד נוכל לדבר שוב",
+    "roman": "eonjenga dasi yaegihal su itgetji.",
+    "en": "Someday we'll be able to talk again",
+    "speak": "언젠가 다시 얘기할 수 있겠지."
+  },
+  {
+    "ko": "끝이라고 생각하지 않을래.",
+    "he": "אני לא רוצה לחשוב שזה הסוף",
+    "roman": "kkeutirago saenggakhaji aneulrae.",
+    "en": "I don't want to think this is the end",
+    "speak": "끝이라고 생각하지 않을래."
+  },
+  {
+    "ko": "그럼, 잘 가.",
+    "he": "אז, להתראות",
+    "roman": "geureom, jal ga.",
+    "en": "Then, goodbye",
+    "speak": "그럼, 잘 가."
   }
 ]

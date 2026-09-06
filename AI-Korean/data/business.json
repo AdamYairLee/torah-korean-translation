@@ -598,5 +598,1805 @@
     "he": "אשתף את התוצאה בקצרה",
     "roman": "gyeolgwareul gandanhi gongyuhagetseupnida",
     "en": "I will briefly share the result"
+  },
+  {
+    "ko": "이번 주 회의 가능한 시간을 알려 주세요",
+    "he": "נא לעדכן באילו שעות אתה פנוי לישיבה השבוע",
+    "roman": "ibeon ju hoeui ganeunghan siganeul alryeo juseyo",
+    "en": "Please let me know your available times for a meeting this week"
+  },
+  {
+    "ko": "회의를 삼십 분 정도로 잡겠습니다",
+    "he": "אקבע את הישיבה לכשלושים דקות",
+    "roman": "hoeuireul samsip bun jeongdoro japgetseupnida",
+    "en": "I'll schedule the meeting for about thirty minutes"
+  },
+  {
+    "ko": "참석자 명단을 먼저 확인하겠습니다",
+    "he": "אבדוק קודם את רשימת המשתתפים",
+    "roman": "chamseokja myeongdaneul meonjeo hwakinhagetseupnida",
+    "en": "I'll check the attendee list first"
+  },
+  {
+    "ko": "화상 회의 링크를 다시 보내 주세요",
+    "he": "נא לשלוח שוב את הקישור לפגישת הווידאו",
+    "roman": "hwasang hoeui ringkeureul dasi bonae juseyo",
+    "en": "Please resend the video meeting link"
+  },
+  {
+    "ko": "시간대가 달라서 조정이 필요합니다",
+    "he": "צריך לתאם בגלל הפרש השעות",
+    "roman": "sigandaega dalraseo jojeongi pilyohapnida",
+    "en": "We need to coordinate because of the time difference"
+  },
+  {
+    "ko": "회의 시작을 십 분 늦추겠습니다",
+    "he": "נדחה את תחילת הישיבה בעשר דקות",
+    "roman": "hoeui sijakeul sip bun neutchugetseupnida",
+    "en": "We'll delay the meeting start by ten minutes"
+  },
+  {
+    "ko": "이 일정은 모두에게 가능한가요?",
+    "he": "האם המועד הזה מתאים לכולם?",
+    "roman": "i iljeongeun moduege ganeunghangayo?",
+    "en": "Does this time work for everyone?"
+  },
+  {
+    "ko": "필요하면 별도 미팅을 잡겠습니다",
+    "he": "אם יהיה צורך, נקבע פגישה נפרדת",
+    "roman": "pilyohamyeon byeoldo mitingeul japgetseupnida",
+    "en": "If needed, we'll schedule a separate meeting"
+  },
+  {
+    "ko": "내일 오전으로 변경해도 될까요?",
+    "he": "אפשר להעביר למחר בבוקר?",
+    "roman": "naeil ojeoneuro byeongyeonghaedo doelkkayo?",
+    "en": "Can we move it to tomorrow morning?"
+  },
+  {
+    "ko": "회의실 예약이 완료되었습니다",
+    "he": "חדר הישיבות הוזמן",
+    "roman": "hoeuisil yeyaki wanryodoeeotseupnida",
+    "en": "The meeting room has been booked"
+  },
+  {
+    "ko": "오늘 논의할 항목은 세 가지입니다",
+    "he": "יש שלושה נושאים לדיון היום",
+    "roman": "oneul nonuihal hangmokeun se gajiipnida",
+    "en": "We have three items to discuss today"
+  },
+  {
+    "ko": "먼저 가장 중요한 안건부터 보겠습니다",
+    "he": "נתחיל בנושא החשוב ביותר",
+    "roman": "meonjeo gajang jungyohan angeonbuteo bogetseupnida",
+    "en": "Let's start with the most important agenda item"
+  },
+  {
+    "ko": "이 안건은 마지막에 다시 다루겠습니다",
+    "he": "נחזור לנושא הזה בסוף",
+    "roman": "i angeoneun majimake dasi darugetseupnida",
+    "en": "We'll revisit this item at the end"
+  },
+  {
+    "ko": "관련 자료는 미리 공유했습니다",
+    "he": "שיתפתי מראש את החומר הרלוונטי",
+    "roman": "gwanryeon jaryoneun miri gongyuhaetseupnida",
+    "en": "I shared the relevant materials in advance"
+  },
+  {
+    "ko": "논의 범위를 조금 줄이는 게 좋겠습니다",
+    "he": "כדאי לצמצם מעט את היקף הדיון",
+    "roman": "nonui beomwireul jogeum julineun ge jotgetseupnida",
+    "en": "It would be good to narrow the scope of the discussion"
+  },
+  {
+    "ko": "이 부분은 결정이 필요한 사안입니다",
+    "he": "הנושא הזה דורש החלטה",
+    "roman": "i bubuneun gyeoljeongi pilyohan saanipnida",
+    "en": "This item requires a decision"
+  },
+  {
+    "ko": "추가 의견이 있으면 말씀해 주세요",
+    "he": "אם יש הערות נוספות, נא לומר",
+    "roman": "chuga uigyeoni iteumyeon malsseumhae juseyo",
+    "en": "Please speak up if you have additional comments"
+  },
+  {
+    "ko": "시간 관계상 다음 안건으로 넘어가겠습니다",
+    "he": "בגלל מגבלת הזמן נעבור לנושא הבא",
+    "roman": "sigan gwangyesang daeum angeoneuro neomeogagetseupnida",
+    "en": "Due to time constraints, we'll move to the next item"
+  },
+  {
+    "ko": "회의 목적을 다시 한번 정리하겠습니다",
+    "he": "אסכם שוב את מטרת הישיבה",
+    "roman": "hoeui mokjeokeul dasi hanbeon jeongrihagetseupnida",
+    "en": "I'll restate the purpose of the meeting"
+  },
+  {
+    "ko": "오늘은 결론이 필요한 항목만 다루겠습니다",
+    "he": "היום נתמקד רק בנושאים שדורשים החלטה",
+    "roman": "oneuleun gyeolroni pilyohan hangmokman darugetseupnida",
+    "en": "Today we'll cover only items that need a decision"
+  },
+  {
+    "ko": "현재 프로젝트는 계획대로 진행 중입니다",
+    "he": "הפרויקט מתקדם כרגע לפי התוכנית",
+    "roman": "hyeonjae peurojekteuneun gyehoekdaero jinhaeng jungipnida",
+    "en": "The project is currently progressing as planned"
+  },
+  {
+    "ko": "이번 주에 첫 번째 단계를 완료했습니다",
+    "he": "השבוע השלמנו את השלב הראשון",
+    "roman": "ibeon jue cheot beonjjae dangyereul wanryohaetseupnida",
+    "en": "We completed the first phase this week"
+  },
+  {
+    "ko": "예상보다 작업 속도가 조금 느립니다",
+    "he": "קצב העבודה מעט איטי מהצפוי",
+    "roman": "yesangboda jakeop sokdoga jogeum neuripnida",
+    "en": "The work is moving a little slower than expected"
+  },
+  {
+    "ko": "핵심 기능은 이미 구현되었습니다",
+    "he": "הפונקציה המרכזית כבר יושמה",
+    "roman": "haeksim gineungeun imi guhyeondoeeotseupnida",
+    "en": "The core functionality has already been implemented"
+  },
+  {
+    "ko": "남은 작업은 테스트와 수정입니다",
+    "he": "מה שנשאר הוא בדיקות ותיקונים",
+    "roman": "nameun jakeopeun teseuteuwa sujeongipnida",
+    "en": "The remaining work is testing and fixes"
+  },
+  {
+    "ko": "일정에 영향을 줄 만한 문제는 없습니다",
+    "he": "אין כרגע בעיה שאמורה להשפיע על לוח הזמנים",
+    "roman": "iljeonge yeonghyangeul jul manhan munjeneun eopseupnida",
+    "en": "There is currently no issue likely to affect the schedule"
+  },
+  {
+    "ko": "진행 상황을 매주 공유하겠습니다",
+    "he": "אשתף עדכון התקדמות מדי שבוע",
+    "roman": "jinhaeng sanghwangeul maeju gongyuhagetseupnida",
+    "en": "I'll share a progress update every week"
+  },
+  {
+    "ko": "다음 단계는 승인 후 시작할 수 있습니다",
+    "he": "נוכל להתחיל את השלב הבא לאחר האישור",
+    "roman": "daeum dangyeneun seungin hu sijakhal su itseupnida",
+    "en": "We can start the next phase after approval"
+  },
+  {
+    "ko": "현재 완료율은 약 칠십 퍼센트입니다",
+    "he": "שיעור ההשלמה כרגע הוא בערך שבעים אחוז",
+    "roman": "hyeonjae wanryoyuleun yak chilsip peosenteuipnida",
+    "en": "The current completion rate is about seventy percent"
+  },
+  {
+    "ko": "세부 일정은 별도 문서에 정리했습니다",
+    "he": "ריכזתי את לוח הזמנים המפורט במסמך נפרד",
+    "roman": "sebu iljeongeun byeoldo munseoe jeongrihaetseupnida",
+    "en": "I organized the detailed schedule in a separate document"
+  },
+  {
+    "ko": "마감일을 하루 연장할 수 있을까요?",
+    "he": "אפשר להאריך את המועד ביום אחד?",
+    "roman": "magamileul haru yeonjanghal su iteulkkayo?",
+    "en": "Can we extend the deadline by one day?"
+  },
+  {
+    "ko": "이 작업은 금요일까지 끝내야 합니다",
+    "he": "צריך לסיים את המשימה הזאת עד יום שישי",
+    "roman": "i jakeopeun geumyoilkkaji kkeutnaeya hapnida",
+    "en": "This task needs to be finished by Friday"
+  },
+  {
+    "ko": "예상 소요 시간을 다시 계산해 보겠습니다",
+    "he": "אחשב מחדש את זמן העבודה הצפוי",
+    "roman": "yesang soyo siganeul dasi gyesanhae bogetseupnida",
+    "en": "I'll recalculate the estimated time required"
+  },
+  {
+    "ko": "마감 전에 검토 시간을 확보해야 합니다",
+    "he": "צריך להשאיר זמן לבדיקה לפני המועד",
+    "roman": "magam jeone geomto siganeul hwakbohaeya hapnida",
+    "en": "We need to leave time for review before the deadline"
+  },
+  {
+    "ko": "일정이 너무 촉박한 것 같습니다",
+    "he": "נראה שלוח הזמנים צפוף מדי",
+    "roman": "iljeongi neomu chokbakhan geot gatseupnida",
+    "en": "The schedule seems too tight"
+  },
+  {
+    "ko": "우선 필수 항목부터 완료하겠습니다",
+    "he": "נסיים קודם את הפריטים החיוניים",
+    "roman": "useon pilsu hangmokbuteo wanryohagetseupnida",
+    "en": "We'll complete the essential items first"
+  },
+  {
+    "ko": "일정 지연 가능성을 미리 공유드립니다",
+    "he": "אני מעדכן מראש על אפשרות לעיכוב",
+    "roman": "iljeong jiyeon ganeungseongeul miri gongyudeuripnida",
+    "en": "I'm sharing the possibility of a delay in advance"
+  },
+  {
+    "ko": "추가 인력이 있으면 일정 단축이 가능합니다",
+    "he": "עם כוח אדם נוסף אפשר לקצר את לוח הזמנים",
+    "roman": "chuga inryeoki iteumyeon iljeong danchuki ganeunghapnida",
+    "en": "With additional staff, we can shorten the timeline"
+  },
+  {
+    "ko": "중간 점검 날짜를 정해 두겠습니다",
+    "he": "נקבע תאריך לבדיקת ביניים",
+    "roman": "junggan jeomgeom naljjareul jeonghae dugetseupnida",
+    "en": "We'll set a date for an interim review"
+  },
+  {
+    "ko": "최종 제출일은 변경되지 않습니다",
+    "he": "מועד ההגשה הסופי לא משתנה",
+    "roman": "choejong jechulileun byeongyeongdoeji anseupnida",
+    "en": "The final submission date remains unchanged"
+  },
+  {
+    "ko": "이 부분은 제가 맡겠습니다",
+    "he": "אני אקח אחריות על החלק הזה",
+    "roman": "i bubuneun jega matgetseupnida",
+    "en": "I'll take responsibility for this part"
+  },
+  {
+    "ko": "자료 정리는 민수 씨에게 부탁하겠습니다",
+    "he": "אבקש ממינסו לארגן את החומרים",
+    "roman": "jaryo jeongrineun minsu ssiege butakhagetseupnida",
+    "en": "I'll ask Minsu to organize the materials"
+  },
+  {
+    "ko": "각자 담당 업무를 다시 확인해 주세요",
+    "he": "נא לוודא שוב את תחומי האחריות של כל אחד",
+    "roman": "gakja damdang eopmureul dasi hwakinhae juseyo",
+    "en": "Please reconfirm everyone's responsibilities"
+  },
+  {
+    "ko": "이 작업은 두 명이 함께 진행하면 좋겠습니다",
+    "he": "כדאי ששני אנשים יעבדו יחד על המשימה הזאת",
+    "roman": "i jakeopeun du myeongi hamkke jinhaenghamyeon jotgetseupnida",
+    "en": "It would be good for two people to work on this task together"
+  },
+  {
+    "ko": "담당자를 한 명 더 지정하겠습니다",
+    "he": "אמנה אדם נוסף כאחראי",
+    "roman": "damdangjareul han myeong deo jijeonghagetseupnida",
+    "en": "I'll assign one more person in charge"
+  },
+  {
+    "ko": "업무가 겹치지 않도록 역할을 나누겠습니다",
+    "he": "נחלק תפקידים כדי למנוע כפילות",
+    "roman": "eopmuga gyeopchiji andorok yeokhaleul nanugetseupnida",
+    "en": "We'll divide roles to avoid overlapping work"
+  },
+  {
+    "ko": "긴급한 건부터 처리해 주세요",
+    "he": "נא לטפל קודם בדברים הדחופים",
+    "roman": "gingeuphan geonbuteo cheorihae juseyo",
+    "en": "Please handle the urgent items first"
+  },
+  {
+    "ko": "제가 없는 동안 이 업무를 부탁드립니다",
+    "he": "אני מבקש שתטפל בזה בזמן שאיעדר",
+    "roman": "jega eopneun dongan i eopmureul butakdeuripnida",
+    "en": "Please take care of this while I'm away"
+  },
+  {
+    "ko": "진행 중 문제가 생기면 바로 공유해 주세요",
+    "he": "אם תתעורר בעיה במהלך העבודה, נא לעדכן מיד",
+    "roman": "jinhaeng jung munjega saenggimyeon baro gongyuhae juseyo",
+    "en": "Please share immediately if a problem arises during the work"
+  },
+  {
+    "ko": "업무 범위를 문서로 명확히 하겠습니다",
+    "he": "נגדיר את היקף העבודה בצורה ברורה במסמך",
+    "roman": "eopmu beomwireul munseoro myeonghwakhi hagetseupnida",
+    "en": "We'll clearly define the scope of work in writing"
+  },
+  {
+    "ko": "메일 제목을 조금 더 구체적으로 써 주세요",
+    "he": "נא לנסח את נושא המייל בצורה יותר ספציפית",
+    "roman": "meil jemokeul jogeum deo guchejeokeuro sseo juseyo",
+    "en": "Please make the email subject more specific"
+  },
+  {
+    "ko": "수정된 파일을 다시 첨부했습니다",
+    "he": "צירפתי שוב את הקובץ המתוקן",
+    "roman": "sujeongdoen paileul dasi cheombuhaetseupnida",
+    "en": "I've attached the revised file again"
+  },
+  {
+    "ko": "문서의 최신 버전을 사용해 주세요",
+    "he": "נא להשתמש בגרסה העדכנית של המסמך",
+    "roman": "munseoui choesin beojeoneul sayonghae juseyo",
+    "en": "Please use the latest version of the document"
+  },
+  {
+    "ko": "공유 폴더에 자료를 올려 두었습니다",
+    "he": "העליתי את החומרים לתיקייה המשותפת",
+    "roman": "gongyu poldeoe jaryoreul olryeo dueotseupnida",
+    "en": "I've uploaded the materials to the shared folder"
+  },
+  {
+    "ko": "파일 접근 권한을 요청했습니다",
+    "he": "ביקשתי הרשאת גישה לקובץ",
+    "roman": "pail jeopgeun gwonhaneul yocheonghaetseupnida",
+    "en": "I requested access permission for the file"
+  },
+  {
+    "ko": "문서 형식이 깨져서 다시 저장했습니다",
+    "he": "שמרתי מחדש כי העיצוב במסמך השתבש",
+    "roman": "munseo hyeongsiki kkaejyeoseo dasi jeojanghaetseupnida",
+    "en": "I saved it again because the document formatting broke"
+  },
+  {
+    "ko": "이메일 수신자를 다시 확인해 주세요",
+    "he": "נא לבדוק שוב את נמעני המייל",
+    "roman": "imeil susinjareul dasi hwakinhae juseyo",
+    "en": "Please double check the email recipients"
+  },
+  {
+    "ko": "중요한 부분은 노란색으로 표시했습니다",
+    "he": "סימנתי את החלקים החשובים בצהוב",
+    "roman": "jungyohan bubuneun noransaekeuro pyosihaetseupnida",
+    "en": "I highlighted the important parts in yellow"
+  },
+  {
+    "ko": "변경 사항은 문서 끝에 정리했습니다",
+    "he": "ריכזתי את השינויים בסוף המסמך",
+    "roman": "byeongyeong sahangeun munseo kkeute jeongrihaetseupnida",
+    "en": "I summarized the changes at the end of the document"
+  },
+  {
+    "ko": "원본 파일은 별도로 보관해 주세요",
+    "he": "נא לשמור את הקובץ המקורי בנפרד",
+    "roman": "wonbon paileun byeoldoro bogwanhae juseyo",
+    "en": "Please keep the original file separately"
+  },
+  {
+    "ko": "고객 요청 사항을 다시 확인했습니다",
+    "he": "בדקתי שוב את בקשות הלקוח",
+    "roman": "gogaek yocheong sahangeul dasi hwakinhaetseupnida",
+    "en": "I reviewed the client's requests again"
+  },
+  {
+    "ko": "고객에게 오늘 중으로 답변하겠습니다",
+    "he": "אענה ללקוח עוד היום",
+    "roman": "gogaekege oneul jungeuro dapbyeonhagetseupnida",
+    "en": "I'll respond to the client today"
+  },
+  {
+    "ko": "요구 사항이 일부 변경되었습니다",
+    "he": "חלק מהדרישות השתנו",
+    "roman": "yogu sahangi ilbu byeongyeongdoeeotseupnida",
+    "en": "Some of the requirements have changed"
+  },
+  {
+    "ko": "고객이 가장 중요하게 보는 부분입니다",
+    "he": "זה החלק שהלקוח מייחס לו את החשיבות הגדולה ביותר",
+    "roman": "gogaeki gajang jungyohage boneun bubunipnida",
+    "en": "This is the part the client considers most important"
+  },
+  {
+    "ko": "추가 요청은 별도 비용이 발생할 수 있습니다",
+    "he": "בקשות נוספות עלולות להיות כרוכות בעלות נוספת",
+    "roman": "chuga yocheongeun byeoldo biyongi balsaenghal su itseupnida",
+    "en": "Additional requests may incur extra costs"
+  },
+  {
+    "ko": "고객과 기대 수준을 맞춰야 합니다",
+    "he": "צריך לתאם ציפיות עם הלקוח",
+    "roman": "gogaekgwa gidae sujuneul matchwoya hapnida",
+    "en": "We need to align expectations with the client"
+  },
+  {
+    "ko": "현재 제안으로는 요구 사항을 충족할 수 있습니다",
+    "he": "ההצעה הנוכחית יכולה לעמוד בדרישות",
+    "roman": "hyeonjae jeaneuroneun yogu sahangeul chungjokhal su itseupnida",
+    "en": "The current proposal can meet the requirements"
+  },
+  {
+    "ko": "고객 피드백을 반영해서 수정하겠습니다",
+    "he": "נתקן בהתאם למשוב של הלקוח",
+    "roman": "gogaek pideubaekeul banyeonghaeseo sujeonghagetseupnida",
+    "en": "We'll revise it based on the client's feedback"
+  },
+  {
+    "ko": "최종 확인을 받은 뒤 진행하겠습니다",
+    "he": "נתקדם לאחר שנקבל אישור סופי",
+    "roman": "choejong hwakineul bateun dwi jinhaenghagetseupnida",
+    "en": "We'll proceed after receiving final confirmation"
+  },
+  {
+    "ko": "고객과의 통화 내용을 기록해 두었습니다",
+    "he": "תיעדתי את תוכן השיחה עם הלקוח",
+    "roman": "gogaekgwaui tonghwa naeyongeul girokhae dueotseupnida",
+    "en": "I documented the conversation with the client"
+  },
+  {
+    "ko": "이번 분기 매출 목표를 확인해 봅시다",
+    "he": "בוא נבדוק את יעד המכירות לרבעון הזה",
+    "roman": "ibeon bungi maechul mokpyoreul hwakinhae bopsida",
+    "en": "Let's review the sales target for this quarter"
+  },
+  {
+    "ko": "잠재 고객 목록을 업데이트했습니다",
+    "he": "עדכנתי את רשימת הלקוחות הפוטנציאליים",
+    "roman": "jamjae gogaek mokrokeul eopdeiteuhaetseupnida",
+    "en": "I updated the prospect list"
+  },
+  {
+    "ko": "이번 제안의 핵심 장점을 강조해 주세요",
+    "he": "נא להדגיש את היתרון המרכזי של ההצעה הזאת",
+    "roman": "ibeon jeanui haeksim jangjeomeul gangjohae juseyo",
+    "en": "Please emphasize the key advantage of this proposal"
+  },
+  {
+    "ko": "고객 반응이 예상보다 긍정적입니다",
+    "he": "תגובת הלקוחות חיובית יותר מהצפוי",
+    "roman": "gogaek baneungi yesangboda geungjeongjeokipnida",
+    "en": "Customer response is more positive than expected"
+  },
+  {
+    "ko": "가격보다 가치 중심으로 설명하겠습니다",
+    "he": "נסביר תוך התמקדות בערך ולא רק במחיר",
+    "roman": "gagyeokboda gachi jungsimeuro seolmyeonghagetseupnida",
+    "en": "We'll explain it with a focus on value rather than price"
+  },
+  {
+    "ko": "후속 연락은 다음 주에 하겠습니다",
+    "he": "ניצור קשר נוסף בשבוע הבא",
+    "roman": "husok yeonrakeun daeum jue hagetseupnida",
+    "en": "We'll follow up next week"
+  },
+  {
+    "ko": "계약 가능성이 높은 고객부터 집중하겠습니다",
+    "he": "נתמקד קודם בלקוחות עם סיכוי גבוה לסגירה",
+    "roman": "gyeyak ganeungseongi nopeun gogaekbuteo jipjunghagetseupnida",
+    "en": "We'll focus first on prospects with a high chance of closing"
+  },
+  {
+    "ko": "제품 시연 일정을 잡아 주세요",
+    "he": "נא לקבוע מועד להדגמת המוצר",
+    "roman": "jepum siyeon iljeongeul japa juseyo",
+    "en": "Please schedule a product demonstration"
+  },
+  {
+    "ko": "고객별로 제안 내용을 다르게 준비했습니다",
+    "he": "הכנתי הצעה מותאמת לכל לקוח",
+    "roman": "gogaekbyeolro jean naeyongeul dareuge junbihaetseupnida",
+    "en": "I prepared different proposal content for each client"
+  },
+  {
+    "ko": "이번 달 신규 문의가 늘었습니다",
+    "he": "מספר הפניות החדשות עלה החודש",
+    "roman": "ibeon dal singyu munuiga neuleotseupnida",
+    "en": "New inquiries increased this month"
+  },
+  {
+    "ko": "이 조건은 조금 더 협의가 필요합니다",
+    "he": "צריך לדון עוד קצת בתנאי הזה",
+    "roman": "i jogeoneun jogeum deo hyeopuiga pilyohapnida",
+    "en": "This condition needs a little more discussion"
+  },
+  {
+    "ko": "가격 조정 가능 범위를 알려 주세요",
+    "he": "נא לעדכן מה טווח הגמישות במחיר",
+    "roman": "gagyeok jojeong ganeung beomwireul alryeo juseyo",
+    "en": "Please let me know the possible range for price adjustment"
+  },
+  {
+    "ko": "납기 조건을 먼저 확정하고 싶습니다",
+    "he": "אני רוצה קודם לסגור את תנאי האספקה",
+    "roman": "napgi jogeoneul meonjeo hwakjeonghago sipseupnida",
+    "en": "I'd like to finalize the delivery terms first"
+  },
+  {
+    "ko": "이 부분은 양측 모두에게 중요한 조건입니다",
+    "he": "זה תנאי חשוב לשני הצדדים",
+    "roman": "i bubuneun yangcheuk moduege jungyohan jogeonipnida",
+    "en": "This is an important condition for both sides"
+  },
+  {
+    "ko": "수량이 늘어나면 단가를 낮출 수 있습니다",
+    "he": "אם הכמות תגדל, נוכל להוריד את המחיר ליחידה",
+    "roman": "suryangi neuleonamyeon dangareul natchul su itseupnida",
+    "en": "If the quantity increases, we can lower the unit price"
+  },
+  {
+    "ko": "결제 조건을 조금 더 유연하게 할 수 있을까요?",
+    "he": "אפשר להגמיש מעט את תנאי התשלום?",
+    "roman": "gyeolje jogeoneul jogeum deo yuyeonhage hal su iteulkkayo?",
+    "en": "Can we make the payment terms a little more flexible?"
+  },
+  {
+    "ko": "제안하신 조건을 내부적으로 검토하겠습니다",
+    "he": "נבדוק את התנאים שהצעתם באופן פנימי",
+    "roman": "jeanhasin jogeoneul naebujeokeuro geomtohagetseupnida",
+    "en": "We'll review your proposed terms internally"
+  },
+  {
+    "ko": "서로 가능한 범위를 찾는 게 중요합니다",
+    "he": "חשוב למצוא טווח שמתאים לשני הצדדים",
+    "roman": "seoro ganeunghan beomwireul chatneun ge jungyohapnida",
+    "en": "It's important to find a range that works for both sides"
+  },
+  {
+    "ko": "이 조건이면 합의할 수 있을 것 같습니다",
+    "he": "נראה שנוכל להסכים בתנאים האלה",
+    "roman": "i jogeonimyeon hapuihal su iteul geot gatseupnida",
+    "en": "I think we can agree under these terms"
+  },
+  {
+    "ko": "최종 가격은 계약서에 명시하겠습니다",
+    "he": "המחיר הסופי יצוין בחוזה",
+    "roman": "choejong gagyeokeun gyeyakseoe myeongsihagetseupnida",
+    "en": "The final price will be specified in the contract"
+  },
+  {
+    "ko": "계약 기간은 일 년으로 제안드립니다",
+    "he": "אנו מציעים תקופת חוזה של שנה",
+    "roman": "gyeyak giganeun il nyeoneuro jeandeuripnida",
+    "en": "We propose a one year contract term"
+  },
+  {
+    "ko": "해지 조건을 다시 확인해 주세요",
+    "he": "נא לבדוק שוב את תנאי הביטול",
+    "roman": "haeji jogeoneul dasi hwakinhae juseyo",
+    "en": "Please review the termination conditions again"
+  },
+  {
+    "ko": "책임 범위가 명확하게 적혀 있어야 합니다",
+    "he": "תחומי האחריות צריכים להיות כתובים בבירור",
+    "roman": "chaekim beomwiga myeonghwakhage jeokhyeo iteoya hapnida",
+    "en": "The scope of responsibility should be clearly stated"
+  },
+  {
+    "ko": "서명 전에 법무팀 검토를 받겠습니다",
+    "he": "נקבל בדיקה מהמחלקה המשפטית לפני החתימה",
+    "roman": "seomyeong jeone beopmutim geomtoreul batgetseupnida",
+    "en": "We'll have the legal team review it before signing"
+  },
+  {
+    "ko": "계약서에 수정할 문구가 있습니다",
+    "he": "יש נוסח שצריך לתקן בחוזה",
+    "roman": "gyeyakseoe sujeonghal munguga itseupnida",
+    "en": "There is wording in the contract that needs revision"
+  },
+  {
+    "ko": "비밀 유지 조항을 추가해 주세요",
+    "he": "נא להוסיף סעיף סודיות",
+    "roman": "bimil yuji johangeul chugahae juseyo",
+    "en": "Please add a confidentiality clause"
+  },
+  {
+    "ko": "자동 연장 여부를 확인해야 합니다",
+    "he": "צריך לבדוק אם יש חידוש אוטומטי",
+    "roman": "jadong yeonjang yeobureul hwakinhaeya hapnida",
+    "en": "We need to check whether there is automatic renewal"
+  },
+  {
+    "ko": "계약 효력 시작일은 다음 달 1일입니다",
+    "he": "החוזה ייכנס לתוקף בראשון לחודש הבא",
+    "roman": "gyeyak hyoryeok sijakileun daeum dal 1ilipnida",
+    "en": "The contract takes effect on the first of next month"
+  },
+  {
+    "ko": "원본 계약서는 양측이 한 부씩 보관합니다",
+    "he": "כל צד ישמור עותק מקורי של החוזה",
+    "roman": "wonbon gyeyakseoneun yangcheuki han bussik bogwanhapnida",
+    "en": "Each party will keep one original copy of the contract"
+  },
+  {
+    "ko": "서명본을 스캔해서 보내 주세요",
+    "he": "נא לסרוק ולשלוח את העותק החתום",
+    "roman": "seomyeongboneul seukaenhaeseo bonae juseyo",
+    "en": "Please scan and send the signed copy"
+  },
+  {
+    "ko": "이번 달 청구서를 발행했습니다",
+    "he": "הפקנו את החשבונית לחודש הזה",
+    "roman": "ibeon dal cheongguseoreul balhaenghaetseupnida",
+    "en": "We issued this month's invoice"
+  },
+  {
+    "ko": "결제 기한은 이달 말까지입니다",
+    "he": "מועד התשלום הוא עד סוף החודש",
+    "roman": "gyeolje gihaneun idal malkkajiipnida",
+    "en": "The payment deadline is the end of this month"
+  },
+  {
+    "ko": "입금 내역을 확인하고 있습니다",
+    "he": "אנחנו בודקים את פרטי התשלום שהתקבל",
+    "roman": "ipgeum naeyeokeul hwakinhago itseupnida",
+    "en": "We're checking the payment record"
+  },
+  {
+    "ko": "금액이 청구서와 일치하지 않습니다",
+    "he": "הסכום אינו תואם לחשבונית",
+    "roman": "geumaeki cheongguseowa ilchihaji anseupnida",
+    "en": "The amount does not match the invoice"
+  },
+  {
+    "ko": "세금이 포함된 금액인가요?",
+    "he": "האם הסכום כולל מס?",
+    "roman": "segeumi pohamdoen geumaekingayo?",
+    "en": "Does the amount include tax?"
+  },
+  {
+    "ko": "미지급 금액이 아직 남아 있습니다",
+    "he": "עדיין נותר סכום שלא שולם",
+    "roman": "mijigeup geumaeki ajik nama itseupnida",
+    "en": "There is still an outstanding amount"
+  },
+  {
+    "ko": "결제 확인서를 보내 드리겠습니다",
+    "he": "אשלח אישור תשלום",
+    "roman": "gyeolje hwakinseoreul bonae deurigetseupnida",
+    "en": "I'll send a payment confirmation"
+  },
+  {
+    "ko": "환율 변동을 반영해야 합니다",
+    "he": "צריך להביא בחשבון את שינוי שער החליפין",
+    "roman": "hwanyul byeondongeul banyeonghaeya hapnida",
+    "en": "We need to account for exchange rate changes"
+  },
+  {
+    "ko": "이번 거래는 선결제가 필요합니다",
+    "he": "העסקה הזאת דורשת תשלום מראש",
+    "roman": "ibeon georaeneun seongyeoljega pilyohapnida",
+    "en": "This transaction requires advance payment"
+  },
+  {
+    "ko": "회계팀에 확인 후 답변드리겠습니다",
+    "he": "אענה לאחר בדיקה עם צוות הנהלת החשבונות",
+    "roman": "hoegyetime hwakin hu dapbyeondeurigetseupnida",
+    "en": "I'll respond after checking with the accounting team"
+  },
+  {
+    "ko": "이번 프로젝트 예산을 다시 검토하겠습니다",
+    "he": "נבחן מחדש את תקציב הפרויקט",
+    "roman": "ibeon peurojekteu yesaneul dasi geomtohagetseupnida",
+    "en": "We'll review the project budget again"
+  },
+  {
+    "ko": "예상보다 비용이 많이 발생했습니다",
+    "he": "נוצרו עלויות גבוהות מהצפוי",
+    "roman": "yesangboda biyongi mani balsaenghaetseupnida",
+    "en": "Costs were higher than expected"
+  },
+  {
+    "ko": "불필요한 지출을 줄일 방법을 찾아야 합니다",
+    "he": "צריך למצוא דרך לצמצם הוצאות מיותרות",
+    "roman": "bulpilyohan jichuleul julil bangbeopeul chataya hapnida",
+    "en": "We need to find ways to reduce unnecessary expenses"
+  },
+  {
+    "ko": "추가 예산 승인이 필요합니다",
+    "he": "נדרש אישור לתקציב נוסף",
+    "roman": "chuga yesan seungini pilyohapnida",
+    "en": "Additional budget approval is required"
+  },
+  {
+    "ko": "현재 예산으로는 범위 확대가 어렵습니다",
+    "he": "קשה להרחיב את ההיקף במסגרת התקציב הנוכחי",
+    "roman": "hyeonjae yesaneuroneun beomwi hwakdaega eoryeopseupnida",
+    "en": "It's difficult to expand the scope within the current budget"
+  },
+  {
+    "ko": "비용 항목별로 다시 계산해 보겠습니다",
+    "he": "נחשב מחדש לפי סעיפי העלות",
+    "roman": "biyong hangmokbyeolro dasi gyesanhae bogetseupnida",
+    "en": "We'll recalculate by cost category"
+  },
+  {
+    "ko": "예산의 일부를 다음 달로 이월하겠습니다",
+    "he": "נעביר חלק מהתקציב לחודש הבא",
+    "roman": "yesanui ilbureul daeum dalro iwolhagetseupnida",
+    "en": "We'll carry part of the budget over to next month"
+  },
+  {
+    "ko": "절감 가능한 항목을 정리했습니다",
+    "he": "ריכזתי את הסעיפים שבהם אפשר לחסוך",
+    "roman": "jeolgam ganeunghan hangmokeul jeongrihaetseupnida",
+    "en": "I listed the areas where we can save"
+  },
+  {
+    "ko": "예산 사용률을 매달 확인하겠습니다",
+    "he": "נבדוק מדי חודש את שיעור ניצול התקציב",
+    "roman": "yesan sayongryuleul maedal hwakinhagetseupnida",
+    "en": "We'll review the budget utilization rate every month"
+  },
+  {
+    "ko": "큰 지출은 사전 승인을 받아야 합니다",
+    "he": "הוצאות גדולות דורשות אישור מראש",
+    "roman": "keun jichuleun sajeon seungineul bataya hapnida",
+    "en": "Large expenses require prior approval"
+  },
+  {
+    "ko": "세 곳에서 견적을 받아 보겠습니다",
+    "he": "נקבל הצעות מחיר משלושה ספקים",
+    "roman": "se goteseo gyeonjeokeul bata bogetseupnida",
+    "en": "We'll get quotes from three suppliers"
+  },
+  {
+    "ko": "가격뿐 아니라 품질도 비교해야 합니다",
+    "he": "צריך להשוות גם איכות ולא רק מחיר",
+    "roman": "gagyeokppun anira pumjildo bigyohaeya hapnida",
+    "en": "We need to compare quality, not just price"
+  },
+  {
+    "ko": "납품 가능한 날짜를 확인해 주세요",
+    "he": "נא לבדוק את תאריך האספקה האפשרי",
+    "roman": "nappum ganeunghan naljjareul hwakinhae juseyo",
+    "en": "Please check the available delivery date"
+  },
+  {
+    "ko": "최소 주문 수량이 어떻게 되나요?",
+    "he": "מהי כמות ההזמנה המינימלית?",
+    "roman": "choeso jumun suryangi eotteotge doenayo?",
+    "en": "What is the minimum order quantity?"
+  },
+  {
+    "ko": "장기 계약 시 할인 조건이 있나요?",
+    "he": "יש תנאי הנחה לחוזה ארוך טווח?",
+    "roman": "janggi gyeyak si halin jogeoni itnayo?",
+    "en": "Are there discount terms for a long term contract?"
+  },
+  {
+    "ko": "새 공급업체의 신뢰도를 확인해야 합니다",
+    "he": "צריך לבדוק את אמינות הספק החדש",
+    "roman": "sae gonggeupeopcheui sinroedoreul hwakinhaeya hapnida",
+    "en": "We need to verify the reliability of the new supplier"
+  },
+  {
+    "ko": "샘플을 먼저 받아 보고 결정하겠습니다",
+    "he": "נקבל קודם דוגמה ואז נחליט",
+    "roman": "saempeuleul meonjeo bata bogo gyeoljeonghagetseupnida",
+    "en": "We'll receive a sample first and then decide"
+  },
+  {
+    "ko": "발주서는 오늘 중으로 보내겠습니다",
+    "he": "נשלח את הזמנת הרכש עוד היום",
+    "roman": "baljuseoneun oneul jungeuro bonaegetseupnida",
+    "en": "We'll send the purchase order today"
+  },
+  {
+    "ko": "기존 업체와 조건을 다시 협상하겠습니다",
+    "he": "ננהל מחדש משא ומתן על התנאים עם הספק הקיים",
+    "roman": "gijon eopchewa jogeoneul dasi hyeopsanghagetseupnida",
+    "en": "We'll renegotiate the terms with the existing supplier"
+  },
+  {
+    "ko": "공급 일정에 여유를 두는 게 좋겠습니다",
+    "he": "כדאי להשאיר מרווח בלוח האספקה",
+    "roman": "gonggeup iljeonge yeoyureul duneun ge jotgetseupnida",
+    "en": "It would be good to leave some buffer in the supply schedule"
+  },
+  {
+    "ko": "출고가 하루 늦어질 예정입니다",
+    "he": "המשלוח צפוי לצאת יום אחד באיחור",
+    "roman": "chulgoga haru neuteojil yejeongipnida",
+    "en": "The shipment is expected to leave one day late"
+  },
+  {
+    "ko": "현재 배송 위치를 확인하고 있습니다",
+    "he": "אנחנו בודקים את מיקום המשלוח הנוכחי",
+    "roman": "hyeonjae baesong wichireul hwakinhago itseupnida",
+    "en": "We're checking the shipment's current location"
+  },
+  {
+    "ko": "통관에 추가 서류가 필요합니다",
+    "he": "נדרשים מסמכים נוספים לשחרור מהמכס",
+    "roman": "tonggwane chuga seoryuga pilyohapnida",
+    "en": "Additional documents are needed for customs clearance"
+  },
+  {
+    "ko": "재고가 예상보다 빨리 줄고 있습니다",
+    "he": "המלאי יורד מהר מהצפוי",
+    "roman": "jaegoga yesangboda ppalri julgo itseupnida",
+    "en": "Inventory is decreasing faster than expected"
+  },
+  {
+    "ko": "다음 주 입고 물량을 확인해 주세요",
+    "he": "נא לבדוק את כמות המלאי שתגיע בשבוע הבא",
+    "roman": "daeum ju ipgo mulryangeul hwakinhae juseyo",
+    "en": "Please check the quantity arriving next week"
+  },
+  {
+    "ko": "배송 주소를 다시 확인했습니다",
+    "he": "בדקתי שוב את כתובת המשלוח",
+    "roman": "baesong jusoreul dasi hwakinhaetseupnida",
+    "en": "I reconfirmed the shipping address"
+  },
+  {
+    "ko": "파손 위험이 있으니 포장을 강화해 주세요",
+    "he": "יש סיכון לנזק, נא לחזק את האריזה",
+    "roman": "pason wiheomi iteuni pojangeul ganghwahae juseyo",
+    "en": "Please reinforce the packaging because there is a risk of damage"
+  },
+  {
+    "ko": "운송비가 지난달보다 올랐습니다",
+    "he": "עלות ההובלה עלתה לעומת החודש שעבר",
+    "roman": "unsongbiga jinandalboda olratseupnida",
+    "en": "Shipping costs increased compared with last month"
+  },
+  {
+    "ko": "긴급 배송이 가능한지 알아보겠습니다",
+    "he": "נבדוק אם אפשר לבצע משלוח דחוף",
+    "roman": "gingeup baesongi ganeunghanji alabogetseupnida",
+    "en": "We'll check whether express delivery is possible"
+  },
+  {
+    "ko": "물류 일정은 공급업체와 다시 맞추겠습니다",
+    "he": "נתאם מחדש את לוח הלוגיסטיקה עם הספק",
+    "roman": "mulryu iljeongeun gonggeupeopchewa dasi matchugetseupnida",
+    "en": "We'll realign the logistics schedule with the supplier"
+  },
+  {
+    "ko": "검수 기준을 먼저 정해야 합니다",
+    "he": "צריך לקבוע קודם את קריטריוני הבדיקה",
+    "roman": "geomsu gijuneul meonjeo jeonghaeya hapnida",
+    "en": "We need to set inspection criteria first"
+  },
+  {
+    "ko": "불량률이 지난달보다 낮아졌습니다",
+    "he": "שיעור הפגומים ירד לעומת החודש שעבר",
+    "roman": "bulryangryuli jinandalboda natajyeotseupnida",
+    "en": "The defect rate decreased compared with last month"
+  },
+  {
+    "ko": "같은 문제가 반복되지 않도록 하겠습니다",
+    "he": "נוודא שאותה בעיה לא תחזור",
+    "roman": "gateun munjega banbokdoeji andorok hagetseupnida",
+    "en": "We'll make sure the same problem doesn't recur"
+  },
+  {
+    "ko": "원인 분석 결과를 공유해 주세요",
+    "he": "נא לשתף את תוצאות ניתוח הסיבה",
+    "roman": "wonin bunseok gyeolgwareul gongyuhae juseyo",
+    "en": "Please share the root cause analysis results"
+  },
+  {
+    "ko": "출하 전에 최종 검사를 진행합니다",
+    "he": "נבצע בדיקה סופית לפני המשלוח",
+    "roman": "chulha jeone choejong geomsareul jinhaenghapnida",
+    "en": "We conduct a final inspection before shipment"
+  },
+  {
+    "ko": "품질 기준을 충족하지 못했습니다",
+    "he": "המוצר לא עמד בתקני האיכות",
+    "roman": "pumjil gijuneul chungjokhaji mothaetseupnida",
+    "en": "It did not meet the quality standards"
+  },
+  {
+    "ko": "수정된 제품으로 다시 테스트하겠습니다",
+    "he": "נבדוק שוב עם המוצר המתוקן",
+    "roman": "sujeongdoen jepumeuro dasi teseuteuhagetseupnida",
+    "en": "We'll retest with the revised product"
+  },
+  {
+    "ko": "검사 결과는 모두 기록해 두세요",
+    "he": "נא לתעד את כל תוצאות הבדיקה",
+    "roman": "geomsa gyeolgwaneun modu girokhae duseyo",
+    "en": "Please record all inspection results"
+  },
+  {
+    "ko": "문제가 발생한 날짜를 정확히 확인해 주세요",
+    "he": "נא לבדוק את התאריך המדויק שבו הבעיה התרחשה",
+    "roman": "munjega balsaenghan naljjareul jeonghwakhi hwakinhae juseyo",
+    "en": "Please confirm the exact date the issue occurred"
+  },
+  {
+    "ko": "개선 조치가 효과가 있는지 지켜보겠습니다",
+    "he": "נעקוב כדי לראות אם פעולת השיפור יעילה",
+    "roman": "gaeseon jochiga hyogwaga itneunji jikyeobogetseupnida",
+    "en": "We'll monitor whether the corrective action is effective"
+  },
+  {
+    "ko": "서버 응답 속도가 느려졌습니다",
+    "he": "זמן התגובה של השרת נהיה איטי",
+    "roman": "seobeo eungdap sokdoga neuryeojyeotseupnida",
+    "en": "The server response time has slowed down"
+  },
+  {
+    "ko": "오류 로그를 먼저 확인해 주세요",
+    "he": "נא לבדוק קודם את יומן השגיאות",
+    "roman": "oryu rogeureul meonjeo hwakinhae juseyo",
+    "en": "Please check the error log first"
+  },
+  {
+    "ko": "재현 가능한 조건을 찾아야 합니다",
+    "he": "צריך למצוא את התנאים שבהם אפשר לשחזר את התקלה",
+    "roman": "jaehyeon ganeunghan jogeoneul chataya hapnida",
+    "en": "We need to identify reproducible conditions"
+  },
+  {
+    "ko": "임시 해결책을 먼저 적용하겠습니다",
+    "he": "ניישם קודם פתרון זמני",
+    "roman": "imsi haegyeolchaekeul meonjeo jeokyonghagetseupnida",
+    "en": "We'll apply a temporary workaround first"
+  },
+  {
+    "ko": "업데이트 후 문제가 시작되었습니다",
+    "he": "הבעיה התחילה לאחר העדכון",
+    "roman": "eopdeiteu hu munjega sijakdoeeotseupnida",
+    "en": "The issue started after the update"
+  },
+  {
+    "ko": "사용자 환경에 따라 결과가 다릅니다",
+    "he": "התוצאה משתנה בהתאם לסביבת המשתמש",
+    "roman": "sayongja hwangyeonge ttara gyeolgwaga dareupnida",
+    "en": "The result differs depending on the user's environment"
+  },
+  {
+    "ko": "백업에서 복원할 수 있는지 확인하겠습니다",
+    "he": "נבדוק אם אפשר לשחזר מגיבוי",
+    "roman": "baekeopeseo bokwonhal su itneunji hwakinhagetseupnida",
+    "en": "We'll check whether we can restore from backup"
+  },
+  {
+    "ko": "문제가 해결되면 배포를 재개하겠습니다",
+    "he": "נחדש את ההפצה לאחר שהבעיה תיפתר",
+    "roman": "munjega haegyeoldoemyeon baeporeul jaegaehagetseupnida",
+    "en": "We'll resume deployment once the issue is fixed"
+  },
+  {
+    "ko": "지원팀에 상세 내용을 전달했습니다",
+    "he": "העברתי לצוות התמיכה את הפרטים המלאים",
+    "roman": "jiwontime sangse naeyongeul jeondalhaetseupnida",
+    "en": "I sent the support team the full details"
+  },
+  {
+    "ko": "오늘 안으로 원인을 찾는 것이 목표입니다",
+    "he": "המטרה היא למצוא את הסיבה עוד היום",
+    "roman": "oneul aneuro wonineul chatneun geoti mokpyoipnida",
+    "en": "The goal is to identify the cause today"
+  },
+  {
+    "ko": "새 기능은 별도 브랜치에서 개발하겠습니다",
+    "he": "נפתח את הפונקציה החדשה בענף נפרד",
+    "roman": "sae gineungeun byeoldo beuraenchieseo gaebalhagetseupnida",
+    "en": "We'll develop the new feature on a separate branch"
+  },
+  {
+    "ko": "코드 리뷰를 요청해 두었습니다",
+    "he": "ביקשתי ביקורת קוד",
+    "roman": "kodeu ribyureul yocheonghae dueotseupnida",
+    "en": "I've requested a code review"
+  },
+  {
+    "ko": "테스트를 통과하면 메인에 병합하겠습니다",
+    "he": "נמזג לענף הראשי לאחר שהבדיקות יעברו",
+    "roman": "teseuteureul tonggwahamyeon meine byeonghaphagetseupnida",
+    "en": "We'll merge into main after the tests pass"
+  },
+  {
+    "ko": "변경 범위가 예상보다 큽니다",
+    "he": "היקף השינוי גדול מהצפוי",
+    "roman": "byeongyeong beomwiga yesangboda keupnida",
+    "en": "The scope of the change is larger than expected"
+  },
+  {
+    "ko": "기존 기능과의 호환성을 확인해야 합니다",
+    "he": "צריך לבדוק תאימות לפונקציות הקיימות",
+    "roman": "gijon gineunggwaui hohwanseongeul hwakinhaeya hapnida",
+    "en": "We need to check compatibility with existing functionality"
+  },
+  {
+    "ko": "배포 전에 자동 테스트를 실행하겠습니다",
+    "he": "נריץ בדיקות אוטומטיות לפני ההפצה",
+    "roman": "baepo jeone jadong teseuteureul silhaenghagetseupnida",
+    "en": "We'll run automated tests before deployment"
+  },
+  {
+    "ko": "이 버그는 다음 패치에 포함하겠습니다",
+    "he": "נכלול את הבאג בתיקון הבא",
+    "roman": "i beogeuneun daeum paechie pohamhagetseupnida",
+    "en": "We'll include this bug in the next patch"
+  },
+  {
+    "ko": "설정 값은 코드와 분리해 주세요",
+    "he": "נא להפריד את ערכי ההגדרות מהקוד",
+    "roman": "seoljeong gapeun kodeuwa bunrihae juseyo",
+    "en": "Please separate configuration values from the code"
+  },
+  {
+    "ko": "개발 환경에서는 정상적으로 작동합니다",
+    "he": "בסביבת הפיתוח זה עובד כרגיל",
+    "roman": "gaebal hwangyeongeseoneun jeongsangjeokeuro jakdonghapnida",
+    "en": "It works normally in the development environment"
+  },
+  {
+    "ko": "릴리스 노트를 작성해 두겠습니다",
+    "he": "אכין הערות גרסה",
+    "roman": "rilriseu noteureul jakseonghae dugetseupnida",
+    "en": "I'll prepare the release notes"
+  },
+  {
+    "ko": "지난달 데이터를 기준으로 분석했습니다",
+    "he": "הניתוח מבוסס על נתוני החודש שעבר",
+    "roman": "jinandal deiteoreul gijuneuro bunseokhaetseupnida",
+    "en": "The analysis is based on last month's data"
+  },
+  {
+    "ko": "표본 수가 아직 충분하지 않습니다",
+    "he": "גודל המדגם עדיין אינו מספיק",
+    "roman": "pyobon suga ajik chungbunhaji anseupnida",
+    "en": "The sample size is not sufficient yet"
+  },
+  {
+    "ko": "이 수치는 전년 대비 증가한 것입니다",
+    "he": "הנתון הזה עלה בהשוואה לשנה שעברה",
+    "roman": "i suchineun jeonnyeon daebi jeunggahan geotipnida",
+    "en": "This figure increased year over year"
+  },
+  {
+    "ko": "데이터에 일부 누락된 값이 있습니다",
+    "he": "יש כמה ערכים חסרים בנתונים",
+    "roman": "deiteoe ilbu nurakdoen gapi itseupnida",
+    "en": "There are some missing values in the data"
+  },
+  {
+    "ko": "분석 기준을 동일하게 맞춰야 합니다",
+    "he": "צריך ליישר את קריטריוני הניתוח",
+    "roman": "bunseok gijuneul dongilhage matchwoya hapnida",
+    "en": "We need to align the analysis criteria"
+  },
+  {
+    "ko": "그래프에서 추세가 분명하게 보입니다",
+    "he": "המגמה נראית בבירור בגרף",
+    "roman": "geuraepeueseo chusega bunmyeonghage boipnida",
+    "en": "The trend is clearly visible in the chart"
+  },
+  {
+    "ko": "결론을 내리기 전에 추가 검증이 필요합니다",
+    "he": "נדרשת בדיקה נוספת לפני שמסיקים מסקנה",
+    "roman": "gyeolroneul naerigi jeone chuga geomjeungi pilyohapnida",
+    "en": "Additional validation is needed before drawing a conclusion"
+  },
+  {
+    "ko": "원시 데이터도 함께 보관해 주세요",
+    "he": "נא לשמור גם את הנתונים הגולמיים",
+    "roman": "wonsi deiteodo hamkke bogwanhae juseyo",
+    "en": "Please keep the raw data as well"
+  },
+  {
+    "ko": "지표 정의를 문서로 정리했습니다",
+    "he": "תיעדתי את הגדרות המדדים",
+    "roman": "jipyo jeonguireul munseoro jeongrihaetseupnida",
+    "en": "I documented the metric definitions"
+  },
+  {
+    "ko": "다음 보고서에는 비교 데이터를 추가하겠습니다",
+    "he": "נוסיף נתוני השוואה לדוח הבא",
+    "roman": "daeum bogoseoeneun bigyo deiteoreul chugahagetseupnida",
+    "en": "We'll add comparative data to the next report"
+  },
+  {
+    "ko": "민감한 정보는 외부에 공유하면 안 됩니다",
+    "he": "אסור לשתף מידע רגיש מחוץ לארגון",
+    "roman": "mingamhan jeongboneun oebue gongyuhamyeon an doepnida",
+    "en": "Sensitive information must not be shared externally"
+  },
+  {
+    "ko": "접근 권한을 최소한으로 설정해 주세요",
+    "he": "נא להגדיר הרשאות גישה מינימליות",
+    "roman": "jeopgeun gwonhaneul choesohaneuro seoljeonghae juseyo",
+    "en": "Please set access permissions to the minimum necessary"
+  },
+  {
+    "ko": "비밀번호를 정기적으로 변경해야 합니다",
+    "he": "צריך לשנות סיסמה באופן קבוע",
+    "roman": "bimilbeonhoreul jeonggijeokeuro byeongyeonghaeya hapnida",
+    "en": "Passwords should be changed regularly"
+  },
+  {
+    "ko": "의심스러운 메일은 열지 마세요",
+    "he": "אל תפתח מיילים חשודים",
+    "roman": "uisimseureoun meileun yeolji maseyo",
+    "en": "Do not open suspicious emails"
+  },
+  {
+    "ko": "파일을 보내기 전에 개인정보를 확인해 주세요",
+    "he": "נא לבדוק מידע אישי לפני שליחת הקובץ",
+    "roman": "paileul bonaegi jeone gaeinjeongboreul hwakinhae juseyo",
+    "en": "Please check for personal information before sending the file"
+  },
+  {
+    "ko": "보안 업데이트를 오늘 적용하겠습니다",
+    "he": "ניישם היום את עדכון האבטחה",
+    "roman": "boan eopdeiteureul oneul jeokyonghagetseupnida",
+    "en": "We'll apply the security update today"
+  },
+  {
+    "ko": "외부 접속 기록을 확인하고 있습니다",
+    "he": "אנחנו בודקים את יומני הגישה החיצונית",
+    "roman": "oebu jeopsok girokeul hwakinhago itseupnida",
+    "en": "We're reviewing external access logs"
+  },
+  {
+    "ko": "이 자료는 내부용으로만 사용해 주세요",
+    "he": "נא להשתמש בחומר הזה לשימוש פנימי בלבד",
+    "roman": "i jaryoneun naebuyongeuroman sayonghae juseyo",
+    "en": "Please use this material for internal purposes only"
+  },
+  {
+    "ko": "퇴사자 계정은 즉시 비활성화해야 합니다",
+    "he": "צריך להשבית מיד חשבונות של עובדים שעזבו",
+    "roman": "toesaja gyejeongeun jeuksi bihwalseonghwahaeya hapnida",
+    "en": "Accounts of departing employees must be disabled immediately"
+  },
+  {
+    "ko": "보안 사고가 발생하면 즉시 보고해 주세요",
+    "he": "במקרה של אירוע אבטחה, נא לדווח מיד",
+    "roman": "boan sagoga balsaenghamyeon jeuksi bogohae juseyo",
+    "en": "Please report immediately if a security incident occurs"
+  },
+  {
+    "ko": "지원자의 경력이 이 역할과 잘 맞습니다",
+    "he": "הניסיון של המועמד מתאים היטב לתפקיד",
+    "roman": "jiwonjaui gyeongryeoki i yeokhalgwa jal matseupnida",
+    "en": "The candidate's experience fits this role well"
+  },
+  {
+    "ko": "면접 일정을 다음 주로 잡겠습니다",
+    "he": "נקבע את הראיון לשבוע הבא",
+    "roman": "myeonjeop iljeongeul daeum juro japgetseupnida",
+    "en": "We'll schedule the interview for next week"
+  },
+  {
+    "ko": "채용 공고 문구를 조금 수정해 주세요",
+    "he": "נא לתקן מעט את נוסח מודעת הדרושים",
+    "roman": "chaeyong gonggo mungureul jogeum sujeonghae juseyo",
+    "en": "Please revise the job posting wording slightly"
+  },
+  {
+    "ko": "이 직무에 필요한 핵심 역량을 정리했습니다",
+    "he": "ריכזתי את הכישורים המרכזיים הנדרשים לתפקיד",
+    "roman": "i jikmue pilyohan haeksim yeokryangeul jeongrihaetseupnida",
+    "en": "I summarized the key competencies required for this role"
+  },
+  {
+    "ko": "추가 면접이 한 번 더 필요합니다",
+    "he": "נדרש ראיון נוסף",
+    "roman": "chuga myeonjeopi han beon deo pilyohapnida",
+    "en": "One more interview is needed"
+  },
+  {
+    "ko": "연봉 범위는 면접 후 협의합니다",
+    "he": "טווח השכר יידון לאחר הראיון",
+    "roman": "yeonbong beomwineun myeonjeop hu hyeopuihapnida",
+    "en": "The salary range will be discussed after the interview"
+  },
+  {
+    "ko": "추천인 확인 절차가 남아 있습니다",
+    "he": "נשאר שלב בדיקת הממליצים",
+    "roman": "chucheonin hwakin jeolchaga nama itseupnida",
+    "en": "The reference check is still pending"
+  },
+  {
+    "ko": "최종 후보 두 명을 비교하고 있습니다",
+    "he": "אנחנו משווים בין שני המועמדים הסופיים",
+    "roman": "choejong hubo du myeongeul bigyohago itseupnida",
+    "en": "We're comparing the two final candidates"
+  },
+  {
+    "ko": "입사 가능 날짜를 확인해 주세요",
+    "he": "נא לבדוק את תאריך תחילת העבודה האפשרי",
+    "roman": "ipsa ganeung naljjareul hwakinhae juseyo",
+    "en": "Please confirm the possible start date"
+  },
+  {
+    "ko": "채용 결과는 개별적으로 안내하겠습니다",
+    "he": "נעדכן כל מועמד באופן אישי לגבי התוצאה",
+    "roman": "chaeyong gyeolgwaneun gaebyeoljeokeuro annaehagetseupnida",
+    "en": "We'll notify each candidate individually of the result"
+  },
+  {
+    "ko": "첫날에는 계정과 장비를 설정합니다",
+    "he": "ביום הראשון נגדיר חשבונות וציוד",
+    "roman": "cheotnaleneun gyejeonggwa jangbireul seoljeonghapnida",
+    "en": "On the first day, we'll set up accounts and equipment"
+  },
+  {
+    "ko": "업무 매뉴얼을 먼저 읽어 주세요",
+    "he": "נא לקרוא קודם את מדריך העבודה",
+    "roman": "eopmu maenyueoleul meonjeo ikeo juseyo",
+    "en": "Please read the work manual first"
+  },
+  {
+    "ko": "이번 주는 교육 일정이 중심입니다",
+    "he": "השבוע יתמקד בעיקר בהדרכה",
+    "roman": "ibeon juneun gyoyuk iljeongi jungsimipnida",
+    "en": "This week will focus mainly on training"
+  },
+  {
+    "ko": "모르는 부분은 담당자에게 바로 물어보세요",
+    "he": "אם משהו לא ברור, שאל מיד את האחראי",
+    "roman": "moreuneun bubuneun damdangjaege baro muleoboseyo",
+    "en": "Ask the person in charge right away if anything is unclear"
+  },
+  {
+    "ko": "팀 소개는 오후에 진행하겠습니다",
+    "he": "נערוך היכרות עם הצוות אחר הצהריים",
+    "roman": "tim sogaeneun ohue jinhaenghagetseupnida",
+    "en": "We'll introduce the team in the afternoon"
+  },
+  {
+    "ko": "실제 업무는 다음 주부터 시작합니다",
+    "he": "העבודה בפועל תתחיל בשבוע הבא",
+    "roman": "silje eopmuneun daeum jubuteo sijakhapnida",
+    "en": "The actual work starts next week"
+  },
+  {
+    "ko": "필수 교육을 모두 이수해야 합니다",
+    "he": "צריך להשלים את כל ההדרכות החובה",
+    "roman": "pilsu gyoyukeul modu isuhaeya hapnida",
+    "en": "All required training must be completed"
+  },
+  {
+    "ko": "첫 달 목표를 함께 정하겠습니다",
+    "he": "נגדיר יחד את היעדים לחודש הראשון",
+    "roman": "cheot dal mokpyoreul hamkke jeonghagetseupnida",
+    "en": "We'll set the first month goals together"
+  },
+  {
+    "ko": "적응 상황을 주기적으로 확인하겠습니다",
+    "he": "נבדוק באופן קבוע את תהליך ההסתגלות",
+    "roman": "jeokeung sanghwangeul jugijeokeuro hwakinhagetseupnida",
+    "en": "We'll regularly check how the adjustment is going"
+  },
+  {
+    "ko": "질문할 수 있는 시간을 따로 마련하겠습니다",
+    "he": "נקצה זמן נפרד לשאלות",
+    "roman": "jilmunhal su itneun siganeul ttaro maryeonhagetseupnida",
+    "en": "We'll set aside dedicated time for questions"
+  },
+  {
+    "ko": "이번 달 성과가 눈에 띄게 좋아졌습니다",
+    "he": "הביצועים השתפרו בצורה ניכרת החודש",
+    "roman": "ibeon dal seonggwaga nune ttuige jotajyeotseupnida",
+    "en": "Performance improved noticeably this month"
+  },
+  {
+    "ko": "좋았던 점부터 말씀드리겠습니다",
+    "he": "אתחיל במה שהיה טוב",
+    "roman": "jotatdeon jeombuteo malsseumdeurigetseupnida",
+    "en": "I'll start with what went well"
+  },
+  {
+    "ko": "이 부분은 조금 더 개선할 수 있습니다",
+    "he": "אפשר לשפר עוד קצת את החלק הזה",
+    "roman": "i bubuneun jogeum deo gaeseonhal su itseupnida",
+    "en": "This area can be improved further"
+  },
+  {
+    "ko": "목표 설정이 조금 더 구체적이면 좋겠습니다",
+    "he": "כדאי שהיעדים יהיו מעט יותר ספציפיים",
+    "roman": "mokpyo seoljeongi jogeum deo guchejeokimyeon jotgetseupnida",
+    "en": "It would be better if the goals were more specific"
+  },
+  {
+    "ko": "피드백을 다음 작업에 반영해 주세요",
+    "he": "נא ליישם את המשוב בעבודה הבאה",
+    "roman": "pideubaekeul daeum jakeope banyeonghae juseyo",
+    "en": "Please apply the feedback to the next task"
+  },
+  {
+    "ko": "업무 처리 속도가 많이 안정되었습니다",
+    "he": "קצב העבודה התייצב מאוד",
+    "roman": "eopmu cheori sokdoga mani anjeongdoeeotseupnida",
+    "en": "The pace of work has become much more consistent"
+  },
+  {
+    "ko": "팀과의 소통도 좋아졌습니다",
+    "he": "גם התקשורת עם הצוות השתפרה",
+    "roman": "timgwaui sotongdo jotajyeotseupnida",
+    "en": "Communication with the team has also improved"
+  },
+  {
+    "ko": "어려운 상황에서도 대응이 좋았습니다",
+    "he": "התמודדת היטב גם במצב קשה",
+    "roman": "eoryeoun sanghwangeseodo daeeungi jotatseupnida",
+    "en": "You handled the difficult situation well"
+  },
+  {
+    "ko": "다음 분기에는 새로운 목표를 잡겠습니다",
+    "he": "נקבע יעד חדש לרבעון הבא",
+    "roman": "daeum bungieneun saeroun mokpyoreul japgetseupnida",
+    "en": "We'll set a new goal for the next quarter"
+  },
+  {
+    "ko": "필요한 지원이 있으면 편하게 말씀해 주세요",
+    "he": "אם נדרשת תמיכה, נא לומר בחופשיות",
+    "roman": "pilyohan jiwoni iteumyeon pyeonhage malsseumhae juseyo",
+    "en": "Please let me know if you need any support"
+  },
+  {
+    "ko": "오늘은 재택근무를 하겠습니다",
+    "he": "היום אעבוד מהבית",
+    "roman": "oneuleun jaetaekgeunmureul hagetseupnida",
+    "en": "I'll work from home today"
+  },
+  {
+    "ko": "오전에는 집중 업무 시간을 확보하겠습니다",
+    "he": "אשמור את הבוקר לעבודה מרוכזת",
+    "roman": "ojeoneneun jipjung eopmu siganeul hwakbohagetseupnida",
+    "en": "I'll reserve the morning for focused work"
+  },
+  {
+    "ko": "메신저는 계속 확인하겠습니다",
+    "he": "אמשיך לבדוק את ההודעות",
+    "roman": "mesinjeoneun gyesok hwakinhagetseupnida",
+    "en": "I'll keep checking messages"
+  },
+  {
+    "ko": "인터넷 연결이 불안정할 수 있습니다",
+    "he": "ייתכן שחיבור האינטרנט יהיה לא יציב",
+    "roman": "inteonet yeongyeoli bulanjeonghal su itseupnida",
+    "en": "The internet connection may be unstable"
+  },
+  {
+    "ko": "카메라는 필요한 경우에만 켜겠습니다",
+    "he": "אדליק מצלמה רק כשצריך",
+    "roman": "kameraneun pilyohan gyeongueman kyeogetseupnida",
+    "en": "I'll turn on the camera only when necessary"
+  },
+  {
+    "ko": "원격으로 접속할 수 있게 설정해 주세요",
+    "he": "נא להגדיר אפשרות גישה מרחוק",
+    "roman": "wongyeokeuro jeopsokhal su itge seoljeonghae juseyo",
+    "en": "Please set up remote access"
+  },
+  {
+    "ko": "파일은 클라우드에 바로 저장해 주세요",
+    "he": "נא לשמור את הקבצים ישירות בענן",
+    "roman": "paileun keulraudeue baro jeojanghae juseyo",
+    "en": "Please save files directly to the cloud"
+  },
+  {
+    "ko": "오늘은 사무실에 출근하지 않습니다",
+    "he": "היום לא אגיע למשרד",
+    "roman": "oneuleun samusile chulgeunhaji anseupnida",
+    "en": "I won't come to the office today"
+  },
+  {
+    "ko": "업무 시간은 평소와 같습니다",
+    "he": "שעות העבודה נשארות כרגיל",
+    "roman": "eopmu siganeun pyeongsowa gatseupnida",
+    "en": "Working hours are the same as usual"
+  },
+  {
+    "ko": "긴급한 일이 있으면 전화 주세요",
+    "he": "אם יש משהו דחוף, נא להתקשר",
+    "roman": "gingeuphan ili iteumyeon jeonhwa juseyo",
+    "en": "Please call if something urgent comes up"
+  },
+  {
+    "ko": "발표는 십 분 안으로 끝내겠습니다",
+    "he": "אסיים את המצגת בתוך עשר דקות",
+    "roman": "balpyoneun sip bun aneuro kkeutnaegetseupnida",
+    "en": "I'll finish the presentation within ten minutes"
+  },
+  {
+    "ko": "첫 슬라이드에서 핵심 메시지를 보여 주세요",
+    "he": "נא להציג את המסר המרכזי בשקופית הראשונה",
+    "roman": "cheot seulraideueseo haeksim mesijireul boyeo juseyo",
+    "en": "Please show the key message on the first slide"
+  },
+  {
+    "ko": "숫자는 그래프로 보여 주는 게 좋겠습니다",
+    "he": "כדאי להציג את המספרים בגרף",
+    "roman": "sutjaneun geuraepeuro boyeo juneun ge jotgetseupnida",
+    "en": "It would be better to show the numbers in a chart"
+  },
+  {
+    "ko": "글자가 너무 많아서 줄여야 합니다",
+    "he": "יש יותר מדי טקסט וצריך לקצר",
+    "roman": "geuljaga neomu manaseo julyeoya hapnida",
+    "en": "There is too much text and it needs to be reduced"
+  },
+  {
+    "ko": "발표 전에 장비를 미리 확인하겠습니다",
+    "he": "אבדוק את הציוד מראש לפני המצגת",
+    "roman": "balpyo jeone jangbireul miri hwakinhagetseupnida",
+    "en": "I'll check the equipment before the presentation"
+  },
+  {
+    "ko": "질문은 마지막에 받겠습니다",
+    "he": "אקבל שאלות בסוף",
+    "roman": "jilmuneun majimake batgetseupnida",
+    "en": "I'll take questions at the end"
+  },
+  {
+    "ko": "이 사례를 넣으면 이해하기 쉬울 것 같습니다",
+    "he": "הדוגמה הזאת תקל על ההבנה",
+    "roman": "i saryereul neoteumyeon ihaehagi swiul geot gatseupnida",
+    "en": "I think this example will make it easier to understand"
+  },
+  {
+    "ko": "결론 슬라이드를 더 간단하게 만들겠습니다",
+    "he": "אפשט את שקופית הסיכום",
+    "roman": "gyeolron seulraideureul deo gandanhage mandeulgetseupnida",
+    "en": "I'll make the conclusion slide simpler"
+  },
+  {
+    "ko": "발표 자료를 참석자에게 미리 보내 주세요",
+    "he": "נא לשלוח את המצגת למשתתפים מראש",
+    "roman": "balpyo jaryoreul chamseokjaege miri bonae juseyo",
+    "en": "Please send the presentation to attendees in advance"
+  },
+  {
+    "ko": "리허설을 한 번 해 보는 게 좋겠습니다",
+    "he": "כדאי לעשות חזרה אחת",
+    "roman": "riheoseoleul han beon hae boneun ge jotgetseupnida",
+    "en": "It would be good to do one rehearsal"
+  },
+  {
+    "ko": "두 가지 선택지를 비교해 보겠습니다",
+    "he": "נשווה בין שתי האפשרויות",
+    "roman": "du gaji seontaekjireul bigyohae bogetseupnida",
+    "en": "Let's compare the two options"
+  },
+  {
+    "ko": "결정 기준을 먼저 정하는 게 좋겠습니다",
+    "he": "כדאי לקבוע קודם את קריטריוני ההחלטה",
+    "roman": "gyeoljeong gijuneul meonjeo jeonghaneun ge jotgetseupnida",
+    "en": "It would be good to set the decision criteria first"
+  },
+  {
+    "ko": "정보가 더 필요해서 오늘 결정하기 어렵습니다",
+    "he": "חסר מידע ולכן קשה להחליט היום",
+    "roman": "jeongboga deo pilyohaeseo oneul gyeoljeonghagi eoryeopseupnida",
+    "en": "We need more information, so it's difficult to decide today"
+  },
+  {
+    "ko": "비용과 효과를 함께 봐야 합니다",
+    "he": "צריך לבחון גם עלות וגם תועלת",
+    "roman": "biyonggwa hyogwareul hamkke bwaya hapnida",
+    "en": "We need to consider both cost and benefit"
+  },
+  {
+    "ko": "장기적인 영향도 고려해야 합니다",
+    "he": "צריך לקחת בחשבון גם את ההשפעה לטווח ארוך",
+    "roman": "janggijeokin yeonghyangdo goryeohaeya hapnida",
+    "en": "We also need to consider the long term impact"
+  },
+  {
+    "ko": "현재로서는 두 번째 안이 더 현실적입니다",
+    "he": "כרגע האפשרות השנייה נראית מציאותית יותר",
+    "roman": "hyeonjaeroseoneun du beonjjae ani deo hyeonsiljeokipnida",
+    "en": "For now, the second option seems more realistic"
+  },
+  {
+    "ko": "의견이 갈리면 추가 데이터를 보겠습니다",
+    "he": "אם הדעות חלוקות, נבדוק נתונים נוספים",
+    "roman": "uigyeoni galrimyeon chuga deiteoreul bogetseupnida",
+    "en": "If opinions are divided, we'll look at additional data"
+  },
+  {
+    "ko": "최종 결정은 책임자가 하겠습니다",
+    "he": "האחראי יקבל את ההחלטה הסופית",
+    "roman": "choejong gyeoljeongeun chaekimjaga hagetseupnida",
+    "en": "The person in charge will make the final decision"
+  },
+  {
+    "ko": "결정 이유를 기록으로 남기겠습니다",
+    "he": "נתעד את הסיבה להחלטה",
+    "roman": "gyeoljeong iyureul girokeuro namgigetseupnida",
+    "en": "We'll document the reason for the decision"
+  },
+  {
+    "ko": "오늘 안에 방향을 확정하는 게 좋겠습니다",
+    "he": "כדאי לקבוע את הכיוון עוד היום",
+    "roman": "oneul ane banghyangeul hwakjeonghaneun ge jotgetseupnida",
+    "en": "It would be good to finalize the direction today"
+  },
+  {
+    "ko": "가장 큰 위험 요소부터 확인하겠습니다",
+    "he": "נבדוק קודם את גורם הסיכון הגדול ביותר",
+    "roman": "gajang keun wiheom yosobuteo hwakinhagetseupnida",
+    "en": "We'll review the biggest risk first"
+  },
+  {
+    "ko": "문제가 생길 경우 대체 계획이 필요합니다",
+    "he": "צריך תוכנית חלופית במקרה של בעיה",
+    "roman": "munjega saenggil gyeongu daeche gyehoeki pilyohapnida",
+    "en": "We need a backup plan in case a problem occurs"
+  },
+  {
+    "ko": "일정 지연이 가장 현실적인 위험입니다",
+    "he": "עיכוב בלוח הזמנים הוא הסיכון הסביר ביותר",
+    "roman": "iljeong jiyeoni gajang hyeonsiljeokin wiheomipnida",
+    "en": "Schedule delay is the most realistic risk"
+  },
+  {
+    "ko": "외부 업체 의존도를 줄여야 합니다",
+    "he": "צריך להפחית תלות בספקים חיצוניים",
+    "roman": "oebu eopche uijondoreul julyeoya hapnida",
+    "en": "We need to reduce dependence on external vendors"
+  },
+  {
+    "ko": "예상하지 못한 비용을 위한 여유가 필요합니다",
+    "he": "צריך להשאיר מרווח לעלויות בלתי צפויות",
+    "roman": "yesanghaji mothan biyongeul wihan yeoyuga pilyohapnida",
+    "en": "We need a buffer for unexpected costs"
+  },
+  {
+    "ko": "위험 수준을 정기적으로 다시 평가하겠습니다",
+    "he": "נעריך מחדש את רמת הסיכון באופן קבוע",
+    "roman": "wiheom sujuneul jeonggijeokeuro dasi pyeonggahagetseupnida",
+    "en": "We'll reassess the risk level regularly"
+  },
+  {
+    "ko": "문제가 커지기 전에 대응해야 합니다",
+    "he": "צריך לפעול לפני שהבעיה גדלה",
+    "roman": "munjega keojigi jeone daeeunghaeya hapnida",
+    "en": "We need to act before the problem grows"
+  },
+  {
+    "ko": "담당자와 비상 연락망을 정리했습니다",
+    "he": "ריכזתי את אנשי הקשר למקרה חירום",
+    "roman": "damdangjawa bisang yeonrakmangeul jeongrihaetseupnida",
+    "en": "I organized the emergency contact list"
+  },
+  {
+    "ko": "이 위험은 현재 허용 가능한 수준입니다",
+    "he": "הסיכון הזה נמצא כרגע ברמה סבירה",
+    "roman": "i wiheomeun hyeonjae heoyong ganeunghan sujunipnida",
+    "en": "This risk is currently at an acceptable level"
+  },
+  {
+    "ko": "변화가 있으면 위험 목록을 업데이트하겠습니다",
+    "he": "נעדכן את רשימת הסיכונים אם יהיה שינוי",
+    "roman": "byeonhwaga iteumyeon wiheom mokrokeul eopdeiteuhagetseupnida",
+    "en": "We'll update the risk list if anything changes"
+  },
+  {
+    "ko": "장기적인 협력 가능성을 논의하고 싶습니다",
+    "he": "אני רוצה לדון באפשרות לשיתוף פעולה ארוך טווח",
+    "roman": "janggijeokin hyeopryeok ganeungseongeul nonuihago sipseupnida",
+    "en": "I'd like to discuss the possibility of long term cooperation"
+  },
+  {
+    "ko": "양사가 서로 보완할 수 있는 부분이 많습니다",
+    "he": "יש תחומים רבים שבהם שתי החברות משלימות זו את זו",
+    "roman": "yangsaga seoro bowanhal su itneun bubuni manseupnida",
+    "en": "There are many areas where our companies can complement each other"
+  },
+  {
+    "ko": "첫 단계는 작은 프로젝트로 시작하면 좋겠습니다",
+    "he": "כדאי להתחיל בפרויקט קטן בשלב הראשון",
+    "roman": "cheot dangyeneun jakeun peurojekteuro sijakhamyeon jotgetseupnida",
+    "en": "It would be good to start with a small project in the first phase"
+  },
+  {
+    "ko": "역할과 책임을 초기에 명확히 하겠습니다",
+    "he": "נבהיר תפקידים ואחריות כבר בהתחלה",
+    "roman": "yeokhalgwa chaekimeul chogie myeonghwakhi hagetseupnida",
+    "en": "We'll clarify roles and responsibilities at the outset"
+  },
+  {
+    "ko": "공동 목표를 먼저 정해 봅시다",
+    "he": "בואו נגדיר קודם יעד משותף",
+    "roman": "gongdong mokpyoreul meonjeo jeonghae bopsida",
+    "en": "Let's define a common goal first"
+  },
+  {
+    "ko": "서로 필요한 자원을 공유할 수 있습니다",
+    "he": "נוכל לשתף את המשאבים שכל צד צריך",
+    "roman": "seoro pilyohan jawoneul gongyuhal su itseupnida",
+    "en": "We can share the resources each side needs"
+  },
+  {
+    "ko": "협력 범위를 단계적으로 확대하겠습니다",
+    "he": "נרחיב את היקף שיתוף הפעולה בהדרגה",
+    "roman": "hyeopryeok beomwireul dangyejeokeuro hwakdaehagetseupnida",
+    "en": "We'll gradually expand the scope of cooperation"
+  },
+  {
+    "ko": "정기적으로 성과를 함께 검토하겠습니다",
+    "he": "נבחן יחד את התוצאות באופן קבוע",
+    "roman": "jeonggijeokeuro seonggwareul hamkke geomtohagetseupnida",
+    "en": "We'll review results together regularly"
+  },
+  {
+    "ko": "파트너십 조건을 문서로 정리하겠습니다",
+    "he": "נתעד את תנאי השותפות במסמך",
+    "roman": "pateuneosip jogeoneul munseoro jeongrihagetseupnida",
+    "en": "We'll document the partnership terms"
+  },
+  {
+    "ko": "좋은 협력 관계를 오래 유지하고 싶습니다",
+    "he": "אנחנו רוצים לשמור על שיתוף פעולה טוב לאורך זמן",
+    "roman": "joteun hyeopryeok gwangyereul orae yujihago sipseupnida",
+    "en": "We want to maintain a strong partnership over the long term"
+  },
+  {
+    "ko": "이번 캠페인의 주요 대상은 신규 고객입니다",
+    "he": "קהל היעד המרכזי של הקמפיין הוא לקוחות חדשים",
+    "roman": "ibeon kaempeinui juyo daesangeun singyu gogaekipnida",
+    "en": "The main target of this campaign is new customers"
+  },
+  {
+    "ko": "광고 문구를 더 짧고 명확하게 바꾸겠습니다",
+    "he": "נקצר ונחדד את נוסח הפרסום",
+    "roman": "gwanggo mungureul deo jjalgo myeonghwakhage bakkugetseupnida",
+    "en": "We'll make the ad copy shorter and clearer"
+  },
+  {
+    "ko": "반응이 좋은 채널에 예산을 더 배정하겠습니다",
+    "he": "נקצה יותר תקציב לערוצים שמציגים ביצועים טובים",
+    "roman": "baneungi joteun chaeneole yesaneul deo baejeonghagetseupnida",
+    "en": "We'll allocate more budget to channels with strong performance"
+  },
+  {
+    "ko": "이번 콘텐츠는 교육적인 방향으로 가겠습니다",
+    "he": "התוכן הזה ילך לכיוון חינוכי",
+    "roman": "ibeon kontencheuneun gyoyukjeokin banghyangeuro gagetseupnida",
+    "en": "We'll take an educational approach with this content"
+  },
+  {
+    "ko": "브랜드 이미지와 맞는지 확인해 주세요",
+    "he": "נא לבדוק שזה מתאים לתדמית המותג",
+    "roman": "beuraendeu imijiwa matneunji hwakinhae juseyo",
+    "en": "Please check whether it matches the brand image"
+  },
+  {
+    "ko": "게시 날짜를 일주일 앞당기겠습니다",
+    "he": "נקדים את מועד הפרסום בשבוע",
+    "roman": "gesi naljjareul iljuil apdanggigetseupnida",
+    "en": "We'll move the publication date one week earlier"
+  },
+  {
+    "ko": "성과는 클릭률과 전환율로 보겠습니다",
+    "he": "נמדוד ביצועים לפי שיעור הקלקה והמרה",
+    "roman": "seonggwaneun keulrikryulgwa jeonhwanyulro bogetseupnida",
+    "en": "We'll measure performance by click through and conversion rates"
+  },
+  {
+    "ko": "고객 반응을 보고 문구를 다시 조정하겠습니다",
+    "he": "נתאים מחדש את הנוסח לפי תגובת הלקוחות",
+    "roman": "gogaek baneungeul bogo mungureul dasi jojeonghagetseupnida",
+    "en": "We'll adjust the copy again based on customer response"
+  },
+  {
+    "ko": "경쟁사와 너무 비슷한 표현은 피하겠습니다",
+    "he": "נימנע מניסוח שדומה מדי למתחרים",
+    "roman": "gyeongjaengsawa neomu biseuthan pyohyeoneun pihagetseupnida",
+    "en": "We'll avoid wording that is too similar to competitors"
+  },
+  {
+    "ko": "캠페인 종료 후 결과를 분석하겠습니다",
+    "he": "ננתח את התוצאות לאחר סיום הקמפיין",
+    "roman": "kaempein jongryo hu gyeolgwareul bunseokhagetseupnida",
+    "en": "We'll analyze the results after the campaign ends"
+  },
+  {
+    "ko": "불편을 드려 죄송합니다",
+    "he": "אנו מתנצלים על אי הנוחות",
+    "roman": "bulpyeoneul deuryeo joesonghapnida",
+    "en": "We apologize for the inconvenience"
+  },
+  {
+    "ko": "문의 내용을 확인하고 있습니다",
+    "he": "אנחנו בודקים את פרטי הפנייה",
+    "roman": "munui naeyongeul hwakinhago itseupnida",
+    "en": "We're reviewing the details of your inquiry"
+  },
+  {
+    "ko": "문제를 해결할 수 있도록 도와드리겠습니다",
+    "he": "נעזור לפתור את הבעיה",
+    "roman": "munjereul haegyeolhal su itdorok dowadeurigetseupnida",
+    "en": "We'll help resolve the issue"
+  },
+  {
+    "ko": "주문 내역을 확인하려면 번호가 필요합니다",
+    "he": "נדרש מספר כדי לבדוק את פרטי ההזמנה",
+    "roman": "jumun naeyeokeul hwakinharyeomyeon beonhoga pilyohapnida",
+    "en": "We need the number to check the order details"
+  },
+  {
+    "ko": "같은 문제가 다시 발생했나요?",
+    "he": "האם אותה בעיה קרתה שוב?",
+    "roman": "gateun munjega dasi balsaenghaetnayo?",
+    "en": "Did the same problem happen again?"
+  },
+  {
+    "ko": "가능한 해결 방법을 두 가지 안내드리겠습니다",
+    "he": "אציע שתי דרכים אפשריות לפתרון",
+    "roman": "ganeunghan haegyeol bangbeopeul du gaji annaedeurigetseupnida",
+    "en": "I'll provide two possible solutions"
+  },
+  {
+    "ko": "처리 결과는 이메일로 보내 드리겠습니다",
+    "he": "נשלח את תוצאת הטיפול במייל",
+    "roman": "cheori gyeolgwaneun imeilro bonae deurigetseupnida",
+    "en": "We'll send the resolution by email"
+  },
+  {
+    "ko": "추가 비용 없이 교환해 드리겠습니다",
+    "he": "נחליף את המוצר ללא עלות נוספת",
+    "roman": "chuga biyong eopi gyohwanhae deurigetseupnida",
+    "en": "We'll replace it at no additional cost"
+  },
+  {
+    "ko": "답변이 늦어진 점 양해 부탁드립니다",
+    "he": "אנו מתנצלים על העיכוב במענה",
+    "roman": "dapbyeoni neuteojin jeom yanghae butakdeuripnida",
+    "en": "We apologize for the delayed response"
+  },
+  {
+    "ko": "이용해 주셔서 감사합니다",
+    "he": "תודה שבחרתם להשתמש בשירות שלנו",
+    "roman": "iyonghae jusyeoseo gamsahapnida",
+    "en": "Thank you for using our service"
+  },
+  {
+    "ko": "오늘 결정된 사항을 정리하겠습니다",
+    "he": "אסכם את מה שהוחלט היום",
+    "roman": "oneul gyeoljeongdoen sahangeul jeongrihagetseupnida",
+    "en": "I'll summarize what was decided today"
+  },
+  {
+    "ko": "각 담당자는 내일까지 진행 상황을 공유해 주세요",
+    "he": "כל אחראי מתבקש לעדכן עד מחר על ההתקדמות",
+    "roman": "gak damdangjaneun naeilkkaji jinhaeng sanghwangeul gongyuhae juseyo",
+    "en": "Each owner should share progress by tomorrow"
+  },
+  {
+    "ko": "다음 회의 전까지 두 가지를 준비해야 합니다",
+    "he": "צריך להכין שני דברים לפני הישיבה הבאה",
+    "roman": "daeum hoeui jeonkkaji du gajireul junbihaeya hapnida",
+    "en": "We need to prepare two things before the next meeting"
+  },
+  {
+    "ko": "미결 사항은 별도 목록으로 관리하겠습니다",
+    "he": "ננהל את הנושאים הפתוחים ברשימה נפרדת",
+    "roman": "migyeol sahangeun byeoldo mokrokeuro gwanrihagetseupnida",
+    "en": "We'll manage open items in a separate list"
+  },
+  {
+    "ko": "오늘 논의한 내용은 모두 기록했습니다",
+    "he": "תיעדתי את כל מה שנדון היום",
+    "roman": "oneul nonuihan naeyongeun modu girokhaetseupnida",
+    "en": "I documented everything discussed today"
+  },
+  {
+    "ko": "우선 오늘 합의한 내용부터 실행하겠습니다",
+    "he": "נתחיל ביישום הדברים שסיכמנו היום",
+    "roman": "useon oneul hapuihan naeyongbuteo silhaenghagetseupnida",
+    "en": "We'll start by implementing what we agreed on today"
+  },
+  {
+    "ko": "추가 질문은 메일로 보내 주세요",
+    "he": "נא לשלוח שאלות נוספות במייל",
+    "roman": "chuga jilmuneun meilro bonae juseyo",
+    "en": "Please send any additional questions by email"
+  },
+  {
+    "ko": "다음 점검은 이 주 뒤에 진행하겠습니다",
+    "he": "הבדיקה הבאה תיערך בעוד שבועיים",
+    "roman": "daeum jeomgeomeun i ju dwie jinhaenghagetseupnida",
+    "en": "The next review will take place in two weeks"
+  },
+  {
+    "ko": "변경 사항이 생기면 바로 공유하겠습니다",
+    "he": "אעדכן מיד אם יהיו שינויים",
+    "roman": "byeongyeong sahangi saenggimyeon baro gongyuhagetseupnida",
+    "en": "I'll share any changes immediately"
+  },
+  {
+    "ko": "오늘 회의는 이것으로 마치겠습니다",
+    "he": "נסיים כאן את הישיבה להיום",
+    "roman": "oneul hoeuineun igeoteuro machigetseupnida",
+    "en": "We'll conclude today's meeting here"
   }
 ]
