@@ -1,8 +1,30 @@
 <!DOCTYPE html>
 <html lang="he" translate="no">
 <head>
-  <!-- Monetag In-Page Push: AIKOREAN_IPP -->
-  <script>(function(s){s.dataset.zone='11514634',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+  <!-- Monetag In-Page Push: AIKOREAN_IPP
+       Load at most once per browser/app session. Closing and reopening the
+       site in a new session allows one new ad load. -->
+  <script>
+  (() => {
+    const sessionKey = 'aik_monetag_ipp_loaded_11514634';
+    let alreadyLoaded = false;
+    try {
+      alreadyLoaded = sessionStorage.getItem(sessionKey) === '1';
+    } catch (_) {}
+
+    if (alreadyLoaded) return;
+
+    try {
+      sessionStorage.setItem(sessionKey, '1');
+    } catch (_) {}
+
+    const adScript = document.createElement('script');
+    adScript.dataset.zone = '11514634';
+    adScript.src = 'https://nap5k.com/tag.min.js';
+    adScript.async = true;
+    (document.head || document.documentElement).appendChild(adScript);
+  })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google" content="notranslate" />
@@ -10,6 +32,7 @@
     <meta name="description" content="AI Korean Master is a Korean reading-first learning project for Hebrew and English speakers. Learn Hangul, daily expressions, real conversation reading, and business Korean." />
   <meta name="theme-color" content="#0f172a" />
   <meta name="application-name" content="AI Korean Master" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="KoreanMaster" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,10 +41,10 @@
   <meta property="og:type" content="website" />
   <meta property="og:image" content="images/bg-korean.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="manifest.json?v=6" />
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="stylesheet" href="css/style.css?v=5" />
+<link rel="stylesheet" href="css/style.css?v=6" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TNJDSEN912"></script>
 <script>
@@ -63,7 +86,8 @@ gtag('config', 'G-TNJDSEN912');
   </main>
 
   <script src="js/config.js"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/app.js?v=6"></script>
+  <script src="js/install.js?v=1"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {

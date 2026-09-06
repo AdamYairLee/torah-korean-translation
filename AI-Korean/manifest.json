@@ -1,7 +1,7 @@
 {
-  "name": "AI Korean Master v1.5",
+  "name": "AI Korean Master",
   "short_name": "KoreanMaster",
-  "description": "Korean reading-first learning app for Hebrew and English speakers.",
+  "description": "Korean reading-first learning app for Hebrew and English speakers, with Hangul, daily expressions, real conversation, business Korean, and pronunciation practice.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -23,5 +23,11 @@
     }
   ],
   "lang": "he",
-  "version": "1.4"
+  "version": "1.6",
+  "id": "./",
+  "categories": [
+    "education",
+    "language"
+  ],
+  "prefer_related_applications": false
 }

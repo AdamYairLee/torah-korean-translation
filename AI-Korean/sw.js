@@ -1,15 +1,19 @@
-const CACHE_NAME = 'ai-korean-master-v1-5-game-fix';
+const CACHE_NAME = 'ai-korean-master-v1-6-pwa-install-ad-once';
 const CORE_ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/config.js',
   './js/app.js',
+  './js/install.js',
   './manifest.json',
   './images/bg-korean.jpg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './data/curriculum.json',
   './data/daily.json',
   './data/business.json',
+  './data/kdrama.json',
   './data/pronunciation.json',
   './data/words.json'
 ];

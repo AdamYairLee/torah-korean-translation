@@ -1,0 +1,29 @@
+AI Korean Master - 광고 / PWA 설치 업데이트
+
+1) Monetag 광고
+- 현재 index.html에는 Monetag In-Page Push zone 11514634 태그가 정확히 1개만 있습니다.
+- X로 닫은 뒤 같은 방문 중 광고가 다시 뜨는 것은 앱 코드의 중복 호출이 아니라 Monetag 광고 네트워크의 노출 빈도 설정 때문입니다.
+- 앱 코드를 억지로 조작해 광고 iframe을 제거하지 않았습니다. Monetag 대시보드/지원팀에서 해당 zone의 frequency cap을 1회/세션으로 설정하는 것이 안전합니다. 해당 옵션이 없으면 1회/24시간을 요청하세요.
+
+Monetag 지원 요청 문구:
+Please set the frequency cap for my In-Page Push zone 11514634 to 1 impression per unique user per session. After the visitor closes the ad, it should not reappear during the same session. If per-session capping is not available, please set it to 1 impression per unique user per 24 hours.
+
+2) 앱 설치(PWA)
+- 기존 파일에는 manifest와 service worker는 있었지만, 사용자가 볼 수 있는 설치 안내/버튼이 없었습니다.
+- 이번 버전에는 모바일 설치 안내를 추가했습니다.
+- Android/Chromium: beforeinstallprompt가 지원되면 'Install' 버튼이 브라우저 설치 창을 호출합니다.
+- iPhone/iPad: 브라우저가 직접 설치창을 호출할 수 없으므로 Safari의 공유 > 홈 화면에 추가 안내가 표시됩니다.
+- 인앱 브라우저처럼 설치 이벤트가 제공되지 않는 경우에도 Chrome/Safari에서 설치하는 방법을 안내합니다.
+- 설치된 상태(standalone)에서는 안내가 뜨지 않습니다.
+- 사용자가 X를 누르면 현재 브라우저 세션 동안만 숨기고, 다음 방문에는 다시 안내할 수 있습니다.
+
+3) 변경 파일
+- index.html
+- css/style.css
+- js/app.js (언어 변경 시 설치 안내 동기화 1줄)
+- js/install.js (신규)
+- manifest.json
+- sw.js
+
+4) 콘텐츠
+- 기존 400개씩 확장된 daily/business/kdrama/pronunciation 데이터는 그대로 보존했습니다.

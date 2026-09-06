@@ -176,7 +176,7 @@ function dirAttr() { return isHebrewMode() ? 'dir="rtl" class="hebrew"' : 'dir="
 function textByLang(obj) { if (!obj) return ''; return typeof obj === 'string' ? obj : (obj[UI_LANG] || (UI_LANG === 'he' ? obj.he : obj.en) || ''); }
 function itemTranslation(item) { return item[UI_LANG] || (UI_LANG === 'he' ? (item.he || item.he_sound || '') : (item.en || item.en_sound || '')); }
 function itemSoundHint(item) { return UI_LANG === 'he' ? (item.he_sound || item.he || '') : (item.en_sound || item.en || ''); }
-function setLang(lang) { UI_LANG = lang; localStorage.setItem('ui_lang', lang); renderMain(); }
+function setLang(lang) { UI_LANG = lang; localStorage.setItem('ui_lang', lang); renderMain(); if (typeof window.refreshInstallPromo === 'function') window.refreshInstallPromo(); }
 function renderLangSwitch() {
   return `<div class="lang-switch" aria-label="Language selector">
     <span>${t('chooseLanguage')}</span>
