@@ -54,21 +54,7 @@ async function kofiWebhook(req:Request):Promise<Response>{
   }
   // The Ko-fi API emits only payment notifications; cancellation must not remove already earned reading rights.
   const type=String(payload.type||"");
-  if(type==="Shop Order"){
-    const codes=[...new Set((Array.isArray(payload.shop_items)?payload.shop_items:[])
-      .filter((item:any)=>Number(item.quantity||1)>0).map((item:any)=>String(item.direct_link_code||"")).filter(Boolean))];
-    if(codes.length){
-      const {data:products,error}=await db.from("torah_5787_shop_products").select("direct_link_code,article_id").in("direct_link_code",codes);
-      if(error)return json(req,{error:"Database error"},500);
-      // Unknown products are not granted access. The mapping is created by the site owner.
-      for(const product of products||[]){
-        const {error:grantError}=await db.from("torah_5787_purchases").upsert({
-          transaction_id:transactionId,article_id:product.article_id,buyer_email:email,paid_at:timestamp.toISOString()
-        },{onConflict:"transaction_id,article_id"});
-        if(grantError)return json(req,{error:"Failed to save paid right"},500);
-      }
-    }
-  }else if(type==="Subscription" || payload.is_subscription_payment===true){
+  if(type==="Subscription" && payload.is_subscription_payment===true){
     // A normal Ko-fi donation must never be mistaken for membership.
     if(kofiTier && monthlyMinimum>0 && String(payload.tier_name||"").trim().toLowerCase()===kofiTier && amount>=monthlyMinimum){
       const {error}=await db.from("torah_5787_membership_periods").upsert({
@@ -83,8 +69,8 @@ async function kofiWebhook(req:Request):Promise<Response>{
   return json(req,{received:true});
 }
 type Article={id:string;title:string;published_at:string|null};
-function canRead(article:Article,owned:Set<string>,periods:any[],admin:boolean):boolean{
-  if(admin || owned.has(article.id))return true;
+function canRead(article:Article,periods:any[],admin:boolean):boolean{
+  if(admin)return true;
   if(!article.published_at)return false;
   const posted=new Date(article.published_at).getTime();
   return periods.some(p=>posted>=new Date(p.starts_at).getTime() && posted<new Date(p.ends_at).getTime());
@@ -99,23 +85,21 @@ async function memberRequest(req:Request):Promise<Response>{
   let body:any;
   try{body=await req.json();}catch{return json(req,{error:"Invalid request"},400);}
   if(body?.action!=="library" && body?.action!=="read")return json(req,{error:"Unknown action"},400);
-  const [adminRes,artRes,purchRes,periodRes]=await Promise.all([
+  const [adminRes,artRes,periodRes]=await Promise.all([
     db.from("torah_5787_admins").select("user_id").eq("user_id",user.id).maybeSingle(),
     db.from("torah_5787_articles").select("id,title,published_at").not("published_at","is",null),
-    db.from("torah_5787_purchases").select("article_id").eq("buyer_email",email),
     db.from("torah_5787_membership_periods").select("starts_at,ends_at").eq("buyer_email",email)
   ]);
-  if(adminRes.error || artRes.error || purchRes.error || periodRes.error)return json(req,{error:"Database lookup failed"},500);
+  if(adminRes.error || artRes.error || periodRes.error)return json(req,{error:"Database lookup failed"},500);
   const admin=!!adminRes.data;
-  const bought=new Set((purchRes.data||[]).map((p:any)=>p.article_id));
   const periods=periodRes.data||[],articles=(artRes.data||[]) as Article[];
   if(body.action==="library"){
-    return json(req,{admin,accessibleIds:articles.filter(a=>canRead(a,bought,periods,admin)).map(a=>a.id)});
+    return json(req,{admin,accessibleIds:articles.filter(a=>canRead(a,periods,admin)).map(a=>a.id)});
   }
   const id=String(body.articleId||"");
   if(!/^[0-9a-z-]{3,80}$/i.test(id))return json(req,{error:"Invalid article"},400);
   const article=articles.find(a=>a.id===id);
-  if(!article || !canRead(article,bought,periods,admin))return json(req,{error:"This lesson has not been purchased"},403);
+  if(!article || !canRead(article,periods,admin))return json(req,{error:"This lesson is not included in a paid membership period"},403);
   const {data:full,error}=await db.from("torah_5787_articles").select("title,blocks").eq("id",id).single();
   if(error || !full)return json(req,{error:"Lesson not found"},404);
   // Do not cache personalized paid content.
