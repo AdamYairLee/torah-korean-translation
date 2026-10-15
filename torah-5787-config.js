@@ -7,8 +7,8 @@
  */
 window.TORAH_5787_CONFIG = Object.freeze({
   kofiHome: "https://ko-fi.com/adamlee1986",
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://rdvxkzohxxgyufizxxrk.supabase.co",
+  supabaseAnonKey: "sb_publishable_4EmaXysGyWLhtEnjSC8EzQ_yiM8fjOE",
   edgeFunctionName: "torah-access",
   paymentReady: false,
   membershipUrl: "",
