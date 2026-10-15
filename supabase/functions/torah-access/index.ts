@@ -85,13 +85,17 @@ async function memberRequest(req:Request):Promise<Response>{
   let body:any;
   try{body=await req.json();}catch{return json(req,{error:"Invalid request"},400);}
   if(body?.action!=="library" && body?.action!=="read")return json(req,{error:"Unknown action"},400);
-  const [adminRes,artRes,periodRes]=await Promise.all([
+  const [adminRes,periodRes]=await Promise.all([
     db.from("torah_5787_admins").select("user_id").eq("user_id",user.id).maybeSingle(),
-    db.from("torah_5787_articles").select("id,title,published_at").not("published_at","is",null),
     db.from("torah_5787_membership_periods").select("starts_at,ends_at").eq("buyer_email",email)
   ]);
-  if(adminRes.error || artRes.error || periodRes.error)return json(req,{error:"Database lookup failed"},500);
+  if(adminRes.error || periodRes.error)return json(req,{error:"Database lookup failed"},500);
   const admin=!!adminRes.data;
+  // Administrators may review private drafts; paying readers only see published lessons.
+  let articleQuery=db.from("torah_5787_articles").select("id,title,published_at");
+  if(!admin)articleQuery=articleQuery.not("published_at","is",null);
+  const artRes=await articleQuery;
+  if(artRes.error)return json(req,{error:"Article lookup failed"},500);
   const periods=periodRes.data||[],articles=(artRes.data||[]) as Article[];
   if(body.action==="library"){
     return json(req,{admin,accessibleIds:articles.filter(a=>canRead(a,periods,admin)).map(a=>a.id)});
