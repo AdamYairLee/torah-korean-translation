@@ -17,11 +17,32 @@ button,input{font:inherit}button,a{touch-action:manipulation}button{cursor:point
 #logout,.reader-top button{background:#f1f4ef;border:1px solid var(--edge);border-radius:8px;padding:6px 12px}.feedback{min-height:1em}
 .lessons .intro{color:var(--muted);font-size:.9rem;margin:3px 0 18px}.lesson-list{display:grid;gap:16px}
 .lesson-card{padding:24px 26px}.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.card-top h3{margin:0;font-size:1.19rem}.lesson-status{font-size:.79rem;color:var(--accent);white-space:nowrap}
-.preview{margin-top:16px;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:1rem;line-height:1.95;letter-spacing:-.013em;word-break:keep-all;overflow-wrap:anywhere}
-.preview p{margin:0}.preview-title{font-family:"Gowun Dodum",sans-serif;font-weight:700;font-size:1.04rem;margin-bottom:7px}
+.preview{margin-top:18px;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:clamp(1.095rem,1.055rem + .24vw,1.165rem);line-height:1.98;letter-spacing:-.008em;word-break:keep-all;overflow-wrap:anywhere;max-width:74ch;margin-inline:auto}
+.preview p{margin:0}.preview-title{font-family:"Gowun Dodum",sans-serif;font-weight:700;font-size:1.075em;line-height:1.65;margin-bottom:12px}
 .card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:20px}.card-actions .read-btn{background:var(--accent)}.subtext{font-size:.83rem;color:var(--muted)}
-.reader{margin:28px 0}.reader-top{display:flex;justify-content:space-between;gap:10px}.reader-content{margin-top:20px;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:1.02rem;line-height:1.99;letter-spacing:-.012em;word-break:keep-all;overflow-wrap:anywhere}
-.reader-content p{margin:0 0 1.15em}.reader-content h3{font-family:"Gowun Dodum",sans-serif;font-size:1.09rem;line-height:1.65;margin:1.8em 0 .8em;font-weight:700;border-left:3px solid var(--accent);padding-left:11px}.paren{color:#798079;font-size:.88em}.hebrew{font-family:"Noto Serif Hebrew",serif;unicode-bidi:isolate}
+.reader{margin:28px 0}.reader-top{display:flex;justify-content:space-between;gap:10px}.reader-content{margin:24px auto 0;max-width:74ch;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:clamp(1.13rem,1.075rem + .28vw,1.24rem);line-height:2.02;letter-spacing:-.008em;word-break:keep-all;overflow-wrap:anywhere}
+.reader-content p{margin:0 0 1.35em}.reader-content h3{font-family:"Gowun Dodum",sans-serif;font-size:1.12em;line-height:1.58;margin:2em 0 .85em;font-weight:700;border-left:3px solid var(--accent);padding-left:12px}.paren{color:#798079;font-size:.91em}.hebrew{font-family:"Noto Serif Hebrew",serif;unicode-bidi:isolate}
 .no-copy,.no-copy *{-webkit-user-select:none;user-select:none}.lesson-footer{text-align:center;margin-top:45px;color:var(--muted);font-size:.82rem}.lesson-footer a{margin:0 6px}
-@media(max-width:680px){.lesson-shell{padding:0 14px 32px}.plan p{min-height:0}.lesson-card,.account,.plan,.reader{padding:18px}.card-top{flex-direction:column;gap:3px}.preview,.reader-content{font-size:1rem;line-height:1.9}.email-fields{flex-direction:column}.lesson-hero{padding-top:14px}}
+@media(max-width:680px){
+  .lesson-top{padding:14px 16px}
+  .lesson-shell{padding:0 12px 32px}
+  .lesson-hero{padding:16px 8px 20px}
+  .lesson-hero p:last-child{font-size:1rem;line-height:1.75}
+  .lesson-card,.account,.plan,.reader{padding:19px 17px}
+  .card-top{flex-direction:column;gap:5px}
+  .preview{font-size:1.125rem;line-height:1.95;max-width:none}
+  .reader-content{font-size:1.16rem;line-height:1.99;max-width:none}
+  .reader-content h3{font-size:1.09em;line-height:1.6}
+  .email-fields{flex-direction:column}
+  .email-fields input{font-size:16px;min-height:46px}
+  .email-fields button,.pay-link,.action{min-height:46px}
+  .pay-link{width:100%}
+  .price{font-size:1.9rem}
+}
+@media(max-width:380px){
+  .lesson-shell{padding-inline:10px}
+  .lesson-card,.account,.plan,.reader{padding:17px 14px}
+  .preview{font-size:1.09rem}
+  .reader-content{font-size:1.125rem}
+}
 @media(prefers-color-scheme:dark){:root{color-scheme:dark;--ink:#e1e8df;--muted:#b9c5ba;--edge:#435349;--paper:#1c2920;--accent:#a3c9aa;--pale:#273c30}body{background:#142017}.plan button,.pay-link,.action,.email-fields button{background:#446c55;color:#fff}#logout,.reader-top button{background:#293b2f;color:#dcebdc}.paren{color:#a3b1a4}}
