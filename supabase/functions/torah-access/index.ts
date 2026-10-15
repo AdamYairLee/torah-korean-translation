@@ -73,7 +73,16 @@ function canRead(article:Article,periods:any[],admin:boolean):boolean{
   if(admin)return true;
   if(!article.published_at)return false;
   const posted=new Date(article.published_at).getTime();
-  return periods.some(p=>posted>=new Date(p.starts_at).getTime() && posted<new Date(p.ends_at).getTime());
+  const now=Date.now();
+  return periods.some(p=>{
+    const start=new Date(p.starts_at).getTime();
+    const end=new Date(p.ends_at).getTime();
+    if(!Number.isFinite(start) || !Number.isFinite(end) || end<=start)return false;
+    // During a paid period, a member can read the already-published back catalogue.
+    if(start<=now && now<end && posted<=now)return true;
+    // After cancellation, retain permanent access to lessons published in a paid period.
+    return start<=posted && posted<end;
+  });
 }
 async function memberRequest(req:Request):Promise<Response>{
   if(!url || !serviceKey)return json(req,{error:"Member service not configured"},503);
