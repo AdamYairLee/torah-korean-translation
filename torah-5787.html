@@ -6,10 +6,10 @@
 <title>5787년 토라 강의 | Jewish Korean</title>
 <meta name="description" content="5787년 파라샤별 토라 강의. 첫 문단 무료 미리보기와 월간 구독 전용 열람.">
 <link rel="canonical" href="https://jewishkorean.com/torah-5787.html">
-<link rel="stylesheet" href="torah-5787.css?v=20261016-2">
+<link rel="stylesheet" href="torah-5787.css?v=20261016-3">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <script src="torah-5787-config.js" defer></script>
-<script src="torah-5787.js?v=20261015-1" defer></script>
+<script src="torah-5787.js?v=20261016-3" defer></script>
 </head>
 <body>
 <header class="lesson-top">
@@ -26,21 +26,22 @@
     <div class="plan featured">
       <div class="plan-type">5787년 토라 강의 · 월간 자동 구독</div>
       <div class="price">$6.50 <span>/ 월 · 약 20₪</span></div>
-      <p>매주 새로운 파라샤 강의를 읽으세요. 구독 결제 기간에 발행된 강의는 구독을 취소해도 언제든 다시 읽을 수 있습니다.</p>
+      <p>월간 구독 중에는 지금까지 발행된 강의를 모두 읽을 수 있습니다. 구독 결제 기간에 새로 발행된 강의는 해지 후에도 계속 읽을 수 있습니다.</p>
       <a id="membership-buy" class="pay-link disabled" aria-disabled="true" tabindex="-1">월간 구독 준비 중</a>
     </div>
   </section>
-  <p class="price-note">Ko-fi에서 매월 USD $6.50가 자동 결제됩니다. 세켈 환산 금액은 환율 및 결제 수수료에 따라 달라질 수 있습니다.</p>
+  <p class="price-note">Ko-fi에서 월 USD $6.50부터 자동 결제됩니다. 세켈 환산 금액은 환율 및 결제 수수료에 따라 달라질 수 있습니다. Ko-fi에서 「5787년 토라 강의」 멤버십 등급을 선택하세요.</p>
   <section class="account" aria-labelledby="account-title">
     <div class="account-head">
       <h2 id="account-title">내 강의 서재</h2>
       <span id="member-status" class="member-status" aria-live="polite">결제 시스템 준비 중</span>
     </div>
-    <p>구독 기간에 열람 권한을 얻은 강의는 이곳에서 계속 읽을 수 있습니다. Ko-fi 결제 이메일로 로그인하세요. 관리자는 등록된 관리자 이메일로 로그인하면 비공개 초안도 열람할 수 있습니다.</p>
+    <p>구독 기간에 열람 권한을 얻은 강의는 이곳에서 계속 읽을 수 있습니다. Ko-fi 결제에 사용한 이메일로 로그인하세요. 구독 결제를 마쳤다면 이 페이지로 돌아와 열람 권한을 새로고침하세요. 관리자는 등록된 관리자 이메일로 로그인하면 모든 강의를 볼 수 있습니다.</p>
     <form id="email-form" class="email-form" hidden>
       <label for="login-email">이메일 로그인</label>
       <div class="email-fields"><input id="login-email" type="email" autocomplete="email" required placeholder="이메일 주소"><button type="submit">로그인 링크 받기</button></div>
     </form>
+    <button id="refresh-access" class="action refresh-access" type="button" hidden>내 강의 열람 권한 새로고침</button>
     <button id="logout" type="button" hidden>로그아웃</button>
     <p id="account-feedback" class="feedback" role="status" aria-live="polite"></p>
   </section>

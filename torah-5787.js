@@ -9,7 +9,7 @@ const $=id=>document.getElementById(id);
 const paymentEnabled=!!(cfg.paymentReady && cfg.supabaseUrl && cfg.supabaseAnonKey);
 const supa=cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase
   ? window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey):null;
-let user=null, accessible=new Set(), isAdmin=false;
+let user=null, accessible=new Set(), permanent=new Set(), isAdmin=false;
 function message(s){$("account-feedback").textContent=s;}
 function make(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function decorateText(parent,text){
@@ -49,14 +49,14 @@ async function invoke(body){
   return data;
 }
 async function refreshLibrary(){
-  accessible.clear();isAdmin=false;
+  accessible.clear();permanent.clear();isAdmin=false;
   if(user){
-    try{const data=await invoke({action:"library"});accessible=new Set(data.accessibleIds||[]);isAdmin=!!data.admin;$("member-status").textContent=isAdmin?"관리자 · 전체 열람":user.email;}
+    try{const data=await invoke({action:"library"});accessible=new Set(data.accessibleIds||[]);permanent=new Set(data.permanentIds||[]);isAdmin=!!data.admin;$("member-status").textContent=isAdmin?"관리자 · 전체 열람":user.email;message("");}
     catch(e){$("member-status").textContent="로그인은 되었지만 서버 연결이 필요합니다.";message(e.message);}
   } else {
     $("member-status").textContent=supa?"로그인 전":"로그인·결제 연결 준비 중";
   }
-  $("email-form").hidden=!supa || !!user;$("logout").hidden=!user;
+  $("email-form").hidden=!supa || !!user;$("logout").hidden=!user;$("refresh-access").hidden=!user;
   render();
 }
 function render(){
@@ -66,7 +66,8 @@ function render(){
     const top=make("div","card-top");
     const heading=make("h3","",entry.title);top.appendChild(heading);
     const hasAccess=isAdmin||accessible.has(entry.id);
-    const status=make("span","lesson-status",hasAccess?"✓ 계속 읽을 수 있는 강의":"첫 문단 무료 공개");top.appendChild(status);card.appendChild(top);
+    const caption=isAdmin?"✓ 관리자 열람":permanent.has(entry.id)?"✓ 영구 열람":hasAccess?"✓ 구독 중 열람 가능":"첫 문단 무료 공개";
+    const status=make("span","lesson-status",caption);top.appendChild(status);card.appendChild(top);
     const preview=make("div","preview no-copy");
     const sub=make("div","preview-title");decorateText(sub,entry.subtitle);preview.appendChild(sub);
     preview.appendChild(formatParagraph(entry.preview));
@@ -75,7 +76,7 @@ function render(){
     if(hasAccess){
       const read=make("button","action read-btn","전문 읽기");read.type="button";read.addEventListener("click",()=>openReader(entry));actions.appendChild(read);
     } else {
-      const note=make("span","subtext",user?"해당 강의는 구독 결제 기간 밖에 발행되어 열람 권한이 없습니다.":"월간 구독 후 같은 이메일로 로그인하면 구독 기간에 발행된 강의를 열람할 수 있습니다.");
+      const note=make("span","subtext",user?"구독 결제 후 열람 권한을 새로고침하세요. 구독 중에는 발행된 모든 강의를 읽을 수 있습니다.":"월간 구독 후 Ko-fi 결제 이메일로 로그인하면 강의 전문을 읽을 수 있습니다.");
       actions.appendChild(note);
     }
     card.appendChild(actions);list.appendChild(card);
@@ -110,6 +111,14 @@ $("email-form").addEventListener("submit",async ev=>{
   if(!email || !supa)return;
   const {error}=await supa.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname}});
   message(error?error.message:"로그인 링크를 이메일로 보냈습니다. 받은편지함을 확인해 주세요.");
+});
+$("refresh-access").addEventListener("click",async()=>{
+  if(!user)return;
+  $("refresh-access").disabled=true;
+  try{
+    await refreshLibrary();
+    message(isAdmin?"관리자 전체 열람 권한을 확인했습니다.":accessible.size?("열람 가능한 강의 "+accessible.size+"편을 확인했습니다."):"아직 확인된 구독 결제 기록이 없습니다. Ko-fi에서 사용한 이메일이 같은지 확인하고 잠시 후 다시 시도해 주세요.");
+  }finally{$("refresh-access").disabled=false;}
 });
 $("logout").addEventListener("click",async()=>{if(supa)await supa.auth.signOut();});
 $("close-reader").addEventListener("click",()=>{$("reader").hidden=true;$("reader-content").replaceChildren();});
