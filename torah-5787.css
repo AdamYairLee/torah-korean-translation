@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Nanum+Myeongjo:wght@400;700&family=Noto+Serif+Hebrew:wght@400;600&display=swap');
+:root{color-scheme:light;--ink:#26342c;--muted:#66746b;--edge:#d7ded7;--paper:#fcfdf9;--accent:#446c55;--pale:#ecf4ec}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:#f3f5f1;font-family:"Gowun Dodum","Noto Sans KR",sans-serif;font-size:16px;line-height:1.7}
+button,input{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}a{color:var(--accent)}
+.lesson-top{max-width:1040px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between}.back-link{text-decoration:none;font-weight:700}.bsad{font-family:"Noto Serif Hebrew",serif}
+.lesson-shell{max-width:1040px;margin:0 auto;padding:0 24px 48px}
+.lesson-hero{text-align:center;padding:36px 10px 24px}.eyebrow{letter-spacing:.13em;color:var(--accent);margin:0}.lesson-hero h1{font-size:clamp(1.65rem,3vw,2.15rem);margin:.25em 0}.lesson-hero p:last-child{color:var(--muted);margin:0}
+.plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.plan,.account,.lesson-card,.reader{background:var(--paper);border:1px solid var(--edge);border-radius:14px;padding:24px}
+.plan.featured{border:2px solid #7b9c7c}.plan-type{font-weight:700}.saving{font-size:.78rem;font-weight:700;border-radius:10px;padding:4px 8px;background:#ecf5ea;color:#30663d;margin-left:6px;white-space:nowrap}
+.price{font-size:2rem;font-weight:700;line-height:1.5;margin:8px 0}.price span{font-size:.95rem;color:var(--muted);font-weight:400}.plan p{min-height:52px;font-size:.91rem;color:var(--muted);margin:0 0 15px}
+.plan button,.pay-link,.action,.email-fields button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;background:var(--accent);border:none;border-radius:8px;padding:9px 16px;color:#fff;text-decoration:none;font-size:.9rem;font-weight:700}
+.pay-link.disabled{background:#a7b3aa;pointer-events:none}.price-note{font-size:.83rem;color:var(--muted);margin:10px 3px 30px}
+.account{margin:22px 0 36px}.account-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.account h2,.lessons h2,.reader h2{font-size:1.2rem;margin:0}.account p{font-size:.88rem;color:var(--muted)}.member-status{background:var(--pale);padding:4px 10px;border-radius:12px;color:var(--accent);font-size:.85rem}
+.email-form label{display:block;font-weight:700;font-size:.9rem;margin-bottom:5px}.email-fields{display:flex;gap:8px}.email-fields input{flex:1;min-width:0;padding:9px;border:1px solid var(--edge);border-radius:7px;font-size:.95rem}
+#logout,.reader-top button{background:#f1f4ef;border:1px solid var(--edge);border-radius:8px;padding:6px 12px}.feedback{min-height:1em}
+.lessons .intro{color:var(--muted);font-size:.9rem;margin:3px 0 18px}.lesson-list{display:grid;gap:16px}
+.lesson-card{padding:24px 26px}.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.card-top h3{margin:0;font-size:1.19rem}.lesson-status{font-size:.79rem;color:var(--accent);white-space:nowrap}
+.preview{margin-top:16px;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:1rem;line-height:1.95;letter-spacing:-.013em;word-break:keep-all;overflow-wrap:anywhere}
+.preview p{margin:0}.preview-title{font-family:"Gowun Dodum",sans-serif;font-weight:700;font-size:1.04rem;margin-bottom:7px}
+.card-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:20px}.card-actions .read-btn{background:var(--accent)}.card-actions .buy-btn{background:#f0f5ef;color:var(--accent);border:1px solid #8ba88b}.card-actions .buy-btn[aria-disabled="true"]{opacity:.55;pointer-events:none}.subtext{font-size:.83rem;color:var(--muted)}
+.reader{margin:28px 0}.reader-top{display:flex;justify-content:space-between;gap:10px}.reader-content{margin-top:20px;font-family:"Nanum Myeongjo","Noto Serif Hebrew",serif;font-size:1.02rem;line-height:1.99;letter-spacing:-.012em;word-break:keep-all;overflow-wrap:anywhere}
+.reader-content p{margin:0 0 1.15em}.reader-content h3{font-family:"Gowun Dodum",sans-serif;font-size:1.09rem;line-height:1.65;margin:1.8em 0 .8em;font-weight:700;border-left:3px solid var(--accent);padding-left:11px}.paren{color:#798079;font-size:.88em}.hebrew{font-family:"Noto Serif Hebrew",serif;unicode-bidi:isolate}
+.no-copy,.no-copy *{-webkit-user-select:none;user-select:none}.lesson-footer{text-align:center;margin-top:45px;color:var(--muted);font-size:.82rem}.lesson-footer a{margin:0 6px}
+@media(max-width:680px){.lesson-shell{padding:0 14px 32px}.plans{grid-template-columns:1fr}.plan p{min-height:0}.lesson-card,.account,.plan,.reader{padding:18px}.card-top{flex-direction:column;gap:3px}.preview,.reader-content{font-size:1rem;line-height:1.9}.email-fields{flex-direction:column}.lesson-hero{padding-top:14px}}
+@media(prefers-color-scheme:dark){:root{color-scheme:dark;--ink:#e1e8df;--muted:#b9c5ba;--edge:#435349;--paper:#1c2920;--accent:#a3c9aa;--pale:#273c30}body{background:#142017}.saving{background:#304836;color:#cde7cd}.plan button,.pay-link,.action,.email-fields button{background:#446c55;color:#fff}.plan button:disabled{background:#5c6d60}.card-actions .buy-btn,#logout,.reader-top button{background:#293b2f;color:#dcebdc}.paren{color:#a3b1a4}}
