@@ -7,18 +7,6 @@ create table if not exists public.torah_5787_articles (
   published_at timestamptz,
   created_at timestamptz not null default now()
 );
-create table if not exists public.torah_5787_shop_products (
-  direct_link_code text primary key,
-  article_id text not null references public.torah_5787_articles(id)
-);
-create table if not exists public.torah_5787_purchases (
-  transaction_id text not null,
-  article_id text not null references public.torah_5787_articles(id),
-  buyer_email text not null,
-  paid_at timestamptz not null,
-  primary key (transaction_id, article_id)
-);
-create index if not exists torah_5787_purchase_email on public.torah_5787_purchases (lower(buyer_email));
 create table if not exists public.torah_5787_membership_periods (
   transaction_id text primary key,
   buyer_email text not null,
@@ -39,13 +27,10 @@ create table if not exists public.torah_5787_admins (
 
 -- Neither visitors nor authenticated clients may query paid content or rights directly.
 alter table public.torah_5787_articles enable row level security;
-alter table public.torah_5787_shop_products enable row level security;
-alter table public.torah_5787_purchases enable row level security;
 alter table public.torah_5787_membership_periods enable row level security;
 alter table public.torah_5787_webhook_events enable row level security;
 alter table public.torah_5787_admins enable row level security;
-revoke all on public.torah_5787_articles, public.torah_5787_shop_products,
-  public.torah_5787_purchases, public.torah_5787_membership_periods,
+revoke all on public.torah_5787_articles, public.torah_5787_membership_periods,
   public.torah_5787_webhook_events, public.torah_5787_admins from anon, authenticated;
 
 -- Administrator access is assigned by an operator in the SQL Editor, never by browser input.
