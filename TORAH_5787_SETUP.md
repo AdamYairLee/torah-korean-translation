@@ -2,6 +2,16 @@
 
 이 작업은 기존 Jewish Korean 사이트에 새 강의 페이지를 추가합니다. 기존 토라 번역·게임·한글 앱 코드는 유지합니다.
 
+## 실제 Supabase 프로젝트 연결 상태 (2026-10-15)
+- 프로젝트 이름: Jewish Korean Torah
+- Project ref: `rdvxkzohxxgyufizxxrk`
+- 대시보드: https://supabase.com/dashboard/project/rdvxkzohxxgyufizxxrk
+- 데이터베이스 테이블 6개 생성 완료 (유료 본문, 매핑, 개별 구매, 멤버십 결제 기간, 이벤트, 관리자)
+- Edge Function `torah-access` 배포 완료 (verify_jwt=false이지만 함수 내부에서 Ko-fi 토큰과 로그인 JWT를 각각 확인)
+- 사이트의 공개 Supabase URL / publishable key 연결 완료
+- **아직 미완료:** Ko-fi 실제 상품 URL, 웹훅 검증 토큰 및 회원 등급, 실제 상품 통화·가격, 로그인 이메일 리다이렉트 승인, 관리자 Supabase 사용자 지정, 유료 원고 비공개 업로드 및 결제 테스트
+- **결제 버튼은 아직 비활성화되어 있습니다. 로그인 이메일 전송은 프로젝트 Auth URL 설정에 따라 추가 구성이 필요할 수 있습니다.**
+
 ## 현재 배포 상태
 - `torah-5787.html` — 베레쉬트와 노악흐 첫 문단 공개 미리보기, 7₪/20₪ 가격 표기.
 - `torah-5787.css` — 한국어 Nanum Myeongjo 및 Gowun Dodum, 히브리어 Noto Serif Hebrew. 하이픈 소제목은 절제된 강조, 괄호 내용은 살짝 작고 회색. 본문 기본 16px 수준.
