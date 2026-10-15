@@ -9,7 +9,7 @@ const $=id=>document.getElementById(id);
 const paymentEnabled=!!(cfg.paymentReady && cfg.supabaseUrl && cfg.supabaseAnonKey);
 const supa=cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase
   ? window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey):null;
-let user=null, accessible=new Set(), isAdmin=false;
+let user=null, accessible=new Set(), permanent=new Set(), isAdmin=false;
 function message(s){$("account-feedback").textContent=s;}
 function make(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function decorateText(parent,text){
@@ -49,9 +49,9 @@ async function invoke(body){
   return data;
 }
 async function refreshLibrary(){
-  accessible.clear();isAdmin=false;
+  accessible.clear();permanent.clear();isAdmin=false;
   if(user){
-    try{const data=await invoke({action:"library"});accessible=new Set(data.accessibleIds||[]);isAdmin=!!data.admin;$("member-status").textContent=isAdmin?"관리자 · 전체 열람":user.email;message("");}
+    try{const data=await invoke({action:"library"});accessible=new Set(data.accessibleIds||[]);permanent=new Set(data.permanentIds||[]);isAdmin=!!data.admin;$("member-status").textContent=isAdmin?"관리자 · 전체 열람":user.email;message("");}
     catch(e){$("member-status").textContent="로그인은 되었지만 서버 연결이 필요합니다.";message(e.message);}
   } else {
     $("member-status").textContent=supa?"로그인 전":"로그인·결제 연결 준비 중";
@@ -66,7 +66,8 @@ function render(){
     const top=make("div","card-top");
     const heading=make("h3","",entry.title);top.appendChild(heading);
     const hasAccess=isAdmin||accessible.has(entry.id);
-    const status=make("span","lesson-status",hasAccess?"✓ 계속 읽을 수 있는 강의":"첫 문단 무료 공개");top.appendChild(status);card.appendChild(top);
+    const caption=isAdmin?"✓ 관리자 열람":permanent.has(entry.id)?"✓ 영구 열람":hasAccess?"✓ 구독 중 열람 가능":"첫 문단 무료 공개";
+    const status=make("span","lesson-status",caption);top.appendChild(status);card.appendChild(top);
     const preview=make("div","preview no-copy");
     const sub=make("div","preview-title");decorateText(sub,entry.subtitle);preview.appendChild(sub);
     preview.appendChild(formatParagraph(entry.preview));
