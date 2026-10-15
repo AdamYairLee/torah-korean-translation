@@ -75,10 +75,8 @@ function render(){
     if(hasAccess){
       const read=make("button","action read-btn","전문 읽기");read.type="button";read.addEventListener("click",()=>openReader(entry));actions.appendChild(read);
     } else {
-      const shop=make("a","action buy-btn","7₪에 개별 구매");
-      if(!setEnabledLink(shop,cfg.shopUrls?.[entry.id],"7₪에 개별 구매"))shop.textContent="개별 구매 준비 중";
-      actions.appendChild(shop);
-      if(supa){const login=make("span","subtext",user?"결제 후 다시 열람 권한을 확인하세요.":"구매한 강의라면 이메일로 로그인하세요.");actions.appendChild(login);}
+      const note=make("span","subtext",user?"해당 강의는 구독 결제 기간 밖에 발행되어 열람 권한이 없습니다.":"월간 구독 후 같은 이메일로 로그인하면 구독 기간에 발행된 강의를 열람할 수 있습니다.");
+      actions.appendChild(note);
     }
     card.appendChild(actions);list.appendChild(card);
   }
@@ -116,10 +114,8 @@ $("email-form").addEventListener("submit",async ev=>{
 $("logout").addEventListener("click",async()=>{if(supa)await supa.auth.signOut();});
 $("close-reader").addEventListener("click",()=>{$("reader").hidden=true;$("reader-content").replaceChildren();});
 const memberLink=$("membership-buy");
-if(!setEnabledLink(memberLink,cfg.membershipUrl,"월간 구독하기 · 20₪"))memberLink.textContent="월간 구독 준비 중";
-$("single-buy").disabled=!paymentEnabled;
-$("single-buy").addEventListener("click",()=>{$("lesson-list").scrollIntoView({behavior:"smooth"});});
-if(!paymentEnabled)message("결제 상품 및 회원 열람 시스템을 연결한 후 구매 버튼이 활성화됩니다.");
+if(!setEnabledLink(memberLink,cfg.membershipUrl,"월간 구독하기 · $6.50/월"))memberLink.textContent="월간 구독 준비 중";
+if(!paymentEnabled)message("Ko-fi 멤버십과 회원 열람 권한 확인이 완료되면 월간 구독 버튼이 활성화됩니다.");
 render();bootAuth().catch(e=>message(e.message));
 // Best-effort copy deterrence, not DRM.
 for(const id of ["lesson-list","reader-content"]){
