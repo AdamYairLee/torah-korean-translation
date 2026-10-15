@@ -1,12 +1,23 @@
 # 5787년 토라 강의 · 월간 구독 전용 운영 안내
+## 2026-10-16 월간 구독 버튼 연결 및 첫 강의 공개
+
+- 사이트의 월간 구독 버튼을 Ko-fi 멤버십 페이지 `https://ko-fi.com/adamlee1986/tiers`에 연결했습니다. Ko-fi 공식 가이드의 `/tiers` 멤버십 공개 페이지 형식을 사용합니다.
+- `torah-5787-config.js`의 `paymentReady`를 `true`로 변경했습니다. **이 플래그는 웹사이트 버튼을 활성화한다는 뜻일 뿐, Ko-fi의 DRAFT 멤버십을 자동으로 공개하는 것은 아닙니다.**
+- `torah-access` Edge Function v9 배포: 결제 기간 중에는 이미 공개된 강의 전체를 읽을 수 있습니다. 해지 후에는 본인이 결제한 기간에 공개된 강의에 대한 영구 열람 권한이 남습니다.
+- 베레쉬트·노악흐 강의 전문을 Supabase에 구독자용 **발행 완료**로 전환했습니다. 이전 `published_at=NULL` 초안 상태를 해제했으며, 원고 마지막 `요약`은 여전히 제외했습니다.
+- 로그인한 구독자가 결제 후 사이트로 돌아와 `내 강의 열람 권한 새로고침`을 눌러 권한을 바로 확인할 수 있도록 했습니다.
+- 실제 월간 유료 결제 및 회원별 권한 부여/영구 보존의 종단 간 통합 테스트는 **아직 실행하지 않았습니다**.
+- 관리자 사용자는 Ko-fi [Memberships 설정](https://ko-fi.com/memberships/settings)에서 **「5787년 토라 강의」 DRAFT 등급을 직접 Publish/Enable**해야 독자가 결제할 수 있습니다. 기존 후원자를 업그레이드/전환하는 옵션은 사용하지 않습니다.
+- Ko-fi 실제 구매 후 `torah_5787_membership_periods`에 올바른 기간과 이메일이 기록되는지 확인해야 합니다. 실상품 결제 영수증의 이메일과 Supabase 로그인 이메일이 일치해야 합니다.
+
 ## 2026-10-16 진행 상황
 
 - **베레쉬트와 노악흐 전문을 Supabase의 비공개 DB에 저장함.** 각 DOCX의 마지막 `- 요약:` 이하를 제외하고 각각 18개 및 30개 단락/제목 블록을 저장함.
-- 두 원고는 `published_at=NULL`인 **비공개 초안**이며, 현재는 일반 회원에게 접근 권한이 없음. 관리자 인증 후에는 비공개 초안 읽기 허용.
+- 두 원고는 초기 등록 시 비공개 초안으로 준비됐으며, 2026-10-16에 구독자용 발행으로 전환함.
 - 관리자로 승인할 이메일 1개를 **비공개 Supabase DB에서만** 허용 목록으로 등록함. 해당 주소의 계정이 이메일 인증을 마치면 `torah_5787_admins`에 자동 등록하는 트리거가 설치됨.
 - `torah-5787.html`의 소개글에서 **'오늘의 질문'을 삭제**하고 새 문장으로 변경함.
 - `torah-5787.css`의 본문을 확대함: 모바일(390px 화면) 미리보기 약 18px, 본문 약 18.6px, 폭 360px 기기에서는 본문 18px. 데스크톱 본문 최대 약 19.8px, 보다 여유로운 행간 및 단락 간격. 한글/히브리어 예쁜 서체와 괄호 안 회색 작은 글씨 유지.
-- **구독 버튼 미활성화 사유:** Ko-fi 등급은 DRAFT이며, `torah-5787-config.js`의 `membershipUrl`이 비어 있고 `paymentReady=false`임. 실제 결제 후 로그인/권한 검증 완료 전 결제 노출 금지.
+- **구독 버튼 활성화:** Ko-fi 멤버십 페이지 링크 등록 및 `paymentReady=true` 적용. Ko-fi 멤버십 DRAFT는 계정 소유자가 별도로 공개해야 함.
 - **완료를 위해 사용자 직접 설정이 필요한 항목:** Supabase Auth URL Configuration에서 Site URL을 `https://jewishkorean.com`으로 설정하고 `https://jewishkorean.com/torah-5787.html`을 Redirect URLs에 등록. 이후 웹사이트에서 관리자로 등록한 이메일로 이메일 로그인 링크를 요청하고 확인해야 함.
 - 아직 **로그인 인증 성공/자동 관리자 부여/유료 결제 후 권한 자동 해제 테스트는 수행되지 않음.** 구독 공개는 해당 검증 뒤 진행.
 
@@ -24,7 +35,7 @@
 - Supabase Project: `rdvxkzohxxgyufizxxrk`, [프로젝트 대시보드](https://supabase.com/dashboard/project/rdvxkzohxxgyufizxxrk)
 - Edge Function `torah-access`: Ko-fi Webhook 수신 및 회원 JWT 검사. 유료 본문은 공개 GitHub에 올리지 않음
 - Ko-fi Webhook의 일반 후원/멤버십/Shop 테스트는 **서버 도달(HTTP 200)**까지 확인. 실상품 구독 권한 부여는 아직 미검증
-- **결제 버튼은 비활성화 상태** (`paymentReady: false`). Ko-fi의 5787년 멤버십은 아직 **DRAFT**, 웹사이트의 유료 전문도 미게시
+- **사이트 구독 버튼은 활성화 상태** (`paymentReady: true`). Ko-fi의 5787년 멤버십은 마지막 확인 당시 **DRAFT**, 두 글의 유료 전문은 서버 측 권한 검증 후 제공
 - 공개 파일 `torah-5787-config.js`에는 Supabase URL, 공개 publishable key만 기재. **비밀 키를 GitHub에 절대 올리지 않음**
 
 ## 남은 필수 설정 (상품 공개 전)
