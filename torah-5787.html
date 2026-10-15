@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5787년 토라 강의 | Jewish Korean</title>
+<meta name="description" content="5787년 파라샤별 토라 강의. 첫 문단 무료 미리보기, 개별 구매 및 월간 구독.">
+<link rel="canonical" href="https://jewishkorean.com/torah-5787.html">
+<link rel="stylesheet" href="torah-5787.css?v=20261015-1">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="torah-5787-config.js" defer></script>
+<script src="torah-5787.js?v=20261015-1" defer></script>
+</head>
+<body>
+<header class="lesson-top">
+  <a class="back-link" href="index.html">← Jewish Korean 홈</a>
+  <span lang="he" dir="rtl" class="bsad">בס״ד</span>
+</header>
+<main class="lesson-shell">
+  <header class="lesson-hero">
+    <p class="eyebrow">5787 · תשפ״ז</p>
+    <h1>5787년 토라 강의</h1>
+    <p>매주 한 편씩, 토라와 유대 현인들의 해석을 오늘의 질문과 함께 공부합니다.</p>
+  </header>
+  <section class="plans" aria-label="유료 강의 이용 안내">
+    <div class="plan">
+      <div class="plan-type">개별 강의</div><div class="price">7₪ <span>/ 편</span></div>
+      <p>원하는 파라샤를 한 번 구매하면 이후 언제든 다시 읽을 수 있습니다.</p>
+      <button id="single-buy" type="button" disabled>파라샤를 선택해 구매</button>
+    </div>
+    <div class="plan featured">
+      <div class="plan-type">월간 자동 구독 <span class="saving">4편 기준 약 29% 할인</span></div>
+      <div class="price">20₪ <span>/ 월</span></div>
+      <p>결제 기간에 발행된 강의는 구독을 종료해도 계속 읽을 수 있습니다.</p>
+      <a id="membership-buy" class="pay-link disabled" aria-disabled="true" tabindex="-1">월간 구독 준비 중</a>
+    </div>
+  </section>
+  <p class="price-note">가격 비교는 한 달에 4편을 개별 구매할 때 28₪를 기준으로 합니다. Ko-fi에서 실제 청구되는 통화와 금액은 결제 화면에서 확인하세요.</p>
+  <section class="account" aria-labelledby="account-title">
+    <div class="account-head">
+      <h2 id="account-title">내 강의 서재</h2>
+      <span id="member-status" class="member-status" aria-live="polite">결제 시스템 준비 중</span>
+    </div>
+    <p>구매한 강의는 이곳에서 다시 열람할 수 있습니다. Ko-fi 결제 이메일과 같은 이메일로 로그인해 주세요.</p>
+    <form id="email-form" class="email-form" hidden>
+      <label for="login-email">이메일 로그인</label>
+      <div class="email-fields"><input id="login-email" type="email" autocomplete="email" required placeholder="이메일 주소"><button type="submit">로그인 링크 받기</button></div>
+    </form>
+    <button id="logout" type="button" hidden>로그아웃</button>
+    <p id="account-feedback" class="feedback" role="status" aria-live="polite"></p>
+  </section>
+  <section class="lessons" aria-labelledby="lessons-title">
+    <h2 id="lessons-title">파라샤별 강의</h2>
+    <p class="intro">각 강의의 첫 문단은 무료로 읽을 수 있습니다. 마지막 「요약」은 책 출판용으로 남겨 두었습니다.</p>
+    <div id="lesson-list" class="lesson-list"></div>
+  </section>
+  <section class="reader" id="reader" hidden aria-labelledby="reader-title">
+    <div class="reader-top"><h2 id="reader-title"></h2><button id="close-reader" type="button">닫기</button></div>
+    <div id="reader-content" class="reader-content" tabindex="0"></div>
+  </section>
+  <footer class="lesson-footer">© Jewish Korean · <a href="https://ko-fi.com/adamlee1986" target="_blank" rel="noopener noreferrer">Ko-fi</a> · <a href="index.html">처음으로</a></footer>
+</main>
+</body>
+</html>
