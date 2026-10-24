@@ -8,7 +8,7 @@ const entries = [
 ];
 const books = [
  {id:"bereshit",label:"베레쉬트"},
- {id:"shemot",label:"시모트"},
+ {id:"shemot",label:"슈모트"},
  {id:"vayikra",label:"바이크라"},
  {id:"bamidbar",label:"바미드바르"},
  {id:"devarim",label:"드바림"}
