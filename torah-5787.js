@@ -2,10 +2,18 @@
 (() => {
 const cfg = window.TORAH_5787_CONFIG || {};
 const entries = [
- {id:"5787-bereshit",title:"파라샤트 베레쉬트",subtitle:"“우주의 나이”와 “창조”는 같은 질문인가? (베레쉬트 1:1)",preview:"라쉬는 베레쉬트 1:1의 문법을 설명하면서 이 구절이 창조의 순서를 가르치려는 문장이라고 단정하지 않는다. 그는 “성경은 무엇이 먼저이고 무엇이 나중인지의 연대를 가르치는 것이 아니다(לא לימד המקרא בסדר המוקדמים והמאוחרים כלום)”라고 기록했다. 물론 창조의 날들에 대해서 문자적으로 이해할 내용도 있으나, 여기서 중요한 건 어느 한 견해를 억지로 과학과 대조해 맞추라는 것이 아니고 토라의 고전 주석들 자체가 이미 본문을 시대에 따른 현대식 연대표로 읽지 않았다는 사실이다. (라쉬 또한 그의 생각으로 토라를 주석한 게 아닌, 유대 문헌들을 정리하고 집대성한 의미를 지닌다)"},
- {id:"5787-noach",title:"파라샤트 노악흐",subtitle:"토라 이전에 주어진 인류의 법질서",preview:"파라샤트 노악흐는 유대 민족에게 주어진 것보다 앞서 “인류 전체”에게 최소의 법질서를 훨씬 선명하게 해준다. 그마라 산헤드린 편 56a의 바라이타에선 브네이 노악흐(노악흐의 후손이라고도 하지만, 비유대인 전체를 나타내는 범용적 표현이다)에게 7개의 계명이 주어졌다고 정리한다. (노아하이드 7계명)"},
- {id:"5787-lech-lecha",title:"파라샤트 렉흐 렉하",subtitle:"단순한 여행이 아닌 정체성의 해체 (베레쉬트 12:1)",preview:"토라는 아브라함에게 단순히 주소를 바꾸라고 하지 않았다. “너의 땅”, “너의 고향”, “네 아버지의 집”은 인간을 규정하는 국가와 문화, 가족의 3개 층이다. 이동은 손실이기도 하지만 동시에 새로운 정체성을 가능하게 하는 조건이다."}
+ {id:"5787-bereshit",book:"bereshit",title:"파라샤트 베레쉬트",subtitle:"“우주의 나이”와 “창조”는 같은 질문인가? (베레쉬트 1:1)",preview:"라쉬는 베레쉬트 1:1의 문법을 설명하면서 이 구절이 창조의 순서를 가르치려는 문장이라고 단정하지 않는다. 그는 “성경은 무엇이 먼저이고 무엇이 나중인지의 연대를 가르치는 것이 아니다(לא לימד המקרא בסדר המוקדמים והמאוחרים כלום)”라고 기록했다. 물론 창조의 날들에 대해서 문자적으로 이해할 내용도 있으나, 여기서 중요한 건 어느 한 견해를 억지로 과학과 대조해 맞추라는 것이 아니고 토라의 고전 주석들 자체가 이미 본문을 시대에 따른 현대식 연대표로 읽지 않았다는 사실이다. (라쉬 또한 그의 생각으로 토라를 주석한 게 아닌, 유대 문헌들을 정리하고 집대성한 의미를 지닌다)"},
+ {id:"5787-noach",book:"bereshit",title:"파라샤트 노악흐",subtitle:"토라 이전에 주어진 인류의 법질서",preview:"파라샤트 노악흐는 유대 민족에게 주어진 것보다 앞서 “인류 전체”에게 최소의 법질서를 훨씬 선명하게 해준다. 그마라 산헤드린 편 56a의 바라이타에선 브네이 노악흐(노악흐의 후손이라고도 하지만, 비유대인 전체를 나타내는 범용적 표현이다)에게 7개의 계명이 주어졌다고 정리한다. (노아하이드 7계명)"},
+ {id:"5787-lech-lecha",book:"bereshit",title:"파라샤트 렉흐 렉하",subtitle:"단순한 여행이 아닌 정체성의 해체 (베레쉬트 12:1)",preview:"토라는 아브라함에게 단순히 주소를 바꾸라고 하지 않았다. “너의 땅”, “너의 고향”, “네 아버지의 집”은 인간을 규정하는 국가와 문화, 가족의 3개 층이다. 이동은 손실이기도 하지만 동시에 새로운 정체성을 가능하게 하는 조건이다."}
 ];
+const books = [
+ {id:"bereshit",label:"베레쉬트"},
+ {id:"shemot",label:"시모트"},
+ {id:"vayikra",label:"바이크라"},
+ {id:"bamidbar",label:"바미드바르"},
+ {id:"devarim",label:"드바림"}
+];
+let activeBook="bereshit"
 const $=id=>document.getElementById(id);
 const paymentEnabled=!!(cfg.paymentReady && cfg.supabaseUrl && cfg.supabaseAnonKey);
 const supa=cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase
@@ -60,9 +68,35 @@ async function refreshLibrary(){
   $("email-form").hidden=!supa || !!user;$("logout").hidden=!user;$("refresh-access").hidden=!user;
   render();
 }
+function renderBookNav(){
+  const nav=$("book-nav");
+  if(!nav)return;
+  nav.replaceChildren();
+  for(const book of books){
+    const count=entries.filter(entry=>(entry.book||"bereshit")===book.id).length;
+    const btn=make("button","book-tab"+(activeBook===book.id?" active":""));
+    btn.type="button";
+    btn.setAttribute("aria-pressed",activeBook===book.id?"true":"false");
+    btn.textContent=count?book.label+" · "+count:book.label;
+    btn.addEventListener("click",()=>{
+      activeBook=book.id;
+      $("reader").hidden=true;
+      $("reader-content").replaceChildren();
+      render();
+    });
+    nav.appendChild(btn);
+  }
+}
 function render(){
+  renderBookNav();
   const list=$("lesson-list");list.replaceChildren();
-  for(const entry of entries){
+  const visibleEntries=entries.filter(entry=>(entry.book||"bereshit")===activeBook).slice().reverse();
+  if(!visibleEntries.length){
+    const empty=make("div","empty-book","아직 등록된 파라샤 강의가 없습니다.");
+    list.appendChild(empty);
+    return;
+  }
+  for(const entry of visibleEntries){
     const card=make("article","lesson-card");
     const top=make("div","card-top");
     const heading=make("h3","",entry.title);top.appendChild(heading);
