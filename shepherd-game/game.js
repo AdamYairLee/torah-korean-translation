@@ -2728,7 +2728,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.10",
+  Wt = "2.3.11",
   SAVE_SCHEMA_VERSION = 3,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -5561,6 +5561,7 @@ function canNpcMoveBetween(npc, from, to) {
       : 0;
     if (!road || road.distance > corridor) return false;
   }
+  if (data.isKohen && !isKohenPatrolPointClear(to.x, to.z)) return false;
   const fromGround = te(from.x, from.z);
   const toGround = te(to.x, to.z);
   const rise = toGround - fromGround;
@@ -6787,40 +6788,94 @@ function moveBanditAlongStreets(bandit, target, delta) {
   return true;
 }
 function isKohenPatrolPointClear(x, z) {
-  if (!isInsideTempleCourt(x, z, -85)) return false;
+  if (!isInsideTempleCourt(x, z, -95)) return false;
   if (
     x >= dt.templeStageXMin - 42 &&
     x <= dt.templeStageXMax + 42 &&
     z >= dt.templeStageZMin - 42 &&
     z <= dt.templeStageZMax + 42
   ) return false;
-  return Math.hypot(x - dt.altarX, z - dt.altarZ) > 105;
+  return Math.hypot(x - dt.altarX, z - dt.altarZ) > 105 &&
+    !npcPositionBlocked(x, z, te(x, z), 24, [4, 30, 58]);
+}
+let kohenPatrolGraph = null;
+function isKohenSegmentClear(kohen, a, b) {
+  const distance = Math.hypot(b.x - a.x, b.z - a.z);
+  const steps = Math.max(1, Math.ceil(distance / 2.5));
+  let previous = a;
+  for (let index = 1; index <= steps; index++) {
+    const fraction = index / steps;
+    const next = { x: a.x + (b.x - a.x) * fraction,
+      z: a.z + (b.z - a.z) * fraction };
+    if (!canNpcMoveBetween(kohen, previous, next)) return false;
+    previous = next;
+  }
+  return true;
+}
+function buildKohenPatrolGraph(kohen) {
+  if (kohenPatrolGraph?.court === dt &&
+      kohenPatrolGraph.revision === collisionRevision) return kohenPatrolGraph;
+  const nodes = [];
+  const cells = new Map();
+  const spacing = 100;
+  const columns = Math.floor((dt.courtXMax - dt.courtXMin - 220) / spacing);
+  const rows = Math.floor((dt.courtZMax - dt.courtZMin - 220) / spacing);
+  for (let row = 0; row <= rows; row++)
+    for (let column = 0; column <= columns; column++) {
+      const x = dt.courtXMin + 110 + column * spacing;
+      const z = dt.courtZMin + 110 + row * spacing;
+      if (!isKohenPatrolPointClear(x, z)) continue;
+      cells.set(`${column},${row}`, nodes.length);
+      nodes.push({ x, z, edges: [] });
+    }
+  for (const [cell, index] of cells) {
+    const [column, row] = cell.split(",").map(Number);
+    for (const neighbor of [`${column + 1},${row}`, `${column},${row + 1}`]) {
+      const other = cells.get(neighbor);
+      if (other === undefined || !isKohenSegmentClear(kohen, nodes[index], nodes[other]))
+        continue;
+      nodes[index].edges.push(other);
+      nodes[other].edges.push(index);
+    }
+  }
+  kohenPatrolGraph = { court: dt, revision: collisionRevision, nodes };
+  return kohenPatrolGraph;
 }
 function chooseKohenWaypoint(kohen) {
-  const candidates = [
-    [dt.courtXMin + 155, dt.courtZMin + 155],
-    [(dt.courtXMin + dt.courtXMax) * 0.5, dt.courtZMin + 145],
-    [dt.courtXMax - 155, dt.courtZMin + 155],
-    [dt.courtXMax - 145, (dt.courtZMin + dt.courtZMax) * 0.5],
-    [dt.courtXMax - 155, dt.courtZMax - 155],
-    [(dt.courtXMin + dt.courtXMax) * 0.5, dt.courtZMax - 145],
-    [dt.courtXMin + 155, dt.courtZMax - 155],
-    [dt.courtXMin + 145, (dt.courtZMin + dt.courtZMax) * 0.5],
-  ].filter(([x, z]) => isKohenPatrolPointClear(x, z));
-  // Keep one continuous circuit. Random reversals made the NPC retrace the
-  // segment it had just walked and look trapped in a short repeated loop.
-  if (!candidates.length) return;
-  const lastIndex = Number.isInteger(kohen.userData.waypointIndex)
-    ? kohen.userData.waypointIndex
-    : -1;
-  const nextIndex = lastIndex < 0
-    ? 0
-    : (lastIndex + 1) % candidates.length;
-  kohen.userData.waypointIndex = nextIndex;
-  const point = candidates[nextIndex] ||
-    [dt.courtXMin + 150, dt.courtZMax - 150];
-  kohen.userData.target.set(point[0], 0, point[1]);
-  kohen.userData.waitFor = 0.6 + Math.random() * 1.2;
+  const graph = buildKohenPatrolGraph(kohen);
+  const { nodes } = graph;
+  const anchors = nodes.map((node, index) => ({ node, index,
+    distance: Math.hypot(node.x - kohen.position.x, node.z - kohen.position.z) }))
+    .sort((a, b) => a.distance - b.distance);
+  const anchor = anchors.find(({ node }) =>
+    isKohenSegmentClear(kohen, kohen.position, node));
+  if (!anchor) { kohen.userData.route = []; return; }
+  const previous = new Array(nodes.length).fill(-1);
+  const distance = new Array(nodes.length).fill(Infinity);
+  const queue = [anchor.index];
+  distance[anchor.index] = 0;
+  for (let head = 0; head < queue.length; head++) {
+    const index = queue[head];
+    for (const next of nodes[index].edges) {
+      if (distance[next] !== Infinity) continue;
+      previous[next] = index;
+      distance[next] = distance[index] + 1;
+      queue.push(next);
+    }
+  }
+  const recent = kohen.userData.recentDestinations || [];
+  let choices = queue.filter((index) =>
+    distance[index] >= 3 && !recent.includes(index));
+  if (!choices.length) choices = queue.filter((index) => distance[index] >= 2);
+  if (!choices.length) { kohen.userData.route = []; return; }
+  const destination = choices[Math.floor(Math.random() * choices.length)];
+  const indices = [];
+  for (let at = destination; at !== -1; at = previous[at]) indices.push(at);
+  indices.reverse();
+  kohen.userData.route = indices.map((index) => nodes[index]);
+  kohen.userData.routeIndex = 0;
+  kohen.userData.recentDestinations = [...recent.slice(-3), destination];
+  kohen.userData.waitFor = 0.4 + Math.random() * 0.9;
   kohen.userData.gesture = Math.floor(Math.random() * 3);
 }
 function captureKohenWalkRig(model) {
@@ -6889,11 +6944,21 @@ function ensureKohen() {
     importedModelBaseY: 0,
     walkRig: null,
     walkPhase: Math.random() * Math.PI * 2,
-    waypointIndex: -1,
+    route: [],
+    routeIndex: 0,
+    recentDestinations: [],
     animationAccumulator: 0,
   };
   i.add(kohen);
   mt.kohen = kohen;
+  if (!isKohenPatrolPointClear(startX, startZ)) {
+    const nearest = buildKohenPatrolGraph(kohen).nodes.slice().sort((a, b) =>
+      Math.hypot(a.x - startX, a.z - startZ) - Math.hypot(b.x - startX, b.z - startZ))[0];
+    if (nearest) {
+      kohen.position.set(nearest.x, te(nearest.x, nearest.z), nearest.z);
+      kohen.userData.lastSafePosition.copy(kohen.position);
+    }
+  }
   chooseKohenWaypoint(kohen);
   loadKohenModel().then((template) => {
     if (!kohen.parent || mt.kohen !== kohen) return;
@@ -6922,7 +6987,12 @@ function updateKohen(delta) {
   const kohen = mt.kohen;
   if (!kohen?.parent || !dt) return;
   kohen.userData.phase += delta;
-  const target = kohen.userData.target;
+  let target = kohen.userData.route?.[kohen.userData.routeIndex];
+  if (!target && kohen.userData.waitFor <= 0) {
+    chooseKohenWaypoint(kohen);
+    target = kohen.userData.route?.[kohen.userData.routeIndex];
+  }
+  if (!target) { kohen.userData.waitFor -= delta; return; }
   const dx = target.x - kohen.position.x;
   const dz = target.z - kohen.position.z;
   const distance = Math.hypot(dx, dz);
@@ -6935,17 +7005,23 @@ function updateKohen(delta) {
     : 0;
   const renderKohen = playerDistance < 1250;
   if (model) model.visible = renderKohen;
-  if (distance > 12) {
+  if (distance > 7) {
     updateProceduralKohenWalk(kohen, true, delta, renderKohen);
     const step = Math.min(distance, 35 * delta);
-    const nextX = kohen.position.x + (dx / distance) * step;
-    const nextZ = kohen.position.z + (dz / distance) * step;
-    if (
-      isKohenPatrolPointClear(nextX, nextZ) &&
-      moveNpcWithSweptCollision(kohen, Math.atan2(dx, dz), step)
-    ) {
+    const beforeX = kohen.position.x;
+    const beforeZ = kohen.position.z;
+    if (moveNpcWithSweptCollision(kohen, Math.atan2(dx, dz), step) &&
+        Math.hypot(kohen.position.x - beforeX, kohen.position.z - beforeZ) >= step * 0.8) {
       kohen.rotation.y = Math.atan2(dx, dz);
     } else {
+      const graph = buildKohenPatrolGraph(kohen);
+      const current = graph.nodes.findIndex((node) => node === target);
+      const previous = kohen.userData.route[kohen.userData.routeIndex - 1];
+      const from = graph.nodes.findIndex((node) => node === previous);
+      if (from >= 0 && current >= 0) {
+        graph.nodes[from].edges = graph.nodes[from].edges.filter((index) => index !== current);
+        graph.nodes[current].edges = graph.nodes[current].edges.filter((index) => index !== from);
+      }
       chooseKohenWaypoint(kohen);
     }
     if (model) {
@@ -6955,7 +7031,10 @@ function updateKohen(delta) {
     }
   } else {
     updateProceduralKohenWalk(kohen, false, delta, renderKohen);
-    kohen.userData.waitFor -= delta;
+    if (kohen.userData.routeIndex < kohen.userData.route.length - 1) {
+      kohen.userData.routeIndex++;
+      kohen.userData.waitFor = 0;
+    } else kohen.userData.waitFor -= delta;
     if (model) {
       const gesture = kohen.userData.gesture;
       model.position.y = kohen.userData.importedModelBaseY;
@@ -6966,7 +7045,9 @@ function updateKohen(delta) {
         ? 0.035 + Math.sin(kohen.userData.phase * 1.4) * 0.025
         : 0;
     }
-    if (kohen.userData.waitFor <= 0) chooseKohenWaypoint(kohen);
+    if (kohen.userData.waitFor <= 0 &&
+        kohen.userData.routeIndex >= kohen.userData.route.length - 1)
+      chooseKohenWaypoint(kohen);
   }
   kohen.position.y = te(kohen.position.x, kohen.position.z);
 }
@@ -7685,8 +7766,34 @@ function removeDuplicateDavidCharacters() {
   });
   stale.forEach((object) => object.parent?.remove(object));
 }
+let cityCitizenSchedulePhase = null;
+function updateCityCitizenSchedule() {
+  const phase = Ze(ut.worldTime).name === "밤" ? "night" : "day";
+  if (phase === cityCitizenSchedulePhase) return;
+  cityCitizenSchedulePhase = phase;
+  const citizens = [...mt.cityCitizens];
+  if (phase === "night") {
+    for (let index = citizens.length - 1; index > 0; index--) {
+      const pick = Math.floor(Math.random() * (index + 1));
+      [citizens[index], citizens[pick]] = [citizens[pick], citizens[index]];
+    }
+  }
+  const roaming = new Set(citizens.slice(0, phase === "night" ? 2 : 4));
+  for (const citizen of mt.cityCitizens) {
+    const active = roaming.has(citizen);
+    if (active && !citizen.userData.entryActive) {
+      citizen.userData.progressPosition.copy(citizen.position);
+      citizen.userData.progressCheckFor = 1.5;
+      citizen.userData.stuckFor = 0;
+      planCityCitizenRoute(citizen, false);
+    }
+    citizen.userData.entryActive = active;
+    if (!active) citizen.visible = false;
+  }
+}
 function resetCityCitizensForEntry() {
   if (!mt.cityCitizens.length) return;
+  cityCitizenSchedulePhase = null;
   const citizens = [...mt.cityCitizens];
   for (let index = citizens.length - 1; index > 0; index--) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
@@ -7737,42 +7844,42 @@ function resetCityCitizensForEntry() {
   const mainSpawn = CITY_CITIZEN_MAIN_LOOP[
     Math.floor(Math.random() * CITY_CITIZEN_MAIN_LOOP.length)
   ];
-  place(mainCitizen, mainSpawn, "main-road");
-  chooseCitizenMainRoadRoute(mainCitizen, false);
+  place(mainCitizen,
+    nearestClearCityRoadPoint(mainSpawn.x, mainSpawn.z, 22) || mainSpawn,
+    "main-road");
+  planCityCitizenRoute(mainCitizen, false);
 
   const alleyCitizen = citizens[1];
   if (!alleyCitizen) return;
   const alleyLoopIndex = Math.floor(Math.random() * CITY_CITIZEN_ALLEY_LOOPS.length);
   const alleyLoop = CITY_CITIZEN_ALLEY_LOOPS[alleyLoopIndex];
   const alleySpawn = alleyLoop[Math.floor(Math.random() * alleyLoop.length)];
-  place(alleyCitizen, alleySpawn, "alley");
+  place(alleyCitizen,
+    nearestClearCityRoadPoint(alleySpawn.x, alleySpawn.z, 22) || alleySpawn,
+    "alley");
   alleyCitizen.userData.alleyLoopIndex = alleyLoopIndex;
-  chooseCitizenAlleyRoute(alleyCitizen);
+  planCityCitizenRoute(alleyCitizen, false);
 
   for (let optionalIndex = 2; optionalIndex < Math.min(4, citizens.length); optionalIndex++) {
     const citizen = citizens[optionalIndex];
-    const appears = Math.random() < 0.58;
     const house = houseCandidates.shift();
-    if (!appears || !house) continue;
-    const direction = Number(house.doorDirection) || 0;
-    const outside = {
+    const direction = Number(house?.doorDirection) || 0;
+    const outside = house ? {
       x: house.doorX + Math.sin(direction) * 30,
       z: house.doorZ + Math.cos(direction) * 30,
-    };
-    const roadExit = nearestClearCityRoadPoint(outside.x, outside.z, 22);
-    const blocked = jt(
-      new t.Vector3(outside.x, te(outside.x, outside.z) + 5, outside.z),
-      citizen.userData.collisionRadius || 14,
-    );
-    const spawn = blocked && roadExit ? roadExit : outside;
-    place(citizen, spawn, "house");
+    } : null;
+    const fallback = CITY_CITIZEN_MAIN_LOOP[
+      (optionalIndex * 3 + Math.floor(Math.random() * 2)) % CITY_CITIZEN_MAIN_LOOP.length
+    ];
+    const spawn = outside && nearestClearCityRoadPoint(outside.x, outside.z, 22) ||
+      nearestClearCityRoadPoint(fallback.x, fallback.z, 22) || fallback;
+    place(citizen, spawn, house ? "house" : "main-road");
     citizen.userData.alleyLoopIndex = Math.floor(
       Math.random() * CITY_CITIZEN_ALLEY_LOOPS.length,
     );
-    if (roadExit && Math.hypot(roadExit.x - spawn.x, roadExit.z - spawn.z) > 8)
-      citizen.userData.path = [{ x: roadExit.x, z: roadExit.z }];
-    else chooseCitizenAlleyRoute(citizen);
+    planCityCitizenRoute(citizen, false);
   }
+  updateCityCitizenSchedule();
 }
 async function loadCityCitizenWithRetry(loader, attempts = 3) {
   let lastError = null;
@@ -7805,14 +7912,18 @@ function ensureCityCitizens() {
     }
     removeDuplicateDavidCharacters();
     const hadCitizens = mt.cityCitizens.length > 0;
+    const newlyAdded = [];
     results.forEach((result, index) => {
       const [kind, citizenIndex] = requests[index];
       if (
         result.status === "fulfilled" &&
         !mt.cityCitizens.some((citizen) => citizen.userData.citizenKind === kind)
-      )
+      ) {
         addCityCitizen(kind, citizenIndex, result.value);
-      else if (result.status === "rejected")
+        const added = mt.cityCitizens.find((citizen) =>
+          citizen.userData.citizenKind === kind);
+        if (added) newlyAdded.push(added);
+      } else if (result.status === "rejected")
         console.warn(`성 안 시민 ${kind} 모델을 불러오지 못했습니다.`, result.reason);
     });
     mt.cityCitizensLoading = false;
@@ -7827,6 +7938,20 @@ function ensureCityCitizens() {
         citizen.userData.entryRole = "hidden";
         citizen.visible = false;
       });
+    } else if (mt.player && Yt(mt.player.position.x, mt.player.position.z, -55)) {
+      for (const citizen of newlyAdded) {
+        const spawn = nearestClearCityRoadPoint(
+          citizen.position.x, citizen.position.z, 22);
+        if (spawn) citizen.position.set(spawn.x, te(spawn.x, spawn.z), spawn.z);
+        citizen.userData.lastSafePosition.copy(citizen.position);
+        citizen.userData.progressPosition.copy(citizen.position);
+        citizen.userData.entryRole = "main-road";
+        const active = cityCitizenSchedulePhase !== "night" ||
+          mt.cityCitizens.filter((other) => other.userData.entryActive).length < 2;
+        citizen.userData.entryActive = active;
+        citizen.visible = active;
+        if (active) planCityCitizenRoute(citizen, false);
+      }
     }
   });
 }
@@ -7837,10 +7962,10 @@ function planCityCitizenRoute(citizen, fleeing) {
     chooseCitizenRoadTarget(citizen, true);
     if (!citizen.userData.path.length)
       chooseCitizenMainRoadRoute(citizen, true);
-  } else if (citizen.userData.entryRole === "main-road") {
-    chooseCitizenMainRoadRoute(citizen, false);
   } else {
-    chooseCitizenAlleyRoute(citizen);
+    chooseCitizenRoadTarget(citizen, false);
+    if (!citizen.userData.path.length)
+      chooseCitizenMainRoadRoute(citizen, false);
   }
   citizen.userData.repathFor = fleeing ? 1.25 : 4.2;
 }
@@ -7927,6 +8052,7 @@ function updateCityCitizens(delta) {
     resetCityCitizensForEntry();
   }
   citizensPlayerWasInsideJerusalem = playerInside;
+  if (cityCitizenSchedulePhase && playerNearCity) updateCityCitizenSchedule();
   if (!playerNearCity) {
     mt.cityCitizens.forEach((citizen) => {
       citizen.visible = false;
@@ -8120,6 +8246,8 @@ function Te() {
     (mt.southGateGuard = null),
     (mt.kohen = null),
     (mt.cityCitizens = []),
+    (cityCitizenSchedulePhase = null),
+    (kohenPatrolGraph = null),
     (mt.cityCitizensLoading = false),
     (performanceState.cityCitizenAccumulator = 0),
     (mt.effects = []),
