@@ -805,6 +805,13 @@ body.title-settings-open #keyGuidePanel{pointer-events:auto}
 }
 
 /* v2.3.4 — compact links back to the two parent learning sites. */
+#quitConfirm{z-index:42}
+#quitConfirm .stone-panel{width:min(480px,calc(100vw - 24px));min-width:0;max-height:calc(var(--app-height,100vh) - 16px);overflow:auto}
+#quitConfirm .stone-panel p{line-height:1.5}
+#quitSaveStatus{min-height:1.5em;margin:8px 0 0;color:#8c251d;font-weight:700}
+body.mobile-device #quitConfirm .stone-panel{width:min(480px,calc(var(--app-width) - 20px));padding:12px 18px}
+body.mobile-device #quitConfirm button{padding:8px 12px;margin:6px auto}
+
 .title-site-links{
   display:grid;
   grid-template-columns:1fr 1fr;

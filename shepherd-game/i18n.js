@@ -63,6 +63,10 @@
     '게임은 휴대폰과 태블릿에서 가로 화면으로 진행됩니다.':'המשחק פועל בטלפונים ובטאבלטים במצב אופקי.',
     '모바일 게임 조작':'פקדי משחק למכשיר נייד','이동 조이스틱':'בקר תנועה','양떼 부르기':'קריאה לצאן',
     '돌팔매 던지기':'הטלת אבן בקלע','지팡이 사용':'שימוש במקל הרועים','무기 선택':'בחירת נשק','달리기':'ריצה','소리 설정':'הגדרות צליל','게임 종료':'יציאה מהמשחק',
+    '종료하기 전에 저장하시겠습니까?':'לשמור את המשחק לפני היציאה?',
+    '저장하지 않고 종료하면 마지막 저장 이후의 진행 상황은 사라집니다.':'יציאה ללא שמירה תבטל את ההתקדמות מאז השמירה האחרונה.',
+    '저장하고 종료':'שמור וצא','저장하지 않고 종료':'צא ללא שמירה','취소':'ביטול',
+    '저장 실패 · 종료하지 않았습니다. 다시 시도해 주세요.':'השמירה נכשלה. המשחק נשאר פתוח. אפשר לנסות שוב.',
     '앱 설치 안내':'התקנת היישום','양떼를 지켜라 앱 아이콘':'סמל היישום שמור על הצאן',
     '앱으로 설치하시겠습니까?':'להתקין את המשחק כיישום?','홈 화면에서 전체 화면으로 바로 게임을 시작할 수 있습니다.':'אפשר להפעיל את המשחק ישירות ממסך הבית ובמסך מלא.',
     '앱으로 설치':'התקנת היישום','나중에':'אחר כך',
@@ -171,6 +175,10 @@
     '게임은 휴대폰과 태블릿에서 가로 화면으로 진행됩니다.':'The game runs in landscape mode on phones and tablets.',
     '모바일 게임 조작':'Mobile game controls','이동 조이스틱':'Movement joystick','양떼 부르기':'Call the flock',
     '돌팔매 던지기':'Throw with sling','지팡이 사용':'Use shepherd staff','무기 선택':'Select weapon','달리기':'Run','소리 설정':'Sound settings','게임 종료':'Exit Game',
+    '종료하기 전에 저장하시겠습니까?':'Save before exiting?',
+    '저장하지 않고 종료하면 마지막 저장 이후의 진행 상황은 사라집니다.':'Exiting without saving will discard progress since your last save.',
+    '저장하고 종료':'Save and Exit','저장하지 않고 종료':'Exit Without Saving','취소':'Cancel',
+    '저장 실패 · 종료하지 않았습니다. 다시 시도해 주세요.':'Save failed. The game is still open. Please try again.',
     '앱 설치 안내':'App installation','양떼를 지켜라 앱 아이콘':'Protect the Flock app icon',
     '앱으로 설치하시겠습니까?':'Install this game as an app?','홈 화면에서 전체 화면으로 바로 게임을 시작할 수 있습니다.':'Launch the game directly from your home screen in full screen.',
     '앱으로 설치':'Install App','나중에':'Later',
@@ -261,13 +269,13 @@
     if (document.body) document.body.classList.toggle('lang-he', lang === 'he');
     const description = document.querySelector('meta[name="description"]');
     if (lang === 'he') {
-      document.title = 'שמור על הצאן · v2.3.11';
+      document.title = 'שמור על הצאן · v2.3.12';
       if (description) description.content = 'הרפתקת רועים תלת־ממדית למחשבים ולמכשירים ניידים, בירושלים העתיקה ובמדבר יהודה.';
     } else if (lang === 'ko') {
-      document.title = '양떼를 지켜라 · v2.3.11';
+      document.title = '양떼를 지켜라 · v2.3.12';
       if (description) description.content = '고대 예루샬라임과 유대 광야를 배경으로 양 떼를 지키는 데스크톱·모바일 3D 양치기 모험입니다.';
     } else {
-      document.title = 'Protect the Flock · v2.3.11';
+      document.title = 'Protect the Flock · v2.3.12';
       if (description) description.content = 'A cross-device 3D shepherd adventure set in ancient Jerusalem and the Judean wilderness.';
     }
   }
