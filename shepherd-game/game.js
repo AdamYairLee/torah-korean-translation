@@ -2728,8 +2728,8 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.9",
-  SAVE_SCHEMA_VERSION = 2,
+  Wt = "2.3.10",
+  SAVE_SCHEMA_VERSION = 3,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
   qt = { x: -1180, z: 1650 };
@@ -9582,9 +9582,8 @@ document.addEventListener(
       ie();
   }),
   (e("#saveBtn").onclick = () => oo(!1)),
-  (e("#quitBtn").onclick = () => {
-    oo(!0);
-    location.reload();
+  (e("#quitBtn").onclick = async () => {
+    if (await oo(!1)) location.reload();
   }),
   (e("#restartBtn").onclick = () => {
     if (ut.flockLost) {
@@ -11145,7 +11144,7 @@ function _e(o, n) {
               ) + 5,
               s.position.z - normalZ * correction,
             );
-            if (!isSheepBlockedAt(sCandidate, isNearJerusalemWall(s) ? 34 : 18)) {
+            if (!isSheepBlockedAt(sCandidate, isNearJerusalemWall(s.position) ? 34 : 18)) {
               s.position.x = sCandidate.x;
               s.position.z = sCandidate.z;
             }
@@ -11315,7 +11314,7 @@ function _e(o, n) {
             const turnOrder = followsCityRoad
               ? [0, 0.28, -0.28, 0.52, -0.52, 0.82, -0.82, 1.2, -1.2]
               : [0, 0.48, -0.48, 0.9, -0.9, 1.45, -1.45];
-            const clearance = isNearJerusalemWall(s)
+            const clearance = isNearJerusalemWall(s.position)
               ? 38
               : followsCityRoad
                 ? 28
@@ -12554,17 +12553,22 @@ async function ensureSaveStorageReady() {
   await saveStorageReadyPromise;
 }
 function readStoredGameSave() {
+  const candidates = [];
   for (const key of [SAVE_PRIMARY_KEY, SAVE_BACKUP_KEY]) {
     try {
       const encoded = localStorage.getItem(key);
       if (!encoded) continue;
       const record = JSON.parse(encoded);
-      if (isUsableSaveRecord(record)) return record;
+      if (isUsableSaveRecord(record)) candidates.push(record);
     } catch (error) {
       console.warn(`저장 데이터 읽기 실패 (${key}):`, error);
     }
   }
-  return isUsableSaveRecord(indexedSaveCache) ? indexedSaveCache : null;
+  if (isUsableSaveRecord(indexedSaveCache)) candidates.push(indexedSaveCache);
+  candidates.sort((a, b) =>
+    savedNumber(b.savedAt, 0) - savedNumber(a.savedAt, 0),
+  );
+  return candidates[0] || null;
 }
 function refreshContinueAvailability() {
   const button = e("#continueBtn");
@@ -12619,6 +12623,15 @@ function buildSaveRecord() {
       z: sheep.position.z,
       hp: Number.isFinite(sheep.userData.hp) ? sheep.userData.hp : 100,
     })),
+    flock: {
+      waitingForPickup: citySheepWaitingForPickup,
+      playerWasInsideJerusalem,
+      nightWatch: {
+        active: nightWatch.active,
+        camp: { x: nightWatch.camp.x, z: nightWatch.camp.z },
+        lastPhase: nightWatch.lastPhase,
+      },
+    },
     route: {
       id: routeChoice.id,
       name: routeChoice.name,
@@ -12639,28 +12652,35 @@ function showPauseSaveStatus(message, failed = !1) {
     status.classList.remove("error");
   }, 2600);
 }
-function oo(silent = !1) {
+async function oo(silent = !1) {
   if (!S || !mt.player || ut.flockLost) return !1;
   try {
     const record = buildSaveRecord();
     const encoded = JSON.stringify(record);
-    let localSaveSucceeded = false;
-    try {
-      localStorage.setItem(SAVE_BACKUP_KEY, encoded);
-      localStorage.setItem(SAVE_PRIMARY_KEY, encoded);
-      if (localStorage.getItem(SAVE_PRIMARY_KEY) !== encoded)
-        throw new Error("저장소 확인값이 일치하지 않습니다.");
-      localSaveSucceeded = true;
-    } catch (localError) {
-      console.warn("Local save unavailable; using IndexedDB fallback:", localError);
+    const writeLocal = (key) => {
+      try {
+        localStorage.setItem(key, encoded);
+        return localStorage.getItem(key) === encoded;
+      } catch (error) {
+        console.warn(`Local save unavailable (${key}):`, error);
+        return false;
+      }
+    };
+    const backupSaved = writeLocal(SAVE_BACKUP_KEY);
+    const primarySaved = writeLocal(SAVE_PRIMARY_KEY);
+    const localSaveSucceeded = backupSaved || primarySaved;
+    if (localSaveSucceeded) {
+      indexedSaveCache = record;
+      if ("indexedDB" in window)
+        writeIndexedGameSave(record).catch((error) =>
+          console.warn("Indexed save backup failed:", error),
+        );
+    } else {
+      if (!("indexedDB" in window))
+        throw new Error("사용 가능한 브라우저 저장소가 없습니다.");
+      await writeIndexedGameSave(record);
+      indexedSaveCache = record;
     }
-    indexedSaveCache = record;
-    if ("indexedDB" in window)
-      writeIndexedGameSave(record).catch((error) =>
-        console.warn("Indexed save backup failed:", error),
-      );
-    if (!localSaveSucceeded && !("indexedDB" in window))
-      throw new Error("사용 가능한 브라우저 저장소가 없습니다.");
     refreshContinueAvailability();
     if (!silent) {
       eo("저장되었습니다.");
@@ -12699,6 +12719,17 @@ function restoreSavedSheep(savedSheep, playerPosition) {
     sheep.position.set(safe.x, te(safe.x, safe.z) + 22, safe.z);
     const savedHp = Number(saved.hp);
     sheep.userData.hp = t.MathUtils.clamp(Number.isFinite(savedHp) ? savedHp : 100, 1, 100);
+    sheep.userData.safeHold = false;
+    sheep.userData.cityGateHold = false;
+    sheep.userData.jerusalemHoldSlot = null;
+    sheep.userData.nightCampPosition = null;
+    sheep.userData.cityPath = null;
+    sheep.userData.campArrivalCycle = -1;
+    sheep.userData.recallUntil = 0;
+    sheep.userData.mobileRushUntil = 0;
+    sheep.userData.urgeUntil = 0;
+    sheep.userData.stuckTime = 0;
+    sheep.userData.target?.set?.(0, 0, 0);
     sheep.userData.lastPos.copy(sheep.position);
   });
 }
@@ -12757,7 +12788,38 @@ function no() {
       mobileInput.movementYaw = B;
       mobileInput.desiredWorldHeading = B;
     }
+    citySheepWaitingForPickup = false;
+    playerWasInsideJerusalem = false;
+    nightWatch.active = false;
+    nightWatch.startedAt = 0;
+    nightWatch.lastPhase = "";
+    nightWatch.sheepLocked = false;
     restoreSavedSheep(saved.sheep, placedPlayer);
+    if (saved.flock && typeof saved.flock === "object") {
+      citySheepWaitingForPickup = !!saved.flock.waitingForPickup;
+      playerWasInsideJerusalem = !!saved.flock.playerWasInsideJerusalem;
+      const watch = saved.flock.nightWatch;
+      if (
+        watch?.active &&
+        Number.isFinite(Number(watch.camp?.x)) &&
+        Number.isFinite(Number(watch.camp?.z))
+      ) {
+        nightWatch.active = true;
+        nightWatch.camp.set(Number(watch.camp.x), 0, Number(watch.camp.z));
+        nightWatch.startedAt = performance.now();
+        nightWatch.lastPhase = typeof watch.lastPhase === "string"
+          ? watch.lastPhase
+          : Ze(ut.worldTime).name;
+        nightWatch.sheepLocked = true;
+        mt.sheep.forEach((sheep) => {
+          sheep.userData.nightCampPosition = sheep.position.clone();
+        });
+      } else if (citySheepWaitingForPickup) {
+        mt.sheep.forEach((sheep, index) =>
+          parkSheepAtJerusalemHold(sheep, index),
+        );
+      }
+    }
     if (saved.route && typeof saved.route === "object") {
       routeChoice.id = typeof saved.route.id === "string" ? saved.route.id : "";
       routeChoice.name = typeof saved.route.name === "string" ? saved.route.name : "";
