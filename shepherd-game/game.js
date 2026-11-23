@@ -140,7 +140,9 @@ function updateOrientationGate() {
     mobileInput.active = false;
     mobileInput.running = false;
     pauseAllGameAudio();
-  } else if (n && S && !distributionAdPauseActive && e("#pause")?.classList.contains("hidden")) {
+  } else if (n && S && !distributionAdPauseActive &&
+             e("#pause")?.classList.contains("hidden") &&
+             e("#quitConfirm")?.classList.contains("hidden")) {
     b = false;
     Bt();
   }
@@ -2728,7 +2730,7 @@ const Ft = [
       wallRZ: 3000,
     },
   ],
-  Wt = "2.3.11",
+  Wt = "2.3.12",
   SAVE_SCHEMA_VERSION = 3,
   SAVE_PRIMARY_KEY = "shepherdGame3DSave",
   SAVE_BACKUP_KEY = "shepherdGame3DSaveBackup",
@@ -6789,6 +6791,9 @@ function moveBanditAlongStreets(bandit, target, delta) {
 }
 function isKohenPatrolPointClear(x, z) {
   if (!isInsideTempleCourt(x, z, -95)) return false;
+  // The sanctuary entrance faces east (positive X). Its western side is the
+  // rear: keep the priest on the two flanks and the open eastern forecourt.
+  if (x < dt.templeStageXMin + 5) return false;
   if (
     x >= dt.templeStageXMin - 42 &&
     x <= dt.templeStageXMax + 42 &&
@@ -7237,7 +7242,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
   for (const node of graph.nodes) {
     if (isInsideTempleCourt(node.x, node.z, 55)) continue;
     const travel = Math.hypot(node.x - citizen.position.x, node.z - citizen.position.z);
-    if (travel < (fleeing ? 320 : 700)) continue;
+    if (travel < (fleeing ? 320 : 280)) continue;
     if (
       !fleeing &&
       citizen.userData.recentTargets.some(
@@ -7255,7 +7260,8 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       );
     const district = node.z < -700 ? 0 : node.z < 350 ? 1 :
       node.z < 1150 ? 2 : node.x < -220 ? 3 : node.x > 220 ? 4 : 5;
-    if (!fleeing && district === previousDistrict) continue;
+    const recentDistricts = citizen.userData.recentDistricts || [];
+    const districtRepeats = recentDistricts.filter((value) => value === district).length;
     const path = makeCitySheepPath(
       current?.x ?? citizen.position.x,
       current?.z ?? citizen.position.z,
@@ -7264,7 +7270,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       navigationOptions,
     );
     if (
-      path.length < 5 ||
+      path.length < (fleeing ? 5 : 2) ||
       path.some((point) => isInsideTempleCourt(point.x, point.z, 42))
     ) continue;
     let routeLength = 0;
@@ -7273,7 +7279,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
         path[index].x - path[index - 1].x,
         path[index].z - path[index - 1].z,
       );
-    if (routeLength < (fleeing ? 360 : 1050)) continue;
+    if (routeLength < (fleeing ? 360 : 340)) continue;
     const edgeKeys = [];
     let repeatedEdges = 0;
     for (let index = 1; index < path.length; index++) {
@@ -7286,7 +7292,7 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       if (citizen.userData.recentRouteEdges.includes(key)) repeatedEdges++;
     }
     const novelty = 1 - repeatedEdges / Math.max(edgeKeys.length, 1);
-    if (!fleeing && novelty < 0.38) continue;
+    if (!fleeing && novelty < 0.18 && districtRepeats > 0) continue;
     let minimumPathDanger = Infinity;
     for (const point of path)
       minimumPathDanger = Math.min(
@@ -7313,14 +7319,16 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
         firstEscapeGain * 5.5 +
         novelty * 160 -
         routeLength * 0.08
-      : routeLength * 0.55 + novelty * 900 + Math.random() * 260;
+      : novelty * 650 + Math.min(travel, 1800) * 0.15 +
+        Math.random() * 700 - districtRepeats * 430 -
+        (district === previousDistrict ? 150 : 0);
     candidates.push({ node, score, path, district, edgeKeys });
   }
   candidates.sort((a, b) => b.score - a.score);
   let best = candidates.length
     ? fleeing
       ? candidates[0]
-      : candidates[Math.floor(Math.random() * Math.min(6, candidates.length))]
+      : candidates[Math.floor(Math.random() * Math.min(12, candidates.length))]
     : null;
   if (!best) {
     citizen.userData.recentTargets.splice(
@@ -7340,11 +7348,12 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
           node.z - citizen.position.z,
         ),
         safety: citizenThreatDistance(node.x, node.z, bandits),
+        shuffle: Math.random(),
       }))
       .sort((a, b) =>
         fleeing && bandits.length
           ? b.safety - a.safety || b.distance - a.distance
-          : b.distance - a.distance,
+          : a.shuffle - b.shuffle,
       );
     // Search the whole reachable component. Limiting this to a handful of
     // farthest nodes failed when a remembered blocked edge temporarily split
@@ -7411,8 +7420,8 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
       );
       const combined = [...firstLeg, ...secondLeg.slice(1)];
       if (
-        firstLeg.length >= 3 &&
-        secondLeg.length >= 3 &&
+        firstLeg.length >= 2 &&
+        secondLeg.length >= 2 &&
         !combined.some((point) => isInsideTempleCourt(point.x, point.z, 42))
       ) {
         best.path = combined;
@@ -7424,6 +7433,11 @@ function chooseCitizenRoadTarget(citizen, fleeing = false) {
   citizen.userData.path = best.path;
   citizen.userData.pathIndex = Math.min(1, citizen.userData.path.length - 1);
   citizen.userData.currentDistrict = best.district;
+  if (!fleeing) {
+    citizen.userData.recentDistricts.push(best.district);
+    if (citizen.userData.recentDistricts.length > 9)
+      citizen.userData.recentDistricts.shift();
+  }
   citizen.userData.recentTargets.push({ x: best.node.x, z: best.node.z });
   if (citizen.userData.recentTargets.length > 10)
     citizen.userData.recentTargets.shift();
@@ -7704,6 +7718,7 @@ function addCityCitizen(kind, index, template) {
     attackedFleeFor: 0,
     fleeing: false,
     recentTargets: [],
+    recentDistricts: [],
     recentRouteEdges: [],
     temporarilyBlockedEdges: [],
     temporarilyBlockedWaypoints: [],
@@ -7813,6 +7828,7 @@ function resetCityCitizensForEntry() {
     citizen.userData.path = [];
     citizen.userData.pathIndex = 0;
     citizen.userData.recentTargets = [];
+    citizen.userData.recentDistricts = [];
     citizen.userData.recentRouteEdges = [];
     citizen.userData.temporarilyBlockedEdges = [];
     citizen.userData.temporarilyBlockedWaypoints = [];
@@ -9287,6 +9303,7 @@ document.addEventListener(
       !(function (t) {
         const e = (function () {
           for (const t of [
+            "quitConfirm",
             "practicePrompt",
             "keyGuidePanel",
             "settingsPanel",
@@ -9394,6 +9411,10 @@ document.addEventListener(
         t.ctrlKey && "KeyW" === t.code && (t.preventDefault(), (K.KeyW = !1)),
         "Enter" === t.code && S && (Ee(), t.preventDefault()),
         "Escape" === t.code &&
+        S &&
+        !e("#quitConfirm").classList.contains("hidden")
+          ? cancelQuitConfirm()
+          : "Escape" === t.code &&
         S &&
         !e("#keyGuidePanel").classList.contains("hidden")
           ? closeKeyGuide()
@@ -9710,8 +9731,31 @@ document.addEventListener(
       ie();
   }),
   (e("#saveBtn").onclick = () => oo(!1)),
-  (e("#quitBtn").onclick = async () => {
-    if (await oo(!1)) location.reload();
+  (e("#quitBtn").onclick = () => {
+    e("#pause").classList.add("hidden");
+    e("#quitSaveStatus").textContent = "";
+    e("#quitConfirm").classList.remove("hidden");
+    setTimeout(() => ke(e("#quitConfirm"), 0), 0);
+  }),
+  (e("#quitCancelBtn").onclick = cancelQuitConfirm),
+  (e("#quitNoSaveBtn").onclick = () => location.reload()),
+  (e("#quitSaveBtn").onclick = async () => {
+    const saveButton = e("#quitSaveBtn");
+    const noSaveButton = e("#quitNoSaveBtn");
+    const cancelButton = e("#quitCancelBtn");
+    saveButton.disabled = true;
+    noSaveButton.disabled = true;
+    cancelButton.disabled = true;
+    try {
+      if (await oo(!1)) location.reload();
+      else e("#quitSaveStatus").textContent =
+        window.ShepherdI18n?.tr?.("저장 실패 · 종료하지 않았습니다. 다시 시도해 주세요.") ||
+        "저장 실패 · 종료하지 않았습니다. 다시 시도해 주세요.";
+    } finally {
+      saveButton.disabled = false;
+      noSaveButton.disabled = false;
+      cancelButton.disabled = false;
+    }
   }),
   (e("#restartBtn").onclick = () => {
     if (ut.flockLost) {
@@ -12769,6 +12813,11 @@ function buildSaveRecord() {
   };
 }
 let saveStatusTimer = 0;
+function cancelQuitConfirm() {
+  e("#quitConfirm").classList.add("hidden");
+  e("#pause").classList.remove("hidden");
+  setTimeout(() => e("#quitBtn").focus({ preventScroll: true }), 0);
+}
 function showPauseSaveStatus(message, failed = !1) {
   const status = e("#saveStatus");
   if (!status) return;
@@ -12987,8 +13036,6 @@ window.addEventListener("gamedistribution:resume", () => {
   }
   updateOrientationGate();
 });
-addEventListener("pagehide", () => oo(!0));
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") oo(!0);
-});
+// Save through the explicit pause control or the quit confirmation. A hidden
+// page must not silently overwrite the save after "exit without saving".
 addEventListener("shepherd:before-language-change", () => oo(!0));
